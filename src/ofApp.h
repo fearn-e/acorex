@@ -20,4 +20,13 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+		
+		bool bDebugText;
+		
+		float previousTime;
+		float deltaTime;
+
+		ofCamera camera;
+		bool cameraMove[6];
+		float cameraSpeed;
 };
