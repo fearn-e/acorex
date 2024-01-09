@@ -32,6 +32,7 @@ class ofApp : public ofBaseApp{
 
 		float rotationSpeed;
 		bool rotatePoints[6];
+		ofNode pointCloudCenter;
 
 		//ofNode pointCloudNode;
 
