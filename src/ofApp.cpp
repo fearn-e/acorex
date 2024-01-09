@@ -14,8 +14,6 @@ void ofApp::setup(){
 
 	//pointCloudNode.setGlobalPosition({ 0,0,0 });
 
-	pointCloudCenter.setGlobalPosition({ 0,0,0 });
-
 	numPoints = 0;
 	points.setMode(OF_PRIMITIVE_POINTS);
 
@@ -57,7 +55,6 @@ void ofApp::update(){
 			vertex += center;
 			points.setVertex(i, vertex);
 		}
-		pointCloudCenter.rotate(deltaSpeed, rotationAxis);
 	}
 }
 
@@ -139,7 +136,6 @@ void ofApp::draw() {
 		ss << ofToString(rotatePoints[0] - rotatePoints[1]);
 		ss << ", " << ofToString(rotatePoints[2] - rotatePoints[3]);
 		ss << ", " << ofToString(rotatePoints[4] - rotatePoints[5]) << endl << endl;
-		ss << "Rotation Change Since Start: " << endl << ofToString(pointCloudCenter.getOrientationEuler(), 2) << endl << endl;
 
 		ss << "Camera Position: " << endl << ofToString(camera.getGlobalPosition(), 2) << endl;
 		ss << "Camera Orientation: " << endl << ofToString(camera.getOrientationEuler(), 2) << endl;
@@ -158,6 +154,7 @@ void ofApp::draw() {
 		ss << "(;): Set Point Size" << endl;
 		ss << "(j): Toggle Point Picker" << endl;
 		ss << "(k): Toggle Draw Points" << endl;
+		ss << "(space): Reset Camera/Mesh" << endl;
 		ofDrawBitmapStringHighlight(ss.str().c_str(), 20, 20);
 	}
 }
@@ -194,9 +191,15 @@ void ofApp::keyPressed(int key){
 		for (int i = 0; i < numPoints; i++) {
 			points.addVertex({ ofRandom(-100, 100), ofRandom(-100, 100), ofRandom(-100, 100) });
 		}
+		pointOrigins = points;
 		break;
 	case ';':
 		glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: ")));
+		break;
+	case ' ':
+		camera.setGlobalPosition({ 0,0,camera.getImagePlaneDistance(ofGetCurrentViewport()) });
+		camera.setGlobalOrientation({ 0,0,0,1 });
+		points = pointOrigins;
 		break;
 	}
 }

@@ -32,12 +32,12 @@ class ofApp : public ofBaseApp{
 
 		float rotationSpeed;
 		bool rotatePoints[6];
-		ofNode pointCloudCenter;
 
 		//ofNode pointCloudNode;
 
 		int numPoints;
 		ofMesh points;
+		ofMesh pointOrigins;
 		
 		int nearestIndex;
 		glm::vec2 nearestVertex;
