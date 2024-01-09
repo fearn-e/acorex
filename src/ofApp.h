@@ -29,4 +29,7 @@ class ofApp : public ofBaseApp{
 		ofCamera camera;
 		bool cameraMove[6];
 		float cameraSpeed;
+
+		int numPoints;
+		vector<ofSpherePrimitive> points;
 };

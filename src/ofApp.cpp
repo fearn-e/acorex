@@ -19,6 +19,10 @@ void ofApp::setup(){
 	for (int i = 0; i < 6; i++) {
 		cameraMove[i] = 0;
 	}
+
+	// Points //
+
+	numPoints = 0;
 }
 
 //--------------------------------------------------------------
@@ -38,7 +42,21 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw() {
+	
+	// Draw Points //
 
+	camera.begin();
+	ofEnableDepthTest();
+
+	ofFill();
+	for (int i = 0; i < numPoints; i++) {
+		points[i].draw();
+	}
+
+	ofDisableDepthTest();
+	ofFill();
+	camera.end();
+	
 	// Draw Debug Text //
 
 	if (bDebugText) {
@@ -47,6 +65,7 @@ void ofApp::draw() {
 		ss << "Screen Size: " << ofToString(ofGetWidth()) << "x" << ofToString(ofGetHeight()) << endl << endl;
 		ss << "FPS: " << ofToString(ofGetFrameRate(), 0) << endl << endl;
 		ss << "Delta Time: " << ofToString(deltaTime, 4) << endl << endl;
+		ss << "Number of Points: " << ofToString(numPoints) << endl << endl;
 
 		ss << "Camera Position: " << ofToString(camera.getGlobalPosition(), 2) << endl;
 		ss << "Camera Orientation: " << ofToString(camera.getOrientationEuler(), 2) << endl;
@@ -55,6 +74,7 @@ void ofApp::draw() {
 		ss << "(w/a/s/d/r/f): Move Camera" << endl;
 		ss << "(.): Toggle Fullscreen" << endl;
 		ss << "(h): Toggle Debug Text" << endl;
+		ss << "(p): Spawn Random Points" << endl;
 		ofDrawBitmapStringHighlight(ss.str().c_str(), 20, 20);
 	}
 }
@@ -81,6 +101,27 @@ void ofApp::keyPressed(int key){
 		ofToggleFullscreen(); break;
 	case 'h':
 		bDebugText = !bDebugText; break;
+	case 'p':
+		numPoints = ofToInt(ofSystemTextBoxDialog("Enter number of points: "));
+		points.resize(numPoints);
+		for (int i = 0; i < numPoints; i++) {
+			points[i].setResolution(2);
+			points[i].setRadius(0.8);
+			points[i].setGlobalPosition({ ofRandom(-ofGetWidth(), ofGetWidth()), ofRandom(-ofGetHeight(), ofGetHeight()), ofRandom(-ofGetWidth(), ofGetWidth()) });
+		}
+		break;
+
+		/*for (int i = 0; i < numPoints; i++) {
+		glm::vec3 pos;
+		pos.x = ofRandom(-100, 100);
+		pos.y = ofRandom(-100, 100);
+		pos.z = ofRandom(-100, 100);
+		points.push_back(ofSpherePrimitive());
+		points.back().setPosition(pos);
+		points.back().setRadius(0.3);
+		points.back().setResolution(2);
+		}*/
+	}
 }
 
 //--------------------------------------------------------------
