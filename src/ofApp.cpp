@@ -75,6 +75,38 @@ void ofApp::draw() {
 	ofFill();
 	camera.end();*/
 
+	// Nearest Point //
+	if (bPointPicker) {
+
+		glm::vec3 mouse(mouseX, mouseY, 0);
+
+		for (int i = 0; i < numPoints; i++) {
+			glm::vec3 vertex = camera.worldToScreen(points.getVertex(i));
+			float distance = glm::distance(vertex, mouse);
+			if (i == 0 || distance < nearestDistance) {
+				nearestDistance = distance;
+				nearestVertex = vertex;
+				nearestIndex = i;
+			}
+		}
+
+		// Draw Nearest Point //
+		if (nearestDistance < 10) {
+			ofFill();
+			ofSetColor(ofColor::gray);
+			ofDrawLine(nearestVertex, mouse);
+
+			ofNoFill();
+			ofSetColor(ofColor::yellow);
+			ofSetLineWidth(2);
+			ofDrawCircle(nearestVertex, 4);
+			ofSetLineWidth(1);
+
+			glm::vec2 offset(10, -10);
+			ofDrawBitmapStringHighlight(ofToString(nearestIndex), mouse + offset);
+		}
+	}
+
 	// Draw Debug Text //
 	if (bDebugText) {
 		ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
