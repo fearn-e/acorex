@@ -44,11 +44,17 @@ void ofApp::draw() {
 	if (bDebugText) {
 		ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
 		stringstream ss;
+		ss << "Screen Size: " << ofToString(ofGetWidth()) << "x" << ofToString(ofGetHeight()) << endl << endl;
+		ss << "FPS: " << ofToString(ofGetFrameRate(), 0) << endl << endl;
+		ss << "Delta Time: " << ofToString(deltaTime, 4) << endl << endl;
 
 		ss << "Camera Position: " << ofToString(camera.getGlobalPosition(), 2) << endl;
 		ss << "Camera Orientation: " << ofToString(camera.getOrientationEuler(), 2) << endl;
 		ss << "Camera Speed: x:" << ofToString(cameraMove[0] - cameraMove[1]) << " y: " << ofToString(cameraMove[2] - cameraMove[3]) << " z: " << ofToString(cameraMove[4] - cameraMove[5]) << endl << endl;
 
+		ss << "(w/a/s/d/r/f): Move Camera" << endl;
+		ss << "(.): Toggle Fullscreen" << endl;
+		ss << "(h): Toggle Debug Text" << endl;
 		ofDrawBitmapStringHighlight(ss.str().c_str(), 20, 20);
 	}
 }
@@ -71,6 +77,8 @@ void ofApp::keyPressed(int key){
 		cameraMove[5] = 1; break;
 	case 's':
 		cameraMove[4] = 1; break;
+	case '.':
+		ofToggleFullscreen(); break;
 	case 'h':
 		bDebugText = !bDebugText; break;
 }
