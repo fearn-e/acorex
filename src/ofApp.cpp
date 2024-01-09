@@ -75,6 +75,7 @@ void ofApp::draw() {
 		ss << "(.): Toggle Fullscreen" << endl;
 		ss << "(h): Toggle Debug Text" << endl;
 		ss << "(p): Spawn Random Points" << endl;
+		ss << "(1/2/3/4/5): Set Point Resolution" << endl;
 		ofDrawBitmapStringHighlight(ss.str().c_str(), 20, 20);
 	}
 }
@@ -101,6 +102,16 @@ void ofApp::keyPressed(int key){
 		ofToggleFullscreen(); break;
 	case 'h':
 		bDebugText = !bDebugText; break;
+	case '1':
+		for (int i = 0; i < numPoints; i++) { points[i].setResolution(1); } break;
+	case '2':
+		for (int i = 0; i < numPoints; i++) { points[i].setResolution(2); } break;
+	case '3':
+		for (int i = 0; i < numPoints; i++) { points[i].setResolution(4); } break;
+	case '4':
+		for (int i = 0; i < numPoints; i++) { points[i].setResolution(8); } break;
+	case '5':
+		for (int i = 0; i < numPoints; i++) { points[i].setResolution(16); } break;
 	case 'p':
 		numPoints = ofToInt(ofSystemTextBoxDialog("Enter number of points: "));
 		points.resize(numPoints);
