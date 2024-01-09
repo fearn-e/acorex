@@ -1,1 +1,2 @@
-# acorex
+# ACorEx
+3D Audio Corpus Explorer
