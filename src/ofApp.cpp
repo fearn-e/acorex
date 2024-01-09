@@ -20,9 +20,13 @@ void ofApp::setup(){
 		cameraMove[i] = 0;
 	}
 
-	// Points //
+	// Mesh //
 
 	numPoints = 0;
+	pointMesh.setMode(OF_PRIMITIVE_POINTS);
+
+	glEnable(GL_POINT_SMOOTH); // use circular points instead of square points
+	glPointSize(3); // make the points bigger
 }
 
 //--------------------------------------------------------------
@@ -42,21 +46,17 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-	
-	// Draw Points //
+
+	// Draw points from a mesh //
 
 	camera.begin();
 	ofEnableDepthTest();
-
-	ofFill();
 	for (int i = 0; i < numPoints; i++) {
-		points[i].draw();
+		pointMesh.draw();
 	}
-
 	ofDisableDepthTest();
-	ofFill();
 	camera.end();
-	
+
 	// Draw Debug Text //
 
 	if (bDebugText) {
@@ -75,7 +75,6 @@ void ofApp::draw() {
 		ss << "(.): Toggle Fullscreen" << endl;
 		ss << "(h): Toggle Debug Text" << endl;
 		ss << "(p): Spawn Random Points" << endl;
-		ss << "(1/2/3/4/5): Set Point Resolution" << endl;
 		ofDrawBitmapStringHighlight(ss.str().c_str(), 20, 20);
 	}
 }
@@ -102,36 +101,13 @@ void ofApp::keyPressed(int key){
 		ofToggleFullscreen(); break;
 	case 'h':
 		bDebugText = !bDebugText; break;
-	case '1':
-		for (int i = 0; i < numPoints; i++) { points[i].setResolution(1); } break;
-	case '2':
-		for (int i = 0; i < numPoints; i++) { points[i].setResolution(2); } break;
-	case '3':
-		for (int i = 0; i < numPoints; i++) { points[i].setResolution(4); } break;
-	case '4':
-		for (int i = 0; i < numPoints; i++) { points[i].setResolution(8); } break;
-	case '5':
-		for (int i = 0; i < numPoints; i++) { points[i].setResolution(16); } break;
 	case 'p':
 		numPoints = ofToInt(ofSystemTextBoxDialog("Enter number of points: "));
-		points.resize(numPoints);
+		pointMesh.clear();
 		for (int i = 0; i < numPoints; i++) {
-			points[i].setResolution(2);
-			points[i].setRadius(0.8);
-			points[i].setGlobalPosition({ ofRandom(-ofGetWidth(), ofGetWidth()), ofRandom(-ofGetHeight(), ofGetHeight()), ofRandom(-ofGetWidth(), ofGetWidth()) });
+			pointMesh.addVertex(ofVec3f(ofRandom(-ofGetWidth(), ofGetWidth()), ofRandom(-ofGetHeight(), ofGetHeight()), ofRandom(-ofGetWidth(), ofGetWidth())));
 		}
 		break;
-
-		/*for (int i = 0; i < numPoints; i++) {
-		glm::vec3 pos;
-		pos.x = ofRandom(-100, 100);
-		pos.y = ofRandom(-100, 100);
-		pos.z = ofRandom(-100, 100);
-		points.push_back(ofSpherePrimitive());
-		points.back().setPosition(pos);
-		points.back().setRadius(0.3);
-		points.back().setResolution(2);
-		}*/
 	}
 }
 
