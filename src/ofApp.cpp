@@ -51,9 +51,8 @@ void ofApp::draw() {
 
 	camera.begin();
 	ofEnableDepthTest();
-	for (int i = 0; i < numPoints; i++) {
-		pointMesh.draw();
-	}
+	ofSetColor(ofColor::gray);
+	pointMesh.drawVertices();
 	ofDisableDepthTest();
 	camera.end();
 
