@@ -31,5 +31,5 @@ class ofApp : public ofBaseApp{
 		float cameraSpeed;
 
 		int numPoints;
-		vector<ofSpherePrimitive> points;
+		vector<glm::vec3> points;
 };
