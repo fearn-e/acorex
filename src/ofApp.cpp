@@ -10,6 +10,9 @@ void ofApp::setup(){
 	previousTime = ofGetElapsedTimef();
 	deltaTime = 0.0;
 
+	numPoints = 0;
+	ofSetSphereResolution(2);
+
 	// Camera //
 
 	//mainCam.setGlobalPosition({ 0,0,0 });
@@ -19,10 +22,6 @@ void ofApp::setup(){
 	for (int i = 0; i < 6; i++) {
 		cameraMove[i] = 0;
 	}
-
-	// Points //
-
-	numPoints = 0;
 }
 
 //--------------------------------------------------------------
@@ -50,7 +49,7 @@ void ofApp::draw() {
 
 	ofFill();
 	for (int i = 0; i < numPoints; i++) {
-		points[i].draw();
+		ofDrawSphere(points[i], 0.8);
 	}
 
 	ofDisableDepthTest();
@@ -103,22 +102,20 @@ void ofApp::keyPressed(int key){
 	case 'h':
 		bDebugText = !bDebugText; break;
 	case '1':
-		for (int i = 0; i < numPoints; i++) { points[i].setResolution(1); } break;
+		for (int i = 0; i < numPoints; i++) { ofSetSphereResolution(1); } break;
 	case '2':
-		for (int i = 0; i < numPoints; i++) { points[i].setResolution(2); } break;
+		for (int i = 0; i < numPoints; i++) { ofSetSphereResolution(2); } break;
 	case '3':
-		for (int i = 0; i < numPoints; i++) { points[i].setResolution(4); } break;
+		for (int i = 0; i < numPoints; i++) { ofSetSphereResolution(4); } break;
 	case '4':
-		for (int i = 0; i < numPoints; i++) { points[i].setResolution(8); } break;
+		for (int i = 0; i < numPoints; i++) { ofSetSphereResolution(8); } break;
 	case '5':
-		for (int i = 0; i < numPoints; i++) { points[i].setResolution(16); } break;
+		for (int i = 0; i < numPoints; i++) { ofSetSphereResolution(16); } break;
 	case 'p':
 		numPoints = ofToInt(ofSystemTextBoxDialog("Enter number of points: "));
 		points.resize(numPoints);
 		for (int i = 0; i < numPoints; i++) {
-			points[i].setResolution(2);
-			points[i].setRadius(0.8);
-			points[i].setGlobalPosition({ ofRandom(-ofGetWidth(), ofGetWidth()), ofRandom(-ofGetHeight(), ofGetHeight()), ofRandom(-ofGetWidth(), ofGetWidth()) });
+			points[i] = { ofRandom(-100, 100), ofRandom(-100, 100), ofRandom(-100, 100) };
 		}
 		break;
 
