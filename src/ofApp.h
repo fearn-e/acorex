@@ -26,7 +26,7 @@ class ofApp : public ofBaseApp{
 		float previousTime;
 		float deltaTime;
 
-		ofCamera camera;
+		ofEasyCam camera;
 		bool cameraMove[6];
 		float cameraSpeed;
 
