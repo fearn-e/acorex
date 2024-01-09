@@ -10,6 +10,16 @@ void ofApp::setup(){
 	previousTime = ofGetElapsedTimef();
 	deltaTime = 0.0;
 
+	// Mesh //
+
+	pointCloudNode.setGlobalPosition({ 0,0,0 });
+
+	numPoints = 0;
+	points.setMode(OF_PRIMITIVE_POINTS);
+
+	glEnable(GL_POINT_SMOOTH);
+	glPointSize(2.0);
+
 	// Camera //
 
 	//mainCam.setGlobalPosition({ 0,0,0 });
@@ -37,11 +47,15 @@ void ofApp::update(){
 	
 	float deltaSpeed = cameraSpeed * deltaTime;
 
-	float cameraMoveX = (cameraMove[0] - cameraMove[1]) * deltaSpeed;
-	float cameraMoveY = (cameraMove[2] - cameraMove[3]) * deltaSpeed;
-	float cameraMoveZ = (cameraMove[4] - cameraMove[5]) * deltaSpeed;
+	//float cameraMoveX = (cameraMove[0] - cameraMove[1]) * deltaSpeed;
+	//float cameraMoveY = (cameraMove[2] - cameraMove[3]) * deltaSpeed;
+	//float cameraMoveZ = (cameraMove[4] - cameraMove[5]) * deltaSpeed;
 
-	camera.move(cameraMoveX, cameraMoveY, cameraMoveZ);
+	//camera.move(cameraMoveX, cameraMoveY, cameraMoveZ);
+
+	//pointCloudNode.rotateDeg(0.1, 0, 1, 0);
+	pointCloudNode.rotateDeg(deltaSpeed, (cameraMove[0] - cameraMove[1]), (cameraMove[2] - cameraMove[3]), (cameraMove[4] - cameraMove[5]));
+
 }
 
 //--------------------------------------------------------------
@@ -50,14 +64,68 @@ void ofApp::draw() {
 	// Draw points from a mesh //
 
 	camera.begin();
-	ofEnableDepthTest();
-	ofSetColor(ofColor::gray);
-	pointMesh.drawVertices();
-	ofDisableDepthTest();
+	ofSetColor(ofColor::white);
+	ofNoFill();
+	ofDrawSphere(0, 0, 0, 300);
 	camera.end();
 
-	// Draw Debug Text //
 
+
+	// Draw Points //
+	if (bDrawPoints) {
+		ofEnableDepthTest();
+			camera.begin();
+				pointCloudNode.transformGL();
+					ofSetColor(220);
+					points.draw();
+
+					ofFill();
+					ofSetColor(ofColor::red);
+					ofDrawCylinder(0, 0, 0, 50);
+					ofSetColor(ofColor::green);
+					ofDrawBox(0, 10, 0, 40);
+
+				pointCloudNode.restoreTransformGL();
+			camera.end();
+		ofDisableDepthTest();
+	}
+
+	// Pick Nearest Point //
+	if (bPointPicker) {
+		pointCloudNode.transformGL();
+
+		glm::vec3 mouse(mouseX, mouseY, 0);
+
+		for (int i = 0; i < numPoints; i++) {
+			glm::vec3 vertex = camera.worldToScreen(points.getVertex(i));
+			float distance = glm::distance(vertex, mouse);
+			if (i == 0 || distance < nearestDistance) {
+				nearestDistance = distance;
+				nearestVertex = vertex;
+				nearestIndex = i;
+			}
+		}
+
+		pointCloudNode.restoreTransformGL();
+
+		// Draw Nearest Point //
+		if (nearestDistance < 10) {
+			ofFill();
+			ofSetColor(ofColor::gray);
+			ofDrawLine(nearestVertex, mouse);
+
+			ofNoFill();
+			ofSetColor(ofColor::yellow);
+			ofSetLineWidth(2);
+			ofDrawCircle(nearestVertex, 4);
+			ofSetLineWidth(1);
+
+			glm::vec2 offset(10, -10);
+			ofDrawBitmapStringHighlight(ofToString(nearestIndex), mouse + offset);
+		}
+	}
+
+	// Draw Debug Text //
 	if (bDebugText) {
 		ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
 		stringstream ss;
@@ -70,10 +138,17 @@ void ofApp::draw() {
 		ss << "Camera Orientation: " << ofToString(camera.getOrientationEuler(), 2) << endl;
 		ss << "Camera Speed: x:" << ofToString(cameraMove[0] - cameraMove[1]) << " y: " << ofToString(cameraMove[2] - cameraMove[3]) << " z: " << ofToString(cameraMove[4] - cameraMove[5]) << endl << endl;
 
+		if (bPointPicker)
+			ss << "Nearest Point: index: " << ofToString(nearestIndex) << " position: " << ofToString(nearestVertex, 2) << " distance: " << ofToString(nearestDistance, 2) << endl << endl;
+
 		ss << "(w/a/s/d/r/f): Move Camera" << endl;
 		ss << "(.): Toggle Fullscreen" << endl;
 		ss << "(h): Toggle Debug Text" << endl;
 		ss << "(p): Spawn Random Points" << endl;
+		ss << "(;): Set Point Size" << endl;
+		ss << "(j): Toggle Point Picker" << endl;
+		ss << "(k): Toggle Draw Points" << endl;
+		ss << "(1/2/3/4/5): Set Point Resolution" << endl;
 		ofDrawBitmapStringHighlight(ss.str().c_str(), 20, 20);
 	}
 }
@@ -100,12 +175,19 @@ void ofApp::keyPressed(int key){
 		ofToggleFullscreen(); break;
 	case 'h':
 		bDebugText = !bDebugText; break;
+	case 'j':
+		bPointPicker = !bPointPicker; break;
+	case 'k':
+		bDrawPoints = !bDrawPoints; break;
 	case 'p':
 		numPoints = ofToInt(ofSystemTextBoxDialog("Enter number of points: "));
-		pointMesh.clear();
+		points.clear();
 		for (int i = 0; i < numPoints; i++) {
-			pointMesh.addVertex(ofVec3f(ofRandom(-ofGetWidth(), ofGetWidth()), ofRandom(-ofGetHeight(), ofGetHeight()), ofRandom(-ofGetWidth(), ofGetWidth())));
+			points.addVertex({ ofRandom(-100, 100), ofRandom(-100, 100), ofRandom(-100, 100) });
 		}
+		break;
+	case ';':
+		glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: ")));
 		break;
 	}
 }
