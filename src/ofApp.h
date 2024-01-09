@@ -22,6 +22,8 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 		
 		bool bDebugText;
+		bool bPointPicker;
+		bool bDrawPoints;
 		
 		float previousTime;
 		float deltaTime;
@@ -31,5 +33,9 @@ class ofApp : public ofBaseApp{
 		float cameraSpeed;
 
 		int numPoints;
-		vector<glm::vec3> points;
+		ofMesh points;
+		
+		int nearestIndex;
+		glm::vec2 nearestVertex;
+		float nearestDistance;
 };
