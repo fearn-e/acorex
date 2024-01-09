@@ -10,8 +10,13 @@ void ofApp::setup(){
 	previousTime = ofGetElapsedTimef();
 	deltaTime = 0.0;
 
+	// Mesh //
+
 	numPoints = 0;
-	ofSetSphereResolution(2);
+	points.setMode(OF_PRIMITIVE_POINTS);
+
+	glEnable(GL_POINT_SMOOTH);
+	glPointSize(2.0);
 
 	// Camera //
 
@@ -41,40 +46,65 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-	
+
+	// Reference Sphere //
+	{
+		camera.begin();
+		ofSetColor(ofColor::white);
+		ofNoFill();
+		ofDrawSphere(0, 0, 0, 300);
+		camera.end();
+	}
+
 	// Draw Points //
+	if (bDrawPoints) {
+		ofEnableDepthTest();
+		camera.begin();
+		ofSetColor(220);
+		points.draw();
+		camera.end();
+		ofDisableDepthTest();
+	}
 
-	camera.begin();
-	ofEnableDepthTest();
-
-	ofFill();
+	/*ofFill();
 	for (int i = 0; i < numPoints; i++) {
 		ofDrawSphere(points[i], 0.8);
 	}
 
 	ofDisableDepthTest();
 	ofFill();
-	camera.end();
-	
-	// Draw Debug Text //
+	camera.end();*/
 
+	// Draw Debug Text //
 	if (bDebugText) {
 		ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
 		stringstream ss;
-		ss << "Screen Size: " << ofToString(ofGetWidth()) << "x" << ofToString(ofGetHeight()) << endl << endl;
+		ss << "Screen: " << ofToString(ofGetWidth()) << "x" << ofToString(ofGetHeight()) << endl << endl;
 		ss << "FPS: " << ofToString(ofGetFrameRate(), 0) << endl << endl;
 		ss << "Delta Time: " << ofToString(deltaTime, 4) << endl << endl;
-		ss << "Number of Points: " << ofToString(numPoints) << endl << endl;
+		ss << "Points: " << ofToString(numPoints) << endl << endl;
 
-		ss << "Camera Position: " << ofToString(camera.getGlobalPosition(), 2) << endl;
-		ss << "Camera Orientation: " << ofToString(camera.getOrientationEuler(), 2) << endl;
-		ss << "Camera Speed: x:" << ofToString(cameraMove[0] - cameraMove[1]) << " y: " << ofToString(cameraMove[2] - cameraMove[3]) << " z: " << ofToString(cameraMove[4] - cameraMove[5]) << endl << endl;
+		ss << "Camera Position: " << endl << ofToString(camera.getGlobalPosition(), 2) << endl;
+		ss << "Camera Orientation: " << endl << ofToString(camera.getOrientationEuler(), 2) << endl;
+		ss << "Camera Speed:" << endl;
+		ss << ofToString(cameraMove[0] - cameraMove[1]);
+		ss << ", " << ofToString(cameraMove[2] - cameraMove[3]);
+		ss << ", " << ofToString(cameraMove[4] - cameraMove[5]) << endl << endl;
 
-		ss << "(w/a/s/d/r/f): Move Camera" << endl;
+		if (bPointPicker)
+		{
+			ss << "Nearest Point:" << endl;
+			ss << "Index: " << ofToString(nearestIndex) << endl;
+			ss << "Distance: " << ofToString(nearestDistance) << endl;
+			ss << "Vertex: " << ofToString(nearestVertex) << endl << endl;
+		}
+		ss << "(wasdrf): Move Camera/Mesh" << endl;
 		ss << "(.): Toggle Fullscreen" << endl;
 		ss << "(h): Toggle Debug Text" << endl;
 		ss << "(p): Spawn Random Points" << endl;
-		ss << "(1/2/3/4/5): Set Point Resolution" << endl;
+		ss << "(;): Set Point Size" << endl;
+		ss << "(j): Toggle Point Picker" << endl;
+		ss << "(k): Toggle Draw Points" << endl;
 		ofDrawBitmapStringHighlight(ss.str().c_str(), 20, 20);
 	}
 }
@@ -101,34 +131,20 @@ void ofApp::keyPressed(int key){
 		ofToggleFullscreen(); break;
 	case 'h':
 		bDebugText = !bDebugText; break;
-	case '1':
-		for (int i = 0; i < numPoints; i++) { ofSetSphereResolution(1); } break;
-	case '2':
-		for (int i = 0; i < numPoints; i++) { ofSetSphereResolution(2); } break;
-	case '3':
-		for (int i = 0; i < numPoints; i++) { ofSetSphereResolution(4); } break;
-	case '4':
-		for (int i = 0; i < numPoints; i++) { ofSetSphereResolution(8); } break;
-	case '5':
-		for (int i = 0; i < numPoints; i++) { ofSetSphereResolution(16); } break;
+	case 'j':
+		bPointPicker = !bPointPicker; break;
+	case 'k':
+		bDrawPoints = !bDrawPoints; break;
 	case 'p':
 		numPoints = ofToInt(ofSystemTextBoxDialog("Enter number of points: "));
-		points.resize(numPoints);
+		points.clear();
 		for (int i = 0; i < numPoints; i++) {
-			points[i] = { ofRandom(-100, 100), ofRandom(-100, 100), ofRandom(-100, 100) };
+			points.addVertex({ ofRandom(-100, 100), ofRandom(-100, 100), ofRandom(-100, 100) });
 		}
 		break;
-
-		/*for (int i = 0; i < numPoints; i++) {
-		glm::vec3 pos;
-		pos.x = ofRandom(-100, 100);
-		pos.y = ofRandom(-100, 100);
-		pos.z = ofRandom(-100, 100);
-		points.push_back(ofSpherePrimitive());
-		points.back().setPosition(pos);
-		points.back().setRadius(0.3);
-		points.back().setResolution(2);
-		}*/
+	case ';':
+		glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: ")));
+		break;
 	}
 }
 
