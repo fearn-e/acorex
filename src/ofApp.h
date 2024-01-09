@@ -29,8 +29,9 @@ class ofApp : public ofBaseApp{
 		float deltaTime;
 
 		ofEasyCam camera;
-		bool cameraMove[6];
-		float cameraSpeed;
+
+		float rotationSpeed;
+		bool rotatePoints[6];
 
 		//ofNode pointCloudNode;
 
