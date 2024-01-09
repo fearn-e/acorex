@@ -12,6 +12,8 @@ void ofApp::setup(){
 
 	// Mesh //
 
+	//pointCloudNode.setGlobalPosition({ 0,0,0 });
+
 	numPoints = 0;
 	points.setMode(OF_PRIMITIVE_POINTS);
 
@@ -42,6 +44,9 @@ void ofApp::update(){
 	float cameraMoveZ = (cameraMove[4] - cameraMove[5]) * deltaSpeed;
 
 	camera.move(cameraMoveX, cameraMoveY, cameraMoveZ);
+
+	//pointCloudNode.rotateDeg(0.1, 0, 1, 0);
+	//pointCloudNode.rotateDeg(deltaSpeed, (cameraMove[0] - cameraMove[1]), (cameraMove[2] - cameraMove[3]), (cameraMove[4] - cameraMove[5]));
 }
 
 //--------------------------------------------------------------
@@ -60,8 +65,10 @@ void ofApp::draw() {
 	if (bDrawPoints) {
 		ofEnableDepthTest();
 		camera.begin();
+		//pointCloudNode.transformGL();
 		ofSetColor(220);
 		points.draw();
+		//pointCloudNode.restoreTransformGL();
 		camera.end();
 		ofDisableDepthTest();
 	}

@@ -32,6 +32,8 @@ class ofApp : public ofBaseApp{
 		bool cameraMove[6];
 		float cameraSpeed;
 
+		//ofNode pointCloudNode;
+
 		int numPoints;
 		ofMesh points;
 		
