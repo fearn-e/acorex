@@ -25,9 +25,9 @@ void ofApp::setup(){
 	//mainCam.setGlobalPosition({ 0,0,0 });
 	camera.setGlobalPosition({ 0,0,camera.getImagePlaneDistance(ofGetCurrentViewport()) });
 
-	cameraSpeed = 75.0;
+	rotationSpeed = 45.0;
 	for (int i = 0; i < 6; i++) {
-		cameraMove[i] = 0;
+		rotatePoints[i] = 0;
 	}
 }
 
@@ -37,16 +37,25 @@ void ofApp::update(){
 	deltaTime = currentTime - previousTime;
 	previousTime = currentTime;
 	
-	float deltaSpeed = cameraSpeed * deltaTime;
+	float deltaSpeed = rotationSpeed * deltaTime;
 
-	float cameraMoveX = (cameraMove[0] - cameraMove[1]) * deltaSpeed;
-	float cameraMoveY = (cameraMove[2] - cameraMove[3]) * deltaSpeed;
-	float cameraMoveZ = (cameraMove[4] - cameraMove[5]) * deltaSpeed;
+	bool movement = rotatePoints[0] || rotatePoints[1] || rotatePoints[2] || rotatePoints[3] || rotatePoints[4] || rotatePoints[5];
 
-	camera.move(cameraMoveX, cameraMoveY, cameraMoveZ);
+	if (movement)
+	{
+		ofVec3f rotationAxis = { 
+			float(rotatePoints[0] - rotatePoints[1]), 
+			float(rotatePoints[2] - rotatePoints[3]), 
+			float(rotatePoints[4] - rotatePoints[5]) };
+		glm::vec3 center = points.getCentroid();
 
-	//pointCloudNode.rotateDeg(0.1, 0, 1, 0);
-	//pointCloudNode.rotateDeg(deltaSpeed, (cameraMove[0] - cameraMove[1]), (cameraMove[2] - cameraMove[3]), (cameraMove[4] - cameraMove[5]));
+		for (int i = 0; i < numPoints; i++) {
+			ofVec3f vertex = points.getVertex(i) - center;
+			vertex.rotate(deltaSpeed, rotationAxis);
+			vertex += center;
+			points.setVertex(i, vertex);
+		}
+	}
 }
 
 //--------------------------------------------------------------
@@ -121,14 +130,15 @@ void ofApp::draw() {
 		ss << "Screen: " << ofToString(ofGetWidth()) << "x" << ofToString(ofGetHeight()) << endl << endl;
 		ss << "FPS: " << ofToString(ofGetFrameRate(), 0) << endl << endl;
 		ss << "Delta Time: " << ofToString(deltaTime, 4) << endl << endl;
-		ss << "Points: " << ofToString(numPoints) << endl << endl;
+
+		ss << "Points: " << ofToString(numPoints) << endl;
+		ss << "Point Rotation:" << endl;
+		ss << ofToString(rotatePoints[0] - rotatePoints[1]);
+		ss << ", " << ofToString(rotatePoints[2] - rotatePoints[3]);
+		ss << ", " << ofToString(rotatePoints[4] - rotatePoints[5]) << endl << endl;
 
 		ss << "Camera Position: " << endl << ofToString(camera.getGlobalPosition(), 2) << endl;
 		ss << "Camera Orientation: " << endl << ofToString(camera.getOrientationEuler(), 2) << endl;
-		ss << "Camera Speed:" << endl;
-		ss << ofToString(cameraMove[0] - cameraMove[1]);
-		ss << ", " << ofToString(cameraMove[2] - cameraMove[3]);
-		ss << ", " << ofToString(cameraMove[4] - cameraMove[5]) << endl << endl;
 
 		if (bPointPicker)
 		{
@@ -155,17 +165,17 @@ void ofApp::keyPressed(int key){
 
 	switch (key) {
 	case 'a':
-		cameraMove[1] = 1; break;
+		rotatePoints[1] = 1; break;
 	case 'd':
-		cameraMove[0] = 1; break;
+		rotatePoints[0] = 1; break;
 	case 'r':
-		cameraMove[2] = 1; break;
+		rotatePoints[2] = 1; break;
 	case 'f':
-		cameraMove[3] = 1; break;
+		rotatePoints[3] = 1; break;
 	case 'w':
-		cameraMove[5] = 1; break;
+		rotatePoints[5] = 1; break;
 	case 's':
-		cameraMove[4] = 1; break;
+		rotatePoints[4] = 1; break;
 	case '.':
 		ofToggleFullscreen(); break;
 	case 'h':
@@ -191,22 +201,22 @@ void ofApp::keyPressed(int key){
 void ofApp::keyReleased(int key){
 	switch (key) {
 	case 'a':
-		cameraMove[1] = 0;
+		rotatePoints[1] = 0;
 		break;
 	case 'd':
-		cameraMove[0] = 0;
+		rotatePoints[0] = 0;
 		break;
 	case 'r':
-		cameraMove[2] = 0;
+		rotatePoints[2] = 0;
 		break;
 	case 'f':
-		cameraMove[3] = 0;
+		rotatePoints[3] = 0;
 		break;
 	case 'w':
-		cameraMove[5] = 0;
+		rotatePoints[5] = 0;
 		break;
 	case 's':
-		cameraMove[4] = 0;
+		rotatePoints[4] = 0;
 		break;
 	}
 
