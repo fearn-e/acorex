@@ -28,6 +28,8 @@ class ofApp : public ofBaseApp{
 		void meshRotation(float deltaSpeed);
 		void pointPicker();
 
+		void soundController();
+
 		bool bDebugText;
 		bool bPointPicker;
 		bool bDrawPoints;
