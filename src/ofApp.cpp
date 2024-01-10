@@ -73,23 +73,22 @@ void ofApp::update() {
 }
 
 void ofApp::loadAudioFiles() {
-	dir.close();
-	folders.clear();
-	audioFiles.clear();
-	points.clear();
-	pointOrigins.clear();
-	numPoints = 0;
+	ofFileDialogResult result = ofSystemLoadDialog("Select samples folder", true, ofFilePath::getAbsolutePath("samples"));
+	if (result.bSuccess) {
+		dir.close();
+		folders.clear();
+		audioFiles.clear();
+		points.clear();
+		pointOrigins.clear();
+		numPoints = 0;
 
-	bLoading = true;
+		bLoading = true;
 
-	string topLevelPath = "samples/";
+		ofFile topDir(result.getPath());
+		folders.insert(folders.end(), topDir);
 
-	dir.doesDirectoryExist(topLevelPath);
-
-	ofFile topDir(topLevelPath);
-	folders.insert(folders.end(), topDir);
-
-	partialLoad(topLevelPath);
+		partialLoad(result.getPath());
+	}
 }
 
 void ofApp::partialLoad(const string& path) {
