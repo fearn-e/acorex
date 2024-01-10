@@ -1,7 +1,7 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
-void ofApp::setup(){
+void ofApp::setup() {
 	ofSetVerticalSync(true);
 	ofBackground(30);
 
@@ -37,7 +37,7 @@ void ofApp::setup(){
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
+void ofApp::update() {
 
 	// Delta Time //
 	float currentTime = ofGetElapsedTimef();
@@ -231,7 +231,7 @@ void ofApp::draw() {
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
+void ofApp::keyPressed(int key) {
 	
 	switch (key) {
 	case 'w':
@@ -250,26 +250,20 @@ void ofApp::keyPressed(int key){
 }
 
 //--------------------------------------------------------------
-void ofApp::keyReleased(int key){
+void ofApp::keyReleased(int key) {
 	switch (key) {
 	case 'w':
-		rotatePoints[0] = 0;
-		break;
+		rotatePoints[0] = 0; break;
 	case 's':
-		rotatePoints[1] = 0;
-		break;
+		rotatePoints[1] = 0; break;
 	case 'a':
-		rotatePoints[2] = 0;
-		break;
+		rotatePoints[2] = 0; break;
 	case 'd':
-		rotatePoints[3] = 0;
-		break;
+		rotatePoints[3] = 0; break;
 	case 'q':
-		rotatePoints[4] = 0;
-		break;
+		rotatePoints[4] = 0; break;
 	case 'e':
-		rotatePoints[5] = 0;
-		break;
+		rotatePoints[5] = 0; break;
 	case '.':
 		ofToggleFullscreen(); break;
 	case 'h':
@@ -279,11 +273,9 @@ void ofApp::keyReleased(int key){
 	case 'k':
 		bDrawPoints = !bDrawPoints; break;
 	case 'o':
-		loadAudioFiles();
-		break;
+		loadAudioFiles(); break;
 	case ';':
-		glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: ")));
-		break;
+		glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: "))); break;
 	case ' ':
 		camera.setGlobalPosition({ 0,0,camera.getImagePlaneDistance(ofGetCurrentViewport()) });
 		camera.setGlobalOrientation({ 0,0,0,1 });
@@ -294,46 +286,46 @@ void ofApp::keyReleased(int key){
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
+void ofApp::mouseMoved(int x, int y ) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
+void ofApp::mouseDragged(int x, int y, int button) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
+void ofApp::mousePressed(int x, int y, int button) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
+void ofApp::mouseReleased(int x, int y, int button) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
+void ofApp::mouseEntered(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y){
+void ofApp::mouseExited(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
+void ofApp::windowResized(int w, int h) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
+void ofApp::gotMessage(ofMessage msg) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
+void ofApp::dragEvent(ofDragInfo dragInfo) { 
 
 }
