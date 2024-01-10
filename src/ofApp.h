@@ -24,6 +24,9 @@ class ofApp : public ofBaseApp{
 		void loadAudioFiles();
 		void loadPortion();
 
+		void meshRotation(float deltaSpeed);
+		void pointPicker();
+
 		bool bDebugText;
 		bool bPointPicker;
 		bool bDrawPoints;
