@@ -101,8 +101,8 @@ void ofApp::partialLoad(const string& path) {
 
 	for (int i = 0; i < dir.getFiles().size(); i++) { // add points for each audio file
 		points.addVertex({ ofRandom(-100, 100), ofRandom(-100, 100), ofRandom(-100, 100) });
-		numPoints += 1;
 	}
+	numPoints += dir.getFiles().size();
 }
 
 void ofApp::checkFolder(const string& path, const string& extension, vector<ofFile>& files) {
