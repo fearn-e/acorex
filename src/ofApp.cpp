@@ -72,6 +72,7 @@ void ofApp::update() {
 	}
 }
 
+//--------------------------------------------------------------
 void ofApp::loadAudioFiles() {
 	ofFileDialogResult result = ofSystemLoadDialog("Select samples folder", true, ofFilePath::getAbsolutePath("samples"));
 	if (result.bSuccess) {
