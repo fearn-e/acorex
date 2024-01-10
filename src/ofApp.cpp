@@ -98,6 +98,8 @@ void ofApp::loadAudioFiles() {
 }
 
 void ofApp::partialLoad(const string& path) {
+	cout << "Loading files from " << folders.back().getAbsolutePath() << endl;
+
 	folders.pop_back(); // remove current folder from list
 
 	checkFolder(path, "", folders); // check for subfolders
@@ -114,7 +116,6 @@ void ofApp::partialLoad(const string& path) {
 	cout << "Loaded " << points.getNumVertices() << " vertices." << endl;
 	cout << "Loaded " << audioFiles.size() << " audio files." << endl;
 	cout << "Remaining folders: " << folders.size() << endl;
-	cout << "Loading files from " << folders.back().getAbsolutePath() << endl;
 	cout << "Found files: " << dir.getFiles().size() << endl;
 }
 
