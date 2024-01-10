@@ -262,7 +262,7 @@ void ofApp::keyReleased(int key) {
 		loadAudioFiles(); break;
 	case ';':
 		glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: "))); break;
-	case ' ':
+	case 'r':
 		camera.setGlobalPosition({ 0,0,camera.getImagePlaneDistance(ofGetCurrentViewport()) });
 		camera.setGlobalOrientation({ 0,0,0,1 });
 		points = pointOrigins;
