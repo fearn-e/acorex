@@ -47,7 +47,7 @@ void ofApp::update() {
 	// Load Audio Files //
 	if (bLoading) {
 		if (folders.size() > 0) {
-			partialLoad();
+			partialLoad(folders.back().getAbsolutePath());
 		}
 		else {
 			bLoading = false;
@@ -82,54 +82,35 @@ void ofApp::loadAudioFiles() {
 
 	bLoading = true;
 
-	string path = "samples/drumkits.mp3/";
+	string topLevelPath = "samples/";
 
-	// Check top level folder for audio files //
-	dir.extensions.clear();
-	dir.allowExt("mp3");
-	dir.listDir(path);
-	dir.sort();
-	audioFiles = dir.getFiles();
+	dir.doesDirectoryExist(topLevelPath);
 
-	// Add points for each audio file //
-	for (int i = 0; i < dir.getFiles().size(); i++) {
-		points.addVertex({ ofRandom(-100, 100), ofRandom(-100, 100), ofRandom(-100, 100) });
-		numPoints += 1;
-	}
+	ofFile topDir(topLevelPath);
+	folders.insert(folders.end(), topDir);
 
-	// Check top level folder for subfolders //
-	dir.extensions.clear();
-	dir.allowExt("");
-	dir.listDir(path);
-	dir.sort();
-	folders = dir.getFiles();
+	partialLoad(topLevelPath);
 }
 
-void ofApp::partialLoad() {
-	// Check current folder for audio files //
-	dir.extensions.clear();
-	dir.allowExt("mp3");
-	dir.listDir(folders[0].getAbsolutePath());
-	dir.sort();
-	if (dir.getFiles().size() > 0)
-		audioFiles.insert(audioFiles.end(), dir.getFiles().begin(), dir.getFiles().end());
+void ofApp::partialLoad(const string& path) {
+	folders.pop_back(); // remove current folder from list
 
-	// Add points for each audio file //
-	for (int i = 0; i < dir.getFiles().size(); i++) {
+	checkFolder(path, "", folders); // check for subfolders
+
+	checkFolder(path, "mp3", audioFiles); // check for audio files
+
+	for (int i = 0; i < dir.getFiles().size(); i++) { // add points for each audio file
 		points.addVertex({ ofRandom(-100, 100), ofRandom(-100, 100), ofRandom(-100, 100) });
 		numPoints += 1;
 	}
+}
 
-	// Check current folder for subfolders //
+void ofApp::checkFolder(const string& path, const string& extension, vector<ofFile>& files) {
 	dir.extensions.clear();
-	dir.allowExt("");
-	dir.listDir(folders[0].getAbsolutePath());
-	dir.sort();
+	dir.allowExt(extension);
+	dir.listDir(path);
 	if (dir.getFiles().size() > 0)
-		folders.insert(folders.end(), dir.getFiles().begin(), dir.getFiles().end());
-
-	// Remove current folder from list //
-	folders.erase(folders.begin());
+		files.insert(files.end(), dir.getFiles().begin(), dir.getFiles().end());
 }
 
 void ofApp::meshRotation(float deltaSpeed) {
