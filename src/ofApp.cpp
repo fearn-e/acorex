@@ -72,23 +72,7 @@ void ofApp::update() {
 		pointPicker();
 	}
 
-	// Sound Players //
-	for (int i = 0; i < sounds.size(); i++) {
-		if(!sounds[i].getIsPlaying())
-			sounds.erase(sounds.begin() + i);
-	}
-
-	if (nearestDistance > 15)
-		lastSoundIndex = 0;
-
-	if (bPointPicker && ofGetKeyPressed(' ') && nearestDistance < 15 && nearestIndex != lastSoundIndex)
-	{
-		sounds.push_back(ofSoundPlayer());
-		sounds.back().load(audioFiles[nearestIndex]);
-		sounds.back().play();
-		lastSoundIndex = nearestIndex;
-	}
-	ofSoundUpdate();
+	soundController();
 }
 
 //--------------------------------------------------------------
@@ -169,6 +153,25 @@ void ofApp::pointPicker() {
 			nearestIndex = i;
 		}
 	}
+}
+
+void ofApp::soundController() {
+	for (int i = 0; i < sounds.size(); i++) {
+		if (!sounds[i].getIsPlaying())
+			sounds.erase(sounds.begin() + i);
+	}
+
+	if (nearestDistance > 15)
+		lastSoundIndex = 0;
+
+	if (bPointPicker && ofGetKeyPressed(' ') && nearestDistance < 15 && nearestIndex != lastSoundIndex)
+	{
+		sounds.push_back(ofSoundPlayer());
+		sounds.back().load(audioFiles[nearestIndex]);
+		sounds.back().play();
+		lastSoundIndex = nearestIndex;
+	}
+	ofSoundUpdate();
 }
 
 //--------------------------------------------------------------
