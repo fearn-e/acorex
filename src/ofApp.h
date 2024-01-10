@@ -22,7 +22,7 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 		
 		void loadAudioFiles();
-		void loadPortion();
+		void partialLoad();
 
 		void meshRotation(float deltaSpeed);
 		void pointPicker();

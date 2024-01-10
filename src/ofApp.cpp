@@ -47,7 +47,7 @@ void ofApp::update() {
 	// Load Audio Files //
 	if (bLoading) {
 		if (folders.size() > 0) {
-			loadPortion();
+			partialLoad();
 		}
 		else {
 			bLoading = false;
@@ -99,7 +99,7 @@ void ofApp::loadAudioFiles() {
 	folders = dir.getFiles();
 }
 
-void ofApp::loadPortion() {
+void ofApp::partialLoad() {
 	// Check current folder for audio files //
 	dir.extensions.clear();
 	dir.allowExt("mp3");
