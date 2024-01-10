@@ -22,7 +22,8 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 		
 		void loadAudioFiles();
-		void partialLoad();
+		void partialLoad(const string& path);
+		void checkFolder(const string& path, const string& extension, vector<ofFile>& files);
 
 		void meshRotation(float deltaSpeed);
 		void pointPicker();
