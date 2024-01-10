@@ -165,20 +165,18 @@ void ofApp::draw() {
 
 	// Draw Nearest Point //
 	if (!bLoading && bPointPicker && nearestDistance < 15) {
-		if (nearestDistance < 15) {
-			ofFill();
-			ofSetColor(ofColor::gray);
-			ofDrawLine(nearestVertexScreenCoordinate, mouse);
+		ofFill();
+		ofSetColor(ofColor::gray);
+		ofDrawLine(nearestVertexScreenCoordinate, mouse);
 
-			ofNoFill();
-			ofSetColor(ofColor::yellow);
-			ofSetLineWidth(2);
-			ofDrawCircle(nearestVertexScreenCoordinate, 4);
-			ofSetLineWidth(1);
+		ofNoFill();
+		ofSetColor(ofColor::yellow);
+		ofSetLineWidth(2);
+		ofDrawCircle(nearestVertexScreenCoordinate, 4);
+		ofSetLineWidth(1);
 
-			glm::vec2 offset(10, -10);
-			ofDrawBitmapStringHighlight(ofToString(nearestIndex) + " - " + audioFiles[nearestIndex].getFileName() , mouse + offset);
-		}
+		glm::vec2 offset(10, -10);
+		ofDrawBitmapStringHighlight(ofToString(nearestIndex) + " - " + audioFiles[nearestIndex].getFileName() , mouse + offset);
 	}
 
 	// Draw Debug Text //
