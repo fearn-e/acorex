@@ -21,9 +21,13 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		
+		void loadAudioFiles();
+		void loadPortion();
+
 		bool bDebugText;
 		bool bPointPicker;
 		bool bDrawPoints;
+		bool bLoading;
 		
 		float previousTime;
 		float deltaTime;
@@ -38,6 +42,11 @@ class ofApp : public ofBaseApp{
 		ofMesh pointOrigins;
 		
 		int nearestIndex;
-		glm::vec2 nearestVertex;
+		glm::vec2 nearestVertexScreenCoordinate;
 		float nearestDistance;
+		glm::vec3 mouse;
+
+		ofDirectory dir;
+		vector<ofFile> folders;
+		vector<ofFile> audioFiles;
 };
