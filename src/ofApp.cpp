@@ -12,8 +12,6 @@ void ofApp::setup(){
 
 	// Mesh //
 
-	//pointCloudNode.setGlobalPosition({ 0,0,0 });
-
 	numPoints = 0;
 	points.setMode(OF_PRIMITIVE_POINTS);
 
@@ -64,7 +62,7 @@ void ofApp::draw() {
 	// Reference Sphere //
 	{
 		camera.begin();
-		ofSetColor(ofColor::white);
+		ofSetColor(ofColor::darkSlateGray);
 		ofNoFill();
 		ofDrawSphere(0, 0, 0, 300);
 		camera.end();
@@ -74,22 +72,11 @@ void ofApp::draw() {
 	if (bDrawPoints) {
 		ofEnableDepthTest();
 		camera.begin();
-		//pointCloudNode.transformGL();
 		ofSetColor(220);
 		points.draw();
-		//pointCloudNode.restoreTransformGL();
 		camera.end();
 		ofDisableDepthTest();
 	}
-
-	/*ofFill();
-	for (int i = 0; i < numPoints; i++) {
-		ofDrawSphere(points[i], 0.8);
-	}
-
-	ofDisableDepthTest();
-	ofFill();
-	camera.end();*/
 
 	// Nearest Point //
 	if (bPointPicker) {

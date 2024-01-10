@@ -33,8 +33,6 @@ class ofApp : public ofBaseApp{
 		float rotationSpeed;
 		bool rotatePoints[6];
 
-		//ofNode pointCloudNode;
-
 		int numPoints;
 		ofMesh points;
 		ofMesh pointOrigins;
