@@ -91,6 +91,12 @@ void ofApp::loadAudioFiles() {
 	dir.sort();
 	audioFiles = dir.getFiles();
 
+	// Add points for each audio file //
+	for (int i = 0; i < dir.getFiles().size(); i++) {
+		points.addVertex({ ofRandom(-100, 100), ofRandom(-100, 100), ofRandom(-100, 100) });
+		numPoints += 1;
+	}
+
 	// Check top level folder for subfolders //
 	dir.extensions.clear();
 	dir.allowExt("");
