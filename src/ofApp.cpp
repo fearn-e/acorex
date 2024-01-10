@@ -147,7 +147,7 @@ void ofApp::draw() {
 			ss << "Distance: " << ofToString(nearestDistance) << endl;
 			ss << "Vertex: " << ofToString(nearestVertex) << endl << endl;
 		}
-		ss << "(wasdrf): Move Camera/Mesh" << endl;
+		ss << "(wasdqe): Move Mesh" << endl;
 		ss << "(.): Toggle Fullscreen" << endl;
 		ss << "(h): Toggle Debug Text" << endl;
 		ss << "(p): Spawn Random Points" << endl;
@@ -162,21 +162,19 @@ void ofApp::draw() {
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	
-	// camera move [x, -x, y, -y, z, -z,]
-
 	switch (key) {
-	case 'a':
-		rotatePoints[1] = 1; break;
-	case 'd':
-		rotatePoints[0] = 1; break;
-	case 'r':
-		rotatePoints[2] = 1; break;
-	case 'f':
-		rotatePoints[3] = 1; break;
 	case 'w':
-		rotatePoints[5] = 1; break;
+		rotatePoints[0] = 1; break;
 	case 's':
+		rotatePoints[1] = 1; break;
+	case 'a':
+		rotatePoints[2] = 1; break;
+	case 'd':
+		rotatePoints[3] = 1; break;
+	case 'q':
 		rotatePoints[4] = 1; break;
+	case 'e':
+		rotatePoints[5] = 1; break;
 	case '.':
 		ofToggleFullscreen(); break;
 	case 'h':
@@ -207,23 +205,23 @@ void ofApp::keyPressed(int key){
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
 	switch (key) {
-	case 'a':
-		rotatePoints[1] = 0;
-		break;
-	case 'd':
+	case 'w':
 		rotatePoints[0] = 0;
 		break;
-	case 'r':
+	case 's':
+		rotatePoints[1] = 0;
+		break;
+	case 'a':
 		rotatePoints[2] = 0;
 		break;
-	case 'f':
+	case 'd':
 		rotatePoints[3] = 0;
 		break;
-	case 'w':
-		rotatePoints[5] = 0;
-		break;
-	case 's':
+	case 'q':
 		rotatePoints[4] = 0;
+		break;
+	case 'e':
+		rotatePoints[5] = 0;
 		break;
 	}
 
