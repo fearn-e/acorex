@@ -6,21 +6,28 @@ void ofApp::setup(){
 	ofBackground(30);
 
 	bDebugText = true;
+
+	bLoading = false;
 	
 	previousTime = ofGetElapsedTimef();
 	deltaTime = 0.0;
 
 	// Mesh //
-
 	numPoints = 0;
 	points.setMode(OF_PRIMITIVE_POINTS);
 
 	glEnable(GL_POINT_SMOOTH);
 	glPointSize(2.0);
 
-	// Camera //
+	bDrawPoints = true;
 
-	//mainCam.setGlobalPosition({ 0,0,0 });
+	// Point Picker //
+	bPointPicker = false;
+	nearestIndex = 0;
+	nearestVertexScreenCoordinate = { 0,0 };
+	nearestDistance = 0;
+
+	// Camera //
 	camera.setGlobalPosition({ 0,0,camera.getImagePlaneDistance(ofGetCurrentViewport()) });
 
 	rotationSpeed = 45.0;
@@ -31,29 +38,120 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+
+	// Delta Time //
 	float currentTime = ofGetElapsedTimef();
 	deltaTime = currentTime - previousTime;
 	previousTime = currentTime;
-	
-	float deltaSpeed = rotationSpeed * deltaTime;
 
-	bool movement = rotatePoints[0] || rotatePoints[1] || rotatePoints[2] || rotatePoints[3] || rotatePoints[4] || rotatePoints[5];
+	// Load Audio Files //
+	if (bLoading) {
+		if (folders.size() > 0) {
+			loadPortion();
+		}
+		else {
+			bLoading = false;
+			pointOrigins = points;
 
-	if (movement)
-	{
-		ofVec3f rotationAxis = { 
-			float(rotatePoints[0] - rotatePoints[1]), 
-			float(rotatePoints[2] - rotatePoints[3]), 
-			float(rotatePoints[4] - rotatePoints[5]) };
-		glm::vec3 center = points.getCentroid();
-
-		for (int i = 0; i < numPoints; i++) {
-			ofVec3f vertex = points.getVertex(i) - center;
-			vertex.rotate(deltaSpeed, rotationAxis);
-			vertex += center;
-			points.setVertex(i, vertex);
+			// Check that all audio files have a point //
+			//assert(numPoints == audioFiles.size());
+			//assert(numPoints == points.getNumVertices());
 		}
 	}
+
+	// Don't update if loading //
+	if (!bLoading)
+	{
+		float deltaSpeed = rotationSpeed * deltaTime;
+
+		// Rotate Points //
+		bool movement = rotatePoints[0] || rotatePoints[1] || rotatePoints[2] || rotatePoints[3] || rotatePoints[4] || rotatePoints[5];
+		if (movement)
+		{
+			ofVec3f rotationAxis = {
+				float(rotatePoints[0] - rotatePoints[1]),
+				float(rotatePoints[2] - rotatePoints[3]),
+				float(rotatePoints[4] - rotatePoints[5]) };
+			glm::vec3 center = points.getCentroid();
+
+			for (int i = 0; i < numPoints; i++) {
+				ofVec3f vertex = points.getVertex(i) - center;
+				vertex.rotate(deltaSpeed, rotationAxis);
+				vertex += center;
+				points.setVertex(i, vertex);
+			}
+		}
+
+		// Point Picker //
+		if (bPointPicker)
+		{
+			mouse = { mouseX, mouseY, 0 };
+
+			for (int i = 0; i < numPoints; i++) {
+				glm::vec3 vertex = camera.worldToScreen(points.getVertex(i));
+				float distance = glm::distance(vertex, mouse);
+				if (i == 0 || distance < nearestDistance) {
+					nearestDistance = distance;
+					nearestVertexScreenCoordinate = vertex;
+					nearestIndex = i;
+				}
+			}
+		}
+	}
+}
+
+void ofApp::loadAudioFiles() {
+	dir.close();
+	folders.clear();
+	audioFiles.clear();
+	points.clear();
+	pointOrigins.clear();
+	numPoints = 0;
+
+	bLoading = true;
+
+	string path = "samples/drumkits.mp3/";
+
+	// Check top level folder for audio files //
+	dir.extensions.clear();
+	dir.allowExt("mp3");
+	dir.listDir(path);
+	dir.sort();
+	audioFiles = dir.getFiles();
+
+	// Check top level folder for subfolders //
+	dir.extensions.clear();
+	dir.allowExt("");
+	dir.listDir(path);
+	dir.sort();
+	folders = dir.getFiles();
+}
+
+void ofApp::loadPortion() {
+	// Check current folder for audio files //
+	dir.extensions.clear();
+	dir.allowExt("mp3");
+	dir.listDir(folders[0].getAbsolutePath());
+	dir.sort();
+	if (dir.getFiles().size() > 0)
+		audioFiles.insert(audioFiles.end(), dir.getFiles().begin(), dir.getFiles().end());
+
+	// Add points for each audio file //
+	for (int i = 0; i < dir.getFiles().size(); i++) {
+		points.addVertex({ ofRandom(-100, 100), ofRandom(-100, 100), ofRandom(-100, 100) });
+		numPoints += 1;
+	}
+
+	// Check current folder for subfolders //
+	dir.extensions.clear();
+	dir.allowExt("");
+	dir.listDir(folders[0].getAbsolutePath());
+	dir.sort();
+	if (dir.getFiles().size() > 0)
+		folders.insert(folders.end(), dir.getFiles().begin(), dir.getFiles().end());
+
+	// Remove current folder from list //
+	folders.erase(folders.begin());
 }
 
 //--------------------------------------------------------------
@@ -78,35 +176,21 @@ void ofApp::draw() {
 		ofDisableDepthTest();
 	}
 
-	// Nearest Point //
-	if (bPointPicker) {
-
-		glm::vec3 mouse(mouseX, mouseY, 0);
-
-		for (int i = 0; i < numPoints; i++) {
-			glm::vec3 vertex = camera.worldToScreen(points.getVertex(i));
-			float distance = glm::distance(vertex, mouse);
-			if (i == 0 || distance < nearestDistance) {
-				nearestDistance = distance;
-				nearestVertex = vertex;
-				nearestIndex = i;
-			}
-		}
-
-		// Draw Nearest Point //
-		if (nearestDistance < 10) {
+	// Draw Nearest Point //
+	if (!bLoading && bPointPicker && nearestDistance < 15) {
+		if (nearestDistance < 15) {
 			ofFill();
 			ofSetColor(ofColor::gray);
-			ofDrawLine(nearestVertex, mouse);
+			ofDrawLine(nearestVertexScreenCoordinate, mouse);
 
 			ofNoFill();
 			ofSetColor(ofColor::yellow);
 			ofSetLineWidth(2);
-			ofDrawCircle(nearestVertex, 4);
+			ofDrawCircle(nearestVertexScreenCoordinate, 4);
 			ofSetLineWidth(1);
 
 			glm::vec2 offset(10, -10);
-			ofDrawBitmapStringHighlight(ofToString(nearestIndex), mouse + offset);
+			ofDrawBitmapStringHighlight(ofToString(nearestIndex) + " - " + audioFiles[nearestIndex].getFileName() , mouse + offset);
 		}
 	}
 
@@ -132,12 +216,12 @@ void ofApp::draw() {
 			ss << "Nearest Point:" << endl;
 			ss << "Index: " << ofToString(nearestIndex) << endl;
 			ss << "Distance: " << ofToString(nearestDistance) << endl;
-			ss << "Vertex: " << ofToString(nearestVertex) << endl << endl;
+			ss << "Vertex: " << ofToString(nearestVertexScreenCoordinate) << endl << endl;
 		}
 		ss << "(wasdqe): Move Mesh" << endl;
 		ss << "(.): Toggle Fullscreen" << endl;
 		ss << "(h): Toggle Debug Text" << endl;
-		ss << "(p): Spawn Random Points" << endl;
+		ss << "(o): Load Audio Files" << endl;
 		ss << "(;): Set Point Size" << endl;
 		ss << "(j): Toggle Point Picker" << endl;
 		ss << "(k): Toggle Draw Points" << endl;
@@ -162,30 +246,6 @@ void ofApp::keyPressed(int key){
 		rotatePoints[4] = 1; break;
 	case 'e':
 		rotatePoints[5] = 1; break;
-	case '.':
-		ofToggleFullscreen(); break;
-	case 'h':
-		bDebugText = !bDebugText; break;
-	case 'j':
-		bPointPicker = !bPointPicker; break;
-	case 'k':
-		bDrawPoints = !bDrawPoints; break;
-	case 'p':
-		numPoints = ofToInt(ofSystemTextBoxDialog("Enter number of points: "));
-		points.clear();
-		for (int i = 0; i < numPoints; i++) {
-			points.addVertex({ ofRandom(-100, 100), ofRandom(-100, 100), ofRandom(-100, 100) });
-		}
-		pointOrigins = points;
-		break;
-	case ';':
-		glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: ")));
-		break;
-	case ' ':
-		camera.setGlobalPosition({ 0,0,camera.getImagePlaneDistance(ofGetCurrentViewport()) });
-		camera.setGlobalOrientation({ 0,0,0,1 });
-		points = pointOrigins;
-		break;
 	}
 }
 
@@ -209,6 +269,25 @@ void ofApp::keyReleased(int key){
 		break;
 	case 'e':
 		rotatePoints[5] = 0;
+		break;
+	case '.':
+		ofToggleFullscreen(); break;
+	case 'h':
+		bDebugText = !bDebugText; break;
+	case 'j':
+		bPointPicker = !bPointPicker; break;
+	case 'k':
+		bDrawPoints = !bDrawPoints; break;
+	case 'o':
+		loadAudioFiles();
+		break;
+	case ';':
+		glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: ")));
+		break;
+	case ' ':
+		camera.setGlobalPosition({ 0,0,camera.getImagePlaneDistance(ofGetCurrentViewport()) });
+		camera.setGlobalOrientation({ 0,0,0,1 });
+		points = pointOrigins;
 		break;
 	}
 
