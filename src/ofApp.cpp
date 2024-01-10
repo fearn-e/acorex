@@ -53,9 +53,10 @@ void ofApp::update() {
 			bLoading = false;
 			pointOrigins = points;
 
-			// Check that all audio files have a point //
-			//assert(numPoints == audioFiles.size());
-			//assert(numPoints == points.getNumVertices());
+			system("cls");
+			cout << "Loaded " << numPoints << " points." << endl;
+			cout << "Loaded " << points.getNumVertices() << " vertices." << endl;
+			cout << "Loaded " << audioFiles.size() << " audio files." << endl;
 		}
 	}
 
@@ -106,6 +107,8 @@ void ofApp::loadAudioFiles() {
 		ofFile topDir(result.getPath());
 		folders.insert(folders.end(), topDir);
 
+		cout << "Loading audio files from " << result.getPath() << endl;
+
 		partialLoad(result.getPath());
 	}
 }
@@ -121,6 +124,14 @@ void ofApp::partialLoad(const string& path) {
 		points.addVertex({ ofRandom(-100, 100), ofRandom(-100, 100), ofRandom(-100, 100) });
 	}
 	numPoints += dir.getFiles().size();
+
+	system("cls");
+	cout << "Loaded " << numPoints << " points." << endl;
+	cout << "Loaded " << points.getNumVertices() << " vertices." << endl;
+	cout << "Loaded " << audioFiles.size() << " audio files." << endl;
+	cout << "Remaining folders: " << folders.size() << endl;
+	cout << "Loading files from " << folders.back().getAbsolutePath() << endl;
+	cout << "Found files: " << dir.getFiles().size() << endl;
 }
 
 void ofApp::checkFolder(const string& path, const string& extension, vector<ofFile>& files) {
