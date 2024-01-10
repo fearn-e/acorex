@@ -59,44 +59,16 @@ void ofApp::update() {
 		}
 	}
 
-	// Don't update if loading //
-	if (!bLoading)
+	bool movement = rotatePoints[0] || rotatePoints[1] || rotatePoints[2] || rotatePoints[3] || rotatePoints[4] || rotatePoints[5];
+	if (!bLoading && movement)
 	{
 		float deltaSpeed = rotationSpeed * deltaTime;
+		meshRotation(deltaSpeed);
+	}
 
-		// Rotate Points //
-		bool movement = rotatePoints[0] || rotatePoints[1] || rotatePoints[2] || rotatePoints[3] || rotatePoints[4] || rotatePoints[5];
-		if (movement)
-		{
-			ofVec3f rotationAxis = {
-				float(rotatePoints[0] - rotatePoints[1]),
-				float(rotatePoints[2] - rotatePoints[3]),
-				float(rotatePoints[4] - rotatePoints[5]) };
-			glm::vec3 center = points.getCentroid();
-
-			for (int i = 0; i < numPoints; i++) {
-				ofVec3f vertex = points.getVertex(i) - center;
-				vertex.rotate(deltaSpeed, rotationAxis);
-				vertex += center;
-				points.setVertex(i, vertex);
-			}
-		}
-
-		// Point Picker //
-		if (bPointPicker)
-		{
-			mouse = { mouseX, mouseY, 0 };
-
-			for (int i = 0; i < numPoints; i++) {
-				glm::vec3 vertex = camera.worldToScreen(points.getVertex(i));
-				float distance = glm::distance(vertex, mouse);
-				if (i == 0 || distance < nearestDistance) {
-					nearestDistance = distance;
-					nearestVertexScreenCoordinate = vertex;
-					nearestIndex = i;
-				}
-			}
-		}
+	if (!bLoading && bPointPicker)
+	{
+		pointPicker();
 	}
 }
 
@@ -152,6 +124,35 @@ void ofApp::loadPortion() {
 
 	// Remove current folder from list //
 	folders.erase(folders.begin());
+}
+
+void ofApp::meshRotation(float deltaSpeed) {
+	ofVec3f rotationAxis = {
+				float(rotatePoints[0] - rotatePoints[1]),
+				float(rotatePoints[2] - rotatePoints[3]),
+				float(rotatePoints[4] - rotatePoints[5]) };
+	glm::vec3 center = points.getCentroid();
+
+	for (int i = 0; i < numPoints; i++) {
+		ofVec3f vertex = points.getVertex(i) - center;
+		vertex.rotate(deltaSpeed, rotationAxis);
+		vertex += center;
+		points.setVertex(i, vertex);
+	}
+}
+
+void ofApp::pointPicker() {
+	mouse = { mouseX, mouseY, 0 };
+
+	for (int i = 0; i < numPoints; i++) {
+		glm::vec3 vertex = camera.worldToScreen(points.getVertex(i));
+		float distance = glm::distance(vertex, mouse);
+		if (i == 0 || distance < nearestDistance) {
+			nearestDistance = distance;
+			nearestVertexScreenCoordinate = vertex;
+			nearestIndex = i;
+		}
+	}
 }
 
 //--------------------------------------------------------------
