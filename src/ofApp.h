@@ -53,4 +53,7 @@ class ofApp : public ofBaseApp{
 		ofDirectory dir;
 		vector<ofFile> folders;
 		vector<ofFile> audioFiles;
+
+		vector<ofSoundPlayer> sounds;
+		int lastSoundIndex;
 };
