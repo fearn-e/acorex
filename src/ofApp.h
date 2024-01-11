@@ -6,8 +6,10 @@ class ofApp : public ofBaseApp{
 
 	public:
 		void setup();
+
 		void update();
 		void updateWhileLoading();
+		void draw();
 
 		void loadAudioFiles();
 		void partialLoad(const string& path);
@@ -16,8 +18,6 @@ class ofApp : public ofBaseApp{
 		void meshRotation(float deltaSpeed);
 		void pointPicker();
 		void soundController();
-
-		void draw();
 
 		void keyPressed(int key);
 		void keyReleased(int key);
