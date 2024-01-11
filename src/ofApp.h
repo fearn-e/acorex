@@ -7,6 +7,7 @@ class ofApp : public ofBaseApp{
 	public:
 		void setup();
 		void update();
+		void updateWhileLoading();
 
 		void loadAudioFiles();
 		void partialLoad(const string& path);
