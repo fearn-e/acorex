@@ -44,35 +44,42 @@ void ofApp::update() {
 	deltaTime = currentTime - previousTime;
 	previousTime = currentTime;
 
-	// Load Audio Files //
-	if (bLoading) {
-		if (folders.size() > 0) {
-			partialLoad(folders.back().getAbsolutePath());
-		}
-		else {
-			bLoading = false;
-			pointOrigins = points;
-
-			system("cls");
-			cout << "Loaded " << numPoints << " points." << endl;
-			cout << "Loaded " << points.getNumVertices() << " vertices." << endl;
-			cout << "Loaded " << audioFiles.size() << " audio files." << endl;
-		}
+	// Loading //
+	if (bLoading)
+	{
+		updateWhileLoading();
+		return;
 	}
+	// Skip Below If Loading ------------------------------------ //
 
 	bool movement = rotatePoints[0] || rotatePoints[1] || rotatePoints[2] || rotatePoints[3] || rotatePoints[4] || rotatePoints[5];
-	if (!bLoading && movement)
+	if (movement)
 	{
 		float deltaSpeed = rotationSpeed * deltaTime;
 		meshRotation(deltaSpeed);
 	}
 
-	if (!bLoading && bPointPicker)
+	if (bPointPicker)
 	{
 		pointPicker();
 	}
 
 	soundController();
+}
+
+void ofApp::updateWhileLoading() {
+	if (folders.size() > 0) {
+		partialLoad(folders.back().getAbsolutePath());
+	}
+	else {
+		bLoading = false;
+		pointOrigins = points;
+
+		system("cls");
+		cout << "Loaded " << numPoints << " points." << endl;
+		cout << "Loaded " << points.getNumVertices() << " vertices." << endl;
+		cout << "Loaded " << audioFiles.size() << " audio files." << endl;
+	}
 }
 
 //--------------------------------------------------------------
@@ -211,7 +218,7 @@ void ofApp::draw() {
 		ofSetLineWidth(1);
 
 		glm::vec2 offset(10, -10);
-		ofDrawBitmapStringHighlight(ofToString(nearestIndex) + " - " + audioFiles[nearestIndex].getFileName() , mouse + offset);
+		ofDrawBitmapStringHighlight(ofToString(nearestIndex) + " - " + audioFiles[nearestIndex].getFileName(), mouse + offset);
 	}
 
 	// Draw Debug Text //
