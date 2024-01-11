@@ -83,6 +83,80 @@ void ofApp::updateWhileLoading() {
 }
 
 //--------------------------------------------------------------
+void ofApp::draw() {
+
+	// Reference Sphere //
+	{
+		camera.begin();
+		ofSetColor(ofColor::darkSlateGray);
+		ofNoFill();
+		ofDrawSphere(0, 0, 0, 300);
+		camera.end();
+	}
+
+	// Draw Points //
+	if (bDrawPoints) {
+		ofEnableDepthTest();
+		camera.begin();
+		ofSetColor(220);
+		points.draw();
+		camera.end();
+		ofDisableDepthTest();
+	}
+
+	// Draw Nearest Point //
+	if (!bLoading && bPointPicker && nearestDistance < 15) {
+		ofFill();
+		ofSetColor(ofColor::gray);
+		ofDrawLine(nearestVertexScreenCoordinate, mouse);
+
+		ofNoFill();
+		ofSetColor(ofColor::yellow);
+		ofSetLineWidth(2);
+		ofDrawCircle(nearestVertexScreenCoordinate, 4);
+		ofSetLineWidth(1);
+
+		glm::vec2 offset(10, -10);
+		ofDrawBitmapStringHighlight(ofToString(nearestIndex) + " - " + audioFiles[nearestIndex].getFileName(), mouse + offset);
+	}
+
+	// Draw Debug Text //
+	if (bDebugText) {
+		ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
+		stringstream ss;
+		ss << "Screen: " << ofToString(ofGetWidth()) << "x" << ofToString(ofGetHeight()) << endl << endl;
+		ss << "FPS: " << ofToString(ofGetFrameRate(), 0) << endl << endl;
+		ss << "Delta Time: " << ofToString(deltaTime, 4) << endl << endl;
+
+		ss << "Points: " << ofToString(numPoints) << endl;
+		ss << "Point Rotation:" << endl;
+		ss << ofToString(rotatePoints[0] - rotatePoints[1]);
+		ss << ", " << ofToString(rotatePoints[2] - rotatePoints[3]);
+		ss << ", " << ofToString(rotatePoints[4] - rotatePoints[5]) << endl << endl;
+
+		ss << "Camera Position: " << endl << ofToString(camera.getGlobalPosition(), 2) << endl;
+		ss << "Camera Orientation: " << endl << ofToString(camera.getOrientationEuler(), 2) << endl;
+
+		if (bPointPicker)
+		{
+			ss << "Nearest Point:" << endl;
+			ss << "Index: " << ofToString(nearestIndex) << endl;
+			ss << "Distance: " << ofToString(nearestDistance) << endl;
+			ss << "Vertex: " << ofToString(nearestVertexScreenCoordinate) << endl << endl;
+		}
+		ss << "(wasdqe): Move Mesh" << endl;
+		ss << "(.): Toggle Fullscreen" << endl;
+		ss << "(h): Toggle Debug Text" << endl;
+		ss << "(o): Load Audio Files" << endl;
+		ss << "(;): Set Point Size" << endl;
+		ss << "(j): Toggle Point Picker" << endl;
+		ss << "(k): Toggle Draw Points" << endl;
+		ss << "(space): Reset Camera/Mesh" << endl;
+		ofDrawBitmapStringHighlight(ss.str().c_str(), 20, 20);
+	}
+}
+
+//--------------------------------------------------------------
 void ofApp::loadAudioFiles() {
 	ofFileDialogResult result = ofSystemLoadDialog("Select samples folder", true, ofFilePath::getAbsolutePath("samples"));
 	if (result.bSuccess) {
@@ -181,80 +255,6 @@ void ofApp::soundController() {
 		lastSoundIndex = nearestIndex;
 	}
 	ofSoundUpdate();
-}
-
-//--------------------------------------------------------------
-void ofApp::draw() {
-
-	// Reference Sphere //
-	{
-		camera.begin();
-		ofSetColor(ofColor::darkSlateGray);
-		ofNoFill();
-		ofDrawSphere(0, 0, 0, 300);
-		camera.end();
-	}
-
-	// Draw Points //
-	if (bDrawPoints) {
-		ofEnableDepthTest();
-		camera.begin();
-		ofSetColor(220);
-		points.draw();
-		camera.end();
-		ofDisableDepthTest();
-	}
-
-	// Draw Nearest Point //
-	if (!bLoading && bPointPicker && nearestDistance < 15) {
-		ofFill();
-		ofSetColor(ofColor::gray);
-		ofDrawLine(nearestVertexScreenCoordinate, mouse);
-
-		ofNoFill();
-		ofSetColor(ofColor::yellow);
-		ofSetLineWidth(2);
-		ofDrawCircle(nearestVertexScreenCoordinate, 4);
-		ofSetLineWidth(1);
-
-		glm::vec2 offset(10, -10);
-		ofDrawBitmapStringHighlight(ofToString(nearestIndex) + " - " + audioFiles[nearestIndex].getFileName(), mouse + offset);
-	}
-
-	// Draw Debug Text //
-	if (bDebugText) {
-		ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
-		stringstream ss;
-		ss << "Screen: " << ofToString(ofGetWidth()) << "x" << ofToString(ofGetHeight()) << endl << endl;
-		ss << "FPS: " << ofToString(ofGetFrameRate(), 0) << endl << endl;
-		ss << "Delta Time: " << ofToString(deltaTime, 4) << endl << endl;
-
-		ss << "Points: " << ofToString(numPoints) << endl;
-		ss << "Point Rotation:" << endl;
-		ss << ofToString(rotatePoints[0] - rotatePoints[1]);
-		ss << ", " << ofToString(rotatePoints[2] - rotatePoints[3]);
-		ss << ", " << ofToString(rotatePoints[4] - rotatePoints[5]) << endl << endl;
-
-		ss << "Camera Position: " << endl << ofToString(camera.getGlobalPosition(), 2) << endl;
-		ss << "Camera Orientation: " << endl << ofToString(camera.getOrientationEuler(), 2) << endl;
-
-		if (bPointPicker)
-		{
-			ss << "Nearest Point:" << endl;
-			ss << "Index: " << ofToString(nearestIndex) << endl;
-			ss << "Distance: " << ofToString(nearestDistance) << endl;
-			ss << "Vertex: " << ofToString(nearestVertexScreenCoordinate) << endl << endl;
-		}
-		ss << "(wasdqe): Move Mesh" << endl;
-		ss << "(.): Toggle Fullscreen" << endl;
-		ss << "(h): Toggle Debug Text" << endl;
-		ss << "(o): Load Audio Files" << endl;
-		ss << "(;): Set Point Size" << endl;
-		ss << "(j): Toggle Point Picker" << endl;
-		ss << "(k): Toggle Draw Points" << endl;
-		ss << "(space): Reset Camera/Mesh" << endl;
-		ofDrawBitmapStringHighlight(ss.str().c_str(), 20, 20);
-	}
 }
 
 //--------------------------------------------------------------
