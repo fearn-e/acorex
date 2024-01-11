@@ -127,6 +127,7 @@ void ofApp::checkFolder(const string& path, const string& extension, vector<ofFi
 		files.insert(files.end(), dir.getFiles().begin(), dir.getFiles().end());
 }
 
+//--------------------------------------------------------------
 void ofApp::meshRotation(float deltaSpeed) {
 	ofVec3f rotationAxis = {
 				float(rotatePoints[0] - rotatePoints[1]),
@@ -268,7 +269,6 @@ void ofApp::keyPressed(int key) {
 	}
 }
 
-//--------------------------------------------------------------
 void ofApp::keyReleased(int key) {
 	switch (key) {
 	case 'w':
@@ -309,27 +309,22 @@ void ofApp::mouseMoved(int x, int y ) {
 
 }
 
-//--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button) {
 
 }
 
-//--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button) {
 
 }
 
-//--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button) {
 
 }
 
-//--------------------------------------------------------------
 void ofApp::mouseEntered(int x, int y) {
 
 }
 
-//--------------------------------------------------------------
 void ofApp::mouseExited(int x, int y) {
 
 }
@@ -339,12 +334,10 @@ void ofApp::windowResized(int w, int h) {
 
 }
 
-//--------------------------------------------------------------
 void ofApp::gotMessage(ofMessage msg) {
 
 }
 
-//--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo) { 
 
 }
