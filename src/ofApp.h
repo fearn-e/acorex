@@ -6,6 +6,7 @@
 class ofApp : public ofBaseApp{
 
 	public:
+
 		void setup();
 
 		void update();
@@ -15,7 +16,7 @@ class ofApp : public ofBaseApp{
 
 		void loadAudioFiles();
 		void partialLoad(const string& path);
-		void checkFolder(const string& path, const string& extension, vector<ofFile>& files);
+		void checkFolder(const string& path, const vector<string>& extension, vector<ofFile>& files);
 
 		void analyseAudioFiles();
 		void partialAnalyse();
@@ -40,7 +41,6 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 	
-
 		bool bDebugText;
 		bool bPointPicker;
 		bool bDrawPoints;
@@ -63,6 +63,8 @@ class ofApp : public ofBaseApp{
 		glm::vec2 nearestVertexScreenCoordinate;
 		float nearestDistance;
 		glm::vec3 mouse;
+
+		vector<string> allowedExtensions;
 
 		ofDirectory dir;
 		vector<ofFile> folders;
