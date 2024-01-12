@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxAudioFile.h"
 
 class ofApp : public ofBaseApp{
 
@@ -9,11 +10,17 @@ class ofApp : public ofBaseApp{
 
 		void update();
 		void updateWhileLoading();
+		void updateWhileAnalysing();
 		void draw();
 
 		void loadAudioFiles();
 		void partialLoad(const string& path);
 		void checkFolder(const string& path, const string& extension, vector<ofFile>& files);
+
+		void analyseAudioFiles();
+		void partialAnalyse();
+		float getRMSAmplitude(ofxAudioFile& audioFile);
+		float getSpectralCentroid(ofxAudioFile& audioFile);
 
 		void meshRotation(float deltaSpeed);
 		void pointPicker();
@@ -38,6 +45,7 @@ class ofApp : public ofBaseApp{
 		bool bPointPicker;
 		bool bDrawPoints;
 		bool bLoading;
+		bool bAnalysing;
 		
 		float previousTime;
 		float deltaTime;
@@ -59,6 +67,15 @@ class ofApp : public ofBaseApp{
 		ofDirectory dir;
 		vector<ofFile> folders;
 		vector<ofFile> audioFiles;
+		int searchedFolders;
+
+		int analysisIndex;
+		int failedAnalysisCount;
+		ofxAudioFile currentAudioFile;
+
+		float rmsAmplitudeScale;
+		float spectralCentroidScale;
+		float lengthScale;
 
 		vector<ofSoundPlayer> sounds;
 		int lastSoundIndex;
