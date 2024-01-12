@@ -280,6 +280,7 @@ void ofApp::partialAnalyse() {
 		return;
 	}
 
+	// TODO - put in error handling for files that fail to analyse
 	float rms = getRMSAmplitude(currentAudioFile);
 	float spectralCentroid = getSpectralCentroid(currentAudioFile);
 	float length = (float)currentAudioFile.length() / (float)currentAudioFile.samplerate();
