@@ -340,6 +340,7 @@ void ofApp::soundController() {
 	{
 		sounds.push_back(ofSoundPlayer());
 		sounds.back().load(audioFiles[nearestIndex]);
+		sounds.back().setVolume(0.35);
 		sounds.back().play();
 		lastSoundIndex = nearestIndex;
 	}
