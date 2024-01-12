@@ -86,7 +86,7 @@ void ofApp::updateWhileLoading() {
 		bLoading = false;
 
 		if (audioFiles.size() > 0) {
-			bAnalysing = true;
+			analyseAudioFiles();
 		}
 		else {
 			ofSystemAlertDialog("No audio files found.");
