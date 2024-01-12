@@ -243,8 +243,6 @@ void ofApp::loadAudioFiles() {
 
 		ofFile topDir(result.getPath());
 		folders.insert(folders.end(), topDir);
-
-		partialLoad(result.getPath()); // TO REMOVE
 	}
 }
 
