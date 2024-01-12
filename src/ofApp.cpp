@@ -10,8 +10,8 @@ void ofApp::setup() {
 	bLoading = false;
 	bAnalysing = false;
 	
-	previousTime = ofGetElapsedTimef();
-	deltaTime = 0.0;
+	previousUpdateTime = ofGetElapsedTimef();
+	previousDrawTime = ofGetElapsedTimef();
 
 	allowedExtensions = { "mp3", "wav", "flac", "ogg" };
 
@@ -45,10 +45,13 @@ void ofApp::setup() {
 //--------------------------------------------------------------
 void ofApp::update() {
 
-	// Delta Time //
+	// Update FPS & Delta Time //
 	float currentTime = ofGetElapsedTimef();
-	deltaTime = currentTime - previousTime;
-	previousTime = currentTime;
+	float deltaTime = currentTime - previousUpdateTime;
+	previousUpdateTime = currentTime;
+
+	updateFPS *= 0.9;
+	updateFPS += 1.0 / deltaTime * 0.1;
 
 	// Loading/Analysing //
 	if (bLoading)
@@ -119,6 +122,14 @@ void ofApp::updateWhileAnalysing() {
 //--------------------------------------------------------------
 void ofApp::draw() {
 
+	// Draw FPS //
+	float currentTime = ofGetElapsedTimef();
+	float deltaTime = currentTime - previousDrawTime;
+	previousDrawTime = currentTime;
+
+	drawFPS *= 0.9;
+	drawFPS += 1.0 / deltaTime * 0.1;
+
 	// Reference Sphere //
 	{
 		camera.begin();
@@ -185,6 +196,8 @@ void ofApp::draw() {
 
 		ss << "Screen: " << ofToString(ofGetWidth()) << "x" << ofToString(ofGetHeight()) << endl;
 		ss << "FPS: " << ofToString(ofGetFrameRate(), 0) << endl;
+		ss << "Update FPS: " << ofToString(updateFPS, 0) << endl;
+		ss << "Draw FPS: " << ofToString(drawFPS, 0) << endl;
 		ss << "Delta time:  " << ofToString(ofGetLastFrameTime(), 4) << endl;
 		ss << endl;
 

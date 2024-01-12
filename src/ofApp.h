@@ -46,9 +46,12 @@ class ofApp : public ofBaseApp{
 		bool bDrawPoints;
 		bool bLoading;
 		bool bAnalysing;
+
+		float drawFPS;
+		float updateFPS;
 		
-		float previousTime;
-		float deltaTime;
+		float previousDrawTime;
+		float previousUpdateTime;
 
 		ofEasyCam camera;
 
