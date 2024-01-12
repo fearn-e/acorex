@@ -236,6 +236,7 @@ void ofApp::loadAudioFiles() {
 		points.clear();
 		pointOrigins.clear();
 		numPoints = 0;
+		searchedFolders = 0;
 
 		bLoading = true;
 		bPointPicker = false;
