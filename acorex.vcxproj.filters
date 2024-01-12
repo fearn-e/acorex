@@ -16,22 +16,61 @@
 		<ClCompile Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.cpp">
 			<Filter>addons\ofxAudioFile\src</Filter>
 		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxFft\src\ofxEasyFft.cpp">
+			<Filter>addons\ofxFft\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxFft\src\ofxFft.cpp">
+			<Filter>addons\ofxFft\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxFft\src\ofxFftBasic.cpp">
+			<Filter>addons\ofxFft\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxFft\src\ofxFftw.cpp">
+			<Filter>addons\ofxFft\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxFft\src\ofxProcessFFT.cpp">
+			<Filter>addons\ofxFft\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxFft\libs\kiss\kiss_fft.c">
+			<Filter>addons\ofxFft\libs\kiss</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxFft\libs\kiss\kiss_fftr.c">
+			<Filter>addons\ofxFft\libs\kiss</Filter>
+		</ClCompile>
 	</ItemGroup>
 	<ItemGroup>
 		<Filter Include="src">
 			<UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons">
-			<UniqueIdentifier>{2BE51770--CD4-0-4E-DA-B-20C-E2614268EC95}</UniqueIdentifier>
+			<UniqueIdentifier>{37796EB3--B8E-D-4D-D3-8-280-8B7D7E6C0987}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxAudioFile">
-			<UniqueIdentifier>{39F6BF8D--926-D-46-D8-A-5F6-034CD7FC570D}</UniqueIdentifier>
+			<UniqueIdentifier>{A194804F--377-3-4E-8E-B-AA8-938B881F4AAC}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxAudioFile\src">
-			<UniqueIdentifier>{4B6B0545--8C8-2-4F-93-A-2EA-1AD8FC06A214}</UniqueIdentifier>
+			<UniqueIdentifier>{43FD522C--1C4-5-40-3F-8-B06-A3565279B77A}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="addons\ofxAudioFile\libs">
-			<UniqueIdentifier>{465B413D--3FB-5-42-8E-B-A27-2E7813A82F22}</UniqueIdentifier>
+			<UniqueIdentifier>{258C3588--977-3-48-02-8-8D7-007715B4457F}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxFft">
+			<UniqueIdentifier>{91B1409C--45D-C-4B-7C-9-CED-2DDF636F8B57}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxFft\src">
+			<UniqueIdentifier>{5A31241F--D2A-4-43-BA-A-A09-DC2C951412B6}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxFft\libs">
+			<UniqueIdentifier>{7C424704--DC6-E-4D-1B-A-2F3-4A5B0FDE5ED0}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxFft\libs\fftw">
+			<UniqueIdentifier>{6425799C--EC2-7-49-99-9-1AD-2DDE9BDD186A}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxFft\libs\fftw\include">
+			<UniqueIdentifier>{FAE2846E--C23-0-4A-E3-A-4EA-08F882057EF6}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxFft\libs\kiss">
+			<UniqueIdentifier>{156C1BA6--208-6-4C-81-B-8D2-6B098612534F}</UniqueIdentifier>
 		</Filter>
 	</ItemGroup>
 	<ItemGroup>
@@ -55,6 +94,33 @@
 		</ClInclude>
 		<ClInclude Include="..\..\..\addons\ofxAudioFile\libs\stb_vorbis.h">
 			<Filter>addons\ofxAudioFile\libs</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxFft\src\ofxEasyFft.h">
+			<Filter>addons\ofxFft\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxFft\src\ofxFft.h">
+			<Filter>addons\ofxFft\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxFft\src\ofxFftBasic.h">
+			<Filter>addons\ofxFft\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxFft\src\ofxFftw.h">
+			<Filter>addons\ofxFft\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxFft\src\ofxProcessFFT.h">
+			<Filter>addons\ofxFft\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxFft\libs\fftw\include\fftw3.h">
+			<Filter>addons\ofxFft\libs\fftw\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxFft\libs\kiss\kiss_fft.h">
+			<Filter>addons\ofxFft\libs\kiss</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxFft\libs\kiss\kiss_fftr.h">
+			<Filter>addons\ofxFft\libs\kiss</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxFft\libs\kiss\_kiss_fft_guts.h">
+			<Filter>addons\ofxFft\libs\kiss</Filter>
 		</ClInclude>
 	</ItemGroup>
 	<ItemGroup>
