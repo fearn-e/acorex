@@ -82,7 +82,16 @@ void ofApp::updateWhileLoading() {
 	}
 	else {
 		bLoading = false;
-		bAnalysing = true;
+
+		if (audioFiles.size() > 0) {
+			bAnalysing = true;
+		}
+		else {
+			ofSystemAlertDialog("No audio files found.");
+
+			if (numPoints > 0)
+				bPointPicker = true;
+		}
 	}
 }
 
