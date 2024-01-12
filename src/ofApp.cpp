@@ -269,8 +269,6 @@ void ofApp::partialAnalyse() {
 
 	points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, length * lengthScale });
 
-	cout << points.getNumVertices() << "/" << audioFiles.size() << endl;
-
 	analysisIndex++;
 }
 
