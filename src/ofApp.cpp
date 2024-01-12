@@ -111,6 +111,8 @@ void ofApp::updateWhileAnalysing() {
 		ss << "Failed to load " << failedAnalysisCount << " audio files." << endl;
 		ss << "Analysis complete." << endl;
 		ofSystemAlertDialog(ss.str().c_str());
+
+		bPointPicker = true;
 	}
 }
 
@@ -230,6 +232,7 @@ void ofApp::loadAudioFiles() {
 		numPoints = 0;
 
 		bLoading = true;
+		bPointPicker = false;
 
 		ofFile topDir(result.getPath());
 		folders.insert(folders.end(), topDir);
@@ -392,9 +395,15 @@ void ofApp::keyReleased(int key) {
 	case 'h':
 		bDebugText = !bDebugText; break;
 	case 'j':
-		bPointPicker = !bPointPicker; break;
+		if (!bLoading && !bAnalysing && numPoints > 0) {
+			bPointPicker = !bPointPicker;
+		}
+		break;
 	case 'k':
-		bDrawPoints = !bDrawPoints; break;
+		if (points.getNumVertices() > 0) {
+			bDrawPoints = !bDrawPoints;
+		}
+		break;
 	case 'o':
 		loadAudioFiles(); break;
 	case ';':
