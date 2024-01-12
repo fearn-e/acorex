@@ -218,7 +218,7 @@ void ofApp::draw() {
 		ss << "(;): Set Point Size" << endl;
 		ss << "(j): Toggle Point Picker" << endl;
 		ss << "(k): Toggle Draw Points" << endl;
-		ss << "(space): Reset Camera/Mesh" << endl;
+		ss << "(r): Reset Camera/Mesh" << endl;
 
 		ofDrawBitmapStringHighlight(ss.str().c_str(), 20, 20);
 	}
