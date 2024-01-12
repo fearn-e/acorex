@@ -13,6 +13,8 @@ void ofApp::setup() {
 	previousTime = ofGetElapsedTimef();
 	deltaTime = 0.0;
 
+	allowedExtensions = { "mp3", "wav", "flac", "ogg" };
+
 	// Mesh //
 	numPoints = 0;
 	points.setMode(OF_PRIMITIVE_POINTS);
@@ -248,16 +250,16 @@ void ofApp::loadAudioFiles() {
 void ofApp::partialLoad(const string& path) {
 	folders.pop_back(); // remove current folder from list
 
-	checkFolder(path, "", folders); // check for subfolders
+	checkFolder(path, { "" }, folders); // check for subfolders
 
-	checkFolder(path, "mp3", audioFiles); // check for audio files
+	checkFolder(path, allowedExtensions, audioFiles); // check for audio files
 
 	searchedFolders++;
 }
 
-void ofApp::checkFolder(const string& path, const string& extension, vector<ofFile>& files) {
+void ofApp::checkFolder(const string& path, const vector<string>& extensions, vector<ofFile>& files) {
 	dir.extensions.clear();
-	dir.allowExt(extension);
+	dir.extensions = extensions;
 	dir.listDir(path);
 	if (dir.getFiles().size() > 0)
 		files.insert(files.end(), dir.getFiles().begin(), dir.getFiles().end());
