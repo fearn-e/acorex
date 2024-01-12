@@ -16,7 +16,6 @@ void ofApp::setup() {
 	allowedExtensions = { "mp3", "wav", "flac", "ogg" };
 
 	// Mesh //
-	numPoints = 0;
 	points.setMode(OF_PRIMITIVE_POINTS);
 
 	glEnable(GL_POINT_SMOOTH);
@@ -91,7 +90,7 @@ void ofApp::updateWhileLoading() {
 		else {
 			ofSystemAlertDialog("No audio files found.");
 
-			if (numPoints > 0)
+			if (points.getNumVertices() > 0)
 				bPointPicker = true;
 		}
 	}
@@ -104,12 +103,11 @@ void ofApp::updateWhileAnalysing() {
 	else {
 		bAnalysing = false;
 
-		numPoints = points.getNumVertices();
 		pointOrigins = points;
 		
 		stringstream ss;
 		ss << "Analysed " << audioFiles.size() << " audio files." << endl;
-		ss << "Points: " << ofToString(numPoints) << endl;
+		ss << "Points: " << ofToString(points.getNumVertices()) << endl;
 		ss << "Failed to load " << failedAnalysisCount << " audio files." << endl;
 		ss << "Analysis complete." << endl;
 		ofSystemAlertDialog(ss.str().c_str());
@@ -194,7 +192,7 @@ void ofApp::draw() {
 		ss << "Camera Orientation: " << endl << ofToString(camera.getOrientationEuler(), 2) << endl;
 		ss << endl;
 
-		ss << "Points: " << ofToString(numPoints) << endl;
+		ss << "Points: " << ofToString(points.getNumVertices()) << endl;
 		ss << endl;
 
 		ss << "Point Picker: " << ofToString(bPointPicker) << endl;
@@ -235,9 +233,8 @@ void ofApp::loadAudioFiles() {
 		audioFiles.clear();
 		points.clear();
 		pointOrigins.clear();
-		numPoints = 0;
 		searchedFolders = 0;
-
+		
 		bLoading = true;
 		bPointPicker = false;
 
@@ -320,7 +317,9 @@ void ofApp::meshRotation(float deltaSpeed) {
 				float(rotatePoints[4] - rotatePoints[5]) };
 	glm::vec3 center = points.getCentroid();
 
-	for (int i = 0; i < numPoints; i++) {
+	int pointCount = points.getNumVertices();
+
+	for (int i = 0; i < pointCount; i++) {
 		ofVec3f vertex = points.getVertex(i) - center;
 		vertex.rotate(deltaSpeed, rotationAxis);
 		vertex += center;
@@ -331,7 +330,9 @@ void ofApp::meshRotation(float deltaSpeed) {
 void ofApp::pointPicker() {
 	mouse = { mouseX, mouseY, 0 };
 
-	for (int i = 0; i < numPoints; i++) {
+	int pointCount = points.getNumVertices();
+
+	for (int i = 0; i < pointCount; i++) {
 		glm::vec3 vertex = camera.worldToScreen(points.getVertex(i));
 		float distance = glm::distance(vertex, mouse);
 		if (i == 0 || distance < nearestDistance) {
@@ -400,7 +401,7 @@ void ofApp::keyReleased(int key) {
 	case 'h':
 		bDebugText = !bDebugText; break;
 	case 'j':
-		if (!bLoading && !bAnalysing && numPoints > 0) {
+		if (!bLoading && !bAnalysing && points.getNumVertices() > 0) {
 			bPointPicker = !bPointPicker;
 		}
 		break;
