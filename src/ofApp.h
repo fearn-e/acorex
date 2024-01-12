@@ -55,7 +55,6 @@ class ofApp : public ofBaseApp{
 		float rotationSpeed;
 		bool rotatePoints[6];
 
-		int numPoints;
 		ofMesh points;
 		ofMesh pointOrigins;
 		
