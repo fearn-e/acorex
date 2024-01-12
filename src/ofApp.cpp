@@ -8,6 +8,7 @@ void ofApp::setup() {
 	bDebugText = true;
 
 	bLoading = false;
+	bAnalysing = false;
 	
 	previousTime = ofGetElapsedTimef();
 	deltaTime = 0.0;
@@ -34,6 +35,10 @@ void ofApp::setup() {
 	for (int i = 0; i < 6; i++) {
 		rotatePoints[i] = 0;
 	}
+
+	rmsAmplitudeScale = 400.0;
+	spectralCentroidScale = 400.0;
+	lengthScale = 50.0;
 }
 
 //--------------------------------------------------------------
@@ -44,13 +49,17 @@ void ofApp::update() {
 	deltaTime = currentTime - previousTime;
 	previousTime = currentTime;
 
-	// Loading //
+	// Loading/Analysing //
 	if (bLoading)
 	{
 		updateWhileLoading();
 		return;
 	}
-	// Skip Below If Loading ------------------------------------ //
+	else if (bAnalysing) {
+		updateWhileAnalysing();
+		return;
+	}
+	// Skip Below If Loading/Analysing ------------------------ //
 
 	bool movement = rotatePoints[0] || rotatePoints[1] || rotatePoints[2] || rotatePoints[3] || rotatePoints[4] || rotatePoints[5];
 	if (movement)
@@ -73,12 +82,26 @@ void ofApp::updateWhileLoading() {
 	}
 	else {
 		bLoading = false;
-		pointOrigins = points;
+		bAnalysing = true;
+	}
+}
 
-		system("cls");
-		cout << "Loaded " << numPoints << " points." << endl;
-		cout << "Loaded " << points.getNumVertices() << " vertices." << endl;
-		cout << "Loaded " << audioFiles.size() << " audio files." << endl;
+void ofApp::updateWhileAnalysing() {
+	if (analysisIndex < audioFiles.size()) {
+		partialAnalyse();
+	}
+	else {
+		bAnalysing = false;
+
+		numPoints = points.getNumVertices();
+		pointOrigins = points;
+		
+		stringstream ss;
+		ss << "Analysed " << audioFiles.size() << " audio files." << endl;
+		ss << "Points: " << ofToString(numPoints) << endl;
+		ss << "Failed to load " << failedAnalysisCount << " audio files." << endl;
+		ss << "Analysis complete." << endl;
+		ofSystemAlertDialog(ss.str().c_str());
 	}
 }
 
@@ -120,10 +143,35 @@ void ofApp::draw() {
 		ofDrawBitmapStringHighlight(ofToString(nearestIndex) + " - " + audioFiles[nearestIndex].getFileName(), mouse + offset);
 	}
 
+	// Draw Loading/Analysing Text //
+	if (bLoading) {
+		ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
+
+		stringstream ss;
+		ss << "Loading audio files..." << endl;
+		ss << "Found " << audioFiles.size() << " files." << endl;
+		ss << "Searched " << searchedFolders << " folders." << endl;
+		ss << "Remaining " << folders.size() << " folders.";
+
+		ofDrawBitmapString(ss.str().c_str(), ofGetWidth() - 200, 20);
+	}
+	else if (bAnalysing) {
+		ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
+
+		stringstream ss;
+		ss << "Analysing audio files..." << endl;
+		ss << "Analysed " << analysisIndex << "/" << audioFiles.size() << endl;
+		ss << "Failed to load " << failedAnalysisCount << " files." << endl;
+
+		ofDrawBitmapString(ss.str().c_str(), ofGetWidth() - 200, 20);
+	}
+
 	// Draw Debug Text //
 	if (bDebugText) {
 		ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
+
 		stringstream ss;
+
 		ss << "Screen: " << ofToString(ofGetWidth()) << "x" << ofToString(ofGetHeight()) << endl << endl;
 		ss << "FPS: " << ofToString(ofGetFrameRate(), 0) << endl << endl;
 		ss << "Delta Time: " << ofToString(deltaTime, 4) << endl << endl;
@@ -143,6 +191,10 @@ void ofApp::draw() {
 			ss << "Index: " << ofToString(nearestIndex) << endl;
 			ss << "Distance: " << ofToString(nearestDistance) << endl;
 			ss << "Vertex: " << ofToString(nearestVertexScreenCoordinate) << endl << endl;
+			ss << "Audio File: " << endl << audioFiles[nearestIndex].getFileName() << endl;
+			ss << "RMS Amplitude: " << pointOrigins.getVertex(nearestIndex).y / rmsAmplitudeScale << endl;
+			ss << "Spectral Centroid: " << pointOrigins.getVertex(nearestIndex).x / spectralCentroidScale << endl;
+			ss << "Length: " << pointOrigins.getVertex(nearestIndex).z / lengthScale << endl;
 		}
 		ss << "(wasdqe): Move Mesh" << endl;
 		ss << "(.): Toggle Fullscreen" << endl;
@@ -152,6 +204,7 @@ void ofApp::draw() {
 		ss << "(j): Toggle Point Picker" << endl;
 		ss << "(k): Toggle Draw Points" << endl;
 		ss << "(space): Reset Camera/Mesh" << endl;
+
 		ofDrawBitmapStringHighlight(ss.str().c_str(), 20, 20);
 	}
 }
@@ -172,32 +225,18 @@ void ofApp::loadAudioFiles() {
 		ofFile topDir(result.getPath());
 		folders.insert(folders.end(), topDir);
 
-		cout << "Loading audio files from " << result.getPath() << endl;
-
-		partialLoad(result.getPath());
+		partialLoad(result.getPath()); // TO REMOVE
 	}
 }
 
 void ofApp::partialLoad(const string& path) {
-	cout << "Loading files from " << folders.back().getAbsolutePath() << endl;
-
 	folders.pop_back(); // remove current folder from list
 
 	checkFolder(path, "", folders); // check for subfolders
 
 	checkFolder(path, "mp3", audioFiles); // check for audio files
 
-	for (int i = 0; i < dir.getFiles().size(); i++) { // add points for each audio file
-		points.addVertex({ ofRandom(-100, 100), ofRandom(-100, 100), ofRandom(-100, 100) });
-	}
-	numPoints += dir.getFiles().size();
-
-	system("cls");
-	cout << "Loaded " << numPoints << " points." << endl;
-	cout << "Loaded " << points.getNumVertices() << " vertices." << endl;
-	cout << "Loaded " << audioFiles.size() << " audio files." << endl;
-	cout << "Remaining folders: " << folders.size() << endl;
-	cout << "Found files: " << dir.getFiles().size() << endl;
+	searchedFolders++;
 }
 
 void ofApp::checkFolder(const string& path, const string& extension, vector<ofFile>& files) {
@@ -206,6 +245,56 @@ void ofApp::checkFolder(const string& path, const string& extension, vector<ofFi
 	dir.listDir(path);
 	if (dir.getFiles().size() > 0)
 		files.insert(files.end(), dir.getFiles().begin(), dir.getFiles().end());
+}
+
+//--------------------------------------------------------------
+void ofApp::analyseAudioFiles() {
+	currentAudioFile.free();
+	analysisIndex = 0;
+	bAnalysing = true;
+}
+
+void ofApp::partialAnalyse() {
+	currentAudioFile.load(audioFiles[analysisIndex].getAbsolutePath());
+	if (!currentAudioFile.loaded()) {
+		failedAnalysisCount++;
+		cout << "Failed to load " << audioFiles[analysisIndex].getFileName() << endl;
+		analysisIndex++;
+		return;
+	}
+
+	float rms = getRMSAmplitude(currentAudioFile);
+	float spectralCentroid = getSpectralCentroid(currentAudioFile);
+	float length = (float)currentAudioFile.length() / (float)currentAudioFile.samplerate();
+
+	points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, length * lengthScale });
+
+	cout << points.getNumVertices() << "/" << audioFiles.size() << endl;
+
+	analysisIndex++;
+}
+
+float ofApp::getRMSAmplitude(ofxAudioFile& audioFile) {
+	float rms = 0.0;
+	int sampsCounted = 0;
+
+	for (int i = 0; i < audioFile.length(); i++) {
+		float leftSample = audioFile.sample(i, 0) * 0.5;
+		float rightSample = audioFile.sample(i, 1) * 0.5;
+
+		rms += leftSample * leftSample;
+		rms += rightSample * rightSample;
+		sampsCounted += 2;
+	}
+
+	rms /= (float)sampsCounted;
+	rms = sqrt(rms);
+
+	return rms;
+}
+
+float ofApp::getSpectralCentroid(ofxAudioFile& audioFile) {
+	return 0.0;
 }
 
 //--------------------------------------------------------------
