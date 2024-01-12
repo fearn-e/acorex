@@ -183,30 +183,34 @@ void ofApp::draw() {
 
 		stringstream ss;
 
-		ss << "Screen: " << ofToString(ofGetWidth()) << "x" << ofToString(ofGetHeight()) << endl << endl;
-		ss << "FPS: " << ofToString(ofGetFrameRate(), 0) << endl << endl;
-		ss << "Delta Time: " << ofToString(deltaTime, 4) << endl << endl;
-
-		ss << "Points: " << ofToString(numPoints) << endl;
-		ss << "Point Rotation:" << endl;
-		ss << ofToString(rotatePoints[0] - rotatePoints[1]);
-		ss << ", " << ofToString(rotatePoints[2] - rotatePoints[3]);
-		ss << ", " << ofToString(rotatePoints[4] - rotatePoints[5]) << endl << endl;
+		ss << "Screen: " << ofToString(ofGetWidth()) << "x" << ofToString(ofGetHeight()) << endl;
+		ss << "FPS: " << ofToString(ofGetFrameRate(), 0) << endl;
+		ss << "Delta time:  " << ofToString(ofGetLastFrameTime(), 4) << endl;
+		ss << endl;
 
 		ss << "Camera Position: " << endl << ofToString(camera.getGlobalPosition(), 2) << endl;
 		ss << "Camera Orientation: " << endl << ofToString(camera.getOrientationEuler(), 2) << endl;
+		ss << endl;
+
+		ss << "Points: " << ofToString(numPoints) << endl;
+		ss << endl;
+
+		ss << "Point Picker: " << ofToString(bPointPicker) << endl;
+		ss << "Draw Points: " << ofToString(bDrawPoints) << endl;
+		ss << endl;
 
 		if (bPointPicker)
 		{
 			ss << "Nearest Point:" << endl;
 			ss << "Index: " << ofToString(nearestIndex) << endl;
 			ss << "Distance: " << ofToString(nearestDistance) << endl;
-			ss << "Vertex: " << ofToString(nearestVertexScreenCoordinate) << endl << endl;
 			ss << "Audio File: " << endl << audioFiles[nearestIndex].getFileName() << endl;
 			ss << "RMS Amplitude: " << pointOrigins.getVertex(nearestIndex).y / rmsAmplitudeScale << endl;
 			ss << "Spectral Centroid: " << pointOrigins.getVertex(nearestIndex).x / spectralCentroidScale << endl;
 			ss << "Length: " << pointOrigins.getVertex(nearestIndex).z / lengthScale << endl;
+			ss << endl;
 		}
+
 		ss << "(wasdqe): Move Mesh" << endl;
 		ss << "(.): Toggle Fullscreen" << endl;
 		ss << "(h): Toggle Debug Text" << endl;
