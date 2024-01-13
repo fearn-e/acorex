@@ -25,7 +25,7 @@ class ofApp : public ofBaseApp{
 		float getSpectralCentroid(ofxAudioFile& audioFile);
 		
 		//void deinterleave(
-		float SpectralCentroidOverTime(float* input, int fileSize, int numChannels, float sampleRate);
+		float SpectralCentroidOverTime(float* input, int fileSize, float sampleRate);
 		float SpectralCentroidOneFrame(float* input, float sampleRate, bool logFreq);
 
 		void meshRotation(float deltaSpeed);
@@ -81,6 +81,8 @@ class ofApp : public ofBaseApp{
 		int analysisIndex;
 		int failedAnalysisCount;
 		ofxAudioFile currentAudioFile;
+
+		vector<vector<float>> deinterleavedAudioData;
 
 		ofxFft* fft;
 		int stftHopSize;

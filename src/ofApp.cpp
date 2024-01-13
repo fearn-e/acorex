@@ -325,17 +325,33 @@ float ofApp::getRMSAmplitude(ofxAudioFile& audioFile) {
 }
 
 float ofApp::getSpectralCentroid(ofxAudioFile& audioFile) {
-	float spectralCentroid;
+	float spectralCentroid = 0.0;
 	int fileSize = audioFile.length();
 	int numChannels = audioFile.channels();
 	float sampleRate = audioFile.samplerate();
 
-	spectralCentroid = SpectralCentroidOverTime(audioFile.data(), fileSize, numChannels, sampleRate);
+	if (numChannels == 1) {
+		spectralCentroid = SpectralCentroidOverTime(audioFile.data(), fileSize, sampleRate);
+	}
+	else {
+		deinterleavedAudioData.resize(numChannels);
+		int channelSize = fileSize / numChannels;
+		for (int i = 0; i < numChannels; i++) {
+			deinterleavedAudioData[i].resize(channelSize);
+		}
+		for (int i = 0; i < fileSize; i++) {
+			deinterleavedAudioData[i % numChannels][i / numChannels] = audioFile.data()[i];
+		}
+		for (int i = 0; i < numChannels; i++) {
+			spectralCentroid += SpectralCentroidOverTime(&deinterleavedAudioData[i][0], channelSize, sampleRate);
+		}
+		spectralCentroid /= numChannels;
+	}
 
 	return spectralCentroid;
 }
 
-float ofApp::SpectralCentroidOverTime(float* input, int fileSize, int numChannels, float sampleRate) {
+float ofApp::SpectralCentroidOverTime(float* input, int fileSize, float sampleRate) {
 	int stftNumFrames = ceil((float)(fileSize - fftBufferSize) / (float)stftHopSize) + 1;
 	std::vector<float> spectralCentroids(stftNumFrames);
 
