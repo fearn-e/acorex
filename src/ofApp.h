@@ -11,12 +11,12 @@ class ofApp : public ofBaseApp{
 		void setup();
 
 		void update();
-		void updateWhileLoading();
+		void updateWhileListing();
 		void updateWhileAnalysing();
 		void draw();
 
-		void loadAudioFiles();
-		void partialLoad(const string& path);
+		void listAudioFiles();
+		void partialList(const string& path);
 		void checkFolder(const string& path, const vector<string>& extension, vector<ofFile>& files);
 
 		void analyseAudioFiles();
@@ -49,7 +49,7 @@ class ofApp : public ofBaseApp{
 		bool bDebugText;
 		bool bPointPicker;
 		bool bDrawPoints;
-		bool bLoading;
+		bool bListing;
 		bool bAnalysing;
 
 		float drawFPS;
