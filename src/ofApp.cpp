@@ -8,7 +8,7 @@ void ofApp::setup() {
 
 	bDebugText = true;
 
-	bLoading = false;
+	bListing = false;
 	bAnalysing = false;
 	
 	previousUpdateTime = ofGetElapsedTimef();
@@ -60,9 +60,9 @@ void ofApp::update() {
 	updateFPS += 1.0 / deltaTime * 0.1;
 
 	// Loading/Analysing //
-	if (bLoading)
+	if (bListing)
 	{
-		updateWhileLoading();
+		updateWhileListing();
 		return;
 	}
 	else if (bAnalysing) {
@@ -86,12 +86,12 @@ void ofApp::update() {
 	soundController();
 }
 
-void ofApp::updateWhileLoading() {
+void ofApp::updateWhileListing() {
 	if (folders.size() > 0) {
-		partialLoad(folders.back().getAbsolutePath());
+		partialList(folders.back().getAbsolutePath());
 	}
 	else {
-		bLoading = false;
+		bListing = false;
 
 		if (audioFiles.size() > 0) {
 			analyseAudioFiles();
@@ -156,7 +156,7 @@ void ofApp::draw() {
 	}
 
 	// Draw Nearest Point //
-	if (!bLoading && bPointPicker && nearestDistance < 15) {
+	if (!bListing && bPointPicker && nearestDistance < 15) {
 		ofFill();
 		ofSetColor(ofColor::gray);
 		ofDrawLine(nearestVertexScreenCoordinate, mouse);
@@ -172,7 +172,7 @@ void ofApp::draw() {
 	}
 
 	// Draw Loading/Analysing Text //
-	if (bLoading) {
+	if (bListing) {
 		ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
 
 		stringstream ss;
@@ -244,7 +244,7 @@ void ofApp::draw() {
 }
 
 //--------------------------------------------------------------
-void ofApp::loadAudioFiles() {
+void ofApp::listAudioFiles() {
 	ofFileDialogResult result = ofSystemLoadDialog("Select samples folder", true, ofFilePath::getAbsolutePath("samples"));
 	if (result.bSuccess) {
 		dir.close();
@@ -254,7 +254,7 @@ void ofApp::loadAudioFiles() {
 		pointOrigins.clear();
 		searchedFolders = 0;
 		
-		bLoading = true;
+		bListing = true;
 		bPointPicker = false;
 
 		ofFile topDir(result.getPath());
@@ -262,7 +262,7 @@ void ofApp::loadAudioFiles() {
 	}
 }
 
-void ofApp::partialLoad(const string& path) {
+void ofApp::partialList(const string& path) {
 	folders.pop_back(); // remove current folder from list
 
 	checkFolder(path, { "" }, folders); // check for subfolders
@@ -561,7 +561,7 @@ void ofApp::keyReleased(int key) {
 	case 'h':
 		bDebugText = !bDebugText; break;
 	case 'j':
-		if (!bLoading && !bAnalysing && points.getNumVertices() > 0) {
+		if (!bListing && !bAnalysing && points.getNumVertices() > 0) {
 			bPointPicker = !bPointPicker;
 		}
 		break;
@@ -571,7 +571,7 @@ void ofApp::keyReleased(int key) {
 		}
 		break;
 	case 'o':
-		loadAudioFiles(); break;
+		listAudioFiles(); break;
 	case ';':
 		glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: "))); break;
 	case 'r':
