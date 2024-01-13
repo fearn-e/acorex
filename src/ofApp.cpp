@@ -298,7 +298,7 @@ void ofApp::partialAnalyse() {
 	}
 
 	// deinterleave audio data
-	int channelSize = currentAudioFile.length() / currentAudioFile.channels();
+	int channelSize = currentAudioFile.length();
 	bool singleChannel = currentAudioFile.channels() == 1;
 	if (!singleChannel) {
 		deinterleaveAudioData(currentAudioFile.data(), currentAudioFile.length(), currentAudioFile.channels());
@@ -381,7 +381,8 @@ void ofApp::partialAnalyse() {
 			points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, timePoint * timePointScale });
 		}
 		else {
-
+			points.addVertex({ 0.0, 0.0, (float)currentAudioFile.length() / (float)currentAudioFile.samplerate() * timePointScale });
+			// TODO - zero pad last frame for multichannel audio
 		}
 
 	}
@@ -389,10 +390,10 @@ void ofApp::partialAnalyse() {
 	analysisIndex++;
 }
 
-void ofApp::deinterleaveAudioData(float* interleavedData, int fileSize, int numChannels) {
+void ofApp::deinterleaveAudioData(float* interleavedData, int channelSize, int numChannels) {
 	deinterleavedAudioData.resize(numChannels);
 
-	int channelSize = fileSize / numChannels;
+	int fileSize = channelSize * numChannels;
 
 	for (int i = 0; i < numChannels; i++) {
 		deinterleavedAudioData[i].resize(channelSize);
