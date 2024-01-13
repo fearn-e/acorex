@@ -1,4 +1,5 @@
 #include "ofApp.h"
+#include <cmath>
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -38,8 +39,13 @@ void ofApp::setup() {
 	}
 
 	rmsAmplitudeScale = 400.0;
-	spectralCentroidScale = 400.0;
+	spectralCentroidScale = 0.02;
 	lengthScale = 50.0;
+
+	// FFT //
+	fftBufferSize = 2048;
+	stftHopSize = fftBufferSize / 2;
+	fft = ofxFft::create(fftBufferSize, OF_FFT_WINDOW_HAMMING);
 }
 
 //--------------------------------------------------------------
@@ -319,7 +325,132 @@ float ofApp::getRMSAmplitude(ofxAudioFile& audioFile) {
 }
 
 float ofApp::getSpectralCentroid(ofxAudioFile& audioFile) {
-	return 0.0;
+	float spectralCentroid;
+	int fileSize = audioFile.length();
+	int numChannels = audioFile.channels();
+	float sampleRate = audioFile.samplerate();
+
+	spectralCentroid = SpectralCentroidOverTime(audioFile.data(), fileSize, numChannels, sampleRate);
+
+	return spectralCentroid;
+}
+
+float ofApp::SpectralCentroidOverTime(float* input, int fileSize, int numChannels, float sampleRate) {
+	int stftNumFrames = ceil((float)(fileSize - fftBufferSize) / (float)stftHopSize) + 1;
+	std::vector<float> spectralCentroids(stftNumFrames);
+
+	// check if zero padding is needed for last frame
+	bool zeroPad = false;
+	if (fileSize % stftHopSize != 0) { zeroPad = true; }
+
+	// calculate spectral centroid for each frame, skip last frame if padding is needed
+	for (int i = 0; i < stftNumFrames - zeroPad; i++) {
+		float* framePointer = input + i * stftHopSize;
+		spectralCentroids[i] = SpectralCentroidOneFrame(framePointer, sampleRate, false);
+	}
+
+	// zero pad last frame
+	if (zeroPad) {
+		int lastFrameStart = (stftNumFrames - 1) * stftHopSize;
+		int lastFrameSize = fileSize - lastFrameStart;
+		float* lastFramePointer = input + lastFrameStart;
+
+		std::vector<float> lastFrame(lastFrameSize);
+
+		memcpy(&lastFrame[0], lastFramePointer, sizeof(float) * lastFrameSize);
+		for (int i = lastFrameSize; i < fftBufferSize; i++) {
+			lastFrame.push_back(0.0);
+		}
+
+		spectralCentroids[stftNumFrames - 1] = SpectralCentroidOneFrame(&lastFrame[0], sampleRate, false);
+	}
+
+	// average spectral centroid
+	float spectralCentroidSum = 0.0;
+	for (int i = 0; i < stftNumFrames; i++) {
+		spectralCentroidSum += spectralCentroids[i];
+	}
+	float spectralCentroidAverage = spectralCentroidSum / stftNumFrames;
+	return spectralCentroidAverage;
+}
+
+float ofApp::SpectralCentroidOneFrame(float* input, float sampleRate, bool logFreq = false) {
+	std::vector<float> ampBins(fft->getBinSize());
+
+	// normalise input
+	float maxValue = 0.0;
+	for (int i = 0; i < fftBufferSize; i++) {
+		if (abs(input[i]) > maxValue) {
+			maxValue = abs(input[i]);
+		}
+	}
+	for (int i = 0; i < fftBufferSize; i++) {
+		input[i] /= maxValue;
+	}
+
+	// do FFT
+	fft->setSignal(input);
+
+	float* fftPointer = fft->getAmplitude();
+	memcpy(&ampBins[0], fftPointer, sizeof(float) * fft->getBinSize());
+
+	// normalise output
+	maxValue = 0.0;
+	for (int i = 0; i < fft->getBinSize(); i++) {
+		if (ampBins[i] > maxValue) {
+			maxValue = ampBins[i];
+		}
+	}
+	for (int i = 0; i < fft->getBinSize(); i++) {
+		ampBins[i] /= maxValue;
+	}
+
+	int numBins = ampBins.size();
+	float binHz = sampleRate / ((numBins - 1) * 2.0);
+	float minBin = 0;
+	float maxBin = (numBins - 1);
+
+	// skip first bin if log frequency
+	if (logFreq)
+	{
+		minBin = 1;
+		ampBins[1] += ampBins[0];
+		ampBins.erase(ampBins.begin());
+	}
+
+	// calculate frequency bins
+	int size = maxBin - minBin;
+	std::vector<float> freqBins(size);
+
+	float minFreq = minBin * binHz;
+	float maxFreq = maxBin * binHz;
+	float step = (maxFreq - minFreq) / (size - 1);
+
+	for (int i = 0; i < size; i++) {
+		freqBins[i] = minFreq + i * step;
+	}
+
+	// log frequency scale
+	if (logFreq) {
+		for (int i = 0; i < size; i++) {
+			freqBins[i] = 69.0 + (12.0 * log(freqBins[i] / 440.0) * 1.44269504088896340736); //log2E
+		}
+	}
+
+	// calculate spectral centroid
+	float ampSum = 0.0;
+	for (int i = 0; i < size; i++) {
+		ampSum += ampBins[i];
+	}
+
+	float ampFreqSum = 0.0;
+	for (int i = 0; i < size; i++) {
+		ampFreqSum += ampBins[i] * freqBins[i];
+	}
+	
+	float centroid = ampFreqSum / ampSum;
+
+	return centroid;
 }
 
 //--------------------------------------------------------------
