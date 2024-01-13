@@ -40,7 +40,7 @@ void ofApp::setup() {
 
 	rmsAmplitudeScale = 400.0;
 	spectralCentroidScale = 0.02;
-	lengthScale = 50.0;
+	timePointScale = 60.0;
 
 	// FFT //
 	fftBufferSize = 2048;
@@ -137,13 +137,13 @@ void ofApp::draw() {
 	drawFPS += 1.0 / deltaTime * 0.1;
 
 	// Reference Sphere //
-	{
+	/*{
 		camera.begin();
 		ofSetColor(ofColor::darkSlateGray);
 		ofNoFill();
 		ofDrawSphere(0, 0, 0, 300);
 		camera.end();
-	}
+	}*/
 
 	// Draw Points //
 	if (bDrawPoints) {
@@ -168,7 +168,7 @@ void ofApp::draw() {
 		ofSetLineWidth(1);
 
 		glm::vec2 offset(10, -10);
-		ofDrawBitmapStringHighlight(ofToString(nearestIndex) + " - " + audioFiles[nearestIndex].getFileName(), mouse + offset);
+		ofDrawBitmapStringHighlight(ofToString(nearestIndex) + " - " + audioFiles[audioFileIndexLink[nearestIndex]].getFileName(), mouse + offset);
 	}
 
 	// Draw Loading/Analysing Text //
@@ -212,6 +212,7 @@ void ofApp::draw() {
 		ss << endl;
 
 		ss << "Points: " << ofToString(points.getNumVertices()) << endl;
+		ss << "Audio Files: " << ofToString(audioFiles.size()) << endl;
 		ss << endl;
 
 		ss << "Point Picker: " << ofToString(bPointPicker) << endl;
@@ -223,10 +224,10 @@ void ofApp::draw() {
 			ss << "Nearest Point:" << endl;
 			ss << "Index: " << ofToString(nearestIndex) << endl;
 			ss << "Distance: " << ofToString(nearestDistance) << endl;
-			ss << "Audio File: " << endl << audioFiles[nearestIndex].getFileName() << endl;
+			ss << "Audio File: " << endl << audioFiles[audioFileIndexLink[nearestIndex]].getFileName() << endl;
 			ss << "RMS Amplitude: " << pointOrigins.getVertex(nearestIndex).y / rmsAmplitudeScale << endl;
 			ss << "Spectral Centroid: " << pointOrigins.getVertex(nearestIndex).x / spectralCentroidScale << endl;
-			ss << "Length: " << pointOrigins.getVertex(nearestIndex).z / lengthScale << endl;
+			ss << "Time Point: " << pointOrigins.getVertex(nearestIndex).z / timePointScale << endl;
 			ss << endl;
 		}
 
@@ -296,101 +297,113 @@ void ofApp::partialAnalyse() {
 		return;
 	}
 
-	// TODO - put in error handling for files that fail to analyse
-	float rms = getRMSAmplitude(currentAudioFile);
-	float spectralCentroid = getSpectralCentroid(currentAudioFile);
-	float length = (float)currentAudioFile.length() / (float)currentAudioFile.samplerate();
-
-	points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, length * lengthScale });
-
-	analysisIndex++;
-}
-
-float ofApp::getRMSAmplitude(ofxAudioFile& audioFile) {
-	float rms = 0.0;
-	int sampsCounted = 0;
-
-	for (int channel = 0; channel < audioFile.channels(); channel++) {
-		for (int i = 0; i < audioFile.length(); i++) {
-			float sample = audioFile.sample(i, channel);
-			rms += sample * sample;
-		}
+	// deinterleave audio data
+	int channelSize = currentAudioFile.length() / currentAudioFile.channels();
+	bool singleChannel = currentAudioFile.channels() == 1;
+	if (!singleChannel) {
+		deinterleaveAudioData(currentAudioFile.data(), currentAudioFile.length(), currentAudioFile.channels());
 	}
-	sampsCounted += audioFile.channels() * audioFile.length();
-
-	rms /= (float)sampsCounted;
-	rms = sqrt(rms);
-
-	return rms;
-}
-
-float ofApp::getSpectralCentroid(ofxAudioFile& audioFile) {
-	float spectralCentroid = 0.0;
-	int fileSize = audioFile.length();
-	int numChannels = audioFile.channels();
-	float sampleRate = audioFile.samplerate();
-
-	if (numChannels == 1) {
-		spectralCentroid = SpectralCentroidOverTime(audioFile.data(), fileSize, sampleRate);
-	}
-	else {
-		deinterleavedAudioData.resize(numChannels);
-		int channelSize = fileSize / numChannels;
-		for (int i = 0; i < numChannels; i++) {
-			deinterleavedAudioData[i].resize(channelSize);
-		}
-		for (int i = 0; i < fileSize; i++) {
-			deinterleavedAudioData[i % numChannels][i / numChannels] = audioFile.data()[i];
-		}
-		for (int i = 0; i < numChannels; i++) {
-			spectralCentroid += SpectralCentroidOverTime(&deinterleavedAudioData[i][0], channelSize, sampleRate);
-		}
-		spectralCentroid /= numChannels;
-	}
-
-	return spectralCentroid;
-}
-
-float ofApp::SpectralCentroidOverTime(float* input, int fileSize, float sampleRate) {
-	int stftNumFrames = ceil((float)(fileSize - fftBufferSize) / (float)stftHopSize) + 1;
-	std::vector<float> spectralCentroids(stftNumFrames);
-
+	
+	// calculate number of frames
+	int numFrames = ceil((float)(channelSize - fftBufferSize) / (float)stftHopSize) + 1;
+	
 	// check if zero padding is needed for last frame
 	bool zeroPad = false;
-	if (fileSize % stftHopSize != 0) { zeroPad = true; }
+	if (channelSize % stftHopSize != 0) { zeroPad = true; }
 
-	// calculate spectral centroid for each frame, skip last frame if padding is needed
-	for (int i = 0; i < stftNumFrames - zeroPad; i++) {
-		float* framePointer = input + i * stftHopSize;
-		spectralCentroids[i] = SpectralCentroidOneFrame(framePointer, sampleRate, false);
+	// set audio file index link
+	for (int i = 0; i < numFrames; i++)
+	{
+		audioFileIndexLink.push_back(analysisIndex);
+	}
+
+	// loop over frames
+	for (int frame = 0; frame < numFrames - zeroPad; frame++) {
+		// calculate spectral centroid
+		float spectralCentroid = 0.0;
+		if (singleChannel) {
+			float* framePointer = currentAudioFile.data() + frame * stftHopSize;
+			spectralCentroid = spectralCentroidOneFrame(framePointer, currentAudioFile.samplerate(), false);
+		}
+		else {
+			for (int channel = 0; channel < currentAudioFile.channels(); channel++) {
+				float* framePointer = &deinterleavedAudioData[channel][frame * stftHopSize];
+				spectralCentroid += spectralCentroidOneFrame(framePointer, currentAudioFile.samplerate(), false);
+			}
+			spectralCentroid /= currentAudioFile.channels();
+		}
+
+		// calculate RMS amplitude
+		float rms = 0.0;
+
+		for (int i = 0; i < fftBufferSize * currentAudioFile.channels(); i++) {
+			float sample = currentAudioFile.data()[i + frame * stftHopSize];
+			rms += sample * sample;
+		}
+
+		rms /= (float)(fftBufferSize * currentAudioFile.channels());
+		rms = sqrt(rms);
+
+		// calculate time point
+		float adjustment = (float)stftHopSize * 0.5;
+		float timePoint = ((float)(frame * stftHopSize) + adjustment) / (float)currentAudioFile.samplerate();
+
+		// add point to mesh
+		points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, timePoint * timePointScale });
 	}
 
 	// zero pad last frame
 	if (zeroPad) {
-		int lastFrameStart = (stftNumFrames - 1) * stftHopSize;
-		int lastFrameSize = fileSize - lastFrameStart;
-		float* lastFramePointer = input + lastFrameStart;
+		if (singleChannel) {
+			int lastFrameStart = (numFrames - 1) * stftHopSize;
+			int lastFrameSize = channelSize - lastFrameStart;
+			float* lastFramePointer = currentAudioFile.data() + lastFrameStart;
 
-		std::vector<float> lastFrame(lastFrameSize);
+			std::vector<float> lastFrame(lastFrameSize);
+			for (int i = lastFrameSize; i < fftBufferSize; i++) {
+				lastFrame.push_back(0.0);
+			}
 
-		memcpy(&lastFrame[0], lastFramePointer, sizeof(float) * lastFrameSize);
-		for (int i = lastFrameSize; i < fftBufferSize; i++) {
-			lastFrame.push_back(0.0);
+			float spectralCentroid = spectralCentroidOneFrame(&lastFrame[0], currentAudioFile.samplerate(), false);
+			float rms = 0.0;
+			
+			for (int i = 0; i < fftBufferSize; i++) {
+				float sample = lastFrame[i];
+				rms += sample * sample;
+			}
+
+			rms /= (float)fftBufferSize;
+			rms = sqrt(rms);
+
+			float adjustment = (float)stftHopSize * 0.5;
+			float timePoint = ((float)(lastFrameStart) + adjustment) / (float)currentAudioFile.samplerate();
+
+			points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, timePoint * timePointScale });
+		}
+		else {
+
 		}
 
-		spectralCentroids[stftNumFrames - 1] = SpectralCentroidOneFrame(&lastFrame[0], sampleRate, false);
 	}
 
-	// average spectral centroid
-	float spectralCentroidSum = 0.0;
-	for (int i = 0; i < stftNumFrames; i++) {
-		spectralCentroidSum += spectralCentroids[i];
-	}
-	float spectralCentroidAverage = spectralCentroidSum / stftNumFrames;
-	return spectralCentroidAverage;
+	analysisIndex++;
 }
 
-float ofApp::SpectralCentroidOneFrame(float* input, float sampleRate, bool logFreq = false) {
+void ofApp::deinterleaveAudioData(float* interleavedData, int fileSize, int numChannels) {
+	deinterleavedAudioData.resize(numChannels);
+
+	int channelSize = fileSize / numChannels;
+
+	for (int i = 0; i < numChannels; i++) {
+		deinterleavedAudioData[i].resize(channelSize);
+	}
+
+	for (int i = 0; i < fileSize; i++) {
+		deinterleavedAudioData[i % numChannels][i / numChannels] = interleavedData[i];
+	}
+}
+
+float ofApp::spectralCentroidOneFrame(float* input, float sampleRate, bool logFreq = false) {
 	std::vector<float> ampBins(fft->getBinSize());
 
 	// normalise input
@@ -515,7 +528,7 @@ void ofApp::soundController() {
 	if (bPointPicker && ofGetKeyPressed(' ') && nearestDistance < 15 && nearestIndex != lastSoundIndex)
 	{
 		sounds.push_back(ofSoundPlayer());
-		sounds.back().load(audioFiles[nearestIndex]);
+		sounds.back().load(audioFiles[audioFileIndexLink[nearestIndex]].getAbsolutePath());
 		sounds.back().setVolume(0.35);
 		sounds.back().play();
 		lastSoundIndex = nearestIndex;

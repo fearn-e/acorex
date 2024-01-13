@@ -21,12 +21,8 @@ class ofApp : public ofBaseApp{
 
 		void analyseAudioFiles();
 		void partialAnalyse();
-		float getRMSAmplitude(ofxAudioFile& audioFile);
-		float getSpectralCentroid(ofxAudioFile& audioFile);
-		
-		//void deinterleave(
-		float SpectralCentroidOverTime(float* input, int fileSize, float sampleRate);
-		float SpectralCentroidOneFrame(float* input, float sampleRate, bool logFreq);
+		void deinterleaveAudioData(float* interleavedData, int fileSize, int numChannels);
+		float spectralCentroidOneFrame(float* input, float sampleRate, bool logFreq);
 
 		void meshRotation(float deltaSpeed);
 		void pointPicker();
@@ -76,6 +72,7 @@ class ofApp : public ofBaseApp{
 		ofDirectory dir;
 		vector<ofFile> folders;
 		vector<ofFile> audioFiles;
+		vector<int> audioFileIndexLink;
 		int searchedFolders;
 
 		int analysisIndex;
@@ -90,7 +87,7 @@ class ofApp : public ofBaseApp{
 
 		float rmsAmplitudeScale;
 		float spectralCentroidScale;
-		float lengthScale;
+		float timePointScale;
 
 		vector<ofSoundPlayer> sounds;
 		int lastSoundIndex;
