@@ -50,10 +50,11 @@ void ofApp::setup() {
 	camera.setFarClip(10000);
 	resetCamera();
 
-	// FFT //
+	// Analysis //
 	fftBufferSize = 4096;
 	stftHopSize = fftBufferSize / 2;
 	fft = ofxFft::create(fftBufferSize, OF_FFT_WINDOW_HAMMING);
+	minimumRMSAmplitude = 0.02;
 }
 
 //--------------------------------------------------------------
@@ -194,10 +195,13 @@ void ofApp::draw() {
 		ofEnableDepthTest();
 		camera.begin();
 		ofSetColor(220);
-		for (int i = 0; i < points.getNumVertices() - 1; i++) {
-			ofVec3f point = points.getVertex(i);
-			ofVec3f nextPoint = points.getVertex(i + 1);
-			if (audioFileIndexLink[i] == audioFileIndexLink[i + 1]) {
+		for (int i = 0; i < (points.getNumVertices() - 1); i++) {
+			bool sameFile = audioFileIndexLink[i] == audioFileIndexLink[i + 1];
+			if (sameFile) {
+				if (connectToNextPoint[i]) { ofSetColor({220, 220, 220}); }
+				if (!connectToNextPoint[i]) { ofSetColor({150, 140, 230}); }
+				ofVec3f point = points.getVertex(i);
+				ofVec3f nextPoint = points.getVertex(i + 1);
 				ofDrawLine(point, nextPoint);
 			}
 		}
@@ -250,10 +254,14 @@ void ofApp::draw() {
 			ofVec3f point = points.getVertex(fileIndex);
 			ofFill();
 			ofDrawCircle(camera.worldToScreen(point), 3);
-			fileIndex++;
 			if (firstPoint) { firstPoint = false; }
-			else { ofDrawLine(camera.worldToScreen(previousPoint), camera.worldToScreen(point)); }
+			else {
+				if (connectToNextPoint[fileIndex - 1]) { ofSetColor(ofColor::red); }
+				if (!connectToNextPoint[fileIndex - 1]) { ofSetColor(ofColor::blue); }
+				ofDrawLine(camera.worldToScreen(previousPoint), camera.worldToScreen(point));
+			}
 			previousPoint = point;
+			fileIndex++;
 		} while (fileIndex < points.getNumVertices() && audioFileIndexLink[fileIndex] == currentFile);
 	}
 
@@ -387,13 +395,9 @@ void ofApp::partialAnalyse() {
 	bool zeroPad = false;
 	if (channelSize % stftHopSize != 0) { zeroPad = true; }
 
-	// set audio file index link
-	for (int i = 0; i < numFrames; i++)
-	{
-		audioFileIndexLink.push_back(analysisIndex);
-	}
-
 	// loop over frames
+	bool skippedPoint = true;
+	float finalTimePoint = 0.0;
 	for (int frame = 0; frame < numFrames - zeroPad; frame++) {
 		// calculate spectral centroid
 		float spectralCentroid = 0.0;
@@ -424,7 +428,19 @@ void ofApp::partialAnalyse() {
 		float timePoint = (float)(frame * stftHopSize) / (float)currentAudioFile.samplerate();
 
 		// add point to mesh
-		points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, timePoint * timePointScale });
+		if (rms > minimumRMSAmplitude) {
+			finalTimePoint = timePoint;
+
+			points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, timePoint * timePointScale });
+			audioFileIndexLink.push_back(analysisIndex);
+			connectToNextPoint.push_back(false);
+			//set previous point to connect to this point
+			if (!skippedPoint) {
+				connectToNextPoint[points.getNumVertices() - 2] = true;
+			} 
+			else { skippedPoint = false; }
+		} 
+		else { skippedPoint = true; }
 	}
 
 	// zero pad last frame
@@ -452,18 +468,44 @@ void ofApp::partialAnalyse() {
 			rms = sqrt(rms);
 
 			float timePoint = (float)(lastFrameStart) / (float)currentAudioFile.samplerate();
+			finalTimePoint = timePoint;
 
-			points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, timePoint * timePointScale });
-			if (timePoint * timePointScale > maxTimePoint) { maxTimePoint = timePoint * timePointScale; }
+			if (rms > minimumRMSAmplitude) {
+				finalTimePoint = timePoint;
+
+				points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, timePoint * timePointScale });
+				audioFileIndexLink.push_back(analysisIndex);
+				connectToNextPoint.push_back(false);
+				//set previous point to connect to this point
+				if (!skippedPoint) {
+					connectToNextPoint[points.getNumVertices() - 2] = true;
+				}
+				else { skippedPoint = false; }
+			}
+			else { skippedPoint = true; }
 		}
 		else {
 			float timePoint = (float)currentAudioFile.length() / (float)currentAudioFile.samplerate();
-			points.addVertex({ 0.0, 0.0, timePoint * timePointScale });
-			if (timePoint * timePointScale > maxTimePoint) { maxTimePoint = timePoint * timePointScale; }
+			float spectralCentroid = 0.0;
+			float rms = 0.0;
+			if (rms > minimumRMSAmplitude) {
+				finalTimePoint = timePoint;
+
+				points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, timePoint * timePointScale });
+				audioFileIndexLink.push_back(analysisIndex);
+				connectToNextPoint.push_back(false);
+				//set previous point to connect to this point
+				if (!skippedPoint) {
+					connectToNextPoint[points.getNumVertices() - 2] = true;
+				}
+				else { skippedPoint = false; }
+			}
+			else { skippedPoint = true; }
 			// TODO - zero pad last frame for multichannel audio
 		}
-
 	}
+
+	if (finalTimePoint * timePointScale > maxTimePoint) { maxTimePoint = finalTimePoint * timePointScale; }
 
 	analysisIndex++;
 }

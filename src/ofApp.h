@@ -63,6 +63,8 @@ class ofApp : public ofBaseApp{
 
 		ofMesh points;
 		ofMesh pointOrigins;
+		vector<int> audioFileIndexLink;
+		vector<bool> connectToNextPoint;
 		
 		int nearestIndex;
 		glm::vec2 nearestVertexScreenCoordinate;
@@ -74,7 +76,6 @@ class ofApp : public ofBaseApp{
 		ofDirectory dir;
 		vector<ofFile> folders;
 		vector<ofFile> audioFiles;
-		vector<int> audioFileIndexLink;
 		int searchedFolders;
 
 		int analysisIndex;
@@ -89,6 +90,7 @@ class ofApp : public ofBaseApp{
 
 		float rmsAmplitudeScale, spectralCentroidScale, timePointScale;
 		float maxRMSAmplitude, maxSpectralCentroid, maxTimePoint;
+		float minimumRMSAmplitude;
 
 		vector<ofSoundPlayer> sounds;
 		int lastSoundIndex;
