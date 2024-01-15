@@ -51,7 +51,7 @@ void ofApp::setup() {
 	resetCamera();
 
 	// FFT //
-	fftBufferSize = 2048;
+	fftBufferSize = 4096;
 	stftHopSize = fftBufferSize / 2;
 	fft = ofxFft::create(fftBufferSize, OF_FFT_WINDOW_HAMMING);
 }
