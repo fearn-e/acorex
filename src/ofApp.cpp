@@ -20,7 +20,7 @@ void ofApp::setup() {
 	points.setMode(OF_PRIMITIVE_POINTS);
 
 	glEnable(GL_POINT_SMOOTH);
-	glPointSize(2.0);
+	glPointSize(3.0);
 
 	bDrawPoints = true;
 
