@@ -53,7 +53,6 @@ void ofApp::setup() {
 	// Analysis //
 	fftBufferSize = 4096;
 	stftHopSize = fftBufferSize / 2;
-	fft = ofxFft::create(fftBufferSize, OF_FFT_WINDOW_HAMMING);
 	minimumRMSAmplitude = 0.02;
 }
 
@@ -370,6 +369,7 @@ void ofApp::analyseAudioFiles() {
 	audioFileIndexLink.clear();
 	maxTimePoint = 5.0 * timePointScale;
 	bAnalysing = true;
+	fft = ofxFft::create(fftBufferSize, OF_FFT_WINDOW_HAMMING);
 }
 
 void ofApp::partialAnalyse() {
