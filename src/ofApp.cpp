@@ -38,9 +38,9 @@ void ofApp::setup() {
 
 	// Point Scales //
 	rmsAmplitudeScale = 400.0;
-	spectralCentroidScale = 0.02;
+	spectralCentroidScale = -0.02;
 	timePointScale = 60.0;
-
+	
 	maxRMSAmplitude = 1.0 * rmsAmplitudeScale;
 	maxSpectralCentroid = 20000.0 * spectralCentroidScale;
 	maxTimePoint = 5.0 * timePointScale;
