@@ -607,6 +607,19 @@ float ofApp::spectralCentroidOneFrame(float* input, float sampleRate, bool logFr
 	float centroid = ampFreqSum / ampSum;
 
 	return centroid;
+
+	//// calculate loudest bin
+	//float loudestBin = 0.0;
+	//int loudestBinIndex = 0;
+	//for (int i = 0; i < size; i++) {
+	//	if (ampBins[i] > loudestBin) {
+	//		loudestBin = ampBins[i];
+	//		loudestBinIndex = i;
+	//	}
+	//}
+	//loudestBin = freqBins[loudestBinIndex];
+
+	//return loudestBin;
 }
 
 //--------------------------------------------------------------
