@@ -28,6 +28,8 @@ class ofApp : public ofBaseApp{
 		void pointPicker();
 		void soundController();
 
+		void resetCamera();
+
 		void keyPressed(int key);
 		void keyReleased(int key);
 
@@ -85,9 +87,8 @@ class ofApp : public ofBaseApp{
 		int stftHopSize;
 		int fftBufferSize;
 
-		float rmsAmplitudeScale;
-		float spectralCentroidScale;
-		float timePointScale;
+		float rmsAmplitudeScale, spectralCentroidScale, timePointScale;
+		float maxRMSAmplitude, maxSpectralCentroid, maxTimePoint;
 
 		vector<ofSoundPlayer> sounds;
 		int lastSoundIndex;
