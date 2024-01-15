@@ -189,6 +189,22 @@ void ofApp::draw() {
 		ofDisableDepthTest();
 	}
 
+	// Draw lines connecting points from the same audio file //
+	if (bDrawPoints && points.getNumVertices() != 0) {
+		ofEnableDepthTest();
+		camera.begin();
+		ofSetColor(220);
+		for (int i = 0; i < points.getNumVertices() - 1; i++) {
+			ofVec3f point = points.getVertex(i);
+			ofVec3f nextPoint = points.getVertex(i + 1);
+			if (audioFileIndexLink[i] == audioFileIndexLink[i + 1]) {
+				ofDrawLine(point, nextPoint);
+			}
+		}
+		camera.end();
+		ofDisableDepthTest();
+	}
+
 	// Draw Nearest Point //
 	if (!bListing && bPointPicker && nearestDistance < 15) {
 		ofVec3f point = points.getVertex(nearestIndex);
