@@ -130,9 +130,6 @@ void ofApp::updateWhileListing() {
 		}
 		else {
 			ofSystemAlertDialog("No audio files found.");
-
-			if (points.getNumVertices() > 0)
-				bPointPicker = true;
 		}
 	}
 }
