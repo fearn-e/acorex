@@ -355,8 +355,7 @@ void ofApp::partialAnalyse() {
 		rms = sqrt(rms);
 
 		// calculate time point
-		float adjustment = (float)stftHopSize * 0.5;
-		float timePoint = ((float)(frame * stftHopSize) + adjustment) / (float)currentAudioFile.samplerate();
+		float timePoint = (float)(frame * stftHopSize) / (float)currentAudioFile.samplerate();
 
 		// add point to mesh
 		points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, timePoint * timePointScale });
@@ -385,8 +384,7 @@ void ofApp::partialAnalyse() {
 			rms /= (float)fftBufferSize;
 			rms = sqrt(rms);
 
-			float adjustment = (float)stftHopSize * 0.5;
-			float timePoint = ((float)(lastFrameStart) + adjustment) / (float)currentAudioFile.samplerate();
+			float timePoint = (float)(lastFrameStart) / (float)currentAudioFile.samplerate();
 
 			points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, timePoint * timePointScale });
 		}
