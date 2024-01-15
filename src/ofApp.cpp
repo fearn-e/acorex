@@ -153,7 +153,7 @@ void ofApp::updateWhileAnalysing() {
 		ss << "Analysis complete." << endl;
 		ofSystemAlertDialog(ss.str().c_str());
 
-		resetCamera();
+		//resetCamera();
 
 		bPointPicker = true;
 
