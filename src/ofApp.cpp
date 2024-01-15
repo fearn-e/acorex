@@ -146,14 +146,38 @@ void ofApp::draw() {
 	drawFPS *= 0.9;
 	drawFPS += 1.0 / deltaTime * 0.1;
 
-	// Reference Sphere //
-	/*{
+	// Draw axes, grid, and labels //
+	{
 		camera.begin();
+		ofDrawBitmapMode(OF_BITMAPMODE_BILLBOARD);
+
+		/*int numSubdivisions = 5;
 		ofSetColor(ofColor::darkSlateGray);
+		for (int x = 0; x < numSubdivisions; x++) {
+			for (int y = 0; y < numSubdivisions; y++) {
+				for (int z = 0; z < numSubdivisions; z++) {
+					ofDrawLine(x * maxSpectralCentroid / numSubdivisions, y * maxRMSAmplitude / numSubdivisions, z * maxTimePoint / numSubdivisions,
+						(x + 1) * maxSpectralCentroid / numSubdivisions, y * maxRMSAmplitude / numSubdivisions, z * maxTimePoint / numSubdivisions);
+					ofDrawLine(x * maxSpectralCentroid / numSubdivisions, y * maxRMSAmplitude / numSubdivisions, z * maxTimePoint / numSubdivisions,
+						x * maxSpectralCentroid / numSubdivisions, (y + 1) * maxRMSAmplitude / numSubdivisions, z * maxTimePoint / numSubdivisions);
+					ofDrawLine(x * maxSpectralCentroid / numSubdivisions, y * maxRMSAmplitude / numSubdivisions, z * maxTimePoint / numSubdivisions,
+						x * maxSpectralCentroid / numSubdivisions, y * maxRMSAmplitude / numSubdivisions, (z + 1) * maxTimePoint / numSubdivisions);
+				}
+			}
+		}*/
+
+		ofSetColor(ofColor::darkGray);
 		ofNoFill();
-		ofDrawSphere(0, 0, 0, 300);
+		ofDrawLine(0, 0, 0, maxSpectralCentroid, 0, 0);
+		ofDrawLine(0, 0, 0, 0, maxRMSAmplitude, 0);
+		ofDrawLine(0, 0, 0, 0, 0, maxTimePoint);
+
+		ofSetColor(ofColor::white);
+		ofDrawBitmapString("Spectral Centroid", maxSpectralCentroid, 0, 0);
+		ofDrawBitmapString("RMS Amplitude", 0, maxRMSAmplitude, 0);
+		ofDrawBitmapString("Time Point", 0, 0, maxTimePoint);
 		camera.end();
-	}*/
+	}
 
 	// Draw Points //
 	if (bDrawPoints) {
@@ -167,18 +191,32 @@ void ofApp::draw() {
 
 	// Draw Nearest Point //
 	if (!bListing && bPointPicker && nearestDistance < 15) {
-		ofFill();
+		ofVec3f point = points.getVertex(nearestIndex);
+
+		camera.begin();
 		ofSetColor(ofColor::gray);
-		ofDrawLine(nearestVertexScreenCoordinate, mouse);
+		ofDrawLine(point, { point.x, point.y, 0});
+		ofDrawLine(point, { 0, point.y, point.z });
+		ofDrawLine(point, { point.x, 0, point.z });
+		ofDrawLine({ point.x, point.y, 0 }, { point.x, 0, 0 });
+		ofDrawLine({ 0, point.y, point.z }, { 0, point.y, 0 });
+		ofDrawLine({ point.x, 0, point.z }, { 0, 0, point.z });
+		
+		ofSetColor(ofColor::red);
+		ofDrawBitmapString(ofToString(point.x / spectralCentroidScale, 0) + "Hz", point.x, 0, 0);
+		ofDrawBitmapString(ofToString(point.y / rmsAmplitudeScale, 3), 0, point.y, 0);
+		ofDrawBitmapString(ofToString(point.z / timePointScale, 2) + "s", 0, 0, point.z);
+		camera.end();
+
+		glm::vec2 offset(10, -10);
+		ofSetColor(ofColor::red);
+		ofDrawBitmapString(ofToString(nearestIndex) + ". " + audioFiles[audioFileIndexLink[nearestIndex]].getFileName(), mouse + offset);
 
 		ofNoFill();
-		ofSetColor(ofColor::yellow);
+		ofSetColor(ofColor::red);
 		ofSetLineWidth(2);
 		ofDrawCircle(nearestVertexScreenCoordinate, 4);
 		ofSetLineWidth(1);
-
-		glm::vec2 offset(10, -10);
-		ofDrawBitmapStringHighlight(ofToString(nearestIndex) + " - " + audioFiles[audioFileIndexLink[nearestIndex]].getFileName(), mouse + offset);
 	}
 
 	// Draw Loading/Analysing Text //
@@ -228,18 +266,6 @@ void ofApp::draw() {
 		ss << "Point Picker: " << ofToString(bPointPicker) << endl;
 		ss << "Draw Points: " << ofToString(bDrawPoints) << endl;
 		ss << endl;
-
-		if (bPointPicker)
-		{
-			ss << "Nearest Point:" << endl;
-			ss << "Index: " << ofToString(nearestIndex) << endl;
-			ss << "Distance: " << ofToString(nearestDistance) << endl;
-			ss << "Audio File: " << endl << audioFiles[audioFileIndexLink[nearestIndex]].getFileName() << endl;
-			ss << "RMS Amplitude: " << pointOrigins.getVertex(nearestIndex).y / rmsAmplitudeScale << endl;
-			ss << "Spectral Centroid: " << pointOrigins.getVertex(nearestIndex).x / spectralCentroidScale << endl;
-			ss << "Time Point: " << pointOrigins.getVertex(nearestIndex).z / timePointScale << endl;
-			ss << endl;
-		}
 
 		ss << "(wasdqe): Move Mesh" << endl;
 		ss << "(.): Toggle Fullscreen" << endl;
