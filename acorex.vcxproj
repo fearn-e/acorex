@@ -61,7 +61,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxAudioFile\libs;..\..\..\addons\ofxAudioFile\src;..\..\..\addons\ofxFft\libs;..\..\..\addons\ofxFft\libs\fftw;..\..\..\addons\ofxFft\libs\fftw\include;..\..\..\addons\ofxFft\libs\fftw\lib;..\..\..\addons\ofxFft\libs\kiss;..\..\..\addons\ofxFft\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxAudioFile\libs;..\..\..\addons\ofxAudioFile\src;..\..\..\addons\ofxFft\libs;..\..\..\addons\ofxFft\libs\fftw;..\..\..\addons\ofxFft\libs\fftw\include;..\..\..\addons\ofxFft\libs\fftw\lib;..\..\..\addons\ofxFft\libs\kiss;..\..\..\addons\ofxFft\src;..\..\..\addons\ofxGui\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)\Build\%(RelativeDir)\$(Configuration)\</ObjectFileName>
@@ -84,7 +84,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxAudioFile\libs;..\..\..\addons\ofxAudioFile\src;..\..\..\addons\ofxFft\libs;..\..\..\addons\ofxFft\libs\fftw;..\..\..\addons\ofxFft\libs\fftw\include;..\..\..\addons\ofxFft\libs\fftw\lib;..\..\..\addons\ofxFft\libs\kiss;..\..\..\addons\ofxFft\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxAudioFile\libs;..\..\..\addons\ofxAudioFile\src;..\..\..\addons\ofxFft\libs;..\..\..\addons\ofxFft\libs\fftw;..\..\..\addons\ofxFft\libs\fftw\include;..\..\..\addons\ofxFft\libs\fftw\lib;..\..\..\addons\ofxFft\libs\kiss;..\..\..\addons\ofxFft\src;..\..\..\addons\ofxGui\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)\Build\%(RelativeDir)\$(Configuration)\</ObjectFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -114,6 +114,16 @@
     <ClCompile Include="..\..\..\addons\ofxFft\src\ofxProcessFFT.cpp" />
     <ClCompile Include="..\..\..\addons\ofxFft\libs\kiss\kiss_fft.c" />
     <ClCompile Include="..\..\..\addons\ofxFft\libs\kiss\kiss_fftr.c" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxBaseGui.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxButton.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxColorPicker.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxGuiGroup.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxInputField.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxLabel.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxPanel.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSlider.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ofApp.h" />
@@ -131,6 +141,18 @@
     <ClInclude Include="..\..\..\addons\ofxFft\libs\kiss\kiss_fft.h" />
     <ClInclude Include="..\..\..\addons\ofxFft\libs\kiss\kiss_fftr.h" />
     <ClInclude Include="..\..\..\addons\ofxFft\libs\kiss\_kiss_fft_guts.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxButton.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxColorPicker.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxGui.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxGuiGroup.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxGuiUtils.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxInputField.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxLabel.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxPanel.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
