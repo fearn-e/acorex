@@ -360,6 +360,7 @@ void ofApp::analyseAudioFiles() {
 	currentAudioFile.free();
 	analysisIndex = 0;
 	audioFileIndexLink.clear();
+	maxTimePoint = 5.0 * timePointScale;
 	bAnalysing = true;
 }
 
