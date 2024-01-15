@@ -20,7 +20,7 @@ class ofApp : public ofBaseApp{
 		void checkFolder(const string& path, const vector<string>& extension, vector<ofFile>& files);
 
 		void analyseAudioFiles();
-		void partialAnalyse();
+		void partialAnalyse(bool logFreq);
 		void deinterleaveAudioData(float* interleavedData, int fileSize, int numChannels);
 		float spectralCentroidOneFrame(float* input, float sampleRate, bool logFreq);
 
@@ -49,6 +49,7 @@ class ofApp : public ofBaseApp{
 		bool bDrawPoints;
 		bool bListing;
 		bool bAnalysing;
+		bool bLogFreq;
 
 		float drawFPS;
 		float updateFPS;

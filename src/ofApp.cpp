@@ -37,12 +37,16 @@ void ofApp::setup() {
 	}
 
 	// Point Scales //
+	bLogFreq = true;
+
+	if (bLogFreq) { spectralCentroidScale = -3.0; }
+	else { spectralCentroidScale = -0.02; }
 	rmsAmplitudeScale = 400.0;
-	spectralCentroidScale = -0.02;
 	timePointScale = 60.0;
-	
+
+	if (bLogFreq) { maxSpectralCentroid = 127.0 * spectralCentroidScale; }
+	else { maxSpectralCentroid = 20000.0 * spectralCentroidScale; }
 	maxRMSAmplitude = 1.0 * rmsAmplitudeScale;
-	maxSpectralCentroid = 20000.0 * spectralCentroidScale;
 	maxTimePoint = 5.0 * timePointScale;
 
 	// Camera //
@@ -115,7 +119,7 @@ void ofApp::updateWhileListing() {
 
 void ofApp::updateWhileAnalysing() {
 	if (analysisIndex < audioFiles.size()) {
-		partialAnalyse();
+		partialAnalyse(bLogFreq);
 	}
 	else {
 		bAnalysing = false;
@@ -222,9 +226,11 @@ void ofApp::draw() {
 		ofDrawLine({ point.x, 0, point.z }, { 0, 0, point.z });
 		
 		ofSetColor(ofColor::red);
-		ofDrawBitmapString(ofToString(point.x / spectralCentroidScale, 0) + "Hz", point.x, 0, 0);
+		if (bLogFreq) { ofDrawBitmapString(ofToString(pow(2, ((point.x / spectralCentroidScale) - 69.0) / 12.0) * 440.0, 1) + "Hz", point.x, 0, 0); }
+		else { ofDrawBitmapString(ofToString(point.x / spectralCentroidScale, 1) + "Hz", point.x, 0, 0); }
 		ofDrawBitmapString(ofToString(point.y / rmsAmplitudeScale, 3), 0, point.y, 0);
 		ofDrawBitmapString(ofToString(point.z / timePointScale, 2) + "s", 0, 0, point.z);
+
 		camera.end();
 
 		glm::vec2 offset(10, -10);
@@ -372,7 +378,7 @@ void ofApp::analyseAudioFiles() {
 	fft = ofxFft::create(fftBufferSize, OF_FFT_WINDOW_HAMMING);
 }
 
-void ofApp::partialAnalyse() {
+void ofApp::partialAnalyse(bool logFreq) {
 	currentAudioFile.load(audioFiles[analysisIndex].getAbsolutePath());
 	if (!currentAudioFile.loaded()) {
 		failedAnalysisCount++;
@@ -403,12 +409,12 @@ void ofApp::partialAnalyse() {
 		float spectralCentroid = 0.0;
 		if (singleChannel) {
 			float* framePointer = currentAudioFile.data() + frame * stftHopSize;
-			spectralCentroid = spectralCentroidOneFrame(framePointer, currentAudioFile.samplerate(), false);
+			spectralCentroid = spectralCentroidOneFrame(framePointer, currentAudioFile.samplerate(), logFreq);
 		}
 		else {
 			for (int channel = 0; channel < currentAudioFile.channels(); channel++) {
 				float* framePointer = &deinterleavedAudioData[channel][frame * stftHopSize];
-				spectralCentroid += spectralCentroidOneFrame(framePointer, currentAudioFile.samplerate(), false);
+				spectralCentroid += spectralCentroidOneFrame(framePointer, currentAudioFile.samplerate(), logFreq);
 			}
 			spectralCentroid /= currentAudioFile.channels();
 		}
@@ -456,7 +462,7 @@ void ofApp::partialAnalyse() {
 				lastFrame.push_back(0.0);
 			}
 
-			float spectralCentroid = spectralCentroidOneFrame(&lastFrame[0], currentAudioFile.samplerate(), false);
+			float spectralCentroid = spectralCentroidOneFrame(&lastFrame[0], currentAudioFile.samplerate(), logFreq);
 			float rms = 0.0;
 			
 			for (int i = 0; i < fftBufferSize; i++) {
@@ -524,7 +530,7 @@ void ofApp::deinterleaveAudioData(float* interleavedData, int channelSize, int n
 	}
 }
 
-float ofApp::spectralCentroidOneFrame(float* input, float sampleRate, bool logFreq = false) {
+float ofApp::spectralCentroidOneFrame(float* input, float sampleRate, bool logFreq) {
 	std::vector<float> ampBins(fft->getBinSize());
 
 	// normalise input
