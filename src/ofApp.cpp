@@ -387,9 +387,12 @@ void ofApp::partialAnalyse() {
 			float timePoint = (float)(lastFrameStart) / (float)currentAudioFile.samplerate();
 
 			points.addVertex({ spectralCentroid * spectralCentroidScale, rms * rmsAmplitudeScale, timePoint * timePointScale });
+			if (timePoint * timePointScale > maxTimePoint) { maxTimePoint = timePoint * timePointScale; }
 		}
 		else {
-			points.addVertex({ 0.0, 0.0, (float)currentAudioFile.length() / (float)currentAudioFile.samplerate() * timePointScale });
+			float timePoint = (float)currentAudioFile.length() / (float)currentAudioFile.samplerate();
+			points.addVertex({ 0.0, 0.0, timePoint * timePointScale });
+			if (timePoint * timePointScale > maxTimePoint) { maxTimePoint = timePoint * timePointScale; }
 			// TODO - zero pad last frame for multichannel audio
 		}
 
