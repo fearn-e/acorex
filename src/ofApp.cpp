@@ -38,16 +38,7 @@ void ofApp::setup() {
 
 	// Point Scales //
 	bLogFreq = true;
-
-	if (bLogFreq) { spectralCentroidScale = -3.0; }
-	else { spectralCentroidScale = -0.02; }
-	rmsAmplitudeScale = 400.0;
-	timePointScale = 60.0;
-
-	if (bLogFreq) { maxSpectralCentroid = 127.0 * spectralCentroidScale; }
-	else { maxSpectralCentroid = 20000.0 * spectralCentroidScale; }
-	maxRMSAmplitude = 1.0 * rmsAmplitudeScale;
-	maxTimePoint = 5.0 * timePointScale;
+	updateScales(bLogFreq);
 
 	// Camera //
 	camera.setNearClip(0.1);
@@ -56,8 +47,37 @@ void ofApp::setup() {
 
 	// Analysis //
 	fftBufferSize = 4096;
+	stftHopRatio = 2;
 	stftHopSize = fftBufferSize / 2;
 	minimumRMSAmplitude = 0.02;
+
+	// GUI //
+
+	selectDirectoryButton.addListener(this, &ofApp::selectDirectory);
+	beginAnalysisButton.addListener(this, &ofApp::listAudioFiles);
+	fftBufferSizeSlider.addListener(this, &ofApp::quantiseFFTBufferSizeSlider);
+	stftHopRatioSlider.addListener(this, &ofApp::quantiseSTFTHopRatioSlider);
+	minimumRMSAmplitudeSlider.addListener(this, &ofApp::quantiseMinimumRMSAmplitudeSlider);
+
+	gui.setup("Analysis Settings");
+	gui.setWidthElements(300);
+	gui.add(selectDirectoryButton.setup("Select Directory"));
+	gui.add(currentDirectoryLabel.setup("Current Directory", ""));
+	gui.add(fftBufferSizeSlider.set("FFT Buffer Size", fftBufferSize, 256, 16384));
+	gui.add(stftHopRatioSlider.set("STFT Hop Ratio", stftHopRatio, 1, 128));
+	gui.add(minimumRMSAmplitudeSlider.set("Minimum RMS Amplitude", minimumRMSAmplitude, 0.0, 1.0));
+	gui.add(logFreqToggle.set("Log Frequency Display/Analysis", bLogFreq));
+	gui.add(beginAnalysisButton.setup("Begin Analysis"));
+	gui.setPosition(ofGetWidth() - gui.getWidth() - 20, ofGetHeight() - gui.getHeight() - 20);
+	gui.registerMouseEvents();
+}
+
+void ofApp::exit() {
+	selectDirectoryButton.removeListener(this, &ofApp::selectDirectory);
+	beginAnalysisButton.removeListener(this, &ofApp::listAudioFiles);
+	fftBufferSizeSlider.removeListener(this, &ofApp::quantiseFFTBufferSizeSlider);
+	stftHopRatioSlider.removeListener(this, &ofApp::quantiseSTFTHopRatioSlider);
+	minimumRMSAmplitudeSlider.removeListener(this, &ofApp::quantiseMinimumRMSAmplitudeSlider);
 }
 
 //--------------------------------------------------------------
@@ -136,6 +156,8 @@ void ofApp::updateWhileAnalysing() {
 		resetCamera();
 
 		bPointPicker = true;
+
+		gui.registerMouseEvents();
 	}
 }
 
@@ -293,6 +315,9 @@ void ofApp::draw() {
 		ofDrawBitmapString(ss.str().c_str(), ofGetWidth() - 200, 20);
 	}
 
+	// Draw Analysis Settings //
+	gui.draw();
+
 	// Draw Debug Text //
 	if (bDebugText) {
 		ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
@@ -332,9 +357,16 @@ void ofApp::draw() {
 }
 
 //--------------------------------------------------------------
-void ofApp::listAudioFiles() {
+void ofApp::selectDirectory() {
 	ofFileDialogResult result = ofSystemLoadDialog("Select samples folder", true, ofFilePath::getAbsolutePath("samples"));
 	if (result.bSuccess) {
+		currentDirectoryLabel.setup(result.getName());
+		selectedDirectory = ofFile(result.getPath());
+	}
+}
+
+void ofApp::listAudioFiles() {
+	if (selectedDirectory.getAbsolutePath() != "") {
 		dir.close();
 		folders.clear();
 		audioFiles.clear();
@@ -345,8 +377,9 @@ void ofApp::listAudioFiles() {
 		bListing = true;
 		bPointPicker = false;
 
-		ofFile topDir(result.getPath());
-		folders.insert(folders.end(), topDir);
+		folders.insert(folders.end(), selectedDirectory);
+
+		gui.unregisterMouseEvents();
 	}
 }
 
@@ -370,11 +403,19 @@ void ofApp::checkFolder(const string& path, const vector<string>& extensions, ve
 
 //--------------------------------------------------------------
 void ofApp::analyseAudioFiles() {
+	bLogFreq = logFreqToggle;
+	updateScales(bLogFreq);
+	fftBufferSize = fftBufferSizeSlider;
+	stftHopRatio = stftHopRatioSlider;
+	minimumRMSAmplitude = minimumRMSAmplitudeSlider;
+
 	currentAudioFile.free();
 	analysisIndex = 0;
 	audioFileIndexLink.clear();
 	maxTimePoint = 5.0 * timePointScale;
 	bAnalysing = true;
+
+	stftHopSize = fftBufferSize / stftHopRatio;
 	fft = ofxFft::create(fftBufferSize, OF_FFT_WINDOW_HAMMING);
 }
 
@@ -623,6 +664,30 @@ float ofApp::spectralCentroidOneFrame(float* input, float sampleRate, bool logFr
 }
 
 //--------------------------------------------------------------
+void ofApp::quantiseFFTBufferSizeSlider(int& value) {
+	value = pow(2, round(log2(value)));
+}
+
+void ofApp::quantiseSTFTHopRatioSlider(int& value) {
+	value = pow(2, round(log2(value)));
+}
+
+void ofApp::quantiseMinimumRMSAmplitudeSlider(float& value) {
+	value = round(value * 1000.0) / 1000.0;
+}
+
+void ofApp::updateScales(bool logFreq) {
+	if (logFreq) { spectralCentroidScale = -3.0; }
+	else { spectralCentroidScale = -0.02; }
+	rmsAmplitudeScale = 400.0;
+	timePointScale = 60.0;
+
+	if (logFreq) { maxSpectralCentroid = 127.0 * spectralCentroidScale; }
+	else { maxSpectralCentroid = 20000.0 * spectralCentroidScale; }
+	maxRMSAmplitude = 1.0 * rmsAmplitudeScale;
+	maxTimePoint = 5.0 * timePointScale;
+}
+
 void ofApp::meshRotation(float deltaSpeed) {
 	ofVec3f rotationAxis = {
 				float(rotatePoints[0] - rotatePoints[1]),
