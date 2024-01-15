@@ -409,8 +409,9 @@ void ofApp::analyseAudioFiles() {
 
 	currentAudioFile.free();
 	analysisIndex = 0;
+	failedAnalysisCount = 0;
 	audioFileIndexLink.clear();
-	maxTimePoint = 5.0 * timePointScale;
+	connectToNextPoint.clear();
 	bAnalysing = true;
 
 	stftHopSize = fftBufferSize / stftHopRatio;
