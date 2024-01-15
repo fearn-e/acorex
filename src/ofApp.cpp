@@ -434,6 +434,7 @@ void ofApp::partialAnalyse() {
 			float* lastFramePointer = currentAudioFile.data() + lastFrameStart;
 
 			std::vector<float> lastFrame(lastFrameSize);
+			memcpy(&lastFrame[0], lastFramePointer, sizeof(float) * lastFrameSize);
 			for (int i = lastFrameSize; i < fftBufferSize; i++) {
 				lastFrame.push_back(0.0);
 			}
