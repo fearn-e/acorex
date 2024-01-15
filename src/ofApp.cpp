@@ -30,17 +30,25 @@ void ofApp::setup() {
 	nearestVertexScreenCoordinate = { 0,0 };
 	nearestDistance = 0;
 
-	// Camera //
-	camera.setGlobalPosition({ 0,0,camera.getImagePlaneDistance(ofGetCurrentViewport()) });
-
+	// Mesh Rotation //
 	rotationSpeed = 45.0;
 	for (int i = 0; i < 6; i++) {
 		rotatePoints[i] = 0;
 	}
 
+	// Point Scales //
 	rmsAmplitudeScale = 400.0;
 	spectralCentroidScale = 0.02;
 	timePointScale = 60.0;
+
+	maxRMSAmplitude = 1.0 * rmsAmplitudeScale;
+	maxSpectralCentroid = 20000.0 * spectralCentroidScale;
+	maxTimePoint = 5.0 * timePointScale;
+
+	// Camera //
+	camera.setNearClip(0.1);
+	camera.setFarClip(10000);
+	resetCamera();
 
 	// FFT //
 	fftBufferSize = 2048;
@@ -51,7 +59,7 @@ void ofApp::setup() {
 //--------------------------------------------------------------
 void ofApp::update() {
 
-	// Update FPS & Delta Time //
+	// Calculate Update FPS & Delta Time //
 	float currentTime = ofGetElapsedTimef();
 	float deltaTime = currentTime - previousUpdateTime;
 	previousUpdateTime = currentTime;
@@ -121,6 +129,8 @@ void ofApp::updateWhileAnalysing() {
 		ss << "Analysis complete." << endl;
 		ofSystemAlertDialog(ss.str().c_str());
 
+		resetCamera();
+
 		bPointPicker = true;
 	}
 }
@@ -128,7 +138,7 @@ void ofApp::updateWhileAnalysing() {
 //--------------------------------------------------------------
 void ofApp::draw() {
 
-	// Draw FPS //
+	// Calculate Draw FPS //
 	float currentTime = ofGetElapsedTimef();
 	float deltaTime = currentTime - previousDrawTime;
 	previousDrawTime = currentTime;
@@ -537,6 +547,16 @@ void ofApp::soundController() {
 	ofSoundUpdate();
 }
 
+void ofApp::resetCamera() {
+	float camereDistanceMultiplier1 = 1.2;
+	camera.setGlobalPosition({ 
+		maxRMSAmplitude * -camereDistanceMultiplier1, 
+		maxSpectralCentroid * -camereDistanceMultiplier1, 
+		maxTimePoint * camereDistanceMultiplier1 
+		});
+	camera.lookAt({ 0, 0, 0 });
+}
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
 	
@@ -589,8 +609,7 @@ void ofApp::keyReleased(int key) {
 	case ';':
 		glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: "))); break;
 	case 'r':
-		camera.setGlobalPosition({ 0,0,camera.getImagePlaneDistance(ofGetCurrentViewport()) });
-		camera.setGlobalOrientation({ 0,0,0,1 });
+		resetCamera();
 		points = pointOrigins;
 		break;
 	}
