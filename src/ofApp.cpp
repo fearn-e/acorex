@@ -359,6 +359,7 @@ void ofApp::checkFolder(const string& path, const vector<string>& extensions, ve
 void ofApp::analyseAudioFiles() {
 	currentAudioFile.free();
 	analysisIndex = 0;
+	audioFileIndexLink.clear();
 	bAnalysing = true;
 }
 
