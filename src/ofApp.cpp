@@ -235,6 +235,28 @@ void ofApp::draw() {
 		ofSetLineWidth(1);
 	}
 
+	// Highlight All Points From Same Selected Audio File //
+	if (!bListing && bPointPicker && nearestDistance < 15) {
+		ofSetColor(ofColor::red);
+		int currentFile = audioFileIndexLink[nearestIndex];
+		int fileIndex = nearestIndex;
+		do {
+			fileIndex--;
+		} while (fileIndex >= 0 && audioFileIndexLink[fileIndex] == currentFile);
+		fileIndex++;
+		bool firstPoint = true;
+		ofVec3f previousPoint;
+		do {
+			ofVec3f point = points.getVertex(fileIndex);
+			ofFill();
+			ofDrawCircle(camera.worldToScreen(point), 3);
+			fileIndex++;
+			if (firstPoint) { firstPoint = false; }
+			else { ofDrawLine(camera.worldToScreen(previousPoint), camera.worldToScreen(point)); }
+			previousPoint = point;
+		} while (fileIndex < points.getNumVertices() && audioFileIndexLink[fileIndex] == currentFile);
+	}
+
 	// Draw Loading/Analysing Text //
 	if (bListing) {
 		ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
