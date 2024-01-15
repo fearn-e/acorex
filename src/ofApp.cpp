@@ -370,9 +370,10 @@ void ofApp::listAudioFiles() {
 		points.clear();
 		pointOrigins.clear();
 		searchedFolders = 0;
-		
+
 		bListing = true;
 		bPointPicker = false;
+		nearestIndex = 0;
 
 		folders.insert(folders.end(), selectedDirectory);
 
