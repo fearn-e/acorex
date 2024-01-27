@@ -27,7 +27,6 @@ void ofApp::setup() {
 	// Point Picker //
 	bPointPicker = false;
 	nearestIndex = 0;
-	nearestVertexScreenCoordinate = { 0,0 };
 	nearestDistance = 0;
 
 	// Mesh Rotation //
@@ -255,12 +254,6 @@ void ofApp::draw() {
 		glm::vec2 offset(10, -10);
 		ofSetColor(ofColor::red);
 		ofDrawBitmapString(ofToString(nearestIndex) + ". " + audioFiles[audioFileIndexLink[nearestIndex]].getFileName(), mouse + offset);
-
-		ofNoFill();
-		ofSetColor(ofColor::red);
-		ofSetLineWidth(2);
-		ofDrawCircle(nearestVertexScreenCoordinate, 4);
-		ofSetLineWidth(1);
 	}
 
 	// Highlight All Points From Same Selected Audio File //
@@ -714,7 +707,6 @@ void ofApp::pointPicker() {
 		float distance = glm::distance(vertex, mouse);
 		if (i == 0 || distance < nearestDistance) {
 			nearestDistance = distance;
-			nearestVertexScreenCoordinate = vertex;
 			nearestIndex = i;
 		}
 	}
