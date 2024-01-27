@@ -14,8 +14,6 @@ void ofApp::setup() {
 	previousUpdateTime = ofGetElapsedTimef();
 	previousDrawTime = ofGetElapsedTimef();
 
-	allowedExtensions = { "mp3", "wav", "flac", "ogg" };
-
 	// Mesh //
 	points.setMode(OF_PRIMITIVE_POINTS);
 
@@ -93,7 +91,19 @@ void ofApp::update() {
 	// Loading/Analysing //
 	if (bListing)
 	{
-		updateWhileListing();
+		bListing = _audioFileLister.process();
+
+		if (!bListing) {
+			if (_audioFileLister.getAudioFiles().size() > 0) {
+				audioFiles.clear();
+				audioFiles = _audioFileLister.getAudioFiles();
+				analyseAudioFiles();
+			}
+			else {
+				ofSystemAlertDialog("No audio files found.");
+				endOfFileProcessing();
+			}
+		}
 		return;
 	}
 	else if (bAnalysing) {
@@ -117,22 +127,6 @@ void ofApp::update() {
 	soundController();
 }
 
-void ofApp::updateWhileListing() {
-	if (folders.size() > 0) {
-		partialList(folders.back().getAbsolutePath());
-	}
-	else {
-		bListing = false;
-
-		if (audioFiles.size() > 0) {
-			analyseAudioFiles();
-		}
-		else {
-			ofSystemAlertDialog("No audio files found.");
-		}
-	}
-}
-
 void ofApp::updateWhileAnalysing() {
 	if (analysisIndex < audioFiles.size()) {
 		partialAnalyse(bLogFreq);
@@ -151,10 +145,16 @@ void ofApp::updateWhileAnalysing() {
 
 		//resetCamera();
 
-		bPointPicker = true;
-
-		gui.registerMouseEvents();
+		endOfFileProcessing();
 	}
+}
+
+void ofApp::endOfFileProcessing() {
+	if (points.getNumVertices() > 0) {
+		bPointPicker = true;
+	}
+
+	gui.registerMouseEvents();
 }
 
 //--------------------------------------------------------------
@@ -289,8 +289,8 @@ void ofApp::draw() {
 		stringstream ss;
 		ss << "Loading audio files..." << endl;
 		ss << "Found " << audioFiles.size() << " files." << endl;
-		ss << "Searched " << searchedFolders << " folders." << endl;
-		ss << "Remaining " << folders.size() << " folders.";
+		ss << "Searched " << _audioFileLister.getFolderCount() << " folders." << endl;
+		ss << "Remaining " << _audioFileLister.getRemainingFolderCount() << " folders.";
 
 		ofDrawBitmapString(ss.str().c_str(), ofGetWidth() - 200, 20);
 	}
@@ -348,48 +348,19 @@ void ofApp::draw() {
 
 //--------------------------------------------------------------
 void ofApp::selectDirectory() {
-	ofFileDialogResult result = ofSystemLoadDialog("Select samples folder", true, ofFilePath::getAbsolutePath("samples"));
-	if (result.bSuccess) {
-		currentDirectoryLabel.setup(result.getName());
-		selectedDirectory = ofFile(result.getPath());
-	}
+	currentDirectoryLabel = _audioFileLister.setDirectory();
 }
 
 void ofApp::listAudioFiles() {
-	if (selectedDirectory.getAbsolutePath() != "") {
-		dir.close();
-		folders.clear();
-		audioFiles.clear();
-		points.clear();
-		pointOrigins.clear();
-		searchedFolders = 0;
-
+	if (_audioFileLister.getValidDirectorySelected()) {
 		bListing = true;
 		bPointPicker = false;
 		nearestIndex = 0;
 
-		folders.insert(folders.end(), selectedDirectory);
-
 		gui.unregisterMouseEvents();
+
+		_audioFileLister.beginListing();
 	}
-}
-
-void ofApp::partialList(const string& path) {
-	folders.pop_back(); // remove current folder from list
-
-	checkFolder(path, { "" }, folders); // check for subfolders
-
-	checkFolder(path, allowedExtensions, audioFiles); // check for audio files
-
-	searchedFolders++;
-}
-
-void ofApp::checkFolder(const string& path, const vector<string>& extensions, vector<ofFile>& files) {
-	dir.extensions.clear();
-	dir.extensions = extensions;
-	dir.listDir(path);
-	if (dir.getFiles().size() > 0)
-		files.insert(files.end(), dir.getFiles().begin(), dir.getFiles().end());
 }
 
 //--------------------------------------------------------------
@@ -399,6 +370,9 @@ void ofApp::analyseAudioFiles() {
 	fftBufferSize = fftBufferSizeSlider;
 	stftHopRatio = stftHopRatioSlider;
 	minimumRMSAmplitude = minimumRMSAmplitudeSlider;
+
+	points.clear();
+	pointOrigins.clear();
 
 	currentAudioFile.free();
 	analysisIndex = 0;
@@ -789,8 +763,6 @@ void ofApp::keyReleased(int key) {
 			bDrawPoints = !bDrawPoints;
 		}
 		break;
-	case 'o':
-		listAudioFiles(); break;
 	case ';':
 		glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: "))); break;
 	case 'r':
