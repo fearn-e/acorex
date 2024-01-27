@@ -57,7 +57,7 @@ void ofApp::setup() {
 	minimumRMSAmplitudeSlider.addListener(this, &ofApp::quantiseMinimumRMSAmplitudeSlider);
 
 	gui.setup("Analysis Settings");
-	gui.setWidthElements(300);
+	gui.setWidthElements(500);
 	gui.add(selectDirectoryButton.setup("Select Directory"));
 	gui.add(currentDirectoryLabel.setup("Current Directory", ""));
 	gui.add(fftBufferSizeSlider.set("FFT Buffer Size", fftBufferSize, 256, 16384));
@@ -101,13 +101,31 @@ void ofApp::update() {
 			}
 			else {
 				ofSystemAlertDialog("No audio files found.");
-				endOfFileProcessing();
+				fileProcessingUnlocks();
 			}
 		}
 		return;
 	}
 	else if (bAnalysing) {
-		updateWhileAnalysing();
+		if (analysisIndex < audioFiles.size()) {
+			partialAnalyse(bLogFreq);
+		}
+		else {
+			bAnalysing = false;
+
+			pointOrigins = points;
+
+			stringstream ss;
+			ss << "Analysed " << audioFiles.size() << " audio files." << endl;
+			ss << "Points: " << ofToString(points.getNumVertices()) << endl;
+			ss << "Failed to load " << failedAnalysisCount << " audio files." << endl;
+			ss << "Analysis complete." << endl;
+			ofSystemAlertDialog(ss.str().c_str());
+
+			//resetCamera();
+
+			fileProcessingUnlocks();
+		}
 		return;
 	}
 	// Skip Below If Loading/Analysing ------------------------ //
@@ -127,34 +145,21 @@ void ofApp::update() {
 	soundController();
 }
 
-void ofApp::updateWhileAnalysing() {
-	if (analysisIndex < audioFiles.size()) {
-		partialAnalyse(bLogFreq);
-	}
-	else {
-		bAnalysing = false;
+void ofApp::fileProcessingLocks() {
+	bPointPicker = false;
+	nearestIndex = 0;
 
-		pointOrigins = points;
-		
-		stringstream ss;
-		ss << "Analysed " << audioFiles.size() << " audio files." << endl;
-		ss << "Points: " << ofToString(points.getNumVertices()) << endl;
-		ss << "Failed to load " << failedAnalysisCount << " audio files." << endl;
-		ss << "Analysis complete." << endl;
-		ofSystemAlertDialog(ss.str().c_str());
-
-		//resetCamera();
-
-		endOfFileProcessing();
-	}
+	//hide gui off screen
+	gui.setPosition(-gui.getWidth(), -gui.getHeight());
 }
 
-void ofApp::endOfFileProcessing() {
+void ofApp::fileProcessingUnlocks() {
 	if (points.getNumVertices() > 0) {
 		bPointPicker = true;
 	}
 
-	gui.registerMouseEvents();
+	//return gui to screen
+	gui.setPosition(ofGetWidth() - gui.getWidth() - 20, ofGetHeight() - gui.getHeight() - 20);
 }
 
 //--------------------------------------------------------------
@@ -353,13 +358,15 @@ void ofApp::selectDirectory() {
 
 void ofApp::listAudioFiles() {
 	if (_audioFileLister.getValidDirectorySelected()) {
-		bListing = true;
-		bPointPicker = false;
-		nearestIndex = 0;
+		fileProcessingLocks();
 
-		gui.unregisterMouseEvents();
+		bListing = true;
 
 		_audioFileLister.beginListing();
+	}
+	else
+	{
+		ofSystemAlertDialog("No directory selected.");
 	}
 }
 
