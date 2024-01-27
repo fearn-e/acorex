@@ -74,7 +74,6 @@ class ofApp : public ofBaseApp{
 		vector<bool> connectToNextPoint;
 		
 		int nearestIndex;
-		glm::vec2 nearestVertexScreenCoordinate;
 		float nearestDistance;
 		glm::vec3 mouse;
 
