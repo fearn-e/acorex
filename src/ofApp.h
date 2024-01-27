@@ -15,8 +15,8 @@ public:
 	void exit();
 
 	void update();
-	void updateWhileAnalysing();
-	void endOfFileProcessing();
+	void fileProcessingLocks();
+	void fileProcessingUnlocks();
 
 	void draw();
 
