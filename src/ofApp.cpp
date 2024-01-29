@@ -118,7 +118,6 @@ void ofApp::update() {
 			stringstream ss;
 			ss << "Analysed " << audioFiles.size() << " audio files." << endl;
 			ss << "Points: " << ofToString(points.getNumVertices()) << endl;
-			ss << "Failed to load " << failedAnalysisCount << " audio files." << endl;
 			ss << "Analysis complete." << endl;
 			ofSystemAlertDialog(ss.str().c_str());
 
@@ -305,7 +304,6 @@ void ofApp::draw() {
 		stringstream ss;
 		ss << "Analysing audio files..." << endl;
 		ss << "Analysed " << analysisIndex << "/" << audioFiles.size() << endl;
-		ss << "Failed to load " << failedAnalysisCount << " files." << endl;
 
 		ofDrawBitmapString(ss.str().c_str(), ofGetWidth() - 200, 20);
 	}
@@ -383,7 +381,6 @@ void ofApp::analyseAudioFiles() {
 
 	currentAudioFile.free();
 	analysisIndex = 0;
-	failedAnalysisCount = 0;
 	audioFileIndexLink.clear();
 	connectToNextPoint.clear();
 	bAnalysing = true;
@@ -395,7 +392,6 @@ void ofApp::analyseAudioFiles() {
 void ofApp::partialAnalyse(bool logFreq) {
 	currentAudioFile.load(audioFiles[analysisIndex].getAbsolutePath());
 	if (!currentAudioFile.loaded()) {
-		failedAnalysisCount++;
 		cout << "Failed to load " << audioFiles[analysisIndex].getFileName() << endl;
 		analysisIndex++;
 		return;

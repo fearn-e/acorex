@@ -83,7 +83,6 @@ public:
 	vector<ofFile> audioFiles;
 
 	int analysisIndex;
-	int failedAnalysisCount;
 	ofxAudioFile currentAudioFile;
 
 	vector<vector<float>> deinterleavedAudioData;
