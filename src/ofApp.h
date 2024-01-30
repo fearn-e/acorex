@@ -6,6 +6,7 @@
 #include "ofxGui.h"
 
 #include "ListAudioFilesInDirectory.h"
+#include "DataController.h"
 
 class ofApp : public ofBaseApp {
 
@@ -15,26 +16,19 @@ public:
 	void exit();
 
 	void update();
-	void fileProcessingLocks();
-	void fileProcessingUnlocks();
 
 	void draw();
 
+	void fileProcessingLocks();
+	void fileProcessingUnlocks();
 	void selectDirectory();
 	void listAudioFiles();
-
 	void analyseAudioFiles();
-	void partialAnalyse(bool logFreq);
-	void deinterleaveAudioData(float* interleavedData, int fileSize, int numChannels);
-	float spectralCentroidOneFrame(float* input, float sampleRate, bool logFreq);
 
 	void quantiseFFTBufferSizeSlider(int& value);
 	void quantiseSTFTHopRatioSlider(int& value);
 	void quantiseMinimumRMSAmplitudeSlider(float& value);
-	void updateScales(bool logFreq);
-	void meshRotation(float deltaSpeed);
-	void pointPicker();
-	void soundController();
+	//void meshRotation(float deltaSpeed);
 	void resetCamera();
 
 	void keyPressed(int key);
@@ -51,51 +45,36 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 	
+	// state boolean flags
 	bool bDebugText;
 	bool bPointPicker;
 	bool bDrawPoints;
 	bool bListing;
 	bool bAnalysing;
-	bool bLogFreq;
 
-	float drawFPS;
-	float updateFPS;
-		
-	float previousDrawTime;
-	float previousUpdateTime;
-
+	// camera
 	ofEasyCam camera;
 
+	// mesh rotating
 	float rotationSpeed;
 	bool rotatePoints[6];
 
-	ofMesh points;
-	ofMesh pointOrigins;
-	vector<int> audioFileIndexLink;
-	vector<bool> connectToNextPoint;
+	// debug fps and delta times
+	float drawFPS, updateFPS;
+	float previousDrawTime, previousUpdateTime;
 		
+	// nearest point
 	int nearestIndex;
-	float nearestDistance;
-	glm::vec3 mouse;
 
-	ListAudioFilesInDirectory _audioFileLister;
+	// file listing
+	ListAudioFilesInDirectory _fileLister;
 	ofFile selectedDirectory;
 	vector<ofFile> audioFiles;
 
-	int analysisIndex;
-	ofxAudioFile currentAudioFile;
+	// file analysis
+	DataController _dataCtrl;
 
-	vector<vector<float>> deinterleavedAudioData;
-
-	ofxFft* fft;
-	int stftHopSize;
-	int fftBufferSize;
-	int stftHopRatio;
-
-	float rmsAmplitudeScale, spectralCentroidScale, timePointScale;
-	float maxRMSAmplitude, maxSpectralCentroid, maxTimePoint;
-	float minimumRMSAmplitude;
-
+	// gui
 	ofxPanel gui;
 	ofxButton selectDirectoryButton;
 	ofxLabel currentDirectoryLabel;
@@ -104,7 +83,4 @@ public:
 	ofParameter<float> minimumRMSAmplitudeSlider;
 	ofParameter<bool> logFreqToggle;
 	ofxButton beginAnalysisButton;
-
-	vector<ofSoundPlayer> sounds;
-	int lastSoundIndex;
 };

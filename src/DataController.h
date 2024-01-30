@@ -1,0 +1,66 @@
+#pragma once
+
+#include "ofMain.h"
+#include "ofxAudioFile.h"
+#include "ofxFft.h"
+
+class DataController {
+
+public:
+	DataController();
+	~DataController();
+
+	void init(bool logFreqSetting, float rmsMinCutoffSetting, 
+			int fftBufferSizeSetting, int stftHopRatioSetting);
+
+	void beginAnalyse(const vector<ofFile>& fileList, bool logFreqSetting, 
+					float rmsMinCutoffSetting, int fftBufferSizeSetting, int stftHopRatioSetting);
+
+	void draw(ofCamera& camera, glm::vec3 mouse, bool drawPointsEnabled, bool listingInProgress, bool pointPickEnabled);
+
+	bool process();
+
+	void analyseOneFile();
+	void deinterleaveAudioData(vector<vector<float>>& deinterleavedData, float* interleavedData, 
+								int fileSize, int numChannels);
+	float spectralCentroidOneFrame(float* input, float sampleRate, bool logFreq);
+
+	void updateScales();
+
+	int pointPicker(glm::vec3 mouse, ofCamera camera);
+
+	void soundController(bool pointPickEnabled);
+
+	glm::vec3 getMaxDimensions();
+	int getPointCount();
+	int getFileFromPoint(int index);
+
+private:
+	ofMesh points;
+
+	vector<int> audioFileIndexLink;
+	vector<bool> connectToNextPoint;
+
+	vector<ofFile> audioFiles;
+
+	int nearestIndex;
+	int analysisIndex;
+	ofxAudioFile currentAudioFile;
+
+	ofxFft* fft;
+	int fftBufferSize;
+	int stftHopRatio;
+	int stftHopSize;
+
+	float rmsScale, centroidScale, timeScale;
+	float rmsMax, centroidMax, timeMax;
+	float rmsMinCutoff;
+
+	bool bLogFreq;
+
+	vector<ofSoundPlayer> sounds;
+	int lastSoundIndex;
+
+	bool bInProgress;
+};
+
