@@ -36,6 +36,6 @@ private:
 
 	int searchedFolders;
 
-	bool inProgress;
+	bool bInProgress;
 };
 

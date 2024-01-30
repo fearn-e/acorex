@@ -30,14 +30,14 @@ bool ListAudioFilesInDirectory::process() {
 
 		searchedFolders++;
 		
-		inProgress = true;
+		bInProgress = true;
 	}
 	else
 	{
-		inProgress = false;
+		bInProgress = false;
 	}
 
-	return inProgress;
+	return bInProgress;
 }
 
 void ListAudioFilesInDirectory::checkOneFolder(const string& path, const vector<string>& extensions, vector<ofFile>& files) {
