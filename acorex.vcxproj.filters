@@ -70,6 +70,9 @@
     <ClCompile Include="src\ListAudioFilesInDirectory.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\DataController.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -198,6 +201,9 @@
       <Filter>addons\ofxGui\src</Filter>
     </ClInclude>
     <ClInclude Include="src\ListAudioFilesInDirectory.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DataController.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

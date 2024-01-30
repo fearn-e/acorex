@@ -104,6 +104,7 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\DataController.cpp" />
     <ClCompile Include="src\ListAudioFilesInDirectory.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
@@ -127,6 +128,7 @@
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\DataController.h" />
     <ClInclude Include="src\ListAudioFilesInDirectory.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.h" />
