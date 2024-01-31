@@ -118,7 +118,7 @@ void ofApp::update() {
 
 	if (bPointPicker)
 	{
-		nearestIndex = _dataCtrl.pointPicker({ mouseX, mouseY, 0 }, camera);
+		nearestIndex = _dataCtrl.pointPicker({ mouseX, mouseY, 0 }, camera, bPointPickerSelected);
 	}
 
 	_dataCtrl.soundController(bPointPicker);
@@ -134,7 +134,7 @@ void ofApp::draw() {
 	drawFPS *= 0.9;
 	drawFPS += 1.0 / deltaTime * 0.1;
 
-	_dataCtrl.draw(camera, {mouseX, mouseY, 0}, bDrawPoints, bListing, bPointPicker);
+	_dataCtrl.draw(camera, {mouseX, mouseY, 0}, bDrawPoints, bListing, bPointPicker, bPointPickerSelected);
 
 	// Draw Listing //
 	if (bListing) {
@@ -193,6 +193,7 @@ void ofApp::draw() {
 //--------------------------------------------------------------
 void ofApp::fileProcessingLocks() {
 	bPointPicker = false;
+	bPointPickerSelected = false;
 	nearestIndex = -1;
 
 	//hide gui off screen
@@ -346,7 +347,13 @@ void ofApp::mouseDragged(int x, int y, int button) {
 }
 
 void ofApp::mousePressed(int x, int y, int button) {
-
+	switch (button) {
+	case 2:
+		if (bPointPicker)
+		{
+			bPointPickerSelected = !bPointPickerSelected;
+		}
+	}
 }
 
 void ofApp::mouseReleased(int x, int y, int button) {

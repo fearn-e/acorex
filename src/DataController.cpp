@@ -40,7 +40,7 @@ void DataController::beginAnalyse(const vector<ofFile>& fileList, bool logFreqSe
 	bInProgress = true;
 }
 
-void DataController::draw(ofCamera& camera, glm::vec3 mouse, bool drawPointsEnabled, bool listingInProgress, bool pointPickEnabled) {
+void DataController::draw(ofCamera& camera, glm::vec3 mouse, bool drawPointsEnabled, bool listingInProgress, bool pointPickEnabled, bool pointPickSelected) {
 	// Draw axes, grid, and labels //
 	{
 		camera.begin();
@@ -125,9 +125,15 @@ void DataController::draw(ofCamera& camera, glm::vec3 mouse, bool drawPointsEnab
 
 		camera.end();
 
-		glm::vec2 offset(10, -10);
+		glm::vec2 filenameScreenPos(20, -20);
+		if (pointPickSelected) {
+			filenameScreenPos += camera.worldToScreen(point);
+		}
+		else {
+			filenameScreenPos += mouse;
+		}
 		ofSetColor(ofColor::red);
-		ofDrawBitmapString(ofToString(nearestIndex) + ". " + audioFiles[audioFileIndexLink[nearestIndex]].getFileName(), mouse + offset);
+		ofDrawBitmapString(ofToString(nearestIndex) + ". " + audioFiles[audioFileIndexLink[nearestIndex]].getFileName(), filenameScreenPos);
 	}
 
 	// Highlight All Points From Same Selected Audio File //
@@ -433,7 +439,9 @@ void DataController::updateScales() {
 	else { centroidMax = 20000.0 * centroidScale; }
 }
 
-int DataController::pointPicker(glm::vec3 mouse, ofCamera camera) {
+int DataController::pointPicker(glm::vec3 mouse, ofCamera camera, bool selected) {
+	if (selected) { return nearestIndex; }
+
 	int pointCount = points.getNumVertices();
 	float nearestDistance = FLT_MAX;
 

@@ -48,6 +48,7 @@ public:
 	// state boolean flags
 	bool bDebugText;
 	bool bPointPicker;
+	bool bPointPickerSelected;
 	bool bDrawPoints;
 	bool bListing;
 	bool bAnalysing;
