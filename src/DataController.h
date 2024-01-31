@@ -16,7 +16,7 @@ public:
 	void beginAnalyse(const vector<ofFile>& fileList, bool logFreqSetting, 
 					float rmsMinCutoffSetting, int fftBufferSizeSetting, int stftHopRatioSetting);
 
-	void draw(ofCamera& camera, glm::vec3 mouse, bool drawPointsEnabled, bool listingInProgress, bool pointPickEnabled);
+	void draw(ofCamera& camera, glm::vec3 mouse, bool drawPointsEnabled, bool listingInProgress, bool pointPickEnabled, bool pointPickSelected);
 
 	bool process();
 
@@ -27,7 +27,7 @@ public:
 
 	void updateScales();
 
-	int pointPicker(glm::vec3 mouse, ofCamera camera);
+	int pointPicker(glm::vec3 mouse, ofCamera camera, bool selected);
 
 	void soundController(bool pointPickEnabled);
 
