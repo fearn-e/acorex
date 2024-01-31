@@ -136,7 +136,7 @@ void ofApp::draw() {
 
 	_dataCtrl.draw(camera, {mouseX, mouseY, 0}, bDrawPoints, bListing, bPointPicker, bPointPickerSelected);
 
-	// Draw Listing //
+	// Draw Listing Progress Text //
 	if (bListing) {
 		ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
 
@@ -177,14 +177,20 @@ void ofApp::draw() {
 		ss << "Draw Points: " << ofToString(bDrawPoints) << endl;
 		ss << endl;
 
-		ss << "(wasdqe): Move Mesh" << endl;
+		//ss << "(wasdqe): Move Mesh" << endl;
+		ss << "(right click): Select file" << endl;
+
+		ss << "(x): Open in Explorer" << endl;
+		ss << "(c): Copy File Path to Clipboard" << endl;
+
+		ss << "(r): Reset Camera/Mesh" << endl;
 		ss << "(.): Toggle Fullscreen" << endl;
-		ss << "(h): Toggle Debug Text" << endl;
-		ss << "(o): Load Audio Files" << endl;
-		ss << "(;): Set Point Size" << endl;
+
 		ss << "(j): Toggle Point Picker" << endl;
 		ss << "(k): Toggle Draw Points" << endl;
-		ss << "(r): Reset Camera/Mesh" << endl;
+
+		ss << "(h): Toggle Debug Text" << endl;
+		ss << "(;): Set Point Size" << endl;
 
 		ofDrawBitmapStringHighlight(ss.str().c_str(), 20, 20);
 	}
@@ -288,38 +294,38 @@ void ofApp::keyPressed(int key) {
 }
 
 void ofApp::keyReleased(int key) {
-	switch (key) {
-	case 'w':
-		rotatePoints[0] = 0; break;
-	case 's':
-		rotatePoints[1] = 0; break;
-	case 'a':
-		rotatePoints[2] = 0; break;
-	case 'd':
-		rotatePoints[3] = 0; break;
-	case 'q':
-		rotatePoints[4] = 0; break;
-	case 'e':
-		rotatePoints[5] = 0; break;
-	case '.':
-		ofToggleFullscreen(); break;
-	case 'h':
-		bDebugText = !bDebugText; break;
-	case 'j':
-		if (!bListing && !bAnalysing && _dataCtrl.getPointCount() > 0) {
-			bPointPicker = !bPointPicker;
-		}
-		break;
-	case 'k':
-		if (_dataCtrl.getPointCount() > 0) {
-			bDrawPoints = !bDrawPoints;
-		}
-		break;
-	case ';':
-		glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: "))); break;
-	case 'r':
-		resetCamera();
-		break;
+    switch (key) {
+    case 'w':
+        rotatePoints[0] = 0; break;
+    case 's':
+        rotatePoints[1] = 0; break;
+    case 'a':
+        rotatePoints[2] = 0; break;
+    case 'd':
+        rotatePoints[3] = 0; break;
+    case 'q':
+        rotatePoints[4] = 0; break;
+    case 'e':
+        rotatePoints[5] = 0; break;
+    case '.':
+        ofToggleFullscreen(); break;
+    case 'h':
+        bDebugText = !bDebugText; break;
+    case 'j':
+        if (!bListing && !bAnalysing && _dataCtrl.getPointCount() > 0) {
+            bPointPicker = !bPointPicker;
+        }
+        break;
+    case 'k':
+        if (_dataCtrl.getPointCount() > 0) {
+            bDrawPoints = !bDrawPoints;
+        }
+        break;
+    case ';':
+        glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: "))); break;
+    case 'r':
+        resetCamera();
+        break;
     case 'c':
         if (nearestIndex != -1) {
             ofSetClipboardString(audioFiles[_dataCtrl.getFileFromPoint(nearestIndex)].getAbsolutePath());
