@@ -357,7 +357,7 @@ void ofApp::mousePressed(int x, int y, int button) {
 	case 2:
 		if (bPointPicker)
 		{
-			bPointPickerSelected = !bPointPickerSelected;
+			_dataCtrl.setPointPickerSelectedSubset(bPointPickerSelected);
 		}
 	}
 }

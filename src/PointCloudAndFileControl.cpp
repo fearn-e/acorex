@@ -132,18 +132,32 @@ void PointCloudAndFileControl::draw(ofCamera& camera, glm::vec3 mouse, bool draw
 		camera.end();
 
 		glm::vec3 filenameScreenPos(20, -20, 0);
-		if (pointPickSelected) {
-			filenameScreenPos += camera.worldToScreen(point);
-		}
-		else {
-			filenameScreenPos += mouse;
-		}
+		filenameScreenPos += camera.worldToScreen(point);
 		ofSetColor(ofColor::white);
-		ofDrawBitmapString(ofToString(nearestIndex) + ". " + audioFiles[audioFileIndexLink[nearestIndex]].getFileName(), filenameScreenPos);
+		ofDrawBitmapStringHighlight(ofToString(nearestIndex) + ". " + audioFiles[audioFileIndexLink[nearestIndex]].getFileName(), filenameScreenPos);
 	}
 
-	// Highlight All Points From Same Selected Audio File //
-	if (!listingInProgress && pointPickEnabled && nearestIndex != -1) {
+	// Highlight All Points From Selected Subset //
+	if (!listingInProgress && pointPickEnabled && pointPickSelected) {
+		bool firstPoint = true;
+		ofVec3f previousPoint;
+		for (int i = 0; i < pointsSelectedSubset.getNumVertices(); i++) {
+			ofVec3f point = pointsSelectedSubset.getVertex(i);
+			ofFill();
+			ofSetColor(ofColor::snow);
+			ofDrawCircle(camera.worldToScreen(point), 3);
+			if (firstPoint) { firstPoint = false; }
+			else {
+				if (connectToNextPoint[selectedSubsetIndexLink[i] - 1]) { ofSetColor(ofColor::linen); }
+				if (!connectToNextPoint[selectedSubsetIndexLink[i] - 1]) { ofSetColor(ofColor::tan); }
+				ofDrawLine(camera.worldToScreen(previousPoint), camera.worldToScreen(point));
+			}
+			previousPoint = point;
+		}
+	}
+
+	// Highlight All Points From Hovered Audio File When a Subset is Not Selected //
+	if (!listingInProgress && pointPickEnabled && !pointPickSelected && nearestIndex != -1) {
 		int currentFile = audioFileIndexLink[nearestIndex];
 		int fileIndex = nearestIndex;
 		do {
@@ -446,17 +460,15 @@ void PointCloudAndFileControl::updateScales() {
 }
 
 int PointCloudAndFileControl::pointPicker(glm::vec3 mouse, ofCamera camera, bool selected) {
-	if (selected) { return nearestIndex; }
-
-	int pointCount = points.getNumVertices();
+	int pointCount = selected ? pointsSelectedSubset.getNumVertices() : points.getNumVertices();
 	float nearestDistance = FLT_MAX;
 
 	for (int i = 0; i < pointCount; i++) {
-		glm::vec3 vertex = camera.worldToScreen(points.getVertex(i));
+		glm::vec3 vertex = camera.worldToScreen(selected ? pointsSelectedSubset.getVertex(i) : points.getVertex(i));
 		float distance = glm::distance(vertex, mouse);
 		if (i == 0 || distance < nearestDistance) {
 			nearestDistance = distance;
-			nearestIndex = i;
+			nearestIndex = selected ? selectedSubsetIndexLink[i] : i;
 		}
 	}
 
@@ -485,6 +497,35 @@ void PointCloudAndFileControl::soundController(bool pointPickEnabled) {
 		lastSoundIndex = nearestIndex;
 	}
 	ofSoundUpdate();
+}
+
+void PointCloudAndFileControl::setPointPickerSelectedSubset(bool& selected) {
+	if (selected) {
+		selected = false;
+		pointsSelectedSubset.clear();
+		selectedSubsetIndexLink.clear();
+	}
+	else if (!selected && nearestIndex != -1) {
+		selected = true;
+		pointsSelectedSubset.clear();
+		selectedSubsetIndexLink.clear();
+
+		int currentFile = audioFileIndexLink[nearestIndex];
+		int fileIndex = nearestIndex;
+		do {
+			fileIndex--;
+		} while (fileIndex >= 0 && audioFileIndexLink[fileIndex] == currentFile);
+		fileIndex++;
+		int startIndex = fileIndex;
+		do {
+			pointsSelectedSubset.addVertex(points.getVertex(fileIndex));
+			fileIndex++;
+		} while (fileIndex < points.getNumVertices() && audioFileIndexLink[fileIndex] == currentFile);
+
+		for (int i = 0; i < pointsSelectedSubset.getNumVertices(); i++) {
+			selectedSubsetIndexLink.push_back(startIndex + i);
+		}
+	}
 }
 
 glm::vec3 PointCloudAndFileControl::getMaxDimensions() {

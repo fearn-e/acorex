@@ -31,6 +31,8 @@ public:
 
 	void soundController(bool pointPickEnabled);
 
+	void setPointPickerSelectedSubset(bool& selected);
+
 	glm::vec3 getMaxDimensions();
 	int getPointCount();
 	int getFileFromPoint(int index);
@@ -40,6 +42,9 @@ private:
 
 	vector<int> audioFileIndexLink;
 	vector<bool> connectToNextPoint;
+
+	ofMesh pointsSelectedSubset;
+	vector<int> selectedSubsetIndexLink;
 
 	vector<ofFile> audioFiles;
 
