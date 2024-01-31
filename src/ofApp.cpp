@@ -324,6 +324,15 @@ void ofApp::keyReleased(int key) {
             ofSetClipboardString(audioFiles[_dataCtrl.getFileFromPoint(nearestIndex)].getAbsolutePath());
         }
         break;
+    case 'x':
+        if (nearestIndex != -1) {
+            //windows only - open explorer and select file using shell execute
+#ifdef _WIN32 || _WIN64
+			ofSystem("explorer /select," + audioFiles[_dataCtrl.getFileFromPoint(nearestIndex)].getAbsolutePath());
+#endif
+			//TODO - add mac path
+        }
+        break;
     }
 }
 
