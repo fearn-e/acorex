@@ -319,8 +319,12 @@ void ofApp::keyReleased(int key) {
 	case 'r':
 		resetCamera();
 		break;
-	}
-
+    case 'c':
+        if (nearestIndex != -1) {
+            ofSetClipboardString(audioFiles[_dataCtrl.getFileFromPoint(nearestIndex)].getAbsolutePath());
+        }
+        break;
+    }
 }
 
 //--------------------------------------------------------------
