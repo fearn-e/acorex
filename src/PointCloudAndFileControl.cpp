@@ -74,11 +74,17 @@ void PointCloudAndFileControl::draw(ofCamera& camera, glm::vec3 mouse, bool draw
 		camera.end();
 	}
 
+	// Set Color for Unselected Points //
+	int unselectedPointColor;
+	if (pointPickSelected) { unselectedPointColor = 60; } //selected
+	else if (nearestIndex != -1) { unselectedPointColor = 120; } //hovered
+	else { unselectedPointColor = 220; } //default
+
 	// Draw Points //
 	if (drawPointsEnabled) {
 		ofEnableDepthTest();
 		camera.begin();
-		ofSetColor(220);
+		ofSetColor(unselectedPointColor);
 		points.draw();
 		camera.end();
 		ofDisableDepthTest();
@@ -88,13 +94,13 @@ void PointCloudAndFileControl::draw(ofCamera& camera, glm::vec3 mouse, bool draw
 	if (drawPointsEnabled && points.getNumVertices() != 0) {
 		ofEnableDepthTest();
 		camera.begin();
-		ofSetColor(220);
+		ofSetColor(unselectedPointColor);
 		for (int i = 0; i < (points.getNumVertices() - 1); i++) {
 			bool sameFile = audioFileIndexLink[i]
 				== audioFileIndexLink[i + 1];
 			if (sameFile) {
-				if (connectToNextPoint[i]) { ofSetColor({220, 220, 220}); }
-				else { ofSetColor({ 150, 140, 230 }); }
+				if (connectToNextPoint[i]) { ofSetColor(unselectedPointColor); }
+				else { ofSetColor( unselectedPointColor, unselectedPointColor / 2, unselectedPointColor / 2 ); }
 				ofVec3f point = points.getVertex(i);
 				ofVec3f nextPoint = points.getVertex(i + 1);
 				ofDrawLine(point, nextPoint);
@@ -117,7 +123,7 @@ void PointCloudAndFileControl::draw(ofCamera& camera, glm::vec3 mouse, bool draw
 		ofDrawLine({ 0, point.y, point.z }, { 0, point.y, 0 });
 		ofDrawLine({ point.x, 0, point.z }, { 0, 0, point.z });
 
-		ofSetColor(ofColor::red);
+		ofSetColor(ofColor::white);
 		if (bLogFreq) { ofDrawBitmapString(ofToString(pow(2, ((point.x / centroidScale) - 69.0) / 12.0) * 440.0, 1) + "Hz", point.x, 0, 0); }
 		else { ofDrawBitmapString(ofToString(point.x / centroidScale, 1) + "Hz", point.x, 0, 0); }
 		ofDrawBitmapString(ofToString(point.y / rmsScale, 3), 0, point.y, 0);
@@ -132,13 +138,12 @@ void PointCloudAndFileControl::draw(ofCamera& camera, glm::vec3 mouse, bool draw
 		else {
 			filenameScreenPos += mouse;
 		}
-		ofSetColor(ofColor::red);
+		ofSetColor(ofColor::white);
 		ofDrawBitmapString(ofToString(nearestIndex) + ". " + audioFiles[audioFileIndexLink[nearestIndex]].getFileName(), filenameScreenPos);
 	}
 
 	// Highlight All Points From Same Selected Audio File //
 	if (!listingInProgress && pointPickEnabled && nearestIndex != -1) {
-		ofSetColor(ofColor::red);
 		int currentFile = audioFileIndexLink[nearestIndex];
 		int fileIndex = nearestIndex;
 		do {
@@ -150,11 +155,12 @@ void PointCloudAndFileControl::draw(ofCamera& camera, glm::vec3 mouse, bool draw
 		do {
 			ofVec3f point = points.getVertex(fileIndex);
 			ofFill();
+			ofSetColor(ofColor::snow);
 			ofDrawCircle(camera.worldToScreen(point), 3);
 			if (firstPoint) { firstPoint = false; }
 			else {
-				if (connectToNextPoint[fileIndex - 1]) { ofSetColor(ofColor::red); }
-				if (!connectToNextPoint[fileIndex - 1]) { ofSetColor(ofColor::blue); }
+				if (connectToNextPoint[fileIndex - 1]) { ofSetColor(ofColor::linen); }
+				if (!connectToNextPoint[fileIndex - 1]) { ofSetColor(ofColor::tan); }
 				ofDrawLine(camera.worldToScreen(previousPoint), camera.worldToScreen(point));
 			}
 			previousPoint = point;
