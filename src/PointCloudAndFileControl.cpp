@@ -1,16 +1,16 @@
-#include "DataController.h"
+#include "PointCloudAndFileControl.h"
 
-DataController::DataController() {
+PointCloudAndFileControl::PointCloudAndFileControl() {
 	points.setMode(OF_PRIMITIVE_POINTS);
 
 	init(false, 0.02, 4096, 2);
 
 	bInProgress = false;
 }
-DataController::~DataController() {
+PointCloudAndFileControl::~PointCloudAndFileControl() {
 }
 
-void DataController::init(bool logFreqSetting, float rmsMinCutoffSetting, 
+void PointCloudAndFileControl::init(bool logFreqSetting, float rmsMinCutoffSetting, 
 							int fftBufferSizeSetting, int stftHopRatioSetting) {
 	points.clear();
 	audioFileIndexLink.clear();
@@ -31,7 +31,7 @@ void DataController::init(bool logFreqSetting, float rmsMinCutoffSetting,
 	fft = ofxFft::create(fftBufferSize, OF_FFT_WINDOW_HAMMING);
 }
 
-void DataController::beginAnalyse(const vector<ofFile>& fileList, bool logFreqSetting, 
+void PointCloudAndFileControl::beginAnalyse(const vector<ofFile>& fileList, bool logFreqSetting, 
 									float rmsMinCutoffSetting, int fftBufferSizeSetting, int stftHopRatioSetting) {
 
 	init(logFreqSetting, rmsMinCutoffSetting, fftBufferSizeSetting, stftHopRatioSetting);
@@ -40,7 +40,7 @@ void DataController::beginAnalyse(const vector<ofFile>& fileList, bool logFreqSe
 	bInProgress = true;
 }
 
-void DataController::draw(ofCamera& camera, glm::vec3 mouse, bool drawPointsEnabled, bool listingInProgress, bool pointPickEnabled, bool pointPickSelected) {
+void PointCloudAndFileControl::draw(ofCamera& camera, glm::vec3 mouse, bool drawPointsEnabled, bool listingInProgress, bool pointPickEnabled, bool pointPickSelected) {
 	// Draw axes, grid, and labels //
 	{
 		camera.begin();
@@ -173,7 +173,7 @@ void DataController::draw(ofCamera& camera, glm::vec3 mouse, bool drawPointsEnab
 	}
 }
 
-bool DataController::process() {
+bool PointCloudAndFileControl::process() {
 	if (analysisIndex < audioFiles.size()) {
 		analyseOneFile();
 		analysisIndex++;
@@ -186,7 +186,7 @@ bool DataController::process() {
 	return bInProgress;
 }
 
-void DataController::analyseOneFile() {
+void PointCloudAndFileControl::analyseOneFile() {
 	currentAudioFile.load(audioFiles[analysisIndex].getAbsolutePath());
 	if (!currentAudioFile.loaded()) {
 		cout << "Failed to load " << audioFiles[analysisIndex].getFileName() << endl;
@@ -320,7 +320,7 @@ void DataController::analyseOneFile() {
 	if (finalTimePoint * timeScale > timeMax) { timeMax = finalTimePoint * timeScale; }
 }
 
-void DataController::deinterleaveAudioData(vector<vector<float>>& deinterleavedData, float* interleavedData, 
+void PointCloudAndFileControl::deinterleaveAudioData(vector<vector<float>>& deinterleavedData, float* interleavedData, 
 												int channelSize, int numChannels) {
 	deinterleavedData.resize(numChannels);
 
@@ -335,7 +335,7 @@ void DataController::deinterleaveAudioData(vector<vector<float>>& deinterleavedD
 	}
 }
 
-float DataController::spectralCentroidOneFrame(float* input, float sampleRate, bool logFreq) {
+float PointCloudAndFileControl::spectralCentroidOneFrame(float* input, float sampleRate, bool logFreq) {
 	std::vector<float> ampBins(fft->getBinSize());
 
 	// normalise input
@@ -427,7 +427,7 @@ float DataController::spectralCentroidOneFrame(float* input, float sampleRate, b
 	//return loudestBin;
 }
 
-void DataController::updateScales() {
+void PointCloudAndFileControl::updateScales() {
 	rmsScale = 400.0;
 	timeScale = 60.0;
 	if (bLogFreq) { centroidScale = -3.0; }
@@ -439,7 +439,7 @@ void DataController::updateScales() {
 	else { centroidMax = 20000.0 * centroidScale; }
 }
 
-int DataController::pointPicker(glm::vec3 mouse, ofCamera camera, bool selected) {
+int PointCloudAndFileControl::pointPicker(glm::vec3 mouse, ofCamera camera, bool selected) {
 	if (selected) { return nearestIndex; }
 
 	int pointCount = points.getNumVertices();
@@ -461,7 +461,7 @@ int DataController::pointPicker(glm::vec3 mouse, ofCamera camera, bool selected)
 	return nearestIndex;
 }
 
-void DataController::soundController(bool pointPickEnabled) {
+void PointCloudAndFileControl::soundController(bool pointPickEnabled) {
 	for (int i = 0; i < sounds.size(); i++) {
 		if (!sounds[i].getIsPlaying())
 			sounds.erase(sounds.begin() + i);
@@ -481,14 +481,14 @@ void DataController::soundController(bool pointPickEnabled) {
 	ofSoundUpdate();
 }
 
-glm::vec3 DataController::getMaxDimensions() {
+glm::vec3 PointCloudAndFileControl::getMaxDimensions() {
 	return { centroidMax, rmsMax, timeMax };
 }
 
-int DataController::getPointCount() {
+int PointCloudAndFileControl::getPointCount() {
 	return points.getNumVertices();
 }
 
-int DataController::getFileFromPoint(int index) {
+int PointCloudAndFileControl::getFileFromPoint(int index) {
 	return audioFileIndexLink[index];
 }
