@@ -125,7 +125,7 @@ void PointCloudAndFileControl::draw(ofCamera& camera, glm::vec3 mouse, bool draw
 
 		camera.end();
 
-		glm::vec2 filenameScreenPos(20, -20);
+		glm::vec3 filenameScreenPos(20, -20, 0);
 		if (pointPickSelected) {
 			filenameScreenPos += camera.worldToScreen(point);
 		}
