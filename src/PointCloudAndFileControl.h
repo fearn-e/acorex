@@ -4,11 +4,11 @@
 #include "ofxAudioFile.h"
 #include "ofxFft.h"
 
-class DataController {
+class PointCloudAndFileControl {
 
 public:
-	DataController();
-	~DataController();
+	PointCloudAndFileControl();
+	~PointCloudAndFileControl();
 
 	void init(bool logFreqSetting, float rmsMinCutoffSetting, 
 			int fftBufferSizeSetting, int stftHopRatioSetting);
