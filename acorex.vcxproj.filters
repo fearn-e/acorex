@@ -70,7 +70,7 @@
     <ClCompile Include="src\ListAudioFilesInDirectory.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\PointCloudAndFileControl.cpp">
+    <ClCompile Include="src\Corpus.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -203,7 +203,7 @@
     <ClInclude Include="src\ListAudioFilesInDirectory.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\PointCloudAndFileControl.h">
+    <ClInclude Include="src\Corpus.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

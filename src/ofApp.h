@@ -6,7 +6,7 @@
 #include "ofxGui.h"
 
 #include "ListAudioFilesInDirectory.h"
-#include "PointCloudAndFileControl.h"
+#include "Corpus.h"
 
 class ofApp : public ofBaseApp {
 
@@ -73,7 +73,7 @@ public:
 	vector<ofFile> audioFiles;
 
 	// file analysis
-	PointCloudAndFileControl _dataCtrl;
+	Corpus _dataCtrl;
 
 	// gui
 	ofxPanel gui;
