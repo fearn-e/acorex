@@ -173,9 +173,9 @@ void ofApp::draw() {
 		ss << "Audio Files: " << ofToString(audioFiles.size()) << endl;
 		ss << endl;
 
-		ss << "Point Picker: " << ofToString(bPointPicker) << endl;
-		ss << "Draw Points: " << ofToString(bDrawPoints) << endl;
-		ss << endl;
+		//ss << "Point Picker: " << ofToString(bPointPicker) << endl;
+		//ss << "Draw Points: " << ofToString(bDrawPoints) << endl;
+		//ss << endl;
 
 		//ss << "(wasdqe): Move Mesh" << endl;
 		ss << "(right click): Select file" << endl;
@@ -186,8 +186,8 @@ void ofApp::draw() {
 		ss << "(r): Reset Camera/Mesh" << endl;
 		ss << "(.): Toggle Fullscreen" << endl;
 
-		ss << "(j): Toggle Point Picker" << endl;
-		ss << "(k): Toggle Draw Points" << endl;
+		//ss << "(j): Toggle Point Picker" << endl;
+		//ss << "(k): Toggle Draw Points" << endl;
 
 		ss << "(h): Toggle Debug Text" << endl;
 		ss << "(;): Set Point Size" << endl;
@@ -311,16 +311,16 @@ void ofApp::keyReleased(int key) {
         ofToggleFullscreen(); break;
     case 'h':
         bDebugText = !bDebugText; break;
-    case 'j':
-        if (!bListing && !bAnalysing && _dataCtrl.getPointCount() > 0) {
-            bPointPicker = !bPointPicker;
-        }
-        break;
-    case 'k':
-        if (_dataCtrl.getPointCount() > 0) {
-            bDrawPoints = !bDrawPoints;
-        }
-        break;
+    //case 'j':
+    //    if (!bListing && !bAnalysing && _dataCtrl.getPointCount() > 0) {
+    //        bPointPicker = !bPointPicker;
+    //    }
+    //    break;
+    //case 'k':
+    //    if (_dataCtrl.getPointCount() > 0) {
+    //        bDrawPoints = !bDrawPoints;
+    //    }
+    //    break;
     case ';':
         glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: "))); break;
     case 'r':
