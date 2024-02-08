@@ -5,111 +5,84 @@
 #include "ofxFft.h"
 #include "ofxGui.h"
 
-class ofApp : public ofBaseApp{
+#include "ListAudioFilesInDirectory.h"
+#include "Corpus.h"
 
-	public:
+class ofApp : public ofBaseApp {
 
-		void setup();
-		void exit();
+public:
 
-		void update();
-		void updateWhileListing();
-		void updateWhileAnalysing();
-		void draw();
+	void setup();
+	void exit();
 
-		void selectDirectory();
-		void listAudioFiles();
-		void partialList(const string& path);
-		void checkFolder(const string& path, const vector<string>& extension, vector<ofFile>& files);
+	void update();
 
-		void analyseAudioFiles();
-		void partialAnalyse(bool logFreq);
-		void deinterleaveAudioData(float* interleavedData, int fileSize, int numChannels);
-		float spectralCentroidOneFrame(float* input, float sampleRate, bool logFreq);
+	void draw();
 
-		void quantiseFFTBufferSizeSlider(int& value);
-		void quantiseSTFTHopRatioSlider(int& value);
-		void quantiseMinimumRMSAmplitudeSlider(float& value);
-		void updateScales(bool logFreq);
-		void meshRotation(float deltaSpeed);
-		void pointPicker();
-		void soundController();
-		void resetCamera();
+	void fileProcessingLocks();
+	void fileProcessingUnlocks();
+	void selectDirectory();
+	void listAudioFiles();
+	void analyseAudioFiles();
 
-		void keyPressed(int key);
-		void keyReleased(int key);
+	void quantiseFFTBufferSizeSlider(int& value);
+	void quantiseSTFTHopRatioSlider(int& value);
+	void quantiseMinimumRMSAmplitudeSlider(float& value);
+	//void meshRotation(float deltaSpeed);
+	void resetCamera();
 
-		void mouseMoved(int x, int y );
-		void mouseDragged(int x, int y, int button);
-		void mousePressed(int x, int y, int button);
-		void mouseReleased(int x, int y, int button);
-		void mouseEntered(int x, int y);
-		void mouseExited(int x, int y);
+	void keyPressed(int key);
+	void keyReleased(int key);
 
-		void windowResized(int w, int h);
-		void dragEvent(ofDragInfo dragInfo);
-		void gotMessage(ofMessage msg);
+	void mouseMoved(int x, int y );
+	void mouseDragged(int x, int y, int button);
+	void mousePressed(int x, int y, int button);
+	void mouseReleased(int x, int y, int button);
+	void mouseEntered(int x, int y);
+	void mouseExited(int x, int y);
+
+	void windowResized(int w, int h);
+	void dragEvent(ofDragInfo dragInfo);
+	void gotMessage(ofMessage msg);
 	
-		bool bDebugText;
-		bool bPointPicker;
-		bool bDrawPoints;
-		bool bListing;
-		bool bAnalysing;
-		bool bLogFreq;
+	// state boolean flags
+	bool bDebugText;
+	bool bPointPicker;
+	bool bPointPickerSelected;
+	bool bDrawPoints;
+	bool bListing;
+	bool bAnalysing;
 
-		float drawFPS;
-		float updateFPS;
+	// camera
+	ofEasyCam camera;
+
+	// mesh rotating
+	float rotationSpeed;
+	bool rotatePoints[6];
+
+	// debug fps and delta times
+	float drawFPS, updateFPS;
+	float previousDrawTime, previousUpdateTime;
 		
-		float previousDrawTime;
-		float previousUpdateTime;
+	// nearest point
+	int nearestIndex;
+	int selectedFileIndex;
 
-		ofEasyCam camera;
+	// file listing
+	ListAudioFilesInDirectory _fileLister;
+	ofFile selectedDirectory;
+	vector<ofFile> audioFiles;
 
-		float rotationSpeed;
-		bool rotatePoints[6];
+	// file analysis
+	Corpus _dataCtrl;
 
-		ofMesh points;
-		ofMesh pointOrigins;
-		vector<int> audioFileIndexLink;
-		vector<bool> connectToNextPoint;
-		
-		int nearestIndex;
-		glm::vec2 nearestVertexScreenCoordinate;
-		float nearestDistance;
-		glm::vec3 mouse;
-
-		vector<string> allowedExtensions;
-
-		ofFile selectedDirectory;
-		ofDirectory dir;
-		vector<ofFile> folders;
-		vector<ofFile> audioFiles;
-		int searchedFolders;
-
-		int analysisIndex;
-		int failedAnalysisCount;
-		ofxAudioFile currentAudioFile;
-
-		vector<vector<float>> deinterleavedAudioData;
-
-		ofxFft* fft;
-		int stftHopSize;
-		int fftBufferSize;
-		int stftHopRatio;
-
-		float rmsAmplitudeScale, spectralCentroidScale, timePointScale;
-		float maxRMSAmplitude, maxSpectralCentroid, maxTimePoint;
-		float minimumRMSAmplitude;
-
-		ofxPanel gui;
-		ofxButton selectDirectoryButton;
-		ofxLabel currentDirectoryLabel;
-		ofParameter<int> fftBufferSizeSlider;
-		ofParameter<int> stftHopRatioSlider;
-		ofParameter<float> minimumRMSAmplitudeSlider;
-		ofParameter<bool> logFreqToggle;
-		ofxButton beginAnalysisButton;
-
-		vector<ofSoundPlayer> sounds;
-		int lastSoundIndex;
+	// gui
+	ofxPanel gui;
+	ofxButton selectDirectoryButton;
+	ofxLabel currentDirectoryLabel;
+	ofParameter<int> fftBufferSizeSlider;
+	ofParameter<int> stftHopRatioSlider;
+	ofParameter<float> minimumRMSAmplitudeSlider;
+	ofParameter<bool> logFreqToggle;
+	ofxButton beginAnalysisButton;
 };
