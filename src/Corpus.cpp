@@ -485,23 +485,20 @@ void Corpus::soundController(bool pointPickEnabled) {
 			sounds.erase(sounds.begin() + i);
 	}
 
-	if (nearestIndex == -1)
-		lastSoundIndex = 0;
-
-	if (pointPickEnabled && ofGetKeyPressed(' ') && nearestIndex != -1 && nearestIndex != lastSoundIndex)
-	{
-		sounds.push_back(ofSoundPlayer());
-		sounds.back().load(audioFiles[audioFileIndexLink[nearestIndex]].getAbsolutePath());
-		sounds.back().setVolume(0.35);
-		sounds.back().play();
-		lastSoundIndex = nearestIndex;
-	}
 	ofSoundUpdate();
 }
 
-void Corpus::setPointPickerSelectedSubset(bool& selected) {
+void Corpus::addSound(int index) {
+	sounds.push_back(ofSoundPlayer());
+	sounds.back().load(audioFiles[index].getAbsolutePath());
+	sounds.back().setVolume(0.35);
+	sounds.back().play();
+}
+
+void Corpus::setPointPickerSelectedSubset(bool& selected, int& selectedFileIndex) {
 	if (selected) {
 		selected = false;
+		selectedFileIndex = -1;
 		pointsSelectedSubset.clear();
 		selectedSubsetIndexLink.clear();
 	}
@@ -511,6 +508,7 @@ void Corpus::setPointPickerSelectedSubset(bool& selected) {
 		selectedSubsetIndexLink.clear();
 
 		int currentFile = audioFileIndexLink[nearestIndex];
+		selectedFileIndex = currentFile;
 		int fileIndex = nearestIndex;
 		do {
 			fileIndex--;

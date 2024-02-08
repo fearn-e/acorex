@@ -66,6 +66,7 @@ public:
 		
 	// nearest point
 	int nearestIndex;
+	int selectedFileIndex;
 
 	// file listing
 	ListAudioFilesInDirectory _fileLister;
