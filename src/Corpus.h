@@ -30,8 +30,9 @@ public:
 	int pointPicker(glm::vec3 mouse, ofCamera camera, bool selected);
 
 	void soundController(bool pointPickEnabled);
+	void addSound(int index);
 
-	void setPointPickerSelectedSubset(bool& selected);
+	void setPointPickerSelectedSubset(bool& selected, int& selectedFileIndex);
 
 	glm::vec3 getMaxDimensions();
 	int getPointCount();

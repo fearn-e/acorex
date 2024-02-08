@@ -186,6 +186,7 @@ void ofApp::draw() {
 		ss << endl;
 
 		ss << "(right click): Select file" << endl;
+		ss << "(space): Play selected/highlighted file" << endl;
 
 		ss << "(x): Open in Explorer" << endl;
 		ss << "(c): Copy File Path to Clipboard" << endl;
@@ -297,61 +298,75 @@ void ofApp::keyPressed(int key) {
 		rotatePoints[4] = 1; break;
 	case 'e':
 		rotatePoints[5] = 1; break;
+	case ' ':
+		if (nearestIndex != -1) {
+			_dataCtrl.addSound(_dataCtrl.getFileFromPoint(nearestIndex));
+		}
+		else if (bPointPickerSelected) {
+			_dataCtrl.addSound(selectedFileIndex);
+		}
+		break;
 	}
 }
 
 void ofApp::keyReleased(int key) {
-    switch (key) {
-    case 'w':
-        rotatePoints[0] = 0; break;
-    case 's':
-        rotatePoints[1] = 0; break;
-    case 'a':
-        rotatePoints[2] = 0; break;
-    case 'd':
-        rotatePoints[3] = 0; break;
-    case 'q':
-        rotatePoints[4] = 0; break;
-    case 'e':
-        rotatePoints[5] = 0; break;
-    case '.':
-        ofToggleFullscreen(); break;
-    case 'h':
-        bDebugText = !bDebugText; break;
-    //case 'j':
-    //    if (!bListing && !bAnalysing && _dataCtrl.getPointCount() > 0) {
-    //        bPointPicker = !bPointPicker;
-    //    }
-    //    break;
-    //case 'k':
-    //    if (_dataCtrl.getPointCount() > 0) {
-    //        bDrawPoints = !bDrawPoints;
-    //    }
-    //    break;
-    case ';':
-        glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: "))); break;
-    case 'r':
-        resetCamera();
-        break;
-    case 'c':
-        if (nearestIndex != -1) {
-            ofSetClipboardString(audioFiles[_dataCtrl.getFileFromPoint(nearestIndex)].getAbsolutePath());
-        }
-        break;
-    case 'x':
-        if (nearestIndex != -1) {
+	switch (key) {
+	case 'w':
+		rotatePoints[0] = 0; break;
+	case 's':
+		rotatePoints[1] = 0; break;
+	case 'a':
+		rotatePoints[2] = 0; break;
+	case 'd':
+		rotatePoints[3] = 0; break;
+	case 'q':
+		rotatePoints[4] = 0; break;
+	case 'e':
+		rotatePoints[5] = 0; break;
+	case '.':
+		ofToggleFullscreen(); break;
+	case 'h':
+		bDebugText = !bDebugText; break;
+		//case 'j':
+		//    if (!bListing && !bAnalysing && _dataCtrl.getPointCount() > 0) {
+		//        bPointPicker = !bPointPicker;
+		//    }
+		//    break;
+		//case 'k':
+		//    if (_dataCtrl.getPointCount() > 0) {
+		//        bDrawPoints = !bDrawPoints;
+		//    }
+		//    break;
+	case ';':
+		glPointSize(ofToFloat(ofSystemTextBoxDialog("Enter point size: "))); break;
+	case 'r':
+		resetCamera();
+		break;
+	case 'c':
+		if (nearestIndex != -1 || bPointPickerSelected) {
+			int index;
+			if (bPointPickerSelected) { index = selectedFileIndex; }
+			else { index = _dataCtrl.getFileFromPoint(nearestIndex); }
+			ofSetClipboardString(audioFiles[index].getAbsolutePath());
+		}
+		break;
+	case 'x':
+		if (nearestIndex != -1 || bPointPickerSelected) {
+			int index;
+			if (bPointPickerSelected) { index = selectedFileIndex; }
+			else { index = _dataCtrl.getFileFromPoint(nearestIndex); }
 #ifdef _WIN32 || _WIN64
-			ofSystem("explorer /select," + audioFiles[_dataCtrl.getFileFromPoint(nearestIndex)].getAbsolutePath());
+			ofSystem("explorer /select," + audioFiles[index].getAbsolutePath());
 #endif
 #ifdef __APPLE__ && __MACH__
-			ofSystem("open " + audioFiles[_dataCtrl.getFileFromPoint(nearestIndex)].getAbsolutePath());
+			ofSystem("open -R " + audioFiles[index].getAbsolutePath());
 #endif
 #ifdef __linux__
-			ofSystem("xdg-open " + audioFiles[_dataCtrl.getFileFromPoint(nearestIndex)].getAbsolutePath());
+			ofSystem("xdg-open " + audioFiles[index].getAbsolutePath());
 #endif
-        }
-        break;
-    }
+		}
+		break;
+	}
 }
 
 //--------------------------------------------------------------
@@ -368,7 +383,7 @@ void ofApp::mousePressed(int x, int y, int button) {
 	case 2:
 		if (bPointPicker)
 		{
-			_dataCtrl.setPointPickerSelectedSubset(bPointPickerSelected);
+			_dataCtrl.setPointPickerSelectedSubset(bPointPickerSelected, selectedFileIndex);
 		}
 	}
 }
