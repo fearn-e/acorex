@@ -177,7 +177,14 @@ void ofApp::draw() {
 		//ss << "Draw Points: " << ofToString(bDrawPoints) << endl;
 		//ss << endl;
 
+		ss << "-----------------------------" << endl;
+
 		//ss << "(wasdqe): Move Mesh" << endl;
+		ss << "Left click drag: Rotate Camera" << endl;
+		ss << "Mouse wheel: Zoom Camera" << endl;
+		ss << "Middle click drag: Pan Camera" << endl;
+		ss << endl;
+
 		ss << "(right click): Select file" << endl;
 
 		ss << "(x): Open in Explorer" << endl;
