@@ -333,11 +333,15 @@ void ofApp::keyReleased(int key) {
         break;
     case 'x':
         if (nearestIndex != -1) {
-            //windows only - open explorer and select file using shell execute
 #ifdef _WIN32 || _WIN64
 			ofSystem("explorer /select," + audioFiles[_dataCtrl.getFileFromPoint(nearestIndex)].getAbsolutePath());
 #endif
-			//TODO - add mac path
+#ifdef __APPLE__ && __MACH__
+			ofSystem("open " + audioFiles[_dataCtrl.getFileFromPoint(nearestIndex)].getAbsolutePath());
+#endif
+#ifdef __linux__
+			ofSystem("xdg-open " + audioFiles[_dataCtrl.getFileFromPoint(nearestIndex)].getAbsolutePath());
+#endif
         }
         break;
     }
