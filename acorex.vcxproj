@@ -18,7 +18,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7FD42DF7-442E-479A-BA76-D0022F99702A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>acorex-flucoma</RootNamespace>
+    <RootNamespace>acorex</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -73,7 +73,7 @@
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>foonathan_memory-0.7.3-dbg.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>src\memory;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>src\memory\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ForceFileOutput>MultiplyDefinedSymbolOnly</ForceFileOutput>
     </Link>
     <PostBuildEvent />
@@ -84,7 +84,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src\Eigen;src\Eigen\src\AccelerateSupport;src\Eigen\src\Cholesky;src\Eigen\src\CholmodSupport;src\Eigen\src\Core;src\Eigen\src\Core\arch\AVX512;src\Eigen\src\Core\arch\AVX;src\Eigen\src\Core\arch\AltiVec;src\Eigen\src\Core\arch\Default;src\Eigen\src\Core\arch\GPU;src\Eigen\src\Core\arch\HIP\hcc;src\Eigen\src\Core\arch\HVX;src\Eigen\src\Core\arch\MSA;src\Eigen\src\Core\arch\NEON;src\Eigen\src\Core\arch\SSE;src\Eigen\src\Core\arch\SVE;src\Eigen\src\Core\arch\SYCL;src\Eigen\src\Core\arch\ZVector;src\Eigen\src\Core\functors;src\Eigen\src\Core\products;src\Eigen\src\Core\util;src\Eigen\src\Eigenvalues;src\Eigen\src\Geometry;src\Eigen\src\Geometry\arch;src\Eigen\src\Householder;src\Eigen\src\IterativeLinearSolvers;src\Eigen\src\Jacobi;src\Eigen\src\KLUSupport;src\Eigen\src\LU;src\Eigen\src\LU\arch;src\Eigen\src\MetisSupport;src\Eigen\src\OrderingMethods;src\Eigen\src\PaStiXSupport;src\Eigen\src\PardisoSupport;src\Eigen\src\QR;src\Eigen\src\SPQRSupport;src\Eigen\src\SVD;src\Eigen\src\SparseCholesky;src\Eigen\src\SparseCore;src\Eigen\src\SparseLU;src\Eigen\src\SparseQR;src\Eigen\src\StlSupport;src\Eigen\src\SuperLUSupport;src\Eigen\src\ThreadPool;src\Eigen\src\UmfPackSupport;src\Eigen\src\misc;src\Eigen\src\plugins;src\flucoma-core;src\flucoma-core\algorithms\public;src\flucoma-core\algorithms\util;src\flucoma-core\clients\common;src\flucoma-core\clients\nrt;src\flucoma-core\clients\rt;src\flucoma-core\data;src\hisstools_library;src\hisstools_library\audio_file;src\hisstools_library\convolution;src\hisstools_library\fft;src;src\memory;src\memory\detail;..\..\..\addons\ofxGui\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxGui\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)\Build\%(RelativeDir)\$(Configuration)\</ObjectFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -97,8 +97,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>foonathan_memory-0.7.3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>src\memory\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ForceFileOutput>MultiplyDefinedSymbolOnly</ForceFileOutput>
     </Link>
     <PostBuildEvent />
