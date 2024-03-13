@@ -5,10 +5,6 @@ obj/
 
 .vs/
 
-src/Eigen/
+deps/
 
-src/flucoma-core/
-
-src/hisstools_library/
-
-src/memory/
+deps-pre-build/
