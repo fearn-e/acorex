@@ -123,21 +123,21 @@ currentOS="win"
     mkdir deps
 
     #copy dependency headerfiles
-    cp -r   deps-pre-build/eigen/Eigen/                                       deps/Eigen/
-    cp -r   deps-pre-build/eigen/unsupported/                                 deps/unsupported/
-    cp -r   deps-pre-build/flucoma-core/include/                              deps/flucoma-core/
-    cp -r   deps-pre-build/memory/include/foonathan/memory                    deps/memory/
-    cp -r   deps-pre-build/hisstools_library/include                          deps/hisstools_library/
-    cp -r   deps-pre-build/spectra/include/Spectra/                           deps/Spectra/
-    cp -r   deps-pre-build/json/include/nlohmann/                             deps/nlohmann/
+    cp -r   deps-pre-build/eigen/Eigen/                                         deps/Eigen/
+    cp -r   deps-pre-build/eigen/unsupported/                                   deps/unsupported/
+    cp -r   deps-pre-build/flucoma-core/include/                                deps/flucoma-core/
+    cp -r   deps-pre-build/memory/include/foonathan/memory/                     deps/memory/
+    cp -r   deps-pre-build/hisstools_library/include/                           deps/hisstools_library/
+    cp -r   deps-pre-build/spectra/include/Spectra/                             deps/Spectra/
+    cp -r   deps-pre-build/json/include/nlohmann/                               deps/nlohmann/
 
     #copy foonathan_memory compiled lib files
-    cp -r   deps-pre-build/compiled-memory/src/Debug/                             deps/memory/
-    cp -r   deps-pre-build/compiled-memory/src/Release/                           deps/memory/
+    cp -r   deps-pre-build/compiled-memory/src/Debug/                           deps/memory/
+    cp -r   deps-pre-build/compiled-memory/src/Release/                         deps/memory/
 
     #copy extra compiled foonathan_memory headers
-    cp      deps-pre-build/compiled-memory/src/config_impl.hpp                    deps/memory/
-    cp      deps-pre-build/compiled-memory/src/container_node_sizes_impl.hpp      deps/memory/
+    cp      deps-pre-build/compiled-memory/src/config_impl.hpp                  deps/memory/
+    cp      deps-pre-build/compiled-memory/src/container_node_sizes_impl.hpp    deps/memory/
 #
 
 echo ""
