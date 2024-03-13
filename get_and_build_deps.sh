@@ -57,6 +57,13 @@ currentOS="win"
         echo "spectra already exists, skipping download"
     fi
     echo ""
+
+    if [ ! -d "json" ]; then
+        git -c advice.detachedHead=false clone --depth 1 -b "v3.11.2" https://github.com/nlohmann/json
+    else
+        echo "json already exists, skipping download"
+    fi
+    echo ""
 #
 
 # Build memory in a new directory
@@ -122,6 +129,7 @@ currentOS="win"
     cp -r   deps-pre-build/memory/include/foonathan/memory                    deps/memory/
     cp -r   deps-pre-build/hisstools_library/include                          deps/hisstools_library/
     cp -r   deps-pre-build/spectra/include/Spectra/                           deps/Spectra/
+    cp -r   deps-pre-build/json/include/nlohmann/                             deps/nlohmann/
 
     #copy foonathan_memory compiled lib files
     cp -r   deps-pre-build/compiled-memory/src/Debug/                             deps/memory/
