@@ -51,6 +51,12 @@ currentOS="win"
     fi
     echo ""
 
+    if [ ! -d "spectra" ]; then
+        git -c advice.detachedHead=false clone --depth 1 -b "v1.0.1" https://github.com/yixuan/spectra
+    else
+        echo "spectra already exists, skipping download"
+    fi
+    echo ""
 #
 
 # Build memory in a new directory
@@ -115,6 +121,7 @@ currentOS="win"
     cp -r   deps-pre-build/flucoma-core/include/                              deps/flucoma-core/
     cp -r   deps-pre-build/memory/include/foonathan/memory                    deps/memory/
     cp -r   deps-pre-build/hisstools_library/include                          deps/hisstools_library/
+    cp -r   deps-pre-build/spectra/include/Spectra/                           deps/Spectra/
 
     #copy foonathan_memory compiled lib files
     cp -r   deps-pre-build/compiled-memory/src/Debug/                             deps/memory/
