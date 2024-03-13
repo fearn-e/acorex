@@ -24,28 +24,28 @@ currentOS="win"
     cd deps-pre-build
 
     if [ ! -d "flucoma-core" ]; then
-        git clone https://github.com/flucoma/flucoma-core
+        git -c advice.detachedHead=false clone --depth 1 -b main https://github.com/flucoma/flucoma-core
     else
         echo "flucoma-core already exists, skipping download"
     fi
     echo ""
 
     if [ ! -d "eigen" ]; then
-        git clone https://gitlab.com/libeigen/eigen
+        git -c advice.detachedHead=false clone --depth 1 -b "3.4.0" https://gitlab.com/libeigen/eigen
     else
         echo "eigen already exists, skipping download"
     fi
     echo ""
 
     if [ ! -d "hisstools_library" ]; then
-        git clone --branch header-only https://github.com/alexharker/hisstools_library
+        git -c advice.detachedHead=false clone --depth 1 -b header-only https://github.com/alexharker/hisstools_library
     else
         echo "hisstools_library already exists, skipping download"
     fi
     echo ""
 
     if [ ! -d "memory" ]; then
-        git clone https://github.com/foonathan/memory
+        git -c advice.detachedHead=false clone --depth 1 -b main https://github.com/foonathan/memory
     else
         echo "memory already exists, skipping download"
     fi
