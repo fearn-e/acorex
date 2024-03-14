@@ -1,9 +1,23 @@
-# acorex-flucoma
+# Acorex
+3D Audio Corpus Explorer
 
-# Requirements to build
+# Build
+### Requirements
 
-CMake (version?)
-Git Bash (version?)
-anything else?
+* CMake (version?)
 
-run ./build-deps.sh
+* Git Bash (version?)
+
+* IDE (VS for Windows, Xcode for Mac, Linux T.B.D.)
+
+### Steps
+
+* Clone the repo
+
+* Run ./build-deps.sh
+
+  * Optional arguments:
+
+    * -c | force recompile
+
+    * -d | force re-download (also forces recompile)
