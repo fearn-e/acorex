@@ -1,88 +1,45 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxAudioFile.h"
-#include "ofxFft.h"
 #include "ofxGui.h"
-
-#include "ListAudioFilesInDirectory.h"
-#include "Corpus.h"
+#include "AnalyseCorpus.h"
+#include "UMAP.h"
 
 class ofApp : public ofBaseApp {
 
 public:
+	ofApp ( );
+	~ofApp ( );
 
-	void setup();
-	void exit();
+	void setup ( );
+	void update ( );
 
-	void update();
+	void draw ( );
+	void exit ( );
 
-	void draw();
+	void StartAnalysis ( );
+	void StartUMAP ( );
 
-	void fileProcessingLocks();
-	void fileProcessingUnlocks();
-	void selectDirectory();
-	void listAudioFiles();
-	void analyseAudioFiles();
+	//void audioIn ( float* input, int bufferSize, int nChannels );
+	//void audioOut ( float* buffer, int bufferSize, int nChannels );
 
-	void quantiseFFTBufferSizeSlider(int& value);
-	void quantiseSTFTHopRatioSlider(int& value);
-	void quantiseMinimumRMSAmplitudeSlider(float& value);
-	//void meshRotation(float deltaSpeed);
-	void resetCamera();
+	//void keyPressed ( int key );
+	//void keyReleased ( int key );
+	//void mouseMoved ( int x, int y );
+	//void mouseDragged ( int x, int y, int button );
+	//void mousePressed ( int x, int y, int button );
+	//void mouseReleased ( int x, int y, int button );
+	//void mouseEntered ( int x, int y );
+	//void mouseExited ( int x, int y );
+	//void windowResized ( int w, int h );
+	//void dragEvent ( ofDragInfo dragInfo );
+	//void gotMessage ( ofMessage msg );
 
-	void keyPressed(int key);
-	void keyReleased(int key);
+private:
+	AnalyseCorpus mAnalyseCorpus;
+	UMAP mUMAP;
 
-	void mouseMoved(int x, int y );
-	void mouseDragged(int x, int y, int button);
-	void mousePressed(int x, int y, int button);
-	void mouseReleased(int x, int y, int button);
-	void mouseEntered(int x, int y);
-	void mouseExited(int x, int y);
-
-	void windowResized(int w, int h);
-	void dragEvent(ofDragInfo dragInfo);
-	void gotMessage(ofMessage msg);
-	
-	// state boolean flags
-	bool bDebugText;
-	bool bPointPicker;
-	bool bPointPickerSelected;
-	bool bDrawPoints;
-	bool bListing;
-	bool bAnalysing;
-
-	// camera
-	ofEasyCam camera;
-
-	// mesh rotating
-	float rotationSpeed;
-	bool rotatePoints[6];
-
-	// debug fps and delta times
-	float drawFPS, updateFPS;
-	float previousDrawTime, previousUpdateTime;
-		
-	// nearest point
-	int nearestIndex;
-	int selectedFileIndex;
-
-	// file listing
-	ListAudioFilesInDirectory _fileLister;
-	ofFile selectedDirectory;
-	vector<ofFile> audioFiles;
-
-	// file analysis
-	Corpus _dataCtrl;
-
-	// gui
-	ofxPanel gui;
-	ofxButton selectDirectoryButton;
-	ofxLabel currentDirectoryLabel;
-	ofParameter<int> fftBufferSizeSlider;
-	ofParameter<int> stftHopRatioSlider;
-	ofParameter<float> minimumRMSAmplitudeSlider;
-	ofParameter<bool> logFreqToggle;
-	ofxButton beginAnalysisButton;
+	ofxPanel mGui;
+	ofxButton mStartAnalysis;
+	ofxButton mStartUMAP;
 };
