@@ -133,6 +133,8 @@ public:
                 shapeMat.row ( i ) <<= shapeDesc;
                 loudness.processFrame ( window, loudnessDesc, true, true );
                 loudnessMat.row ( i ) <<= loudnessDesc;
+
+                // for OverTime analysis versions, computestats and add dataset points inside this for loop here
             }
 
             RealVector pitchStats = ComputeStats ( pitchMat, stats );
