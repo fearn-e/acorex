@@ -73,7 +73,7 @@
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>foonathan_memory-0.7.3-dbg.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>deps/memory/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ForceFileOutput>MultiplyDefinedSymbolOnly</ForceFileOutput>
     </Link>
     <PostBuildEvent />
@@ -98,7 +98,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <AdditionalDependencies>foonathan_memory-0.7.3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>deps/memory/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ForceFileOutput>MultiplyDefinedSymbolOnly</ForceFileOutput>
     </Link>
     <PostBuildEvent />

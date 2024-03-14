@@ -8,3 +8,5 @@ obj/
 deps/
 
 deps-pre-build/
+
+libs/

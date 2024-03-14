@@ -116,12 +116,17 @@ currentOS="win"
 
 # Install dependencies to deps folder
     echo "--------------------------------------------------"
-    echo "installing dependencies to deps folder"
+    echo "installing dependencies and libraries"
     echo ""
     if [ -d "deps" ]; then
         rm -r -f deps
     fi
     mkdir deps
+
+    if [ -d "libs" ]; then
+        rm -r -f libs
+    fi
+    mkdir libs
 
     #copy dependency headerfiles
     cp -r   deps-pre-build/eigen/Eigen/                                         deps/Eigen/
@@ -133,8 +138,10 @@ currentOS="win"
     cp -r   deps-pre-build/json/include/nlohmann/                               deps/nlohmann/
 
     #copy foonathan_memory compiled lib files
-    cp      deps-pre-build/compiled-memory/src/Debug/*                          deps/memory/
-    cp      deps-pre-build/compiled-memory/src/Release/*                        deps/memory/
+    if [ "$currentOS" == "win" ]; then
+        cp  deps-pre-build/compiled-memory/src/Debug/*                          libs/
+        cp  deps-pre-build/compiled-memory/src/Release/*                        libs/
+    fi
 
     #copy extra compiled foonathan_memory headers
     cp      deps-pre-build/compiled-memory/src/config_impl.hpp                  deps/memory/
