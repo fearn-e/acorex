@@ -77,9 +77,9 @@ currentOS="win"
 
     #build foonathan_memory libs
     cd compiled-memory
-    echo $currentOS
 
     if [ "$currentOS" == "win" ]; then
+        echo "windows"
         cmake -DFOONATHAN_MEMORY_BUILD_TESTS=OFF -DFOONATHAN_MEMORY_BUILD_TOOLS=OFF -DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF .
 
         echo ""
@@ -94,6 +94,7 @@ currentOS="win"
 
         cmake --build . --config Release
     elif [ "$currentOS" == "mac" ]; then
+        echo "macos"
         cmake -DCMAKE_BUILD_TYPE=DEBUG -DFOONATHAN_MEMORY_BUILD_TESTS=OFF -DFOONATHAN_MEMORY_BUILD_TOOLS=OFF -DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF .
         cmake -DCMAKE_BUILD_TYPE=RELEASE -DFOONATHAN_MEMORY_BUILD_TESTS=OFF -DFOONATHAN_MEMORY_BUILD_TOOLS=OFF -DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF .
         
@@ -132,8 +133,8 @@ currentOS="win"
     cp -r   deps-pre-build/json/include/nlohmann/                               deps/nlohmann/
 
     #copy foonathan_memory compiled lib files
-    cp -r   deps-pre-build/compiled-memory/src/Debug/                           deps/memory/
-    cp -r   deps-pre-build/compiled-memory/src/Release/                         deps/memory/
+    cp      deps-pre-build/compiled-memory/src/Debug/*                          deps/memory/
+    cp      deps-pre-build/compiled-memory/src/Release/*                        deps/memory/
 
     #copy extra compiled foonathan_memory headers
     cp      deps-pre-build/compiled-memory/src/config_impl.hpp                  deps/memory/
