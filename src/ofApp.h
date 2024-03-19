@@ -2,8 +2,8 @@
 
 #include "ofMain.h"
 #include "ofxGui.h"
-#include "AnalyseCorpus.h"
-#include "UMAP.h"
+
+#include "CorpusController.h"
 
 class ofApp : public ofBaseApp {
 
@@ -36,10 +36,10 @@ public:
 	//void gotMessage ( ofMessage msg );
 
 private:
-	AnalyseCorpus mAnalyseCorpus;
-	UMAP mUMAP;
+	CorpusController mCorpusController;
 
 	ofxPanel mGui;
 	ofxButton mStartAnalysis;
 	ofxButton mStartUMAP;
+	ofxToggle mTimeDimension;
 };
