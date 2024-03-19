@@ -1,4 +1,5 @@
 #include "ofApp.h"
+#include "CorpusController.h"
 
 ofApp::ofApp ( )
 {
@@ -17,6 +18,7 @@ void ofApp::setup ( )
 	mGui.setup ( "Analysis" );
 	mGui.add ( mStartAnalysis.setup ( "Start Analysis" ) );
 	mGui.add ( mStartUMAP.setup ( "Start UMAP" ) );
+	mGui.add ( mTimeDimension.setup ( "Time Dimension", false ) );
 	mGui.setPosition ( 10, 10 );
 }
 
@@ -36,42 +38,58 @@ void ofApp::exit ( )
 
 void ofApp::StartAnalysis ( )
 {
-	ofFileDialogResult result = ofSystemLoadDialog ( "Select folder containing audio files", true, ofFilePath::getCurrentWorkingDirectory ( ) );
-	if ( !result.bSuccess )
+	bool success;
+
+	ofFileDialogResult resultIn = ofSystemLoadDialog ( "Select folder containing audio files...", true, ofFilePath::getCurrentWorkingDirectory ( ) );
+	if ( !resultIn.bSuccess )
 	{
 		ofLogError ( "ofApp::startAnalysis" ) << "No folder selected";
 		return;
 	}
 
-	std::string inPath = result.getPath ( );
-	std::vector<std::string> files;
-	
-	ofFile temp = ofFile ( result.getPath ( ) );
-	std::string outPath = temp.getEnclosingDirectory ( ) + "analysis_output.json";
+	ofFileDialogResult resultOut = ofSystemSaveDialog ( "analysed_corpus.json", "Saving corpus as..." );
+	if ( !resultOut.bSuccess )
+	{
+		ofLogError ( "ofApp::startAnalysis" ) << "Invalid save query";
+		return;
+	}
 
-	files = mAnalyseCorpus.SearchDirectory ( inPath );
-
-	mAnalyseCorpus.Analyse ( files, outPath );
+	success = mCorpusController.CreateCorpus ( resultIn.getPath ( ), resultOut.getPath ( ), mTimeDimension );
+	if ( !success )
+	{
+		ofLogError ( "ofApp" ) << "Corpus creation failed";
+		return;
+	}
 }
 
 void ofApp::StartUMAP ( )
 {
-	ofFileDialogResult result = ofSystemLoadDialog ( "Select analysis file", false, ofFilePath::getCurrentWorkingDirectory ( ) );
-	if ( !result.bSuccess )
+	bool success;
+
+
+	ofFileDialogResult resultIn = ofSystemLoadDialog ( "Select corpus file...", false, ofFilePath::getCurrentWorkingDirectory ( ) );
+	if ( !resultIn.bSuccess )
 	{
 		ofLogError ( "ofApp::startUMAP" ) << "No file selected";
 		return;
 	}
 
-	if ( result.getPath ( ).find ( ".json" ) == std::string::npos )
+	//#ifdef _WIN32
+	//auto resultOut = pfd::save_file::save_file("Saving reduced analysis as...", "reduced_corpus.json", { "JSON Files", "*.json" });
+	//std::string resultOutPath = resultOut.result();
+	//#endif
+
+	ofFileDialogResult resultOut = ofSystemSaveDialog ( "reduced_corpus.json", "Saving reduced analysis as..." );
+	if ( !resultOut.bSuccess )
 	{
-		ofLogError ( "ofApp::startUMAP" ) << "File is not a json file";
+		ofLogError ( "ofApp::startUMAP" ) << "Invalid save query";
 		return;
 	}
-
-	std::string inPath = result.getPath ( );
-	ofFile temp = ofFile ( result.getPath ( ) );
-	std::string outPath = temp.getEnclosingDirectory ( ) + "umap_output.json";
-
-	mUMAP.Fit ( inPath, outPath );
+	
+	success = mCorpusController.ReduceCorpus ( resultIn.getPath ( ), resultOut.getPath ( ) );
+	if ( !success )
+	{
+		ofLogError ( "ofApp" ) << "Corpus reduction failed";
+		return;
+	}
 }

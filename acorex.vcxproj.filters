@@ -37,6 +37,18 @@
     <ClCompile Include="src\ofApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Corpus\JSON.cpp">
+      <Filter>src\Corpus</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CorpusController.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Corpus\Analyse.cpp">
+      <Filter>src\Corpus</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Corpus\UMAP.cpp">
+      <Filter>src\Corpus</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -50,6 +62,9 @@
     </Filter>
     <Filter Include="addons\ofxGui\src">
       <UniqueIdentifier>{C50E7B39--31C-6-41-96-8-2DD-928FBADCE7DA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Corpus">
+      <UniqueIdentifier>{b1bc8163-7718-4c38-8894-a98c9cc3034e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -92,11 +107,20 @@
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h">
       <Filter>addons\ofxGui\src</Filter>
     </ClInclude>
-    <ClInclude Include="src\AnalyseCorpus.h">
+    <ClInclude Include="src\Corpus\Analyse.h">
+      <Filter>src\Corpus</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CorpusController.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\UMAP.h">
+    <ClInclude Include="src\GUI.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Corpus\JSON.h">
+      <Filter>src\Corpus</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Corpus\UMAP.h">
+      <Filter>src\Corpus</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
