@@ -1,7 +1,7 @@
 #pragma once
 
-#include "algorithms/public/DataSetQuery.hpp"
-#include "algorithms/public/UMAP.hpp"
+#include <algorithms/public/DataSetQuery.hpp>
+#include <algorithms/public/UMAP.hpp>
 #include <Eigen/Core>
 #include <data/FluidDataSet.hpp>
 #include <data/FluidIndex.hpp>
@@ -10,6 +10,7 @@
 #include <data/TensorTypes.hpp>
 #include <vector>
 
+namespace acorex {
 namespace corpus {
 
 class UMAP {
@@ -26,3 +27,4 @@ private:
 };
 
 } // namespace corpus
+} // namespace acorex
