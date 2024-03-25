@@ -3,9 +3,71 @@
 #include "Corpus/Analyse.h"
 #include <ofLog.h>
 
-int corpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid::FluidDataSet<std::string, double, 1>& dataset, bool timeDimension)
+int acorex::corpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid::FluidDataSet<std::string, double, 1>& dataset, const std::vector<corpus::Metadata>& metaset )
 {
     int filesFailed = 0;
+
+    int numDimensions = 0;
+
+    bool timeDimension = false;
+    bool analysisPitch = false; bool analysisLoudness = false; bool analysisShape = false; bool analysisMFCC = false;
+    fluid::index windowSize = 0; fluid::index hopFraction = 0;
+    fluid::index nBands = 0; fluid::index nCoefs = 0; fluid::index minFreq = 0; fluid::index maxFreq = 0;
+
+    for ( auto& meta : metaset )
+    {
+        switch ( meta.key )
+        {
+        case META_TIME_DIMENSION:
+            timeDimension = meta.boolValue;
+            break;
+        case META_ANALYSIS_PITCH:
+            analysisPitch = meta.boolValue;
+            break;
+        case META_ANALYSIS_LOUDNESS:
+            analysisLoudness = meta.boolValue;
+            break;
+        case META_ANALYSIS_SHAPE:
+            analysisShape = meta.boolValue;
+            break;
+        case META_ANALYSIS_MFCC:
+            analysisMFCC = meta.boolValue;
+            break;
+        case META_WINDOW_FFT_SIZE:
+            windowSize = meta.intValue;
+            break;
+        case META_HOP_FRACTION:
+            hopFraction = meta.intValue;
+            break;
+        case META_N_BANDS:
+            nBands = meta.intValue;
+            break;
+        case META_N_COEFS:
+            nCoefs = meta.intValue;
+            break;
+        case META_MIN_FREQ:
+            minFreq = meta.intValue;
+            break;
+        case META_MAX_FREQ:
+            maxFreq = meta.intValue;
+            break;
+		}
+    }
+
+    numDimensions += timeDimension * 2;
+    numDimensions += analysisPitch * 2;
+    numDimensions += analysisLoudness * 2;
+    numDimensions += analysisShape * 7;
+    numDimensions += analysisMFCC * nCoefs;
+
+    if ( !timeDimension ) { numDimensions *= 7; } // 7 stats computed for each dimension
+
+    dataset.resize ( numDimensions );
+
+    fluid::index fftSize = windowSize;
+    fluid::index nBins = fftSize / 2 + 1;
+    fluid::index hopSize = windowSize / hopFraction;
+    fluid::index halfWindow = windowSize / 2;
 
     for ( int fileIndex = 0; fileIndex < files.size ( ); fileIndex++ )
     {
@@ -28,16 +90,6 @@ int corpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid::Flui
 
         fluid::index nSamples = file.frames ( );
         auto samplingRate = file.sampling_rate ( );
-
-        fluid::index nBins = 513;
-        fluid::index fftSize = 2 * (nBins - 1);
-        fluid::index hopSize = 1024;
-        fluid::index windowSize = 1024;
-        fluid::index halfWindow = windowSize / 2;
-        fluid::index nBands = 40;
-        fluid::index nCoefs = 13;
-        fluid::index minFreq = 20;
-        fluid::index maxFreq = 5000;
 
         fluid::algorithm::STFT stft { windowSize, fftSize, hopSize };
         fluid::algorithm::MelBands bands { nBands, fftSize };
@@ -64,7 +116,7 @@ int corpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid::Flui
         padded ( fluid::Slice ( halfWindow, in.size ( ) ) ) <<= in;
 
         for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
-        {
+        { // TODO - ENABLE/DISABLE DIFFERENT ANALYSES BASED ON METADATA FLAGS
             fluid::ComplexVector  frame ( nBins );
             fluid::RealVector     magnitude ( nBins );
             fluid::RealVector     mels ( nBands );
@@ -133,7 +185,7 @@ int corpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid::Flui
     return filesFailed;
 }
 
-fluid::RealVector corpus::Analyse::ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats )
+fluid::RealVector acorex::corpus::Analyse::ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats )
 {
     fluid::index      dim = matrix.cols ( );
     fluid::RealMatrix tmp ( dim, 7 );

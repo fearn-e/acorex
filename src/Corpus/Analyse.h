@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Corpus/Metadata.h"
 #include <Eigen/Core>
 #include <algorithms/public/DCT.hpp>
 #include <algorithms/public/Loudness.hpp>
@@ -17,6 +18,7 @@
 #include <vector>
 #include <string>
 
+namespace acorex {
 namespace corpus {
 
 class Analyse {
@@ -24,10 +26,11 @@ public:
 	Analyse ( ) { };
 	~Analyse ( ) { };
 
-	int ProcessFiles ( std::vector<std::string>& files, fluid::FluidDataSet<std::string, double, 1>& dataset, bool timeDimension );
+	int ProcessFiles ( std::vector<std::string>& files, fluid::FluidDataSet<std::string, double, 1>& dataset, const std::vector<corpus::Metadata>& metaset );
 
 private:
 	fluid::RealVector ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats );
 };
 
 } // namespace corpus
+} // namespace acorex

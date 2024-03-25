@@ -1,24 +1,23 @@
 #pragma once
 
-#include "ofMain.h"
-#include "ofxGui.h"
-
-#include "CorpusController.h"
+#include "Interface/ControllerUI.h"
+#include <ofMain.h>
+#include <ofxGui.h>
 
 class ofApp : public ofBaseApp {
 
 public:
-	ofApp ( );
-	~ofApp ( );
+	ofApp ( ) { }
+	~ofApp ( ) { }
 
 	void setup ( );
 	void update ( );
-
 	void draw ( );
 	void exit ( );
 
-	void StartAnalysis ( );
-	void StartUMAP ( );
+	void CreateCorpus ( );
+	void ReduceCorpus ( );
+	void InsertIntoCorpus ( );
 
 	//void audioIn ( float* input, int bufferSize, int nChannels );
 	//void audioOut ( float* buffer, int bufferSize, int nChannels );
@@ -36,10 +35,5 @@ public:
 	//void gotMessage ( ofMessage msg );
 
 private:
-	CorpusController mCorpusController;
-
-	ofxPanel mGui;
-	ofxButton mStartAnalysis;
-	ofxButton mStartUMAP;
-	ofxToggle mTimeDimension;
+	acorex::interface::ControllerUI mControllerUI;
 };
