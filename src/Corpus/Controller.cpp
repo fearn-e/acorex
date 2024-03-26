@@ -13,7 +13,7 @@ bool acorex::corpus::Controller::CreateCorpus ( const std::string& inputPath, co
 	if ( !success ) { return false; }
 	
 	fluid::FluidDataSet<std::string, double, 1> dataset ( 1 );
-	int numFailed = mAnalyse.ProcessFiles ( files, dataset, timeDimension );
+	int numFailed = mAnalyse.ProcessFiles ( files, dataset, metaset );
 	if ( numFailed < files.size() && dataset.size() != 0 ) { ofLogNotice ( "Controller" ) << "Processed " << files.size ( ) << " files into " << dataset.size ( ) << " points, with " << numFailed << " files failed."; }
 	else 
 	{ 
