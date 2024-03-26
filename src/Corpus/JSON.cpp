@@ -198,7 +198,7 @@ bool acorex::corpus::JSON::ReplaceExtensionToMeta ( std::string& path )
 		return false;
 	}
 
-	path.replace ( path.find_last_of ( '.' ), path.length ( ), ".meta.json" );
+	path.replace ( path.find_last_of ( '.' ), path.length ( ), ".meta" );
 
 	return true;
 }
