@@ -14,11 +14,12 @@ void acorex::interface::ControllerUI::setup ( )
 
 		mMainPanel.setPosition ( 40, 40 );
 		mMainPanel.setWidthElements ( 200 );
+		mMainPanel.disableHeader ( );
 	}
 
 	// Analysis Panel ------------------------------
 	{
-		mAnalysisPanel.setup ( "Analysis Settings" );
+		mAnalysisPanel.setup ( "Analysis" );
 
 		mAnalysisPanel.add ( mAnalysisPickDirectoryButton.setup ( "Pick Audio Directory" ) );
 		mAnalysisPanel.add ( mAnalysisDirectoryLabel.setup ( "", "?" ) );
@@ -44,11 +45,12 @@ void acorex::interface::ControllerUI::setup ( )
 
 		mAnalysisPanel.setPosition ( -1000, -1000 );
 		mAnalysisPanel.setWidthElements ( 315 );
+		mAnalysisPanel.disableHeader ( );
 	}
 
 	// Reduction Panel -----------------------------
 	{
-		mReductionPanel.setup ( "Reduction Settings" );
+		mReductionPanel.setup ( "Reduction" );
 
 		mReductionPanel.add ( mReductionPickInputFileButton.setup ( "Pick Input File" ) );
 		mReductionPanel.add ( mReductionInputLabel.setup ( "", "?" ) );
@@ -63,6 +65,7 @@ void acorex::interface::ControllerUI::setup ( )
 
 		mReductionPanel.setPosition ( -1000, -1000 );
 		mReductionPanel.setWidthElements ( 300 );
+		mReductionPanel.disableHeader ( );
 	}
 
 	// Insertion Duplicate Question Panel ----------
@@ -75,6 +78,7 @@ void acorex::interface::ControllerUI::setup ( )
 		
 		mInsertionDuplicateQuestionPanel.setPosition ( -1000, -1000 );
 		mInsertionDuplicateQuestionPanel.setWidthElements ( 350 );
+		mInsertionDuplicateQuestionPanel.disableHeader ( );
 	}
 
 	// Listeners ----------------------------------
