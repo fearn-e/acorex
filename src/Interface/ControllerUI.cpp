@@ -628,6 +628,7 @@ void acorex::interface::ControllerUI::HideAllPanels ( )
 void acorex::interface::ControllerUI::ShowMainPanel ( )
 {
 	ShowPanel ( mMainPanel, bDrawMainPanel, true );
+	ResetDefaultValues ( );
 }
 
 void acorex::interface::ControllerUI::ShowAnalysisPanel ( )
