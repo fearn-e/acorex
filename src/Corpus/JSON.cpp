@@ -44,7 +44,14 @@ bool acorex::corpus::JSON::Read ( const std::string& inputFile, fluid::FluidData
 bool acorex::corpus::JSON::WriteMeta ( const std::string& outputFile, std::vector<corpus::Metadata>& metaset )
 {
 	std::string metaPath = outputFile;
-	ReplaceExtensionToMeta ( metaPath );
+	bool success = ReplaceExtensionToMeta ( metaPath );
+
+	if ( !success )
+	{
+		ofLogError ( "JSON" ) << "Failed to replace extension";
+		return false;
+	}
+
 	std::ofstream file ( metaPath );
 	nlohmann::json j;
 
@@ -90,7 +97,14 @@ bool acorex::corpus::JSON::WriteMeta ( const std::string& outputFile, std::vecto
 bool acorex::corpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<corpus::Metadata>& metaset, bool loadDefaults )
 {
 	std::string metaPath = inputFile;
-	ReplaceExtensionToMeta ( metaPath );
+	bool success = ReplaceExtensionToMeta ( metaPath );
+
+	if ( !success )
+	{
+		ofLogError ( "JSON" ) << "Failed to replace extension";
+		return false;
+	}
+
 
 	if ( loadDefaults )
 	{
@@ -176,7 +190,15 @@ bool acorex::corpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<
 	return true;
 }
 
-void acorex::corpus::JSON::ReplaceExtensionToMeta ( std::string& path )
+bool acorex::corpus::JSON::ReplaceExtensionToMeta ( std::string& path )
 {
-	path.replace ( path.find ( ".json" ), 5, ".meta" );
+	if ( path.find ( ".json" ) == std::string::npos )
+	{
+		ofLogError ( "JSON" ) << "Invalid file extension";
+		return false;
+	}
+
+	path.replace ( path.find_last_of ( '.' ), path.length ( ), ".meta.json" );
+
+	return true;
 }
