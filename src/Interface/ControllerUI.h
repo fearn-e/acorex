@@ -21,6 +21,8 @@ public:
 
 private:
 	void SetupPanels ( );
+	void ResetValuesAndPanels ( );
+
 	void AnalyseInitial ( );
 	void AnalyseInsertReplace ( );
 	void AnalyseInsertKeep ( );
@@ -32,8 +34,6 @@ private:
 	void SelectAnalysisOutputFile ( );
 	void SelectReductionInputFile ( );
 	void SelectReductionOutputFile ( );
-
-	void ResetDefaultValues ( );
 
 	bool SetSettingsFromFile ( std::vector<corpus::Metadata>& metaset, bool cancelIfAlreadyReduced );
 	std::vector<corpus::Metadata> PackSettingsIntoSet ( );
