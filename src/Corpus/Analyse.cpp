@@ -7,8 +7,6 @@ int acorex::corpus::Analyse::ProcessFiles ( std::vector<std::string>& files, flu
 {
     int filesFailed = 0;
 
-    int numDimensions = 0;
-
     bool timeDimension = false;
     bool analysisPitch = false; bool analysisLoudness = false; bool analysisShape = false; bool analysisMFCC = false;
     fluid::index windowSize = 0; fluid::index hopFraction = 0;
@@ -53,14 +51,23 @@ int acorex::corpus::Analyse::ProcessFiles ( std::vector<std::string>& files, flu
             break;
 		}
     }
+    
+    fluid::index numTimeDimensions = timeDimension ? 2 : 0;
+    fluid::index numPitchDimensions = analysisPitch ? 2 : 0;
+    fluid::index numLoudnessDimensions = analysisLoudness ? 2 : 0;
+    fluid::index numShapeDimensions = analysisShape ? 7 : 0;
+    fluid::index numMFCCDimensions = analysisMFCC ? nCoefs : 0;
 
-    numDimensions += timeDimension * 2;
-    numDimensions += analysisPitch * 2;
-    numDimensions += analysisLoudness * 2;
-    numDimensions += analysisShape * 7;
-    numDimensions += analysisMFCC * nCoefs;
+    if ( !timeDimension )
+    {
+        numTimeDimensions *= 7;
+        numPitchDimensions *= 7;
+        numLoudnessDimensions *= 7;
+        numShapeDimensions *= 7;
+        numMFCCDimensions *= 7;
+    }
 
-    if ( !timeDimension ) { numDimensions *= 7; } // 7 stats computed for each dimension
+    fluid::index numDimensions = numTimeDimensions + numPitchDimensions + numLoudnessDimensions + numShapeDimensions + numMFCCDimensions;
 
     dataset.resize ( numDimensions );
 
@@ -116,28 +123,46 @@ int acorex::corpus::Analyse::ProcessFiles ( std::vector<std::string>& files, flu
         padded ( fluid::Slice ( halfWindow, in.size ( ) ) ) <<= in;
 
         for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
-        { // TODO - ENABLE/DISABLE DIFFERENT ANALYSES BASED ON METADATA FLAGS
-            fluid::ComplexVector  frame ( nBins );
+        {
             fluid::RealVector     magnitude ( nBins );
-            fluid::RealVector     mels ( nBands );
-            fluid::RealVector     mfccs ( nCoefs );
-            fluid::RealVector     pitch ( 2 );
-            fluid::RealVector     shapeDesc ( 7 );
-            fluid::RealVector     loudnessDesc ( 2 );
             fluid::RealVectorView window = padded ( fluid::Slice ( frameIndex * hopSize, windowSize ) );
-            stft.processFrame ( window, frame );
-            stft.magnitude ( frame, magnitude );
-            bands.processFrame ( magnitude, mels, false, false, true,
-                fluid::FluidDefaultAllocator ( ) );
-            dct.processFrame ( mels, mfccs );
-            mfccMat.row ( frameIndex ) <<= mfccs;
-            yin.processFrame ( magnitude, pitch, minFreq, maxFreq, samplingRate );
-            pitchMat.row ( frameIndex ) <<= pitch;
-            shape.processFrame ( magnitude, shapeDesc, samplingRate, 0, -1, 0.95, false,
-                false, fluid::FluidDefaultAllocator ( ) );
-            shapeMat.row ( frameIndex ) <<= shapeDesc;
-            loudness.processFrame ( window, loudnessDesc, true, true );
-            loudnessMat.row ( frameIndex ) <<= loudnessDesc;
+
+            if ( analysisPitch || analysisShape || analysisMFCC )
+            {
+                fluid::ComplexVector  frame ( nBins );
+                stft.processFrame ( window, frame );
+                stft.magnitude ( frame, magnitude );
+            }
+
+            if ( analysisPitch )
+            {
+                fluid::RealVector     pitch ( 2 );
+                yin.processFrame ( magnitude, pitch, minFreq, maxFreq, samplingRate );
+                pitchMat.row ( frameIndex ) <<= pitch;
+            }
+
+            if ( analysisLoudness )
+            {
+                fluid::RealVector     loudnessDesc ( 2 );
+                loudness.processFrame ( window, loudnessDesc, true, true );
+                loudnessMat.row ( frameIndex ) <<= loudnessDesc;
+            }
+
+            if ( analysisShape )
+            {
+                fluid::RealVector     shapeDesc ( 7 );
+                shape.processFrame ( magnitude, shapeDesc, samplingRate, 0, -1, 0.95, false, false, fluid::FluidDefaultAllocator ( ) );
+                shapeMat.row ( frameIndex ) <<= shapeDesc;
+			}
+
+            if ( analysisMFCC )
+            {
+                fluid::RealVector     mfccs ( nCoefs );
+                fluid::RealVector     mels ( nBands );
+                bands.processFrame ( magnitude, mels, false, false, true, fluid::FluidDefaultAllocator ( ) );
+                dct.processFrame ( mels, mfccs );
+                mfccMat.row ( frameIndex ) <<= mfccs;
+            }
         }
 
         if ( timeDimension )
@@ -147,15 +172,40 @@ int acorex::corpus::Analyse::ProcessFiles ( std::vector<std::string>& files, flu
 
             for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
             {
-                fluid::RealVector allVectors ( 26 ); // 2 for time (samples, seconds), 2 for pitch, 2 for loudness, 7 for shape, 13 for mfcc
+                fluid::RealVector allVectors ( numDimensions );
 
-                double sampleIndex = frameIndex * hopSize;
+                fluid::index currentDimTracker = 0;
 
-                allVectors ( fluid::Slice ( 0, 2 ) ) <<= fluid::RealVector { sampleIndex, sampleIndex / samplingRate };
-                allVectors ( fluid::Slice ( 2, 2 ) ) <<= pitchMat.row ( frameIndex );
-                allVectors ( fluid::Slice ( 4, 2 ) ) <<= loudnessMat.row ( frameIndex );
-                allVectors ( fluid::Slice ( 6, 7 ) ) <<= shapeMat.row ( frameIndex );
-                allVectors ( fluid::Slice ( 13, 13 ) ) <<= mfccMat.row ( frameIndex );
+                if ( timeDimension )
+                {
+                    double sampleIndex = frameIndex * hopSize;
+					allVectors ( fluid::Slice ( currentDimTracker, numTimeDimensions ) ) <<= fluid::RealVector { sampleIndex, sampleIndex / samplingRate };
+					currentDimTracker += numTimeDimensions;
+				}
+
+                if ( analysisPitch )
+                {
+                    allVectors ( fluid::Slice ( currentDimTracker, numPitchDimensions ) ) <<= pitchMat.row ( frameIndex );
+                    currentDimTracker += numPitchDimensions;
+                }
+
+                if ( analysisLoudness )
+                {
+                    allVectors ( fluid::Slice ( currentDimTracker, numLoudnessDimensions ) ) <<= loudnessMat.row ( frameIndex );
+                    currentDimTracker += numLoudnessDimensions;
+                }
+
+                if ( analysisShape )
+                {
+					allVectors ( fluid::Slice ( currentDimTracker, numShapeDimensions ) ) <<= shapeMat.row ( frameIndex );
+					currentDimTracker += numShapeDimensions;
+				}
+
+                if ( analysisMFCC )
+                {
+					allVectors ( fluid::Slice ( currentDimTracker, numMFCCDimensions ) ) <<= mfccMat.row ( frameIndex );
+					currentDimTracker += numMFCCDimensions;
+				}
 
                 std::string indexString = std::to_string ( frameIndex );
                 int curDigits = indexString.length ( );
@@ -171,12 +221,29 @@ int acorex::corpus::Analyse::ProcessFiles ( std::vector<std::string>& files, flu
             fluid::RealVector shapeStats = ComputeStats ( shapeMat, stats );
             fluid::RealVector mfccStats = ComputeStats ( mfccMat, stats );
 
-            fluid::RealVector allStats ( 168 );
+            fluid::RealVector allStats ( numDimensions );
 
-            allStats ( fluid::Slice ( 0, 14 ) ) <<= pitchStats;
-            allStats ( fluid::Slice ( 14, 14 ) ) <<= loudnessStats;
-            allStats ( fluid::Slice ( 28, 49 ) ) <<= shapeStats;
-            allStats ( fluid::Slice ( 77, 91 ) ) <<= mfccStats;
+            fluid::index currentDimTracker = 0;
+
+            if ( analysisPitch )
+            {
+				allStats ( fluid::Slice ( currentDimTracker, numPitchDimensions ) ) <<= pitchStats;
+			}
+
+            if ( analysisLoudness )
+            {
+                allStats ( fluid::Slice ( currentDimTracker, numLoudnessDimensions ) ) <<= loudnessStats;
+            }
+
+            if ( analysisShape )
+            {
+				allStats ( fluid::Slice ( currentDimTracker, numShapeDimensions ) ) <<= shapeStats;
+			}
+
+            if ( analysisMFCC )
+            {
+                allStats ( fluid::Slice ( currentDimTracker, numMFCCDimensions ) ) <<= mfccStats;
+            }
 
             dataset.add ( inputFileName, allStats );
         }
