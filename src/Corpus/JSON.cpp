@@ -131,31 +131,31 @@ bool acorex::corpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<
 	{
 		if ( each.at ( 2 ).is_boolean ( ) )
 		{
-			MetaList key = each.at ( 1 );
+			MetaList key = each.at ( 0 );
 			bool value = each.at ( 2 );
 			metaset.push_back ( corpus::Metadata ( key, value ) );
 		}
 		else if ( each.at ( 2 ).is_number_integer ( ) )
 		{
-			MetaList key = each.at ( 1 );
+			MetaList key = each.at ( 0 );
 			int value = each.at ( 2 );
 			metaset.push_back ( corpus::Metadata ( key, value ) );
 		}
 		else if ( each.at ( 2 ).is_number_float ( ) )
 		{
-			MetaList key = each.at ( 1 );
+			MetaList key = each.at ( 0 );
 			double value = each.at ( 2 );
 			metaset.push_back ( corpus::Metadata ( key, value ) );
 		}
 		else if ( each.at ( 2 ).is_string ( ) )
 		{
-			MetaList key = each.at ( 1 );
+			MetaList key = each.at ( 0 );
 			std::string value = each.at ( 2 );
 			metaset.push_back ( corpus::Metadata ( key, value ) );
 		}
 		else if ( each.at ( 2 ).is_array ( ) )
 		{
-			MetaList key = each.at ( 1 );
+			MetaList key = each.at ( 0 );
 			std::vector<std::string> value = each.at ( 2 );
 			metaset.push_back ( corpus::Metadata ( key, value ) );
 		}
