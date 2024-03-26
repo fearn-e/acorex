@@ -32,8 +32,6 @@ private:
 	void SelectReductionInputFile ( );
 	void SelectReductionOutputFile ( );
 
-	void ReplaceExtension ( std::string& path );
-
 	void ResetDefaultValues ( );
 
 	bool SetSettingsFromFile ( std::vector<corpus::Metadata>& metaset, bool cancelIfAlreadyReduced );
