@@ -105,11 +105,16 @@ bool acorex::corpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<
 		return false;
 	}
 
-
 	if ( loadDefaults )
 	{
 		std::string defaultFileName = DEFAULT_META_FILE;
 		metaPath = ofFilePath::getCurrentWorkingDirectory ( ) + defaultFileName;
+
+		if ( !ofFile::doesFileExist ( metaPath ) )
+		{
+			ofLogError ( "JSON" ) << "Default metadata file not found";
+			return false;
+		}
 	}
 
 	auto inputJSON = fluid::JSONFile ( metaPath, "r" );
