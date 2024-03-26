@@ -22,6 +22,8 @@ public:
 
 private:
 	MetaStrings mMetaStrings;
+
+	void ReplaceExtensionToMeta ( std::string& path );
 };
 
 } // namespace corpus

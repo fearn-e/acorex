@@ -43,7 +43,9 @@ bool acorex::corpus::JSON::Read ( const std::string& inputFile, fluid::FluidData
 
 bool acorex::corpus::JSON::WriteMeta ( const std::string& outputFile, std::vector<corpus::Metadata>& metaset )
 {
-	std::ofstream file ( outputFile );
+	std::string metaPath = outputFile;
+	ReplaceExtensionToMeta ( metaPath );
+	std::ofstream file ( metaPath );
 	nlohmann::json j;
 
 	j = nlohmann::json::array ( );
@@ -71,7 +73,7 @@ bool acorex::corpus::JSON::WriteMeta ( const std::string& outputFile, std::vecto
 	file.close ( );
 
 	std::vector<corpus::Metadata> writeTestSet;
-	ReadMeta ( outputFile, writeTestSet, false );
+	ReadMeta ( metaPath, writeTestSet, false );
 
 	if ( metaset.size ( ) != writeTestSet.size ( ) )
 	{
@@ -84,26 +86,27 @@ bool acorex::corpus::JSON::WriteMeta ( const std::string& outputFile, std::vecto
 
 bool acorex::corpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<corpus::Metadata>& metaset, bool loadDefaults )
 {
-	std::string fileName = inputFile;
+	std::string metaPath = inputFile;
+	ReplaceExtensionToMeta ( metaPath );
 
 	if ( loadDefaults )
 	{
-		std::string defaultFileName = "/data/default_metadata.json";
-		fileName = ofFilePath::getCurrentWorkingDirectory ( ) + defaultFileName;
+		std::string defaultFileName = DEFAULT_META_FILE;
+		metaPath = ofFilePath::getCurrentWorkingDirectory ( ) + defaultFileName;
 	}
 
-	auto inputJSON = fluid::JSONFile ( inputFile, "r" );
+	auto inputJSON = fluid::JSONFile ( metaPath, "r" );
 	nlohmann::json j = inputJSON.read ( );
 
 	if ( !inputJSON.ok ( ) )
 	{
 		if ( loadDefaults )
 		{
-			ofLogError ( "JSON" ) << "failed to read default metadata from " << fileName;
+			ofLogError ( "JSON" ) << "failed to read default metadata from " << metaPath;
 		}
 		else
 		{ 
-			ofLogError ( "JSON" ) << "failed to read metadata from " << inputFile;
+			ofLogError ( "JSON" ) << "failed to read metadata from " << metaPath;
 		}
 		return false;
 	}
@@ -162,4 +165,9 @@ bool acorex::corpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<
 	}
 
 	return true;
+}
+
+void acorex::corpus::JSON::ReplaceExtensionToMeta ( std::string& path )
+{
+	path.replace ( path.find ( ".json" ), 5, ".meta" );
 }

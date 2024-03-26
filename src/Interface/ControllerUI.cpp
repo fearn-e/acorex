@@ -305,10 +305,8 @@ void acorex::interface::ControllerUI::SelectAnalysisOutputFile ( )
 
 	if ( bInsertingIntoCorpus )
 	{
-		std::string metaPath = outputFile.getPath ( );
-		ReplaceExtension ( metaPath );
 		std::vector<corpus::Metadata> metaset;
-		mJSON.ReadMeta ( metaPath, metaset, false );
+		mJSON.ReadMeta ( outputFile.getPath ( ), metaset, false );
 		bool success = SetSettingsFromFile ( metaset, true );
 		if ( !success )
 		{
@@ -342,10 +340,8 @@ void acorex::interface::ControllerUI::SelectReductionInputFile ( )
 		return;
 	}
 
-	std::string metaPath = inputFile.getPath ( );
-	ReplaceExtension ( metaPath );
 	std::vector<corpus::Metadata> metaset;
-	mJSON.ReadMeta ( metaPath, metaset, false );
+	mJSON.ReadMeta ( inputFile.getPath ( ), metaset, false );
 	bool success = SetSettingsFromFile ( metaset, true );
 	if ( !success )
 	{
@@ -380,11 +376,6 @@ void acorex::interface::ControllerUI::SelectReductionOutputFile ( )
 	outputPath = outputFile.getPath ( );
 	mReductionOutputLabel = outputFile.getName ( );
 	bReductionOutputSelected = true;
-}
-
-void acorex::interface::ControllerUI::ReplaceExtension ( std::string& path )
-{
-	path.replace ( path.find ( ".json" ), 5, ".meta" );
 }
 
 void acorex::interface::ControllerUI::ResetDefaultValues ( )
