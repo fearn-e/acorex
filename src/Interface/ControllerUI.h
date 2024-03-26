@@ -61,7 +61,8 @@ private:
 	bool bReductionInputSelected = false;
 	bool bReductionOutputSelected = false;
 	
-	bool bFlashingInvalidFields = false;
+	bool bFlashingInvalidFileSelects = false;
+	bool bFlashingInvalidAnalysisToggles = false;
 	int flashColour = 0;
 
 	// Metadata -----------------------------------
