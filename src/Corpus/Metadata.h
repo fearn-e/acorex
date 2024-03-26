@@ -49,7 +49,7 @@ public:
 		case META_MAX_ITERATIONS: return "maxIterations";
 		case META_INSERTION_REPLACES_DUPLICATES: return "insertionReplacesDuplicates";
 		case META_DIMENSION_NAMES: return "dimensionNames";
-		default: return "";
+		default: return "unknown";
 		}
 	}
 };
