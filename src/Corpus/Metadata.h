@@ -1,11 +1,12 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace acorex {
 namespace corpus {
 
-#define META_LIST_SIZE 14
+#define META_LIST_SIZE 16
 
 enum MetaList {
 	META_HAS_BEEN_REDUCED,
@@ -22,7 +23,8 @@ enum MetaList {
 	META_MAX_FREQ,
 	META_REDUCED_DIMENSIONS,
 	META_MAX_ITERATIONS,
-	META_INSERTION_REPLACES_DUPLICATES
+	META_INSERTION_REPLACES_DUPLICATES,
+	META_DIMENSION_NAMES
 };
 
 class MetaStrings {
@@ -46,22 +48,25 @@ public:
 		case META_REDUCED_DIMENSIONS: return "reducedDimensions";
 		case META_MAX_ITERATIONS: return "maxIterations";
 		case META_INSERTION_REPLACES_DUPLICATES: return "insertionReplacesDuplicates";
+		case META_DIMENSION_NAMES: return "dimensionNames";
 		default: return "";
 		}
 	}
 };
 
 struct Metadata {
-	enum class MetaType { BOOL, INT, DOUBLE, STRING };
+	enum class MetaType { BOOL, INT, DOUBLE, STRING, STR_ARRAY };
 
 	Metadata ( MetaList key, bool value ) :					key ( key ), type ( MetaType::BOOL ), boolValue ( value ),
-															intValue ( 0 ), doubleValue ( 0.0f ), stringValue ( "" ) { }
+															intValue ( 0 ), doubleValue ( 0.0f ), stringValue ( "" ), stringArray ( std::vector<std::string> ( ) ) { }
 	Metadata ( MetaList key, int value ) :					key ( key ), type ( MetaType::INT ), intValue ( value ),
-															boolValue ( false ), doubleValue ( 0.0f ), stringValue ( "" ) { }
+															boolValue ( false ), doubleValue ( 0.0f ), stringValue ( "" ), stringArray ( std::vector<std::string> ( ) ) { }
 	Metadata ( MetaList key, double value ) :				key ( key ), type ( MetaType::DOUBLE ), doubleValue ( value ),
-															boolValue ( false ), intValue ( 0 ), stringValue ( "" ) { }
+															boolValue ( false ), intValue ( 0 ), stringValue ( "" ), stringArray ( std::vector<std::string> ( ) ) { }
 	Metadata ( MetaList key, std::string value ) :			key ( key ), type ( MetaType::STRING ), stringValue ( value ),
-															boolValue ( false ), intValue ( 0 ), doubleValue ( 0.0f ) { }
+															boolValue ( false ), intValue ( 0 ), doubleValue ( 0.0f ), stringArray ( std::vector<std::string> ( ) ) { }
+	Metadata ( MetaList key, std::vector<std::string> value ) : key ( key ), type ( MetaType::STR_ARRAY ), stringArray ( value ),
+																boolValue ( false ), intValue ( 0 ), doubleValue ( 0.0f ), stringValue ( "" ) { }
 
 	MetaList key;
 	MetaType type;
@@ -70,6 +75,7 @@ struct Metadata {
 	int intValue;
 	double doubleValue;
 	std::string stringValue;
+	std::vector<std::string> stringArray;
 };
 
 } // namespace corpus
