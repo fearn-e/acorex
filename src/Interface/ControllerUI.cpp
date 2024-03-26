@@ -87,7 +87,7 @@ void acorex::interface::ControllerUI::draw ( )
 	if ( bDrawAnalysisPanel ) {	mAnalysisPanel.draw ( ); }
 	if ( bDrawReductionPanel ) { mReductionPanel.draw ( ); }
 
-	if ( bFlashingInvalidFields )
+	if ( bFlashingInvalidFileSelects )
 	{
 		if ( bDrawAnalysisPanel && !bAnalysisDirectorySelected )
 		{
@@ -112,11 +112,30 @@ void acorex::interface::ControllerUI::draw ( )
 		if ( flashColour < 0 )
 		{
 			flashColour = 255;
-			bFlashingInvalidFields = false;
+			bFlashingInvalidFileSelects = false;
 			mAnalysisDirectoryLabel.setBackgroundColor ( ofColor ( 0 ) );
 			mAnalysisOutputLabel.setBackgroundColor ( ofColor ( 0 ) );
 			mReductionInputLabel.setBackgroundColor ( ofColor ( 0 ) );
 			mReductionOutputLabel.setBackgroundColor ( ofColor ( 0 ) );
+		}
+	}
+
+	if ( bFlashingInvalidAnalysisToggles )
+	{
+		mAnalysisLoudnessToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+		mAnalysisPitchToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+		mAnalysisShapeToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+		mAnalysisMFCCToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+
+		flashColour = flashColour - 2;
+		if ( flashColour < 0 )
+		{
+			flashColour = 255;
+			bFlashingInvalidAnalysisToggles = false;
+			mAnalysisLoudnessToggle.setBackgroundColor ( ofColor ( 0 ) );
+			mAnalysisPitchToggle.setBackgroundColor ( ofColor ( 0 ) );
+			mAnalysisShapeToggle.setBackgroundColor ( ofColor ( 0 ) );
+			mAnalysisMFCCToggle.setBackgroundColor ( ofColor ( 0 ) );
 		}
 	}
 }
@@ -143,8 +162,16 @@ void acorex::interface::ControllerUI::Analyse ( )
 	if ( !bAnalysisDirectorySelected || !bAnalysisOutputSelected )
 	{
 		flashColour = 255;
-		bFlashingInvalidFields = true;
+		bFlashingInvalidFileSelects = true;
 		ofLogError ( "ControllerUI" ) << "Analysis directory or output file not selected";
+		return;
+	}
+
+	if ( !mAnalysisLoudnessToggle && !mAnalysisPitchToggle && !mAnalysisShapeToggle && !mAnalysisMFCCToggle )
+	{
+		flashColour = 255;
+		bFlashingInvalidAnalysisToggles = true;
+		ofLogError ( "ControllerUI" ) << "No analysis types selected";
 		return;
 	}
 
@@ -174,7 +201,7 @@ void acorex::interface::ControllerUI::Reduce ( )
 	if ( !bReductionInputSelected || !bReductionOutputSelected )
 	{
 		flashColour = 255;
-		bFlashingInvalidFields = true;
+		bFlashingInvalidFileSelects = true;
 		ofLogError ( "ControllerUI" ) << "Reduction input or output file not selected";
 		return;
 	}
