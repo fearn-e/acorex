@@ -438,6 +438,8 @@ bool acorex::interface::ControllerUI::SetSettingsFromFile ( std::vector<corpus::
 	{
 		switch ( meta.key )
 		{
+			case corpus::META_HAS_BEEN_REDUCED:
+				break;
 			case corpus::META_TIME_DIMENSION:
 				timeDimension = meta.boolValue;
 				break;
