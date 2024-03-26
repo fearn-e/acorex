@@ -581,10 +581,9 @@ void acorex::interface::ControllerUI::QuantiseWindowSize ( int& value )
 			diff = newdiff;
 		}
 	}
-
 	mWindowFFTField.setup ( mWindowFFTField.getName(), closest, mWindowFFTField.getMin(), mWindowFFTField.getMax() );
-	mAnalysisPanel.setWidthElements ( mAnalysisPanel.getWidth ( ) );
-	mAnalysisPanel.setPosition ( mAnalysisPanel.getPosition ( ) );
+	mAnalysisMetadataPanel.setWidthElements ( mAnalysisMetadataPanel.getWidth ( ) );
+	mAnalysisMetadataPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ) );
 }
 
 void acorex::interface::ControllerUI::QuantiseHopFraction ( int& value )
@@ -602,8 +601,8 @@ void acorex::interface::ControllerUI::QuantiseHopFraction ( int& value )
 		}
 	}
 	mHopFractionField.setup ( mHopFractionField.getName ( ), closest, mHopFractionField.getMin ( ), mHopFractionField.getMax ( ) );
-	mAnalysisPanel.setWidthElements ( mAnalysisPanel.getWidth ( ) );
-	mAnalysisPanel.setPosition ( mAnalysisPanel.getPosition ( ) );
+	mAnalysisMetadataPanel.setWidthElements ( mAnalysisMetadataPanel.getWidth ( ) );
+	mAnalysisMetadataPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ) );
 }
 
 void acorex::interface::ControllerUI::ToggleAnalysisUILockout ( bool lock )
