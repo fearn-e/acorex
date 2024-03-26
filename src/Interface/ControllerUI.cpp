@@ -64,6 +64,18 @@ void acorex::interface::ControllerUI::setup ( )
 		mReductionPanel.setPosition ( -1000, -1000 );
 	}
 
+	// Insertion Duplicate Question Panel ----------
+	{
+		mInsertionDuplicateQuestionPanel.setup ( "Insertion Question" );
+
+		mInsertionDuplicateQuestionPanel.add ( mInsertionDuplicateQuestionLabel.setup ( "For files already existing in the set, which version to use?", "" ) );
+		mInsertionDuplicateQuestionPanel.add ( mInsertionDuplicateYesButton.setup ( "New" ) );
+		mInsertionDuplicateQuestionPanel.add ( mInsertionDuplicateNoButton.setup ( "Existing" ) );
+		
+		mInsertionDuplicateQuestionPanel.setPosition ( -1000, -1000 );
+		mInsertionDuplicateQuestionPanel.setWidthElements ( 350 );
+	}
+
 	// Listeners ----------------------------------
 	{
 		mCreateCorpusButton.addListener ( this, &ControllerUI::ShowAnalysisPanel );
@@ -76,8 +88,10 @@ void acorex::interface::ControllerUI::setup ( )
 		mReductionPickOutputFileButton.addListener ( this, &ControllerUI::SelectReductionOutputFile );
 		mWindowFFTField.addListener ( this, &ControllerUI::QuantiseWindowSize );
 		mHopFractionField.addListener ( this, &ControllerUI::QuantiseHopFraction );
-		mConfirmAnalysisButton.addListener ( this, &ControllerUI::Analyse );
+		mConfirmAnalysisButton.addListener ( this, &ControllerUI::AnalyseInitial );
 		mConfirmReductionButton.addListener ( this, &ControllerUI::Reduce );
+		mInsertionDuplicateYesButton.addListener ( this, &ControllerUI::AnalyseInsertReplace );
+		mInsertionDuplicateNoButton.addListener ( this, &ControllerUI::AnalyseInsertKeep );
 	}
 }
 
@@ -152,12 +166,14 @@ void acorex::interface::ControllerUI::exit ( )
 	mReductionPickOutputFileButton.removeListener ( this, &ControllerUI::SelectReductionOutputFile );
 	mWindowFFTField.removeListener ( this, &ControllerUI::QuantiseWindowSize );
 	mHopFractionField.removeListener ( this, &ControllerUI::QuantiseHopFraction );
-	mConfirmAnalysisButton.removeListener ( this, &ControllerUI::Analyse );
+	mConfirmAnalysisButton.removeListener ( this, &ControllerUI::AnalyseInitial );
 	mConfirmReductionButton.removeListener ( this, &ControllerUI::Reduce );
+	mInsertionDuplicateYesButton.removeListener ( this, &ControllerUI::AnalyseInsertReplace );
+	mInsertionDuplicateNoButton.removeListener ( this, &ControllerUI::AnalyseInsertKeep );
 }
 
 
-void acorex::interface::ControllerUI::Analyse ( )
+void acorex::interface::ControllerUI::AnalyseInitial ( )
 {
 	if ( !bAnalysisDirectorySelected || !bAnalysisOutputSelected )
 	{
@@ -175,6 +191,31 @@ void acorex::interface::ControllerUI::Analyse ( )
 		return;
 	}
 
+	if ( bInsertingIntoCorpus )
+	{
+		ShowPanel ( mInsertionDuplicateQuestionPanel, bDrawInsertionDuplicateQuestionPanel, true );
+		return;
+	}
+
+	Analyse ( );
+}
+
+void acorex::interface::ControllerUI::AnalyseInsertReplace ( )
+{
+	insertionReplacesDuplicates = true;
+	Analyse ( );
+}
+
+void acorex::interface::ControllerUI::AnalyseInsertKeep ( )
+{
+	insertionReplacesDuplicates = false;
+	Analyse ( );
+}
+
+void acorex::interface::ControllerUI::Analyse ( )
+{
+	HideAllPanels ( );
+
 	std::vector<corpus::Metadata> metaset = PackSettingsIntoSet ( );
 	bool success = false;
 	if ( !bInsertingIntoCorpus )
@@ -188,12 +229,15 @@ void acorex::interface::ControllerUI::Analyse ( )
 
 	if ( !success )
 	{
+		ShowPanel ( mMainPanel, bDrawMainPanel, true );
 		ofLogError ( "ControllerUI" ) << "Failed to create corpus";
 		return;
 	}
-	
-	// TODO - ask if user wants to reduce the data or view it in the corpus viewer
-	// make a new panel for this with two choices
+	else
+	{
+		// TODO - ask if user wants to reduce the data or view it in the corpus viewer
+		// make a new panel for this with two choices
+	}
 }
 
 void acorex::interface::ControllerUI::Reduce ( )
@@ -441,8 +485,10 @@ bool acorex::interface::ControllerUI::SetSettingsFromFile ( std::vector<corpus::
 			case corpus::META_MAX_ITERATIONS:
 				maxIterations = meta.intValue;
 				break;
+			case corpus::META_INSERTION_REPLACES_DUPLICATES:
+				break;
 			default:
-				ofLogError ( "ControllerUI" ) << "Invalid metadata key";
+				ofLogError ( "ControllerUI" ) << "Invalid metadata key: " << meta.key << " = " << mMetaStrings.getStringFromMeta ( meta.key );
 				return false;
 		}
 	}
@@ -484,6 +530,7 @@ std::vector<acorex::corpus::Metadata> acorex::interface::ControllerUI::PackSetti
 	metaset.push_back ( corpus::Metadata ( corpus::META_MAX_FREQ, mMaxFreqField ) );
 	metaset.push_back ( corpus::Metadata ( corpus::META_REDUCED_DIMENSIONS, mReducedDimensionsField ) );
 	metaset.push_back ( corpus::Metadata ( corpus::META_MAX_ITERATIONS, mMaxIterationsField ) );
+	metaset.push_back ( corpus::Metadata ( corpus::META_INSERTION_REPLACES_DUPLICATES, bInsertingIntoCorpus ) );
 
 	return metaset;
 }
@@ -581,6 +628,7 @@ void acorex::interface::ControllerUI::HideAllPanels ( )
 	mMainPanel.setPosition ( -1000, -1000 ); bDrawMainPanel = false;
 	mAnalysisPanel.setPosition ( -1000, -1000 ); bDrawAnalysisPanel = false;
 	mReductionPanel.setPosition ( -1000, -1000 ); bDrawReductionPanel = false;
+	mInsertionDuplicateQuestionPanel.setPosition ( -1000, -1000 ); bDrawInsertionDuplicateQuestionPanel = false;
 }
 
 void acorex::interface::ControllerUI::ShowMainPanel ( )
