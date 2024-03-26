@@ -569,21 +569,31 @@ void acorex::interface::ControllerUI::ToggleAnalysisUILockout ( bool lock )
 	}
 }
 
+void acorex::interface::ControllerUI::ShowPanel (ofxPanel& visiblePanel, bool& visibleDrawFlag, bool hideOthers )
+{
+	if ( hideOthers ) { HideAllPanels ( ); }
+	visiblePanel.setPosition ( 40, 40 );
+	visibleDrawFlag = true;
+}
+
+void acorex::interface::ControllerUI::HideAllPanels ( )
+{
+	mMainPanel.setPosition ( -1000, -1000 ); bDrawMainPanel = false;
+	mAnalysisPanel.setPosition ( -1000, -1000 ); bDrawAnalysisPanel = false;
+	mReductionPanel.setPosition ( -1000, -1000 ); bDrawReductionPanel = false;
+}
+
 void acorex::interface::ControllerUI::ShowMainPanel ( )
 {
-	mMainPanel.setPosition ( 40, 40 ); mAnalysisPanel.setPosition ( -1000, -1000 ); mReductionPanel.setPosition ( -1000, -1000 );
-	bDrawMainPanel = true; bDrawAnalysisPanel = false; bDrawReductionPanel = false;
-	ResetDefaultValues ( );
+	ShowPanel ( mMainPanel, bDrawMainPanel, false );
 }
 
 void acorex::interface::ControllerUI::ShowAnalysisPanel ( )
 {
-	mMainPanel.setPosition ( -1000, -1000 ); mAnalysisPanel.setPosition ( 40, 40 ); mReductionPanel.setPosition ( -1000, -1000 );
-	bDrawMainPanel = false; bDrawAnalysisPanel = true; bDrawReductionPanel = false;
+	ShowPanel ( mAnalysisPanel, bDrawAnalysisPanel, true );
 }
 
 void acorex::interface::ControllerUI::ShowReductionPanel ( )
 {
-	mMainPanel.setPosition ( -1000, -1000 ); mAnalysisPanel.setPosition ( -1000, -1000 ); mReductionPanel.setPosition ( 40, 40 );
-	bDrawMainPanel = false; bDrawAnalysisPanel = false; bDrawReductionPanel = true;
+	ShowPanel ( mReductionPanel, bDrawReductionPanel, true );
 }
