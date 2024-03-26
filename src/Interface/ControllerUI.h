@@ -91,26 +91,27 @@ private:
 	std::string inputPath = "";
 	std::string outputPath = "";
 
-	// UI Elements ---------------------------------
+	// Panels -------------------------------------
 
 	ofxPanel mMainPanel;
-	ofxPanel mAnalysisPanel;
-	ofxPanel mReductionPanel;
-
 	ofxButton mCreateCorpusButton;
 	ofxButton mReduceCorpusButton;
 
+
+	ofxPanel mAnalysisPanel;
 	ofxButton mAnalysisPickDirectoryButton;
 	ofxLabel mAnalysisDirectoryLabel;
 	ofxButton mAnalysisPickOutputFileButton;
 	ofxLabel mAnalysisOutputLabel;
+	ofxButton mConfirmAnalysisButton;
+	ofxButton mCancelAnalysisButton;
+
+
+	ofxPanel mReductionPanel;
 	ofxButton mReductionPickInputFileButton;
 	ofxLabel mReductionInputLabel;
 	ofxButton mReductionPickOutputFileButton;
 	ofxLabel mReductionOutputLabel;
-
-	ofxButton mConfirmAnalysisButton;
-	ofxButton mCancelAnalysisButton;
 	ofxButton mConfirmReductionButton;
 	ofxButton mCancelReductionButton;
 };
