@@ -13,7 +13,7 @@ void acorex::interface::ControllerUI::setup ( )
 		mMainPanel.add ( mReduceCorpusButton.setup ( "Reduce Corpus" ) );
 
 		mMainPanel.setPosition ( 40, 40 );
-		mMainPanel.setWidthElements ( 250 );
+		mMainPanel.setWidthElements ( 200 );
 	}
 
 	// Analysis Panel ------------------------------
@@ -43,7 +43,7 @@ void acorex::interface::ControllerUI::setup ( )
 		mAnalysisPanel.add ( mCancelAnalysisButton.setup ( "Cancel" ) );
 
 		mAnalysisPanel.setPosition ( -1000, -1000 );
-		mAnalysisPanel.setWidthElements ( 300 );
+		mAnalysisPanel.setWidthElements ( 315 );
 	}
 
 	// Reduction Panel -----------------------------
