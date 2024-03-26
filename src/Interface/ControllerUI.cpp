@@ -521,7 +521,7 @@ std::vector<acorex::corpus::Metadata> acorex::interface::ControllerUI::PackSetti
 	metaset.push_back ( corpus::Metadata ( corpus::META_MAX_FREQ, mMaxFreqField ) );
 	metaset.push_back ( corpus::Metadata ( corpus::META_REDUCED_DIMENSIONS, mReducedDimensionsField ) );
 	metaset.push_back ( corpus::Metadata ( corpus::META_MAX_ITERATIONS, mMaxIterationsField ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_INSERTION_REPLACES_DUPLICATES, bInsertingIntoCorpus ) );
+	metaset.push_back ( corpus::Metadata ( corpus::META_INSERTION_REPLACES_DUPLICATES, insertionReplacesDuplicates ) );
 
 	return metaset;
 }
