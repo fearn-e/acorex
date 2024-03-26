@@ -64,7 +64,7 @@ void acorex::interface::ControllerUI::SetupPanels ( )
 		mAnalysisMetadataPanel.setWidthElements ( 315 );
 		mAnalysisMetadataPanel.disableHeader ( );
 
-		
+
 		mAnalysisConfirmPanel.setup ( "Confirm Analysis" );
 
 		mAnalysisConfirmPanel.add ( mConfirmAnalysisButton.setup ( "Confirm" ) );
@@ -102,7 +102,7 @@ void acorex::interface::ControllerUI::SetupPanels ( )
 		mInsertionDuplicateQuestionPanel.add ( mInsertionDuplicateQuestionLabel.setup ( "For files already existing in the set, which version to use?", "" ) );
 		mInsertionDuplicateQuestionPanel.add ( mInsertionDuplicateYesButton.setup ( "New" ) );
 		mInsertionDuplicateQuestionPanel.add ( mInsertionDuplicateNoButton.setup ( "Existing" ) );
-		
+
 		mInsertionDuplicateQuestionPanel.setPosition ( -1000, -1000 );
 		mInsertionDuplicateQuestionPanel.setWidthElements ( 350 );
 		mInsertionDuplicateQuestionPanel.disableHeader ( );
@@ -126,6 +126,21 @@ void acorex::interface::ControllerUI::SetupPanels ( )
 		mInsertionDuplicateNoButton.addListener ( this, &ControllerUI::AnalyseInsertKeep );
 	}
 }
+
+void acorex::interface::ControllerUI::ResetValuesAndPanels ( )
+{
+	ToggleAnalysisUILockout ( false );
+
+	bInsertingIntoCorpus = false;
+
+	hasBeenReduced = false;
+
+	inputPath = "";
+	outputPath = "";
+
+	SetupPanels ( );
+}
+
 
 void acorex::interface::ControllerUI::draw ( )
 {
@@ -210,7 +225,6 @@ void acorex::interface::ControllerUI::exit ( )
 	mInsertionDuplicateYesButton.removeListener ( this, &ControllerUI::AnalyseInsertReplace );
 	mInsertionDuplicateNoButton.removeListener ( this, &ControllerUI::AnalyseInsertKeep );
 }
-
 
 void acorex::interface::ControllerUI::AnalyseInitial ( )
 {
@@ -415,29 +429,6 @@ void acorex::interface::ControllerUI::SelectReductionOutputFile ( )
 	outputPath = outputFile.getPath ( );
 	mReductionOutputLabel = outputFile.getName ( );
 	bReductionOutputSelected = true;
-}
-
-void acorex::interface::ControllerUI::ResetDefaultValues ( )
-{
-	std::vector<corpus::Metadata> metaset;
-	mJSON.ReadMeta ( "", metaset, true );
-	SetSettingsFromFile ( metaset, false );
-	ToggleAnalysisUILockout ( false );
-	
-	bInsertingIntoCorpus = false;
-	bAnalysisDirectorySelected = false;
-	bAnalysisOutputSelected = false;
-	bReductionInputSelected = false;
-	bReductionOutputSelected = false;
-
-	hasBeenReduced = false;
-
-	inputPath = "";
-	outputPath = "";
-	mAnalysisDirectoryLabel = "?";
-	mAnalysisOutputLabel = "?";
-	mReductionInputLabel = "?";
-	mReductionOutputLabel = "?";
 }
 
 bool acorex::interface::ControllerUI::SetSettingsFromFile ( std::vector<corpus::Metadata>& metaset, bool cancelIfAlreadyReduced )
@@ -650,8 +641,8 @@ void acorex::interface::ControllerUI::HideAllPanels ( )
 
 void acorex::interface::ControllerUI::ShowMainPanel ( )
 {
+	ResetValuesAndPanels ( );
 	ShowPanel ( mMainPanel, bDrawMainPanel, true );
-	ResetDefaultValues ( );
 }
 
 void acorex::interface::ControllerUI::ShowAnalysisPanel ( )
