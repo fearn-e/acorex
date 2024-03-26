@@ -545,6 +545,7 @@ void acorex::interface::ControllerUI::QuantiseWindowSize ( int& value )
 	}
 
 	mWindowFFTField.setup ( mWindowFFTField.getName(), closest, mWindowFFTField.getMin(), mWindowFFTField.getMax() );
+	mAnalysisPanel.setWidthElements ( mAnalysisPanel.getWidth ( ) );
 	mAnalysisPanel.setPosition ( mAnalysisPanel.getPosition ( ) );
 }
 
@@ -563,6 +564,7 @@ void acorex::interface::ControllerUI::QuantiseHopFraction ( int& value )
 		}
 	}
 	mHopFractionField.setup ( mHopFractionField.getName ( ), closest, mHopFractionField.getMin ( ), mHopFractionField.getMax ( ) );
+	mAnalysisPanel.setWidthElements ( mAnalysisPanel.getWidth ( ) );
 	mAnalysisPanel.setPosition ( mAnalysisPanel.getPosition ( ) );
 }
 
