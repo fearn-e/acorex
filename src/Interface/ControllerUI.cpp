@@ -27,17 +27,17 @@ void acorex::interface::ControllerUI::setup ( )
 
 		mAnalysisPanel.add ( mTimeDimensionToggle.setup ( "Time Dimension", mTimeDimensionToggle ) );
 
-		mAnalysisPanel.add ( mAnalysisPitchToggle.setup ( "Pitch", mAnalysisPitchToggle ) );
-		mAnalysisPanel.add ( mAnalysisLoudnessToggle.setup ( "Loudness", mAnalysisLoudnessToggle ) );
-		mAnalysisPanel.add ( mAnalysisShapeToggle.setup ( "Shape", mAnalysisShapeToggle ) );
-		mAnalysisPanel.add ( mAnalysisMFCCToggle.setup ( "MFCC", mAnalysisMFCCToggle ) );
+		mAnalysisPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", mAnalysisPitchToggle ) );
+		mAnalysisPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", mAnalysisLoudnessToggle ) );
+		mAnalysisPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Shape", mAnalysisShapeToggle ) );
+		mAnalysisPanel.add ( mAnalysisMFCCToggle.setup ( "Analyse MFCC", mAnalysisMFCCToggle ) );
 
-		mAnalysisPanel.add ( mWindowFFTField.setup ( "Window Size", 1024, 512, 8192 ) );
-		mAnalysisPanel.add ( mHopFractionField.setup ( "Hop Size (Fraction of Window)", 2, 1, 16 ) );
-		mAnalysisPanel.add ( mNBandsField.setup ( "Bands", 40, 1, 100 ) );
-		mAnalysisPanel.add ( mNCoefsField.setup ( "Coefs", 13, 1, 20 ) );
-		mAnalysisPanel.add ( mMinFreqField.setup ( "Min Freq", 20, 20, 2000 ) );
-		mAnalysisPanel.add ( mMaxFreqField.setup ( "Max Freq", 5000, 20, 20000 ) );
+		mAnalysisPanel.add ( mWindowFFTField.setup ( "Window Size: ", 1024, 512, 8192 ) );
+		mAnalysisPanel.add ( mHopFractionField.setup ( "Hop Size (Fraction of Window):  1 / ", 2, 1, 16 ) );
+		mAnalysisPanel.add ( mNBandsField.setup ( "Bands: ", 40, 1, 100 ) );
+		mAnalysisPanel.add ( mNCoefsField.setup ( "Coefs: ", 13, 1, 20 ) );
+		mAnalysisPanel.add ( mMinFreqField.setup ( "Min Freq: ", 20, 20, 2000 ) );
+		mAnalysisPanel.add ( mMaxFreqField.setup ( "Max Freq: ", 5000, 20, 20000 ) );
 
 		mAnalysisPanel.add ( mConfirmAnalysisButton.setup ( "Confirm" ) );
 		mAnalysisPanel.add ( mCancelAnalysisButton.setup ( "Cancel" ) );
