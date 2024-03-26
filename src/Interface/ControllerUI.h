@@ -20,6 +20,7 @@ public:
 	void exit ( );
 
 private:
+	void SetupPanels ( );
 	void AnalyseInitial ( );
 	void AnalyseInsertReplace ( );
 	void AnalyseInsertKeep ( );

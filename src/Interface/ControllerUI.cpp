@@ -4,9 +4,22 @@
 
 void acorex::interface::ControllerUI::setup ( )
 {
+	SetupPanels ( );
+}
+
+void acorex::interface::ControllerUI::SetupPanels ( )
+{
+	exit ( );
+	mMainPanel.clear ( );
+	mAnalysisPanel.clear ( );
+	mAnalysisMetadataPanel.clear ( );
+	mAnalysisConfirmPanel.clear ( );
+	mReductionPanel.clear ( );
+	mInsertionDuplicateQuestionPanel.clear ( );
+
 	// Main Panel ---------------------------------
 	{
-		
+
 		mMainPanel.setup ( "Menu" );
 
 		mMainPanel.add ( mCreateCorpusButton.setup ( "Analyse Corpus" ) );
