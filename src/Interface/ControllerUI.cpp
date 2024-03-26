@@ -13,7 +13,7 @@ void acorex::interface::ControllerUI::setup ( )
 		mMainPanel.add ( mReduceCorpusButton.setup ( "Reduce Corpus" ) );
 
 		mMainPanel.setPosition ( 40, 40 );
-		mMainPanel.setWidthElements ( 450 );
+		mMainPanel.setWidthElements ( 250 );
 	}
 
 	// Analysis Panel ------------------------------
@@ -43,7 +43,7 @@ void acorex::interface::ControllerUI::setup ( )
 		mAnalysisPanel.add ( mCancelAnalysisButton.setup ( "Cancel" ) );
 
 		mAnalysisPanel.setPosition ( -1000, -1000 );
-		mAnalysisPanel.setWidthElements ( 250 );
+		mAnalysisPanel.setWidthElements ( 300 );
 	}
 
 	// Reduction Panel -----------------------------
@@ -62,6 +62,7 @@ void acorex::interface::ControllerUI::setup ( )
 		mReductionPanel.add ( mCancelReductionButton.setup ( "Cancel" ) );
 
 		mReductionPanel.setPosition ( -1000, -1000 );
+		mReductionPanel.setWidthElements ( 300 );
 	}
 
 	// Insertion Duplicate Question Panel ----------
