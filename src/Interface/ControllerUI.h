@@ -40,6 +40,9 @@ private:
 
 	void ToggleAnalysisUILockout ( bool lock );
 
+	void ShowPanel ( ofxPanel& visiblePanel, bool& visibleDrawFlag, bool hideOthers );
+	void HideAllPanels ( );
+
 	void ShowMainPanel ( );
 	void ShowAnalysisPanel ( );
 	void ShowReductionPanel ( );
