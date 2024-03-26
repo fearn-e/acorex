@@ -20,7 +20,11 @@ public:
 	void exit ( );
 
 private:
+	void AnalyseInitial ( );
+	void AnalyseInsertReplace ( );
+	void AnalyseInsertKeep ( );
 	void Analyse ( );
+
 	void Reduce ( );
 
 	void SelectAnalysisDirectory ( );
@@ -50,12 +54,14 @@ private:
 	corpus::Controller mController;
 	corpus::JSON mJSON;
 	interface::Colors mColors;
+	corpus::MetaStrings mMetaStrings;
 
 	// State --------------------------------------
 
 	bool bDrawMainPanel = true;
 	bool bDrawAnalysisPanel = false;
 	bool bDrawReductionPanel = false;
+	bool bDrawInsertionDuplicateQuestionPanel = false;
 	
 	bool bInsertingIntoCorpus = false;
 
@@ -89,6 +95,8 @@ private:
 	ofxIntField mReducedDimensionsField;
 	ofxIntField mMaxIterationsField;
 
+	bool insertionReplacesDuplicates = false;
+
 	// File Paths ---------------------------------
 
 	std::string inputPath = "";
@@ -117,6 +125,11 @@ private:
 	ofxLabel mReductionOutputLabel;
 	ofxButton mConfirmReductionButton;
 	ofxButton mCancelReductionButton;
+
+	ofxPanel mInsertionDuplicateQuestionPanel;
+	ofxLabel mInsertionDuplicateQuestionLabel;
+	ofxButton mInsertionDuplicateYesButton;
+	ofxButton mInsertionDuplicateNoButton;
 };
 
 } // namespace interface
