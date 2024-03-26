@@ -66,6 +66,9 @@ bool acorex::corpus::JSON::WriteMeta ( const std::string& outputFile, std::vecto
 		case corpus::Metadata::MetaType::STRING:
 			j.push_back ( { each.key, mMetaStrings.getStringFromMeta(each.key), each.stringValue } );
 			break;
+		case corpus::Metadata::MetaType::STR_ARRAY:
+			j.push_back ( { each.key, mMetaStrings.getStringFromMeta(each.key), each.stringArray } );
+			break;
 		}
 	}
 
@@ -148,6 +151,12 @@ bool acorex::corpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<
 		{
 			MetaList key = each.at ( 1 );
 			std::string value = each.at ( 2 );
+			metaset.push_back ( corpus::Metadata ( key, value ) );
+		}
+		else if ( each.at ( 2 ).is_array ( ) )
+		{
+			MetaList key = each.at ( 1 );
+			std::vector<std::string> value = each.at ( 2 );
 			metaset.push_back ( corpus::Metadata ( key, value ) );
 		}
 		else
