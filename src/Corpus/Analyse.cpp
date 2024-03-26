@@ -60,7 +60,6 @@ int acorex::corpus::Analyse::ProcessFiles ( std::vector<std::string>& files, flu
 
     if ( !timeDimension )
     {
-        numTimeDimensions *= 7;
         numPitchDimensions *= 7;
         numLoudnessDimensions *= 7;
         numShapeDimensions *= 7;
