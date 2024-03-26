@@ -26,26 +26,40 @@ void acorex::interface::ControllerUI::setup ( )
 		mAnalysisPanel.add ( mAnalysisPickOutputFileButton.setup ( "Pick Output File" ) );
 		mAnalysisPanel.add ( mAnalysisOutputLabel.setup ( "", "?" ) );
 
-		mAnalysisPanel.add ( mTimeDimensionToggle.setup ( "Time Dimension", mTimeDimensionToggle ) );
-
-		mAnalysisPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", mAnalysisPitchToggle ) );
-		mAnalysisPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", mAnalysisLoudnessToggle ) );
-		mAnalysisPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Shape", mAnalysisShapeToggle ) );
-		mAnalysisPanel.add ( mAnalysisMFCCToggle.setup ( "Analyse MFCC", mAnalysisMFCCToggle ) );
-
-		mAnalysisPanel.add ( mWindowFFTField.setup ( "Window Size: ", 1024, 512, 8192 ) );
-		mAnalysisPanel.add ( mHopFractionField.setup ( "Hop Size (Fraction of Window):  1 / ", 2, 1, 16 ) );
-		mAnalysisPanel.add ( mNBandsField.setup ( "Bands: ", 40, 1, 100 ) );
-		mAnalysisPanel.add ( mNCoefsField.setup ( "Coefs: ", 13, 1, 20 ) );
-		mAnalysisPanel.add ( mMinFreqField.setup ( "Min Freq: ", 20, 20, 2000 ) );
-		mAnalysisPanel.add ( mMaxFreqField.setup ( "Max Freq: ", 5000, 20, 20000 ) );
-
-		mAnalysisPanel.add ( mConfirmAnalysisButton.setup ( "Confirm" ) );
-		mAnalysisPanel.add ( mCancelAnalysisButton.setup ( "Cancel" ) );
-
 		mAnalysisPanel.setPosition ( -1000, -1000 );
 		mAnalysisPanel.setWidthElements ( 315 );
 		mAnalysisPanel.disableHeader ( );
+
+
+		mAnalysisMetadataPanel.setup ( "Analysis Metadata" );
+
+		mAnalysisMetadataPanel.add ( mTimeDimensionToggle.setup ( "Time Dimension", mTimeDimensionToggle ) );
+
+		mAnalysisMetadataPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", mAnalysisPitchToggle ) );
+		mAnalysisMetadataPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", mAnalysisLoudnessToggle ) );
+		mAnalysisMetadataPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Shape", mAnalysisShapeToggle ) );
+		mAnalysisMetadataPanel.add ( mAnalysisMFCCToggle.setup ( "Analyse MFCC", mAnalysisMFCCToggle ) );
+
+		mAnalysisMetadataPanel.add ( mWindowFFTField.setup ( "Window Size: ", 1024, 512, 8192 ) );
+		mAnalysisMetadataPanel.add ( mHopFractionField.setup ( "Hop Size (Fraction of Window):  1 / ", 2, 1, 16 ) );
+		mAnalysisMetadataPanel.add ( mNBandsField.setup ( "Bands: ", 40, 1, 100 ) );
+		mAnalysisMetadataPanel.add ( mNCoefsField.setup ( "Coefs: ", 13, 1, 20 ) );
+		mAnalysisMetadataPanel.add ( mMinFreqField.setup ( "Min Freq: ", 20, 20, 2000 ) );
+		mAnalysisMetadataPanel.add ( mMaxFreqField.setup ( "Max Freq: ", 5000, 20, 20000 ) );
+
+		mAnalysisMetadataPanel.setPosition ( -1000, -1000 );
+		mAnalysisMetadataPanel.setWidthElements ( 315 );
+		mAnalysisMetadataPanel.disableHeader ( );
+
+		
+		mAnalysisConfirmPanel.setup ( "Confirm Analysis" );
+
+		mAnalysisConfirmPanel.add ( mConfirmAnalysisButton.setup ( "Confirm" ) );
+		mAnalysisConfirmPanel.add ( mCancelAnalysisButton.setup ( "Cancel" ) );
+
+		mAnalysisConfirmPanel.setPosition ( -1000, -1000 );
+		mAnalysisConfirmPanel.setWidthElements ( 315 );
+		mAnalysisConfirmPanel.disableHeader ( );
 	}
 
 	// Reduction Panel -----------------------------
@@ -103,7 +117,14 @@ void acorex::interface::ControllerUI::setup ( )
 void acorex::interface::ControllerUI::draw ( )
 {
 	if ( bDrawMainPanel ) { mMainPanel.draw ( ); }
-	if ( bDrawAnalysisPanel ) {	mAnalysisPanel.draw ( ); }
+	if ( bDrawAnalysisPanel ) 
+	{	
+		mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + 10 );
+		mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + 10 );
+		mAnalysisPanel.draw ( ); 
+		mAnalysisMetadataPanel.draw ( );
+		mAnalysisConfirmPanel.draw ( );
+	}
 	if ( bDrawReductionPanel ) { mReductionPanel.draw ( ); }
 
 	if ( bFlashingInvalidFileSelects )
@@ -588,31 +609,11 @@ void acorex::interface::ControllerUI::ToggleAnalysisUILockout ( bool lock )
 
 	if ( lock )
 	{
-		mTimeDimensionToggle.unregisterMouseEvents ( );
-		mAnalysisPitchToggle.unregisterMouseEvents ( );
-		mAnalysisLoudnessToggle.unregisterMouseEvents ( );
-		mAnalysisShapeToggle.unregisterMouseEvents ( );
-		mAnalysisMFCCToggle.unregisterMouseEvents ( );
-		mWindowFFTField.unregisterMouseEvents ( );
-		mHopFractionField.unregisterMouseEvents ( );
-		mNBandsField.unregisterMouseEvents ( );
-		mNCoefsField.unregisterMouseEvents ( );
-		mMinFreqField.unregisterMouseEvents ( );
-		mMaxFreqField.unregisterMouseEvents ( );
+		mAnalysisMetadataPanel.unregisterMouseEvents ( );
 	}
 	else
 	{
-		mTimeDimensionToggle.registerMouseEvents ( );
-		mAnalysisPitchToggle.registerMouseEvents ( );
-		mAnalysisLoudnessToggle.registerMouseEvents ( );
-		mAnalysisShapeToggle.registerMouseEvents ( );
-		mAnalysisMFCCToggle.registerMouseEvents ( );
-		mWindowFFTField.registerMouseEvents ( );
-		mHopFractionField.registerMouseEvents ( );
-		mNBandsField.registerMouseEvents ( );
-		mNCoefsField.registerMouseEvents ( );
-		mMinFreqField.registerMouseEvents ( );
-		mMaxFreqField.registerMouseEvents ( );
+		mAnalysisMetadataPanel.registerMouseEvents ( );
 	}
 }
 
@@ -640,6 +641,8 @@ void acorex::interface::ControllerUI::ShowMainPanel ( )
 void acorex::interface::ControllerUI::ShowAnalysisPanel ( )
 {
 	ShowPanel ( mAnalysisPanel, bDrawAnalysisPanel, true );
+	ShowPanel ( mAnalysisMetadataPanel, bDrawAnalysisPanel, false );
+	ShowPanel ( mAnalysisConfirmPanel, bDrawAnalysisPanel, false );
 }
 
 void acorex::interface::ControllerUI::ShowReductionPanel ( )

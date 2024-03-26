@@ -108,6 +108,8 @@ private:
 
 
 	ofxPanel mAnalysisPanel;
+	ofxPanel mAnalysisMetadataPanel;
+	ofxPanel mAnalysisConfirmPanel;
 	ofxButton mAnalysisPickDirectoryButton;
 	ofxLabel mAnalysisDirectoryLabel;
 	ofxButton mAnalysisPickOutputFileButton;
