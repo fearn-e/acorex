@@ -623,10 +623,14 @@ void acorex::interface::ControllerUI::ToggleAnalysisUILockout ( bool lock )
 	if ( lock )
 	{
 		mAnalysisMetadataPanel.unregisterMouseEvents ( );
+		mWindowFFTField.unregisterMouseEvents ( );
+		mHopFractionField.unregisterMouseEvents ( );
 	}
 	else
 	{
 		mAnalysisMetadataPanel.registerMouseEvents ( );
+		mWindowFFTField.registerMouseEvents ( );
+		mHopFractionField.registerMouseEvents ( );
 	}
 }
 
