@@ -161,22 +161,54 @@ void AcorexInterface::ControllerUI::Reset ( )
 
 void AcorexInterface::ControllerUI::draw ( )
 {
-	if ( bDrawMainPanel ) { mMainPanel.draw ( ); }
+	if ( bDrawMainPanel )
+	{
+		//draw background rectangle around main panel
+		ofSetColor ( mColors.panelBackgroundColor );
+		ofDrawRectangle ( 
+			mMainPanel.getPosition ( ).x - mLayout.panelBackgroundMargin, 
+			mMainPanel.getPosition ( ).y - mLayout.panelBackgroundMargin, 
+			mMainPanel.getWidth ( ) + mLayout.panelBackgroundMargin * 2,
+			mMainPanel.getHeight ( ) + mLayout.panelBackgroundMargin * 2 );
+		mMainPanel.draw ( );
+	}
+
 	if ( bDrawAnalysisPanel )
 	{
-		mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + 10 );
-		mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + 10 );		
+		int backgroundHeight = mAnalysisPanel.getHeight ( ) + mAnalysisMetadataPanel.getHeight ( ) + mAnalysisConfirmPanel.getHeight ( ) + mLayout.interPanelSpacing * 2;
+
+		mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout.interPanelSpacing );
+		mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout.interPanelSpacing );
+		if ( bDrawAnalysisInsertionPanel )
+		{
+			backgroundHeight += mAnalysisInsertionPanel.getHeight ( ) + mLayout.interPanelSpacing;
+			mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout.interPanelSpacing );
+		}
+		
+		ofSetColor ( mColors.panelBackgroundColor );
+		ofDrawRectangle (
+			mAnalysisPanel.getPosition ( ).x - mLayout.panelBackgroundMargin, 
+			mAnalysisPanel.getPosition ( ).y - mLayout.panelBackgroundMargin, 
+			mAnalysisPanel.getWidth ( ) + mLayout.panelBackgroundMargin * 2,
+			backgroundHeight + mLayout.panelBackgroundMargin * 2 );
+
 		mAnalysisPanel.draw ( );
 		mAnalysisMetadataPanel.draw ( );
 		mAnalysisConfirmPanel.draw ( );
-
-		if ( bDrawAnalysisInsertionPanel )
-		{
-			mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + 10 );
-			mAnalysisInsertionPanel.draw ( );
-		}
+		if ( bDrawAnalysisInsertionPanel ) { mAnalysisInsertionPanel.draw ( ); }
 	}
-	if ( bDrawReductionPanel ) { mReductionPanel.draw ( ); }
+
+	if ( bDrawReductionPanel ) 
+	{
+		ofSetColor ( mColors.panelBackgroundColor );
+		ofDrawRectangle (
+			mReductionPanel.getPosition ( ).x - mLayout.panelBackgroundMargin,
+			mReductionPanel.getPosition ( ).y - mLayout.panelBackgroundMargin,
+			mReductionPanel.getWidth ( ) + mLayout.panelBackgroundMargin * 2,
+			mReductionPanel.getHeight ( ) + mLayout.panelBackgroundMargin * 2 );
+
+		mReductionPanel.draw ( );
+	}
 
 	if ( bFlashingInvalidFileSelects )
 	{
