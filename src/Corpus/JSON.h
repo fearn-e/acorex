@@ -17,7 +17,7 @@ public:
 
 	bool WriteMeta ( const std::string& outputFile, std::vector<AcorexCorpus::Metadata>& metaset );
 
-	bool ReadMeta ( const std::string& inputFile, std::vector<AcorexCorpus::Metadata>& metaset, bool loadDefaults );
+	bool ReadMeta ( const std::string& inputFile, std::vector<AcorexCorpus::Metadata>& metaset );
 
 private:
 	MetaStrings mMetaStrings;

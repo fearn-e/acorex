@@ -83,7 +83,7 @@ bool AcorexCorpus::JSON::WriteMeta ( const std::string& outputFile, std::vector<
 	file.close ( );
 
 	std::vector<AcorexCorpus::Metadata> writeTestSet;
-	ReadMeta ( metaPath, writeTestSet, false );
+	ReadMeta ( metaPath, writeTestSet );
 
 	if ( metaset.size ( ) != writeTestSet.size ( ) )
 	{
@@ -94,7 +94,7 @@ bool AcorexCorpus::JSON::WriteMeta ( const std::string& outputFile, std::vector<
 	return true;
 }
 
-bool AcorexCorpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<AcorexCorpus::Metadata>& metaset, bool loadDefaults )
+bool AcorexCorpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<AcorexCorpus::Metadata>& metaset )
 {
 	std::string metaPath = inputFile;
 	bool success = ReplaceExtensionToMeta ( metaPath );
@@ -105,44 +105,18 @@ bool AcorexCorpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<Ac
 		return false;
 	}
 
-	if ( loadDefaults )
-	{
-		std::string defaultFileName = DEFAULT_META_FILE;
-		metaPath = ofFilePath::getCurrentWorkingDirectory ( ) + defaultFileName;
-
-		if ( !ofFile::doesFileExist ( metaPath ) )
-		{
-			ofLogError ( "JSON" ) << "Default metadata file not found";
-			return false;
-		}
-	}
-
 	auto inputJSON = fluid::JSONFile ( metaPath, "r" );
 	nlohmann::json j = inputJSON.read ( );
 
 	if ( !inputJSON.ok ( ) )
 	{
-		if ( loadDefaults )
-		{
-			ofLogError ( "JSON" ) << "failed to read default metadata from " << metaPath;
-		}
-		else
-		{ 
-			ofLogError ( "JSON" ) << "failed to read metadata from " << metaPath;
-		}
+		ofLogError ( "JSON" ) << "failed to read metadata from " << metaPath;
 		return false;
 	}
 
 	if ( !j.is_array ( ) )
 	{
-		if ( loadDefaults )
-		{
-			ofLogError ( "JSON" ) << "failed to read default metadata";
-		}
-		else
-		{
-			ofLogError ( "JSON" ) << "Invalid metadata format";
-		}
+		ofLogError ( "JSON" ) << "Invalid metadata format";
 		return false;
 	}
 
@@ -180,14 +154,7 @@ bool AcorexCorpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<Ac
 		}
 		else
 		{
-			if ( loadDefaults )
-			{
-				ofLogError ( "JSON" ) << "failed to read default metadata";
-			}
-			else
-			{
-				ofLogError ( "JSON" ) << "Invalid JSON format at line " << each;
-			}
+			ofLogError ( "JSON" ) << "Invalid JSON format at line " << each;
 			return false;
 		}
 	}
