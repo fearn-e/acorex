@@ -39,6 +39,8 @@ private:
 
 	bool SetSettingsFromFile ( std::vector<AcorexCorpus::Metadata>& metaset, bool cancelIfAlreadyReduced );
 	std::vector<AcorexCorpus::Metadata> PackSettingsIntoSet ( );
+	void PackDimensionNamesIntoSet ( std::vector<AcorexCorpus::Metadata>& metaset, bool reducing );
+	void Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames );
 
 	// UI Value Management -------------------------
 

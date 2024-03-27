@@ -306,6 +306,7 @@ void AcorexInterface::ControllerUI::Analyse ( )
 	}
 
 	std::vector<AcorexCorpus::Metadata> metaset = PackSettingsIntoSet ( );
+	PackDimensionNamesIntoSet ( metaset, false );
 	bool success = false;
 	if ( !bInsertingIntoCorpus )
 	{
@@ -553,6 +554,8 @@ bool AcorexInterface::ControllerUI::SetSettingsFromFile ( std::vector<AcorexCorp
 				break;
 			case AcorexCorpus::META_INSERTION_REPLACES_DUPLICATES:
 				break;
+			case AcorexCorpus::META_DIMENSION_NAMES:
+				break;
 			default:
 				ofLogError ( "ControllerUI" ) << "Invalid metadata key: " << meta.key << " = " << mMetaStrings.getStringFromMeta ( meta.key );
 				return false;
@@ -599,6 +602,109 @@ std::vector<AcorexCorpus::Metadata> AcorexInterface::ControllerUI::PackSettingsI
 	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_INSERTION_REPLACES_DUPLICATES, mAnalysisInsertionToggle ) );
 
 	return metaset;
+}
+
+void AcorexInterface::ControllerUI::PackDimensionNamesIntoSet ( std::vector<AcorexCorpus::Metadata>& metaset, bool reducing )
+{
+	std::vector<std::string> dimensionNames;
+
+	if ( reducing )
+	{
+		if ( mTimeDimensionToggle )
+		{
+			dimensionNames.push_back ( "Samples" );
+			dimensionNames.push_back ( "Time" );
+		}
+
+		for ( int i = 0; i < mReducedDimensionsField; i++ )
+		{
+			dimensionNames.push_back ( "Dimension " + ofToString ( i ) );
+		}
+	}
+
+	if ( mTimeDimensionToggle )
+	{ 
+		dimensionNames.push_back ( "Samples" );
+		dimensionNames.push_back ( "Time" );
+
+		if ( mAnalysisPitchToggle )
+		{
+			dimensionNames.push_back ( "Pitch" );
+			dimensionNames.push_back ( "Pitch Confidence" );
+		}
+
+		if ( mAnalysisLoudnessToggle )
+		{
+			dimensionNames.push_back ( "Loudness" );
+			dimensionNames.push_back ( "True Peak" );
+		}
+
+		if ( mAnalysisShapeToggle )
+		{
+			dimensionNames.push_back ( "Spectral Centroid" );
+			dimensionNames.push_back ( "Spectral Spread" );
+			dimensionNames.push_back ( "Spectral Skewness" );
+			dimensionNames.push_back ( "Spectral Kurtosis" );
+			dimensionNames.push_back ( "Spectral Rolloff" );
+			dimensionNames.push_back ( "Spectral Flatness" );
+			dimensionNames.push_back ( "Spectral Crest" );
+		}
+
+		if ( mAnalysisMFCCToggle )
+		{
+			for ( int i = 0; i < mNCoefsField; i++ )
+			{
+				dimensionNames.push_back ( "MFCC " + ofToString ( i ) );
+			}
+		}
+		
+	}
+	else
+	{
+		if ( mAnalysisPitchToggle )
+		{
+			Push7Stats ( "Pitch", dimensionNames );
+			Push7Stats ( "Pitch Confidence", dimensionNames );
+		}
+
+		if ( mAnalysisLoudnessToggle )
+		{
+			Push7Stats ( "Loudness", dimensionNames );
+			Push7Stats ( "True Peak", dimensionNames );
+		}
+
+		if ( mAnalysisShapeToggle )
+		{
+			Push7Stats ( "Spectral Centroid", dimensionNames );
+			Push7Stats ( "Spectral Spread", dimensionNames );
+			Push7Stats ( "Spectral Skewness", dimensionNames );
+			Push7Stats ( "Spectral Kurtosis", dimensionNames );
+			Push7Stats ( "Spectral Rolloff", dimensionNames );
+			Push7Stats ( "Spectral Flatness", dimensionNames );
+			Push7Stats ( "Spectral Crest", dimensionNames );
+		}
+
+		if ( mAnalysisMFCCToggle )
+		{
+			for ( int i = 0; i < mNCoefsField; i++ )
+			{
+				Push7Stats ( "MFCC " + ofToString ( i ), dimensionNames );
+			}
+		}
+	}
+
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_DIMENSION_NAMES, dimensionNames ) );
+}
+
+void AcorexInterface::ControllerUI::Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames )
+{
+	dimensionNames.push_back ( masterDimension + " (Mean)" );
+	dimensionNames.push_back ( masterDimension + " (Standard Deviation)" );
+	dimensionNames.push_back ( masterDimension + " (Skewness)" );
+	dimensionNames.push_back ( masterDimension + " (Kurtosis)" );
+	dimensionNames.push_back ( masterDimension + " (Low %)" );
+	dimensionNames.push_back ( masterDimension + " (Middle %)" );
+	dimensionNames.push_back ( masterDimension + " (High %)" );
 }
 
 // UI Value Management -------------------------------
