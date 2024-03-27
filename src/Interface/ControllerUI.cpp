@@ -402,7 +402,7 @@ void AcorexInterface::ControllerUI::SelectAnalysisOutputFile ( )
 	if ( bInsertingIntoCorpus )
 	{
 		std::vector<AcorexCorpus::Metadata> metaset;
-		mJSON.ReadMeta ( outputFile.getPath ( ), metaset, false );
+		mJSON.ReadMeta ( outputFile.getPath ( ), metaset );
 		bool success = SetSettingsFromFile ( metaset, true );
 		if ( !success )
 		{
@@ -437,7 +437,7 @@ void AcorexInterface::ControllerUI::SelectReductionInputFile ( )
 	}
 
 	std::vector<AcorexCorpus::Metadata> metaset;
-	mJSON.ReadMeta ( inputFile.getPath ( ), metaset, false );
+	mJSON.ReadMeta ( inputFile.getPath ( ), metaset );
 	bool success = SetSettingsFromFile ( metaset, true );
 	if ( !success )
 	{
