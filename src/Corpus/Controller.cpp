@@ -61,12 +61,33 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 	success = SearchDirectory ( inputPath, files );
 	if ( !success ) { return false; }
 
-	// CHECK REPLACE DUPLICATES
+	fluid::FluidDataSet<std::string, double, 1> dataset ( 1 );
+	int numFailed = mAnalyse.ProcessFiles ( files, dataset, metaset );
+	if ( numFailed < files.size ( ) && dataset.size ( ) != 0 ) { ofLogNotice ( "Controller" ) << "Processed " << files.size ( ) << " files into " << dataset.size ( ) << " points, with " << numFailed << " files failed."; }
+	else
+	{
+		ofLogError ( "Controller" ) << "Failed to process any files.";
+		return false;
+	}
 
-	//call Analyse.AnalysePerFile or Analyse.AnalysePerFrame
-	//call JSON.ReadAnalysis
-	//insert new data into dataset
-	//call JSON.WriteAnalysis
+	fluid::FluidDataSet<std::string, double, 1> existingDataset ( 1 );
+	success = mJSON.Read ( outputPath, existingDataset );
+	if ( !success ) { return false; }
+
+	fluid::FluidTensorView existingFileNames = existingDataset.getIds ( );
+
+	for ( int i = 0; i < dataset.size ( ); i++ )
+	{
+		// TODO - check if the file already exists in the dataset
+	}
+
+	return true;
+}
+
+bool InsertionTreatFilesList ( std::vector<std::string>& files,  )
+{
+
+
 
 	return true;
 }
