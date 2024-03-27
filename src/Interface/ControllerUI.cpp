@@ -4,6 +4,12 @@
 
 void AcorexInterface::ControllerUI::setup ( )
 {
+	Reset ( );
+	ShowMainPanel ( );
+}
+
+void AcorexInterface::ControllerUI::Reset ( )
+{
 	// Clear --------------------------------------
 	{
 		RemoveListeners ( );
@@ -25,7 +31,7 @@ void AcorexInterface::ControllerUI::setup ( )
 
 	// States -------------------------------------
 	{
-		bDrawMainPanel = true;
+		bDrawMainPanel = false;
 		bDrawAnalysisPanel = false;
 		bDrawReductionPanel = false;
 		bDrawAnalysisInsertionPanel = false;
@@ -51,7 +57,7 @@ void AcorexInterface::ControllerUI::setup ( )
 		mMainPanel.add ( mCreateCorpusButton.setup ( "Analyse Corpus" ) );
 		mMainPanel.add ( mReduceCorpusButton.setup ( "Reduce Corpus" ) );
 
-		mMainPanel.setPosition ( 40, 40 );
+		mMainPanel.setPosition ( -1000, -1000 );
 		mMainPanel.setWidthElements ( 200 );
 		mMainPanel.disableHeader ( );
 	}
@@ -643,14 +649,14 @@ void AcorexInterface::ControllerUI::ToggleAnalysisUILockout ( bool lock )
 
 void AcorexInterface::ControllerUI::ShowMainPanel ( )
 {
-	setup ( );
+	Reset ( );
 	bDrawMainPanel = true;
 	mMainPanel.setPosition ( 40, 40 );
 }
 
 void AcorexInterface::ControllerUI::ShowAnalysisPanel ( )
 {
-	setup ( );
+	Reset ( );
 	bDrawAnalysisPanel = true;
 	mAnalysisPanel.setPosition ( 40, 40 );
 	mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + 10 );
@@ -671,7 +677,7 @@ void AcorexInterface::ControllerUI::HideAnalysisInsertionPanel ( )
 
 void AcorexInterface::ControllerUI::ShowReductionPanel ( )
 {
-	setup ( );
+	Reset ( );
 	bDrawReductionPanel = true;
 	mReductionPanel.setPosition ( 40, 40 );
 }
