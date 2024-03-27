@@ -322,15 +322,13 @@ void AcorexInterface::ControllerUI::Analyse ( )
 		ofLogError ( "ControllerUI" ) << "Failed to create corpus";
 		return;
 	}
-	else
-	{
-		if ( !bInsertingIntoCorpus )
-		{
-			// TODO - write metadata to file
-		}
-		// TODO - ask if user wants to reduce the data or view it in the corpus viewer
-		// make a new panel for this with two choices
-	}
+
+	mJSON.WriteMeta ( outputPath, metaset );
+
+	ShowMainPanel ( );
+	ofLogNotice ( "ControllerUI" ) << "Corpus created";
+	// TODO - ask if user wants to reduce the data or view it in the corpus viewer
+	// make a new panel for this with two choices
 }
 
 void AcorexInterface::ControllerUI::Reduce ( )

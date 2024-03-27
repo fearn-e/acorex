@@ -23,11 +23,6 @@ bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, cons
 
 	success = mJSON.Write ( outputPath, dataset );
 	if ( !success ) { return false; }
-
-	//std::string metaPath = outputPath;
-	//metaPath.replace ( metaPath.find_last_of ( '.' ), metaPath.length ( ), ".meta.json" );
-	//success = WriteMeta ( metaPath, metaset );
-	//if ( !success ) { return false; }
 	
 	return true;
 }
