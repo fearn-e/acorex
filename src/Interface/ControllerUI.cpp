@@ -57,8 +57,8 @@ void AcorexInterface::ControllerUI::Reset ( )
 		mMainPanel.add ( mCreateCorpusButton.setup ( "Analyse Corpus" ) );
 		mMainPanel.add ( mReduceCorpusButton.setup ( "Reduce Corpus" ) );
 
-		mMainPanel.setPosition ( -1000, -1000 );
-		mMainPanel.setWidthElements ( 200 );
+		mMainPanel.setPosition ( mLayout.hiddenPanelPosition );
+		mMainPanel.setWidthElements ( mLayout.mainPanelWidth );
 		mMainPanel.disableHeader ( );
 	}
 
@@ -71,7 +71,7 @@ void AcorexInterface::ControllerUI::Reset ( )
 		mAnalysisPanel.add ( mAnalysisPickOutputFileButton.setup ( "Pick Output File" ) );
 		mAnalysisPanel.add ( mAnalysisOutputLabel.setup ( "", "?" ) );
 
-		mAnalysisPanel.setPosition ( -1000, -1000 );
+		mAnalysisPanel.setPosition ( mLayout.hiddenPanelPosition );
 		mAnalysisPanel.setWidthElements ( 315 );
 		mAnalysisPanel.disableHeader ( );
 
@@ -92,8 +92,8 @@ void AcorexInterface::ControllerUI::Reset ( )
 		mAnalysisMetadataPanel.add ( mMinFreqField.setup ( "Min Freq: ", 20, 20, 2000 ) );
 		mAnalysisMetadataPanel.add ( mMaxFreqField.setup ( "Max Freq: ", 5000, 20, 20000 ) );
 
-		mAnalysisMetadataPanel.setPosition ( -1000, -1000 );
-		mAnalysisMetadataPanel.setWidthElements ( 315 );
+		mAnalysisMetadataPanel.setPosition ( mLayout.hiddenPanelPosition );
+		mAnalysisMetadataPanel.setWidthElements ( mLayout.analysisPanelWidth );
 		mAnalysisMetadataPanel.disableHeader ( );
 
 
@@ -102,8 +102,8 @@ void AcorexInterface::ControllerUI::Reset ( )
 		mAnalysisConfirmPanel.add ( mConfirmAnalysisButton.setup ( "Confirm" ) );
 		mAnalysisConfirmPanel.add ( mCancelAnalysisButton.setup ( "Cancel" ) );
 
-		mAnalysisConfirmPanel.setPosition ( -1000, -1000 );
-		mAnalysisConfirmPanel.setWidthElements ( 315 );
+		mAnalysisConfirmPanel.setPosition ( mLayout.hiddenPanelPosition );
+		mAnalysisConfirmPanel.setWidthElements ( mLayout.analysisPanelWidth );
 		mAnalysisConfirmPanel.disableHeader ( );
 	}
 
@@ -114,8 +114,8 @@ void AcorexInterface::ControllerUI::Reset ( )
 		mAnalysisInsertionPanel.add ( mAnalysisInsertionQuestionLabel.setup ( "For files already existing in the set, which version to use?", "" ) );
 		mAnalysisInsertionPanel.add ( mAnalysisInsertionToggle.setup ( "Existing", false ) );
 
-		mAnalysisInsertionPanel.setPosition ( -1000, -1000 );
-		mAnalysisInsertionPanel.setWidthElements ( 350 );
+		mAnalysisInsertionPanel.setPosition ( mLayout.hiddenPanelPosition );
+		mAnalysisInsertionPanel.setWidthElements ( mLayout.analysisPanelWidth );
 		mAnalysisInsertionPanel.disableHeader ( );
 	}
 
@@ -134,8 +134,8 @@ void AcorexInterface::ControllerUI::Reset ( )
 		mReductionPanel.add ( mConfirmReductionButton.setup ( "Confirm" ) );
 		mReductionPanel.add ( mCancelReductionButton.setup ( "Cancel" ) );
 
-		mReductionPanel.setPosition ( -1000, -1000 );
-		mReductionPanel.setWidthElements ( 300 );
+		mReductionPanel.setPosition ( mLayout.hiddenPanelPosition );
+		mReductionPanel.setWidthElements ( mLayout.reductionPanelWidth );
 		mReductionPanel.disableHeader ( );
 	}
 
@@ -651,33 +651,33 @@ void AcorexInterface::ControllerUI::ShowMainPanel ( )
 {
 	Reset ( );
 	bDrawMainPanel = true;
-	mMainPanel.setPosition ( 40, 40 );
+	mMainPanel.setPosition ( mLayout.defaultPanelPosition );
 }
 
 void AcorexInterface::ControllerUI::ShowAnalysisPanel ( )
 {
 	Reset ( );
 	bDrawAnalysisPanel = true;
-	mAnalysisPanel.setPosition ( 40, 40 );
-	mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + 10 );
-	mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + 10 );
+	mAnalysisPanel.setPosition ( mLayout.defaultPanelPosition );
+	mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout.interPanelSpacing );
+	mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout.interPanelSpacing );
 }
 
 void AcorexInterface::ControllerUI::ShowAnalysisInsertionPanel ( )
 {
 	bDrawAnalysisInsertionPanel = true;
-	mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + 10 );
+	mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout.interPanelSpacing );
 }
 
 void AcorexInterface::ControllerUI::HideAnalysisInsertionPanel ( )
 {
 	bDrawAnalysisInsertionPanel = false;
-	mAnalysisInsertionPanel.setPosition ( -1000, -1000 );
+	mAnalysisInsertionPanel.setPosition ( mLayout.hiddenPanelPosition );
 }
 
 void AcorexInterface::ControllerUI::ShowReductionPanel ( )
 {
 	Reset ( );
 	bDrawReductionPanel = true;
-	mReductionPanel.setPosition ( 40, 40 );
+	mReductionPanel.setPosition ( mLayout.defaultPanelPosition );
 }

@@ -134,8 +134,9 @@ private:
 
 	AcorexCorpus::Controller mController;
 	AcorexCorpus::JSON mJSON;
-	AcorexInterface::Colors mColors;
 	AcorexCorpus::MetaStrings mMetaStrings;
+	AcorexInterface::Colors mColors;
+	AcorexInterface::ControllerUILayout mLayout;
 };
 
 } // namespace interface
