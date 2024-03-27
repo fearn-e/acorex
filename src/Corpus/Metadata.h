@@ -8,7 +8,7 @@ namespace corpus {
 
 #define META_LIST_SIZE 16
 
-#define DEFAULT_META_FILE "data/default_metadata.meta"
+#define DEFAULT_META_FILE "data/defaults.meta"
 
 enum MetaList {
 	META_HAS_BEEN_REDUCED,
