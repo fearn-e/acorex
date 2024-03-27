@@ -4,18 +4,44 @@
 
 void acorex::interface::ControllerUI::setup ( )
 {
-	SetupPanels ( );
-}
+	// Clear --------------------------------------
+	{
+		RemoveListeners ( );
 
-void acorex::interface::ControllerUI::SetupPanels ( )
-{
-	exit ( );
-	mMainPanel.clear ( );
-	mAnalysisPanel.clear ( );
-	mAnalysisMetadataPanel.clear ( );
-	mAnalysisConfirmPanel.clear ( );
-	mReductionPanel.clear ( );
-	mInsertionDuplicateQuestionPanel.clear ( );
+		mMainPanel.clear ( );
+		mAnalysisPanel.clear ( );
+		mAnalysisMetadataPanel.clear ( );
+		mAnalysisConfirmPanel.clear ( );
+		mReductionPanel.clear ( );
+		mAnalysisInsertionPanel.clear ( );
+	}
+
+	// Variables ----------------------------------
+	{
+		hasBeenReduced = false;
+		inputPath = "";
+		outputPath = "";
+	}
+
+	// States -------------------------------------
+	{
+		bDrawMainPanel = true;
+		bDrawAnalysisPanel = false;
+		bDrawReductionPanel = false;
+		bDrawAnalysisInsertionPanel = false;
+
+		bInsertingIntoCorpus = false;
+
+		bAnalysisDirectorySelected = false;
+		bAnalysisOutputSelected = false;
+		bReductionInputSelected = false;
+		bReductionOutputSelected = false;
+
+		bFlashingInvalidFileSelects = false;
+		bFlashingInvalidAnalysisToggles = false;
+
+		flashColour = 255;
+	}
 
 	// Main Panel ---------------------------------
 	{
@@ -30,7 +56,7 @@ void acorex::interface::ControllerUI::SetupPanels ( )
 		mMainPanel.disableHeader ( );
 	}
 
-	// Analysis Panel ------------------------------
+	// Analysis Panel -----------------------------
 	{
 		mAnalysisPanel.setup ( "Analysis" );
 
@@ -46,7 +72,7 @@ void acorex::interface::ControllerUI::SetupPanels ( )
 
 		mAnalysisMetadataPanel.setup ( "Analysis Metadata" );
 
-		mAnalysisMetadataPanel.add ( mTimeDimensionToggle.setup ( "Time Dimension", mTimeDimensionToggle ) );
+		mAnalysisMetadataPanel.add ( mTimeDimensionToggle.setup ( "Time Dimension", true ) );
 
 		mAnalysisMetadataPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", true ) );
 		mAnalysisMetadataPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", true ) );
@@ -75,7 +101,19 @@ void acorex::interface::ControllerUI::SetupPanels ( )
 		mAnalysisConfirmPanel.disableHeader ( );
 	}
 
-	// Reduction Panel -----------------------------
+	// Insertion Duplicate Question Panel ---------
+	{
+		mAnalysisInsertionPanel.setup ( "Insertion Question" );
+
+		mAnalysisInsertionPanel.add ( mAnalysisInsertionQuestionLabel.setup ( "For files already existing in the set, which version to use?", "" ) );
+		mAnalysisInsertionPanel.add ( mAnalysisInsertionToggle.setup ( "Existing", false ) );
+
+		mAnalysisInsertionPanel.setPosition ( -1000, -1000 );
+		mAnalysisInsertionPanel.setWidthElements ( 350 );
+		mAnalysisInsertionPanel.disableHeader ( );
+	}
+
+	// Reduction Panel ----------------------------
 	{
 		mReductionPanel.setup ( "Reduction" );
 
@@ -95,19 +133,6 @@ void acorex::interface::ControllerUI::SetupPanels ( )
 		mReductionPanel.disableHeader ( );
 	}
 
-	// Insertion Duplicate Question Panel ----------
-	{
-		mInsertionDuplicateQuestionPanel.setup ( "Insertion Question" );
-
-		mInsertionDuplicateQuestionPanel.add ( mInsertionDuplicateQuestionLabel.setup ( "For files already existing in the set, which version to use?", "" ) );
-		mInsertionDuplicateQuestionPanel.add ( mInsertionDuplicateYesButton.setup ( "New" ) );
-		mInsertionDuplicateQuestionPanel.add ( mInsertionDuplicateNoButton.setup ( "Existing" ) );
-
-		mInsertionDuplicateQuestionPanel.setPosition ( -1000, -1000 );
-		mInsertionDuplicateQuestionPanel.setWidthElements ( 350 );
-		mInsertionDuplicateQuestionPanel.disableHeader ( );
-	}
-
 	// Listeners ----------------------------------
 	{
 		mCreateCorpusButton.addListener ( this, &ControllerUI::ShowAnalysisPanel );
@@ -120,36 +145,22 @@ void acorex::interface::ControllerUI::SetupPanels ( )
 		mReductionPickOutputFileButton.addListener ( this, &ControllerUI::SelectReductionOutputFile );
 		mWindowFFTField.addListener ( this, &ControllerUI::QuantiseWindowSize );
 		mHopFractionField.addListener ( this, &ControllerUI::QuantiseHopFraction );
-		mConfirmAnalysisButton.addListener ( this, &ControllerUI::AnalyseInitial );
+		mConfirmAnalysisButton.addListener ( this, &ControllerUI::Analyse );
 		mConfirmReductionButton.addListener ( this, &ControllerUI::Reduce );
-		mInsertionDuplicateYesButton.addListener ( this, &ControllerUI::AnalyseInsertReplace );
-		mInsertionDuplicateNoButton.addListener ( this, &ControllerUI::AnalyseInsertKeep );
+		mAnalysisInsertionToggle.addListener ( this, &ControllerUI::AnalysisInsertionToggleChanged );
 	}
-}
 
-void acorex::interface::ControllerUI::ResetValuesAndPanels ( )
-{
 	ToggleAnalysisUILockout ( false );
-
-	bInsertingIntoCorpus = false;
-
-	hasBeenReduced = false;
-
-	inputPath = "";
-	outputPath = "";
-
-	SetupPanels ( );
 }
-
 
 void acorex::interface::ControllerUI::draw ( )
 {
 	if ( bDrawMainPanel ) { mMainPanel.draw ( ); }
-	if ( bDrawAnalysisPanel ) 
-	{	
+	if ( bDrawAnalysisPanel )
+	{
 		mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + 10 );
 		mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + 10 );
-		mAnalysisPanel.draw ( ); 
+		mAnalysisPanel.draw ( );
 		mAnalysisMetadataPanel.draw ( );
 		mAnalysisConfirmPanel.draw ( );
 	}
@@ -210,6 +221,11 @@ void acorex::interface::ControllerUI::draw ( )
 
 void acorex::interface::ControllerUI::exit ( )
 {
+	RemoveListeners ( );
+}
+
+void acorex::interface::ControllerUI::RemoveListeners ( )
+{
 	mCreateCorpusButton.removeListener ( this, &ControllerUI::ShowAnalysisPanel );
 	mReduceCorpusButton.removeListener ( this, &ControllerUI::ShowReductionPanel );
 	mCancelAnalysisButton.removeListener ( this, &ControllerUI::ShowMainPanel );
@@ -220,13 +236,14 @@ void acorex::interface::ControllerUI::exit ( )
 	mReductionPickOutputFileButton.removeListener ( this, &ControllerUI::SelectReductionOutputFile );
 	mWindowFFTField.removeListener ( this, &ControllerUI::QuantiseWindowSize );
 	mHopFractionField.removeListener ( this, &ControllerUI::QuantiseHopFraction );
-	mConfirmAnalysisButton.removeListener ( this, &ControllerUI::AnalyseInitial );
+	mConfirmAnalysisButton.removeListener ( this, &ControllerUI::Analyse );
 	mConfirmReductionButton.removeListener ( this, &ControllerUI::Reduce );
-	mInsertionDuplicateYesButton.removeListener ( this, &ControllerUI::AnalyseInsertReplace );
-	mInsertionDuplicateNoButton.removeListener ( this, &ControllerUI::AnalyseInsertKeep );
+	mAnalysisInsertionToggle.removeListener ( this, &ControllerUI::AnalysisInsertionToggleChanged );
 }
 
-void acorex::interface::ControllerUI::AnalyseInitial ( )
+// Analyse and Reduce ---------------------------
+
+void acorex::interface::ControllerUI::Analyse ( )
 {
 	if ( !bAnalysisDirectorySelected || !bAnalysisOutputSelected )
 	{
@@ -244,31 +261,6 @@ void acorex::interface::ControllerUI::AnalyseInitial ( )
 		return;
 	}
 
-	if ( bInsertingIntoCorpus )
-	{
-		ShowPanel ( mInsertionDuplicateQuestionPanel, bDrawInsertionDuplicateQuestionPanel, true );
-		return;
-	}
-
-	Analyse ( );
-}
-
-void acorex::interface::ControllerUI::AnalyseInsertReplace ( )
-{
-	insertionReplacesDuplicates = true;
-	Analyse ( );
-}
-
-void acorex::interface::ControllerUI::AnalyseInsertKeep ( )
-{
-	insertionReplacesDuplicates = false;
-	Analyse ( );
-}
-
-void acorex::interface::ControllerUI::Analyse ( )
-{
-	HideAllPanels ( );
-
 	std::vector<corpus::Metadata> metaset = PackSettingsIntoSet ( );
 	bool success = false;
 	if ( !bInsertingIntoCorpus )
@@ -282,12 +274,16 @@ void acorex::interface::ControllerUI::Analyse ( )
 
 	if ( !success )
 	{
-		ShowPanel ( mMainPanel, bDrawMainPanel, true );
+		ShowMainPanel ( );
 		ofLogError ( "ControllerUI" ) << "Failed to create corpus";
 		return;
 	}
 	else
 	{
+		if ( !bInsertingIntoCorpus )
+		{
+			// TODO - write metadata to file
+		}
 		// TODO - ask if user wants to reduce the data or view it in the corpus viewer
 		// make a new panel for this with two choices
 	}
@@ -308,6 +304,7 @@ void acorex::interface::ControllerUI::Reduce ( )
 	// TODO - open in corpus viewer
 }
 
+// File Dialog Button Callbacks -----------------
 
 void acorex::interface::ControllerUI::SelectAnalysisDirectory ( )
 {
@@ -350,10 +347,12 @@ void acorex::interface::ControllerUI::SelectAnalysisOutputFile ( )
 	if ( ofFile::doesFileExist ( outputFile.getPath ( ) ) )
 	{
 		bInsertingIntoCorpus = true;
+		ShowAnalysisInsertionPanel ( );
 	}
 	else
 	{
 		bInsertingIntoCorpus = false;
+		HideAnalysisInsertionPanel ( );
 	}
 
 	if ( bInsertingIntoCorpus )
@@ -430,6 +429,8 @@ void acorex::interface::ControllerUI::SelectReductionOutputFile ( )
 	mReductionOutputLabel = outputFile.getName ( );
 	bReductionOutputSelected = true;
 }
+
+// Load and Save Settings -----------------------
 
 bool acorex::interface::ControllerUI::SetSettingsFromFile ( std::vector<corpus::Metadata>& metaset, bool cancelIfAlreadyReduced )
 {
@@ -553,10 +554,12 @@ std::vector<acorex::corpus::Metadata> acorex::interface::ControllerUI::PackSetti
 	metaset.push_back ( corpus::Metadata ( corpus::META_MAX_FREQ, mMaxFreqField ) );
 	metaset.push_back ( corpus::Metadata ( corpus::META_REDUCED_DIMENSIONS, mReducedDimensionsField ) );
 	metaset.push_back ( corpus::Metadata ( corpus::META_MAX_ITERATIONS, mMaxIterationsField ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_INSERTION_REPLACES_DUPLICATES, insertionReplacesDuplicates ) );
+	metaset.push_back ( corpus::Metadata ( corpus::META_INSERTION_REPLACES_DUPLICATES, mAnalysisInsertionToggle ) );
 
 	return metaset;
 }
+
+// UI Value Management -------------------------------
 
 void acorex::interface::ControllerUI::QuantiseWindowSize ( int& value )
 {
@@ -596,6 +599,14 @@ void acorex::interface::ControllerUI::QuantiseHopFraction ( int& value )
 	mAnalysisMetadataPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ) );
 }
 
+void acorex::interface::ControllerUI::AnalysisInsertionToggleChanged ( bool& value )
+{
+	if ( value ) { mAnalysisInsertionToggle.setName ( "New" ); }
+	else { mAnalysisInsertionToggle.setName ( "Existing" ); }
+}
+
+// Panel Management ------------------------------
+
 void acorex::interface::ControllerUI::ToggleAnalysisUILockout ( bool lock )
 {
 	mTimeDimensionToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
@@ -624,35 +635,37 @@ void acorex::interface::ControllerUI::ToggleAnalysisUILockout ( bool lock )
 	}
 }
 
-void acorex::interface::ControllerUI::ShowPanel (ofxPanel& visiblePanel, bool& visibleDrawFlag, bool hideOthers )
-{
-	if ( hideOthers ) { HideAllPanels ( ); }
-	visiblePanel.setPosition ( 40, 40 );
-	visibleDrawFlag = true;
-}
-
-void acorex::interface::ControllerUI::HideAllPanels ( )
-{
-	mMainPanel.setPosition ( -1000, -1000 ); bDrawMainPanel = false;
-	mAnalysisPanel.setPosition ( -1000, -1000 ); bDrawAnalysisPanel = false;
-	mReductionPanel.setPosition ( -1000, -1000 ); bDrawReductionPanel = false;
-	mInsertionDuplicateQuestionPanel.setPosition ( -1000, -1000 ); bDrawInsertionDuplicateQuestionPanel = false;
-}
-
 void acorex::interface::ControllerUI::ShowMainPanel ( )
 {
-	ResetValuesAndPanels ( );
-	ShowPanel ( mMainPanel, bDrawMainPanel, true );
+	setup ( );
+	bDrawMainPanel = true;
+	mMainPanel.setPosition ( 40, 40 );
 }
 
 void acorex::interface::ControllerUI::ShowAnalysisPanel ( )
 {
-	ShowPanel ( mAnalysisPanel, bDrawAnalysisPanel, true );
-	ShowPanel ( mAnalysisMetadataPanel, bDrawAnalysisPanel, false );
-	ShowPanel ( mAnalysisConfirmPanel, bDrawAnalysisPanel, false );
+	setup ( );
+	bDrawAnalysisPanel = true;
+	mAnalysisPanel.setPosition ( 40, 40 );
+	mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + 10 );
+	mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + 10 );
+}
+
+void acorex::interface::ControllerUI::ShowAnalysisInsertionPanel ( )
+{
+	bDrawAnalysisInsertionPanel = true;
+	mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + 10 );
+}
+
+void acorex::interface::ControllerUI::HideAnalysisInsertionPanel ( )
+{
+	bDrawAnalysisInsertionPanel = false;
+	mAnalysisInsertionPanel.setPosition ( -1000, -1000 );
 }
 
 void acorex::interface::ControllerUI::ShowReductionPanel ( )
 {
-	ShowPanel ( mReductionPanel, bDrawReductionPanel, true );
+	setup ( );
+	bDrawReductionPanel = true;
+	mReductionPanel.setPosition ( 40, 40 );
 }
