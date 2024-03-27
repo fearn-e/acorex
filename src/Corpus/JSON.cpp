@@ -83,7 +83,7 @@ bool AcorexCorpus::JSON::WriteMeta ( const std::string& outputFile, std::vector<
 	file.close ( );
 
 	std::vector<AcorexCorpus::Metadata> writeTestSet;
-	ReadMeta ( metaPath, writeTestSet );
+	ReadMeta ( outputFile, writeTestSet );
 
 	if ( metaset.size ( ) != writeTestSet.size ( ) )
 	{
