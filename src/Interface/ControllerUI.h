@@ -20,65 +20,64 @@ public:
 	void exit ( );
 
 private:
-	void SetupPanels ( );
-	void ResetValuesAndPanels ( );
+	void RemoveListeners ( );
 
-	void AnalyseInitial ( );
-	void AnalyseInsertReplace ( );
-	void AnalyseInsertKeep ( );
+	// Analyse and Reduce --------------------------
+
 	void Analyse ( );
-
 	void Reduce ( );
+
+	// File Dialog Button Callbacks ----------------
 
 	void SelectAnalysisDirectory ( );
 	void SelectAnalysisOutputFile ( );
 	void SelectReductionInputFile ( );
 	void SelectReductionOutputFile ( );
 
+	// Load and Save Settings ----------------------
+
 	bool SetSettingsFromFile ( std::vector<corpus::Metadata>& metaset, bool cancelIfAlreadyReduced );
 	std::vector<corpus::Metadata> PackSettingsIntoSet ( );
 
+	// UI Value Management -------------------------
+
 	void QuantiseWindowSize ( int& value );
 	void QuantiseHopFraction ( int& value );
+	void AnalysisInsertionToggleChanged ( bool& value );
+
+	// Panel Management ----------------------------
 
 	void ToggleAnalysisUILockout ( bool lock );
-
-	void ShowPanel ( ofxPanel& visiblePanel, bool& visibleDrawFlag, bool hideOthers );
-	void HideAllPanels ( );
-
 	void ShowMainPanel ( );
 	void ShowAnalysisPanel ( );
+	void ShowAnalysisInsertionPanel ( );
+	void HideAnalysisInsertionPanel ( );
 	void ShowReductionPanel ( );
-
-	corpus::Controller mController;
-	corpus::JSON mJSON;
-	interface::Colors mColors;
-	corpus::MetaStrings mMetaStrings;
 
 	// State --------------------------------------
 
-	bool bDrawMainPanel = true;
-	bool bDrawAnalysisPanel = false;
-	bool bDrawReductionPanel = false;
-	bool bDrawInsertionDuplicateQuestionPanel = false;
+	bool bDrawMainPanel;
+	bool bDrawAnalysisPanel;
+	bool bDrawAnalysisInsertionPanel;
+	bool bDrawReductionPanel;
 	
-	bool bInsertingIntoCorpus = false;
+	bool bInsertingIntoCorpus;
 
-	bool bAnalysisDirectorySelected = false;
-	bool bAnalysisOutputSelected = false;
-	bool bReductionInputSelected = false;
-	bool bReductionOutputSelected = false;
+	bool bAnalysisDirectorySelected;
+	bool bAnalysisOutputSelected;
+	bool bReductionInputSelected;
+	bool bReductionOutputSelected;
 	
-	bool bFlashingInvalidFileSelects = false;
-	bool bFlashingInvalidAnalysisToggles = false;
-	int flashColour = 0;
+	bool bFlashingInvalidFileSelects;
+	bool bFlashingInvalidAnalysisToggles;
+	int flashColour;
 
 	// Metadata -----------------------------------
 
 	//stats - mean, standard deviation, skewness, kurtosis, low percentile, middle (median default), high percentile
 	//int maxSamplingRate = 22050;
 
-	bool hasBeenReduced = false;
+	bool hasBeenReduced;
 	ofxToggle mTimeDimensionToggle;
 	ofxToggle mAnalysisPitchToggle;
 	ofxToggle mAnalysisLoudnessToggle;
@@ -94,12 +93,10 @@ private:
 	ofxIntField mReducedDimensionsField;
 	ofxIntField mMaxIterationsField;
 
-	bool insertionReplacesDuplicates = false;
-
 	// File Paths ---------------------------------
 
-	std::string inputPath = "";
-	std::string outputPath = "";
+	std::string inputPath;
+	std::string outputPath;
 
 	// Panels -------------------------------------
 
@@ -118,6 +115,10 @@ private:
 	ofxButton mConfirmAnalysisButton;
 	ofxButton mCancelAnalysisButton;
 
+	ofxPanel mAnalysisInsertionPanel;
+	ofxLabel mAnalysisInsertionQuestionLabel;
+	ofxToggle mAnalysisInsertionToggle;
+
 
 	ofxPanel mReductionPanel;
 	ofxButton mReductionPickInputFileButton;
@@ -127,10 +128,13 @@ private:
 	ofxButton mConfirmReductionButton;
 	ofxButton mCancelReductionButton;
 
-	ofxPanel mInsertionDuplicateQuestionPanel;
-	ofxLabel mInsertionDuplicateQuestionLabel;
-	ofxButton mInsertionDuplicateYesButton;
-	ofxButton mInsertionDuplicateNoButton;
+
+
+
+	corpus::Controller mController;
+	corpus::JSON mJSON;
+	interface::Colors mColors;
+	corpus::MetaStrings mMetaStrings;
 };
 
 } // namespace interface
