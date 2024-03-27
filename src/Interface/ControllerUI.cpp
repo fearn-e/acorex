@@ -159,10 +159,16 @@ void AcorexInterface::ControllerUI::draw ( )
 	if ( bDrawAnalysisPanel )
 	{
 		mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + 10 );
-		mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + 10 );
+		mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + 10 );		
 		mAnalysisPanel.draw ( );
 		mAnalysisMetadataPanel.draw ( );
 		mAnalysisConfirmPanel.draw ( );
+
+		if ( bDrawAnalysisInsertionPanel )
+		{
+			mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + 10 );
+			mAnalysisInsertionPanel.draw ( );
+		}
 	}
 	if ( bDrawReductionPanel ) { mReductionPanel.draw ( ); }
 
