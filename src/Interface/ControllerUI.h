@@ -19,6 +19,8 @@ public:
 	void exit ( );
 
 private:
+	// Setup --------------------------------------
+	void Reset ( );
 	void RemoveListeners ( );
 
 	// Analyse and Reduce --------------------------
