@@ -3,7 +3,7 @@
 #include "UMAP.h"
 #include "ofLog.h"
 
-bool acorex::corpus::UMAP::Fit ( fluid::FluidDataSet<std::string, double, 1>& datasetIN, fluid::FluidDataSet<std::string, double, 1>& datasetOUT )
+bool AcorexCorpus::UMAP::Fit ( fluid::FluidDataSet<std::string, double, 1>& datasetIN, fluid::FluidDataSet<std::string, double, 1>& datasetOUT )
 {
     fluid::algorithm::UMAP algorithm;
 
@@ -12,7 +12,7 @@ bool acorex::corpus::UMAP::Fit ( fluid::FluidDataSet<std::string, double, 1>& da
     return true;
 }
 
-bool acorex::corpus::UMAP::FitOverTime ( fluid::FluidDataSet<std::string, double, 1>& datasetIN, fluid::FluidDataSet<std::string, double, 1>& datasetOUT )
+bool AcorexCorpus::UMAP::FitOverTime ( fluid::FluidDataSet<std::string, double, 1>& datasetIN, fluid::FluidDataSet<std::string, double, 1>& datasetOUT )
 {
 	fluid::algorithm::UMAP algorithm;
 

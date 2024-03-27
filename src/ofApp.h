@@ -35,5 +35,5 @@ public:
 	//void gotMessage ( ofMessage msg );
 
 private:
-	acorex::interface::ControllerUI mControllerUI;
+	AcorexInterface::ControllerUI mControllerUI;
 };

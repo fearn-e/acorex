@@ -3,7 +3,7 @@
 #include "Corpus/Analyse.h"
 #include <ofLog.h>
 
-int acorex::corpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid::FluidDataSet<std::string, double, 1>& dataset, const std::vector<corpus::Metadata>& metaset )
+int AcorexCorpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid::FluidDataSet<std::string, double, 1>& dataset, const std::vector<AcorexCorpus::Metadata>& metaset )
 {
     int filesFailed = 0;
 
@@ -251,7 +251,7 @@ int acorex::corpus::Analyse::ProcessFiles ( std::vector<std::string>& files, flu
     return filesFailed;
 }
 
-fluid::RealVector acorex::corpus::Analyse::ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats )
+fluid::RealVector AcorexCorpus::Analyse::ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats )
 {
     fluid::index      dim = matrix.cols ( );
     fluid::RealMatrix tmp ( dim, 7 );

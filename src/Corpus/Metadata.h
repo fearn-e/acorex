@@ -3,8 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace acorex {
-namespace corpus {
+namespace AcorexCorpus {
 
 #define META_LIST_SIZE 16
 
@@ -80,5 +79,4 @@ struct Metadata {
 	std::vector<std::string> stringArray;
 };
 
-} // namespace corpus
-} // namespace acorex
+} // namespace AcorexCorpus

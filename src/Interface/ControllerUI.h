@@ -7,8 +7,7 @@
 #include <ofxGui.h>
 #include <ofSystemUtils.h>
 
-namespace acorex {
-namespace interface {
+namespace AcorexInterface {
 
 class ControllerUI {
 public:
@@ -36,8 +35,8 @@ private:
 
 	// Load and Save Settings ----------------------
 
-	bool SetSettingsFromFile ( std::vector<corpus::Metadata>& metaset, bool cancelIfAlreadyReduced );
-	std::vector<corpus::Metadata> PackSettingsIntoSet ( );
+	bool SetSettingsFromFile ( std::vector<AcorexCorpus::Metadata>& metaset, bool cancelIfAlreadyReduced );
+	std::vector<AcorexCorpus::Metadata> PackSettingsIntoSet ( );
 
 	// UI Value Management -------------------------
 
@@ -131,11 +130,10 @@ private:
 
 
 
-	corpus::Controller mController;
-	corpus::JSON mJSON;
-	interface::Colors mColors;
-	corpus::MetaStrings mMetaStrings;
+	AcorexCorpus::Controller mController;
+	AcorexCorpus::JSON mJSON;
+	AcorexInterface::Colors mColors;
+	AcorexCorpus::MetaStrings mMetaStrings;
 };
 
 } // namespace interface
-} // namespace acorex

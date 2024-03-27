@@ -4,8 +4,7 @@
 #include <data/FluidJSON.hpp>
 #include <data/FluidDataSet.hpp>
 
-namespace acorex {
-namespace corpus {
+namespace AcorexCorpus {
 
 class JSON {
 public:
@@ -16,9 +15,9 @@ public:
 
 	bool Read ( const std::string& inputFile, fluid::FluidDataSet<std::string, double, 1>& dataset );
 
-	bool WriteMeta ( const std::string& outputFile, std::vector<corpus::Metadata>& metaset );
+	bool WriteMeta ( const std::string& outputFile, std::vector<AcorexCorpus::Metadata>& metaset );
 
-	bool ReadMeta ( const std::string& inputFile, std::vector<corpus::Metadata>& metaset, bool loadDefaults );
+	bool ReadMeta ( const std::string& inputFile, std::vector<AcorexCorpus::Metadata>& metaset, bool loadDefaults );
 
 private:
 	MetaStrings mMetaStrings;
@@ -26,5 +25,4 @@ private:
 	bool ReplaceExtensionToMeta ( std::string& path );
 };
 
-} // namespace corpus
-} // namespace acorex
+} // namespace AcorexCorpus

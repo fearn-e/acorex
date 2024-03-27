@@ -38,19 +38,19 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Corpus\JSON.cpp">
-      <Filter>src\Acorex\Corpus</Filter>
+      <Filter>src\Corpus</Filter>
     </ClCompile>
     <ClCompile Include="src\Corpus\Analyse.cpp">
-      <Filter>src\Acorex\Corpus</Filter>
+      <Filter>src\Corpus</Filter>
     </ClCompile>
     <ClCompile Include="src\Corpus\UMAP.cpp">
-      <Filter>src\Acorex\Corpus</Filter>
+      <Filter>src\Corpus</Filter>
     </ClCompile>
     <ClCompile Include="src\Interface\ControllerUI.cpp">
-      <Filter>src\Acorex\Interface</Filter>
+      <Filter>src\Interface</Filter>
     </ClCompile>
     <ClCompile Include="src\Corpus\Controller.cpp">
-      <Filter>src\Acorex\Corpus</Filter>
+      <Filter>src\Corpus</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -66,13 +66,10 @@
     <Filter Include="addons\ofxGui\src">
       <UniqueIdentifier>{C50E7B39--31C-6-41-96-8-2DD-928FBADCE7DA}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Acorex">
-      <UniqueIdentifier>{84907337-3de7-4ade-8d36-ae224b5c43f6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Acorex\Corpus">
+    <Filter Include="src\Corpus">
       <UniqueIdentifier>{b1bc8163-7718-4c38-8894-a98c9cc3034e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Acorex\Interface">
+    <Filter Include="src\Interface">
       <UniqueIdentifier>{6155338d-f0e2-42b9-9f17-80bba8b367bc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -117,25 +114,25 @@
       <Filter>addons\ofxGui\src</Filter>
     </ClInclude>
     <ClInclude Include="src\Corpus\Analyse.h">
-      <Filter>src\Acorex\Corpus</Filter>
+      <Filter>src\Corpus</Filter>
     </ClInclude>
     <ClInclude Include="src\Corpus\JSON.h">
-      <Filter>src\Acorex\Corpus</Filter>
+      <Filter>src\Corpus</Filter>
     </ClInclude>
     <ClInclude Include="src\Corpus\UMAP.h">
-      <Filter>src\Acorex\Corpus</Filter>
+      <Filter>src\Corpus</Filter>
     </ClInclude>
     <ClInclude Include="src\Corpus\Metadata.h">
-      <Filter>src\Acorex\Corpus</Filter>
+      <Filter>src\Corpus</Filter>
     </ClInclude>
     <ClInclude Include="src\Interface\ControllerUI.h">
-      <Filter>src\Acorex\Interface</Filter>
+      <Filter>src\Interface</Filter>
     </ClInclude>
     <ClInclude Include="src\Interface\InterfaceDefs.h">
-      <Filter>src\Acorex\Interface</Filter>
+      <Filter>src\Interface</Filter>
     </ClInclude>
     <ClInclude Include="src\Corpus\Controller.h">
-      <Filter>src\Acorex\Corpus</Filter>
+      <Filter>src\Corpus</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

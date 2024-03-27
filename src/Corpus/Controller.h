@@ -8,29 +8,27 @@
 #include <vector>
 #include <string>
 
-namespace acorex {
-namespace corpus {
+namespace AcorexCorpus {
 
 class Controller {
 public:
 	Controller ( ) { };
 	~Controller ( ) { };
 
-	bool CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<corpus::Metadata>& metaset );
+	bool CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<AcorexCorpus::Metadata>& metaset );
 
-	bool ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<corpus::Metadata>& metaset );
+	bool ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<AcorexCorpus::Metadata>& metaset );
 
-	bool InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<corpus::Metadata>& metaset );
+	bool InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<AcorexCorpus::Metadata>& metaset );
 
 private:
 	bool SearchDirectory ( const std::string& directory, std::vector<std::string>& files );
 
-	bool WriteMeta ( const std::string& outputFile, std::vector<corpus::Metadata>& metaset );
+	bool WriteMeta ( const std::string& outputFile, std::vector<AcorexCorpus::Metadata>& metaset );
 
-	corpus::JSON mJSON;
-	corpus::Analyse mAnalyse;
-	corpus::UMAP mUMAP;
+	AcorexCorpus::JSON mJSON;
+	AcorexCorpus::Analyse mAnalyse;
+	AcorexCorpus::UMAP mUMAP;
 };
 
-} // namespace corpus
-} // namespace acorex
+} // namespace AcorexCorpus

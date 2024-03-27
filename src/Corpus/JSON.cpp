@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 
-bool acorex::corpus::JSON::Write ( const std::string& outputFile, fluid::FluidDataSet<std::string, double, 1>& dataset )
+bool AcorexCorpus::JSON::Write ( const std::string& outputFile, fluid::FluidDataSet<std::string, double, 1>& dataset )
 {
 	auto outputJSON = fluid::JSONFile ( outputFile, "w" );
 	outputJSON.write ( dataset );
@@ -19,7 +19,7 @@ bool acorex::corpus::JSON::Write ( const std::string& outputFile, fluid::FluidDa
 	return true;
 }
 
-bool acorex::corpus::JSON::Read ( const std::string& inputFile, fluid::FluidDataSet<std::string, double, 1>& dataset )
+bool AcorexCorpus::JSON::Read ( const std::string& inputFile, fluid::FluidDataSet<std::string, double, 1>& dataset )
 {
 	auto inputJSON = fluid::JSONFile ( inputFile, "r" );
 	nlohmann::json j = inputJSON.read ( );
@@ -41,7 +41,7 @@ bool acorex::corpus::JSON::Read ( const std::string& inputFile, fluid::FluidData
 	return true;
 }
 
-bool acorex::corpus::JSON::WriteMeta ( const std::string& outputFile, std::vector<corpus::Metadata>& metaset )
+bool AcorexCorpus::JSON::WriteMeta ( const std::string& outputFile, std::vector<AcorexCorpus::Metadata>& metaset )
 {
 	std::string metaPath = outputFile;
 	bool success = ReplaceExtensionToMeta ( metaPath );
@@ -61,19 +61,19 @@ bool acorex::corpus::JSON::WriteMeta ( const std::string& outputFile, std::vecto
 	{
 		switch ( each.type )
 		{
-		case corpus::Metadata::MetaType::BOOL:
+		case AcorexCorpus::Metadata::MetaType::BOOL:
 			j.push_back ( { each.key, mMetaStrings.getStringFromMeta(each.key), each.boolValue } );
 			break;
-		case corpus::Metadata::MetaType::INT:
+		case AcorexCorpus::Metadata::MetaType::INT:
 			j.push_back ( { each.key, mMetaStrings.getStringFromMeta(each.key), each.intValue } );
 			break;
-		case corpus::Metadata::MetaType::DOUBLE:
+		case AcorexCorpus::Metadata::MetaType::DOUBLE:
 			j.push_back ( { each.key, mMetaStrings.getStringFromMeta(each.key), each.doubleValue } );
 			break;
-		case corpus::Metadata::MetaType::STRING:
+		case AcorexCorpus::Metadata::MetaType::STRING:
 			j.push_back ( { each.key, mMetaStrings.getStringFromMeta(each.key), each.stringValue } );
 			break;
-		case corpus::Metadata::MetaType::STR_ARRAY:
+		case AcorexCorpus::Metadata::MetaType::STR_ARRAY:
 			j.push_back ( { each.key, mMetaStrings.getStringFromMeta(each.key), each.stringArray } );
 			break;
 		}
@@ -82,7 +82,7 @@ bool acorex::corpus::JSON::WriteMeta ( const std::string& outputFile, std::vecto
 	file << j.dump ( 4 );
 	file.close ( );
 
-	std::vector<corpus::Metadata> writeTestSet;
+	std::vector<AcorexCorpus::Metadata> writeTestSet;
 	ReadMeta ( metaPath, writeTestSet, false );
 
 	if ( metaset.size ( ) != writeTestSet.size ( ) )
@@ -94,7 +94,7 @@ bool acorex::corpus::JSON::WriteMeta ( const std::string& outputFile, std::vecto
 	return true;
 }
 
-bool acorex::corpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<corpus::Metadata>& metaset, bool loadDefaults )
+bool AcorexCorpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<AcorexCorpus::Metadata>& metaset, bool loadDefaults )
 {
 	std::string metaPath = inputFile;
 	bool success = ReplaceExtensionToMeta ( metaPath );
@@ -152,31 +152,31 @@ bool acorex::corpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<
 		{
 			MetaList key = each.at ( 0 );
 			bool value = each.at ( 2 );
-			metaset.push_back ( corpus::Metadata ( key, value ) );
+			metaset.push_back ( AcorexCorpus::Metadata ( key, value ) );
 		}
 		else if ( each.at ( 2 ).is_number_integer ( ) )
 		{
 			MetaList key = each.at ( 0 );
 			int value = each.at ( 2 );
-			metaset.push_back ( corpus::Metadata ( key, value ) );
+			metaset.push_back ( AcorexCorpus::Metadata ( key, value ) );
 		}
 		else if ( each.at ( 2 ).is_number_float ( ) )
 		{
 			MetaList key = each.at ( 0 );
 			double value = each.at ( 2 );
-			metaset.push_back ( corpus::Metadata ( key, value ) );
+			metaset.push_back ( AcorexCorpus::Metadata ( key, value ) );
 		}
 		else if ( each.at ( 2 ).is_string ( ) )
 		{
 			MetaList key = each.at ( 0 );
 			std::string value = each.at ( 2 );
-			metaset.push_back ( corpus::Metadata ( key, value ) );
+			metaset.push_back ( AcorexCorpus::Metadata ( key, value ) );
 		}
 		else if ( each.at ( 2 ).is_array ( ) )
 		{
 			MetaList key = each.at ( 0 );
 			std::vector<std::string> value = each.at ( 2 );
-			metaset.push_back ( corpus::Metadata ( key, value ) );
+			metaset.push_back ( AcorexCorpus::Metadata ( key, value ) );
 		}
 		else
 		{
@@ -195,7 +195,7 @@ bool acorex::corpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<
 	return true;
 }
 
-bool acorex::corpus::JSON::ReplaceExtensionToMeta ( std::string& path )
+bool AcorexCorpus::JSON::ReplaceExtensionToMeta ( std::string& path )
 {
 	if ( path.find ( ".json" ) == std::string::npos )
 	{
