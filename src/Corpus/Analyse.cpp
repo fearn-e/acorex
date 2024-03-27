@@ -227,21 +227,25 @@ int AcorexCorpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid
             if ( analysisPitch )
             {
 				allStats ( fluid::Slice ( currentDimTracker, numPitchDimensions ) ) <<= pitchStats;
+                currentDimTracker += numPitchDimensions;
 			}
 
             if ( analysisLoudness )
             {
                 allStats ( fluid::Slice ( currentDimTracker, numLoudnessDimensions ) ) <<= loudnessStats;
+                currentDimTracker += numLoudnessDimensions;
             }
 
             if ( analysisShape )
             {
 				allStats ( fluid::Slice ( currentDimTracker, numShapeDimensions ) ) <<= shapeStats;
+                currentDimTracker += numShapeDimensions;
 			}
 
             if ( analysisMFCC )
             {
                 allStats ( fluid::Slice ( currentDimTracker, numMFCCDimensions ) ) <<= mfccStats;
+                currentDimTracker += numMFCCDimensions;
             }
 
             dataset.add ( inputFileName, allStats );
