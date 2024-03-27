@@ -48,10 +48,10 @@ void acorex::interface::ControllerUI::SetupPanels ( )
 
 		mAnalysisMetadataPanel.add ( mTimeDimensionToggle.setup ( "Time Dimension", mTimeDimensionToggle ) );
 
-		mAnalysisMetadataPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", mAnalysisPitchToggle ) );
-		mAnalysisMetadataPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", mAnalysisLoudnessToggle ) );
-		mAnalysisMetadataPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Shape", mAnalysisShapeToggle ) );
-		mAnalysisMetadataPanel.add ( mAnalysisMFCCToggle.setup ( "Analyse MFCC", mAnalysisMFCCToggle ) );
+		mAnalysisMetadataPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", true ) );
+		mAnalysisMetadataPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", true ) );
+		mAnalysisMetadataPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Shape", false ) );
+		mAnalysisMetadataPanel.add ( mAnalysisMFCCToggle.setup ( "Analyse MFCC", false ) );
 
 		mAnalysisMetadataPanel.add ( mWindowFFTField.setup ( "Window Size: ", 1024, 512, 8192 ) );
 		mAnalysisMetadataPanel.add ( mHopFractionField.setup ( "Hop Size (Fraction of Window):  1 / ", 2, 1, 16 ) );
