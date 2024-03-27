@@ -87,6 +87,12 @@ echo "OS discovered as $currentOS"
         FORCE_DOWNLOAD_TIP+=1
     fi
 
+    if [ ! -d "tl" ]; then
+        git -c advice.detachedHead=false clone --depth 1 -b "v1.1.0" https://github.com/tartanllama/optional.git
+    else
+        FORCE_DOWNLOAD_TIP+=1
+    fi
+
     if [ $FORCE_DOWNLOAD_TIP > 0 ]; then
         echo "$FORCE_DOWNLOAD_TIP downloads already exist and were skipped (force this step with -d)"
         echo ""
@@ -169,6 +175,7 @@ echo "OS discovered as $currentOS"
     cp -r   deps-pre-build/hisstools_library/include/                           deps/hisstools_library/
     cp -r   deps-pre-build/spectra/include/Spectra/                             deps/Spectra/
     cp -r   deps-pre-build/json/include/nlohmann/                               deps/nlohmann/
+    cp -r   deps-pre-build/optional/include/tl/                                 deps/tl/
 
     #copy foonathan_memory compiled lib files
     if [ "$currentOS" == "win" ]; then
