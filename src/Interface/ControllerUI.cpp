@@ -2,7 +2,7 @@
 
 #include "Interface/ControllerUI.h"
 
-void acorex::interface::ControllerUI::setup ( )
+void AcorexInterface::ControllerUI::setup ( )
 {
 	// Clear --------------------------------------
 	{
@@ -153,7 +153,7 @@ void acorex::interface::ControllerUI::setup ( )
 	ToggleAnalysisUILockout ( false );
 }
 
-void acorex::interface::ControllerUI::draw ( )
+void AcorexInterface::ControllerUI::draw ( )
 {
 	if ( bDrawMainPanel ) { mMainPanel.draw ( ); }
 	if ( bDrawAnalysisPanel )
@@ -219,12 +219,12 @@ void acorex::interface::ControllerUI::draw ( )
 	}
 }
 
-void acorex::interface::ControllerUI::exit ( )
+void AcorexInterface::ControllerUI::exit ( )
 {
 	RemoveListeners ( );
 }
 
-void acorex::interface::ControllerUI::RemoveListeners ( )
+void AcorexInterface::ControllerUI::RemoveListeners ( )
 {
 	mCreateCorpusButton.removeListener ( this, &ControllerUI::ShowAnalysisPanel );
 	mReduceCorpusButton.removeListener ( this, &ControllerUI::ShowReductionPanel );
@@ -243,7 +243,7 @@ void acorex::interface::ControllerUI::RemoveListeners ( )
 
 // Analyse and Reduce ---------------------------
 
-void acorex::interface::ControllerUI::Analyse ( )
+void AcorexInterface::ControllerUI::Analyse ( )
 {
 	if ( !bAnalysisDirectorySelected || !bAnalysisOutputSelected )
 	{
@@ -261,7 +261,7 @@ void acorex::interface::ControllerUI::Analyse ( )
 		return;
 	}
 
-	std::vector<corpus::Metadata> metaset = PackSettingsIntoSet ( );
+	std::vector<AcorexCorpus::Metadata> metaset = PackSettingsIntoSet ( );
 	bool success = false;
 	if ( !bInsertingIntoCorpus )
 	{
@@ -289,7 +289,7 @@ void acorex::interface::ControllerUI::Analyse ( )
 	}
 }
 
-void acorex::interface::ControllerUI::Reduce ( )
+void AcorexInterface::ControllerUI::Reduce ( )
 {
 	if ( !bReductionInputSelected || !bReductionOutputSelected )
 	{
@@ -306,7 +306,7 @@ void acorex::interface::ControllerUI::Reduce ( )
 
 // File Dialog Button Callbacks -----------------
 
-void acorex::interface::ControllerUI::SelectAnalysisDirectory ( )
+void AcorexInterface::ControllerUI::SelectAnalysisDirectory ( )
 {
 	ofFileDialogResult audioDirectory = ofSystemLoadDialog ( "Select folder containing audio files...", true, ofFilePath::getCurrentWorkingDirectory ( ) );
 	if ( !audioDirectory.bSuccess )
@@ -330,7 +330,7 @@ void acorex::interface::ControllerUI::SelectAnalysisDirectory ( )
 	//auto resultOut = pfd::save_file::save_file("Saving reduced analysis as...", "reduced_corpus.json", { "JSON Files", "*.json" });
 	//std::string resultOutPath = resultOut.result();
 	//#endif
-void acorex::interface::ControllerUI::SelectAnalysisOutputFile ( )
+void AcorexInterface::ControllerUI::SelectAnalysisOutputFile ( )
 {
 	ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus.json", "Save analysed corpus as..." );
 	if ( !outputFile.bSuccess )
@@ -357,7 +357,7 @@ void acorex::interface::ControllerUI::SelectAnalysisOutputFile ( )
 
 	if ( bInsertingIntoCorpus )
 	{
-		std::vector<corpus::Metadata> metaset;
+		std::vector<AcorexCorpus::Metadata> metaset;
 		mJSON.ReadMeta ( outputFile.getPath ( ), metaset, false );
 		bool success = SetSettingsFromFile ( metaset, true );
 		if ( !success )
@@ -373,7 +373,7 @@ void acorex::interface::ControllerUI::SelectAnalysisOutputFile ( )
 	bAnalysisOutputSelected = true;
 }
 
-void acorex::interface::ControllerUI::SelectReductionInputFile ( )
+void AcorexInterface::ControllerUI::SelectReductionInputFile ( )
 {
 	ofFileDialogResult inputFile = ofSystemLoadDialog ( "Select a corpus file...", false, ofFilePath::getCurrentWorkingDirectory ( ) );
 	if ( !inputFile.bSuccess )
@@ -392,7 +392,7 @@ void acorex::interface::ControllerUI::SelectReductionInputFile ( )
 		return;
 	}
 
-	std::vector<corpus::Metadata> metaset;
+	std::vector<AcorexCorpus::Metadata> metaset;
 	mJSON.ReadMeta ( inputFile.getPath ( ), metaset, false );
 	bool success = SetSettingsFromFile ( metaset, true );
 	if ( !success )
@@ -411,7 +411,7 @@ void acorex::interface::ControllerUI::SelectReductionInputFile ( )
 	//auto resultOut = pfd::save_file::save_file("Saving reduced analysis as...", "reduced_corpus.json", { "JSON Files", "*.json" });
 	//std::string resultOutPath = resultOut.result();
 	//#endif
-void acorex::interface::ControllerUI::SelectReductionOutputFile ( )
+void AcorexInterface::ControllerUI::SelectReductionOutputFile ( )
 {
 	ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus_reduced.json", "Save reduced corpus as..." );
 	if ( !outputFile.bSuccess )
@@ -432,13 +432,13 @@ void acorex::interface::ControllerUI::SelectReductionOutputFile ( )
 
 // Load and Save Settings -----------------------
 
-bool acorex::interface::ControllerUI::SetSettingsFromFile ( std::vector<corpus::Metadata>& metaset, bool cancelIfAlreadyReduced )
+bool AcorexInterface::ControllerUI::SetSettingsFromFile ( std::vector<AcorexCorpus::Metadata>& metaset, bool cancelIfAlreadyReduced )
 {
 	if ( cancelIfAlreadyReduced )
 	{
 		for ( auto& meta : metaset )
 		{
-			if ( meta.key != corpus::META_HAS_BEEN_REDUCED )
+			if ( meta.key != AcorexCorpus::META_HAS_BEEN_REDUCED )
 			{
 				continue;
 			}
@@ -468,48 +468,48 @@ bool acorex::interface::ControllerUI::SetSettingsFromFile ( std::vector<corpus::
 	{
 		switch ( meta.key )
 		{
-			case corpus::META_HAS_BEEN_REDUCED:
+			case AcorexCorpus::META_HAS_BEEN_REDUCED:
 				break;
-			case corpus::META_TIME_DIMENSION:
+			case AcorexCorpus::META_TIME_DIMENSION:
 				timeDimension = meta.boolValue;
 				break;
-			case corpus::META_ANALYSIS_PITCH:
+			case AcorexCorpus::META_ANALYSIS_PITCH:
 				analysisPitch = meta.boolValue;
 				break;
-			case corpus::META_ANALYSIS_LOUDNESS:
+			case AcorexCorpus::META_ANALYSIS_LOUDNESS:
 				analysisLoudness = meta.boolValue;
 				break;
-			case corpus::META_ANALYSIS_SHAPE:
+			case AcorexCorpus::META_ANALYSIS_SHAPE:
 				analysisShape = meta.boolValue;
 				break;
-			case corpus::META_ANALYSIS_MFCC:
+			case AcorexCorpus::META_ANALYSIS_MFCC:
 				analysisMFCC = meta.boolValue;
 				break;
-			case corpus::META_WINDOW_FFT_SIZE:
+			case AcorexCorpus::META_WINDOW_FFT_SIZE:
 				windowSize = meta.intValue;
 				break;
-			case corpus::META_HOP_FRACTION:
+			case AcorexCorpus::META_HOP_FRACTION:
 				hopSizeFraction = meta.intValue;
 				break;
-			case corpus::META_N_BANDS:
+			case AcorexCorpus::META_N_BANDS:
 				nBands = meta.intValue;
 				break;
-			case corpus::META_N_COEFS:
+			case AcorexCorpus::META_N_COEFS:
 				nCoefs = meta.intValue;
 				break;
-			case corpus::META_MIN_FREQ:
+			case AcorexCorpus::META_MIN_FREQ:
 				minFreq = meta.intValue;
 				break;
-			case corpus::META_MAX_FREQ:
+			case AcorexCorpus::META_MAX_FREQ:
 				maxFreq = meta.intValue;
 				break;
-			case corpus::META_REDUCED_DIMENSIONS:
+			case AcorexCorpus::META_REDUCED_DIMENSIONS:
 				reducedDimensions = meta.intValue;
 				break;
-			case corpus::META_MAX_ITERATIONS:
+			case AcorexCorpus::META_MAX_ITERATIONS:
 				maxIterations = meta.intValue;
 				break;
-			case corpus::META_INSERTION_REPLACES_DUPLICATES:
+			case AcorexCorpus::META_INSERTION_REPLACES_DUPLICATES:
 				break;
 			default:
 				ofLogError ( "ControllerUI" ) << "Invalid metadata key: " << meta.key << " = " << mMetaStrings.getStringFromMeta ( meta.key );
@@ -536,32 +536,32 @@ bool acorex::interface::ControllerUI::SetSettingsFromFile ( std::vector<corpus::
 	return true;
 }
 
-std::vector<acorex::corpus::Metadata> acorex::interface::ControllerUI::PackSettingsIntoSet ( )
+std::vector<AcorexCorpus::Metadata> AcorexInterface::ControllerUI::PackSettingsIntoSet ( )
 {
-	std::vector<corpus::Metadata> metaset;
+	std::vector<AcorexCorpus::Metadata> metaset;
 
-	metaset.push_back ( corpus::Metadata ( corpus::META_HAS_BEEN_REDUCED, hasBeenReduced ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_TIME_DIMENSION, mTimeDimensionToggle ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_ANALYSIS_PITCH, mAnalysisPitchToggle ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_ANALYSIS_LOUDNESS, mAnalysisLoudnessToggle ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_ANALYSIS_SHAPE, mAnalysisShapeToggle ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_ANALYSIS_MFCC, mAnalysisMFCCToggle ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_WINDOW_FFT_SIZE, mWindowFFTField ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_HOP_FRACTION, mHopFractionField ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_N_BANDS, mNBandsField ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_N_COEFS, mNCoefsField ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_MIN_FREQ, mMinFreqField ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_MAX_FREQ, mMaxFreqField ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_REDUCED_DIMENSIONS, mReducedDimensionsField ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_MAX_ITERATIONS, mMaxIterationsField ) );
-	metaset.push_back ( corpus::Metadata ( corpus::META_INSERTION_REPLACES_DUPLICATES, mAnalysisInsertionToggle ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_HAS_BEEN_REDUCED, hasBeenReduced ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_TIME_DIMENSION, mTimeDimensionToggle ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_ANALYSIS_PITCH, mAnalysisPitchToggle ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_ANALYSIS_LOUDNESS, mAnalysisLoudnessToggle ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_ANALYSIS_SHAPE, mAnalysisShapeToggle ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_ANALYSIS_MFCC, mAnalysisMFCCToggle ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_WINDOW_FFT_SIZE, mWindowFFTField ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_HOP_FRACTION, mHopFractionField ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_N_BANDS, mNBandsField ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_N_COEFS, mNCoefsField ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_MIN_FREQ, mMinFreqField ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_MAX_FREQ, mMaxFreqField ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_REDUCED_DIMENSIONS, mReducedDimensionsField ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_MAX_ITERATIONS, mMaxIterationsField ) );
+	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_INSERTION_REPLACES_DUPLICATES, mAnalysisInsertionToggle ) );
 
 	return metaset;
 }
 
 // UI Value Management -------------------------------
 
-void acorex::interface::ControllerUI::QuantiseWindowSize ( int& value )
+void AcorexInterface::ControllerUI::QuantiseWindowSize ( int& value )
 {
 	//find closest power of 2 between 512 and 8192
 	int closest = 512;
@@ -580,7 +580,7 @@ void acorex::interface::ControllerUI::QuantiseWindowSize ( int& value )
 	mAnalysisMetadataPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ) );
 }
 
-void acorex::interface::ControllerUI::QuantiseHopFraction ( int& value )
+void AcorexInterface::ControllerUI::QuantiseHopFraction ( int& value )
 {
 	//find closest power of 2 between 1 and 16
 	int closest = 1;
@@ -599,7 +599,7 @@ void acorex::interface::ControllerUI::QuantiseHopFraction ( int& value )
 	mAnalysisMetadataPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ) );
 }
 
-void acorex::interface::ControllerUI::AnalysisInsertionToggleChanged ( bool& value )
+void AcorexInterface::ControllerUI::AnalysisInsertionToggleChanged ( bool& value )
 {
 	if ( value ) { mAnalysisInsertionToggle.setName ( "New" ); }
 	else { mAnalysisInsertionToggle.setName ( "Existing" ); }
@@ -607,7 +607,7 @@ void acorex::interface::ControllerUI::AnalysisInsertionToggleChanged ( bool& val
 
 // Panel Management ------------------------------
 
-void acorex::interface::ControllerUI::ToggleAnalysisUILockout ( bool lock )
+void AcorexInterface::ControllerUI::ToggleAnalysisUILockout ( bool lock )
 {
 	mTimeDimensionToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
 	mAnalysisPitchToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
@@ -635,14 +635,14 @@ void acorex::interface::ControllerUI::ToggleAnalysisUILockout ( bool lock )
 	}
 }
 
-void acorex::interface::ControllerUI::ShowMainPanel ( )
+void AcorexInterface::ControllerUI::ShowMainPanel ( )
 {
 	setup ( );
 	bDrawMainPanel = true;
 	mMainPanel.setPosition ( 40, 40 );
 }
 
-void acorex::interface::ControllerUI::ShowAnalysisPanel ( )
+void AcorexInterface::ControllerUI::ShowAnalysisPanel ( )
 {
 	setup ( );
 	bDrawAnalysisPanel = true;
@@ -651,19 +651,19 @@ void acorex::interface::ControllerUI::ShowAnalysisPanel ( )
 	mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + 10 );
 }
 
-void acorex::interface::ControllerUI::ShowAnalysisInsertionPanel ( )
+void AcorexInterface::ControllerUI::ShowAnalysisInsertionPanel ( )
 {
 	bDrawAnalysisInsertionPanel = true;
 	mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + 10 );
 }
 
-void acorex::interface::ControllerUI::HideAnalysisInsertionPanel ( )
+void AcorexInterface::ControllerUI::HideAnalysisInsertionPanel ( )
 {
 	bDrawAnalysisInsertionPanel = false;
 	mAnalysisInsertionPanel.setPosition ( -1000, -1000 );
 }
 
-void acorex::interface::ControllerUI::ShowReductionPanel ( )
+void AcorexInterface::ControllerUI::ShowReductionPanel ( )
 {
 	setup ( );
 	bDrawReductionPanel = true;

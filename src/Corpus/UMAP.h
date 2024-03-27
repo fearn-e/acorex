@@ -10,8 +10,7 @@
 #include <data/TensorTypes.hpp>
 #include <vector>
 
-namespace acorex {
-namespace corpus {
+namespace AcorexCorpus {
 
 class UMAP {
 public:
@@ -26,5 +25,4 @@ private:
     fluid::algorithm::DataSetQuery mQuery;
 };
 
-} // namespace corpus
-} // namespace acorex
+} // namespace AcorexCorpus

@@ -4,7 +4,7 @@
 #include <ofLog.h>
 #include <filesystem>
 
-bool acorex::corpus::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<corpus::Metadata>& metaset )
+bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<AcorexCorpus::Metadata>& metaset )
 {
 	bool success;
 
@@ -32,7 +32,7 @@ bool acorex::corpus::Controller::CreateCorpus ( const std::string& inputPath, co
 	return true;
 }
 
-bool acorex::corpus::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<corpus::Metadata>& metaset )
+bool AcorexCorpus::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<AcorexCorpus::Metadata>& metaset )
 {
 	bool success;
 
@@ -58,7 +58,7 @@ bool acorex::corpus::Controller::ReduceCorpus ( const std::string& inputPath, co
 	return true;
 }
 
-bool acorex::corpus::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<corpus::Metadata>& metaset )
+bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<AcorexCorpus::Metadata>& metaset )
 {
 	bool success;
 
@@ -76,7 +76,7 @@ bool acorex::corpus::Controller::InsertIntoCorpus ( const std::string& inputPath
 	return true;
 }
 
-bool acorex::corpus::Controller::SearchDirectory ( const std::string& directory, std::vector<std::string>& files )
+bool AcorexCorpus::Controller::SearchDirectory ( const std::string& directory, std::vector<std::string>& files )
 {
 	using namespace std::filesystem;
 	for ( const auto& entry : recursive_directory_iterator ( directory ) )
@@ -105,7 +105,7 @@ bool acorex::corpus::Controller::SearchDirectory ( const std::string& directory,
 	return true;
 }
 
-bool acorex::corpus::Controller::WriteMeta ( const std::string& outputFile, std::vector<corpus::Metadata>& metaset )
+bool AcorexCorpus::Controller::WriteMeta ( const std::string& outputFile, std::vector<AcorexCorpus::Metadata>& metaset )
 {
 	bool success;
 

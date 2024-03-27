@@ -2,8 +2,7 @@
 
 #include <ofxGui.h>
 
-namespace acorex {
-namespace interface {
+namespace AcorexInterface {
 
 	class Colors {
 	public:
@@ -13,4 +12,3 @@ namespace interface {
 
 	};
 } // namespace interface
-} // namespace acorex
