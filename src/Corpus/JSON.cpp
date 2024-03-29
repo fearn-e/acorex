@@ -62,7 +62,7 @@ bool AcorexCorpus::JSON::WriteMeta ( const std::string& outputFile, const Acorex
 #endif
 
 #define STRINGIFY( x ) #x, x
-	j.push_back ( { 0, STRINGIFY ( metaset.hasBeenReduced ) } );
+	j.push_back ( { 0, STRINGIFY ( metaset.isReduction ) } );
 	j.push_back ( { 1, STRINGIFY ( metaset.insertionReplacesDuplicates ) } );
 	j.push_back ( { 2, STRINGIFY ( metaset.timeDimension ) } );
 	j.push_back ( { 3, STRINGIFY ( metaset.analysisPitch ) } );

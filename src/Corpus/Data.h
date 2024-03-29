@@ -7,7 +7,7 @@ namespace AcorexCorpus {
 
 struct TimeDataSet {
 	const bool timeDimension = true;
-	bool hasBeenReduced = false;
+	bool isReduction = false;
 	int currentDimensionCount = 0;
 
 	std::vector<std::string> dimensionNames; // [dimension]
@@ -20,7 +20,7 @@ struct TimeDataSet {
 
 struct StatsDataSet {
 	const bool timeDimension = false;
-	bool hasBeenReduced = false;
+	bool isReduction = false;
 	int currentDimensionCount = 0;
 
 	std::vector<std::string> dimensionNames; // [dimension]
@@ -33,8 +33,6 @@ struct StatsDataSet {
 	std::vector<std::vector<double>> lowerQuartileData;		// [file][dimension]
 	std::vector<std::vector<double>> medianData;			// [file][dimension]
 	std::vector<std::vector<double>> upperQuartileData;		// [file][dimension]
-
-
 };
 
 #define DATA_ANALYSIS_SETTINGS_COUNT 10
