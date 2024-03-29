@@ -503,7 +503,7 @@ void AcorexInterface::ControllerUI::SelectReductionOutputFile ( )
 
 bool AcorexInterface::ControllerUI::UnpackSettingsFromFile ( AcorexCorpus::MetaSetStruct& metaset, bool cancelIfAlreadyReduced )
 {
-	if ( cancelIfAlreadyReduced && metaset.hasBeenReduced )
+	if ( cancelIfAlreadyReduced && metaset.isReduction )
 	{
 		ofLogError ( "ControllerUI" ) << "Analysis has already been reduced";
 		return false;
@@ -535,7 +535,7 @@ AcorexCorpus::MetaSetStruct AcorexInterface::ControllerUI::PackSettingsFromUser 
 {
 	AcorexCorpus::MetaSetStruct metaset;
 
-	metaset.hasBeenReduced = mHasBeenReduced;
+	metaset.isReduction = mHasBeenReduced;
 	metaset.insertionReplacesDuplicates = mAnalysisInsertionToggle;
 	metaset.timeDimension = mTimeDimensionToggle;
 	metaset.analysisPitch = mAnalysisPitchToggle;
