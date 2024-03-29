@@ -25,7 +25,7 @@ public:
 	Analyse ( ) { };
 	~Analyse ( ) { };
 
-	int ProcessFiles ( std::vector<std::string>& files, fluid::FluidDataSet<std::string, double, 1>& dataset, const std::vector<AcorexCorpus::Metadata>& metaset );
+	int ProcessFiles ( std::vector<std::string>& files, fluid::FluidDataSet<std::string, double, 1>& dataset, const AcorexCorpus::MetaSetStruct& metaset );
 
 private:
 	fluid::RealVector ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats );

@@ -3,78 +3,110 @@
 #include <string>
 #include <vector>
 
+#include <cassert>
+
 namespace AcorexCorpus {
 
-#define META_LIST_SIZE 16
+struct MetaSetStruct {
 
-enum MetaList {
-	META_HAS_BEEN_REDUCED,
-	META_TIME_DIMENSION,
-	META_ANALYSIS_PITCH,
-	META_ANALYSIS_LOUDNESS,
-	META_ANALYSIS_SHAPE,
-	META_ANALYSIS_MFCC,
-	META_WINDOW_FFT_SIZE,
-	META_HOP_FRACTION,
-	META_N_BANDS,
-	META_N_COEFS,
-	META_MIN_FREQ,
-	META_MAX_FREQ,
-	META_REDUCED_DIMENSIONS,
-	META_MAX_ITERATIONS,
-	META_INSERTION_REPLACES_DUPLICATES,
-	META_DIMENSION_NAMES
-};
+#define META_SET_SIZE_18
+#define META_SET_FIELD_COUNT 18
+#define META_SET_MAX_INDEX 17
 
-class MetaStrings {
-public:
-	std::string getStringFromMeta ( MetaList meta )
+	enum MetaIndex {
+		MINDEX_hasBeenReduced = 0,
+		MINDEX_insertionReplacesDuplicates = 1,
+		MINDEX_timeDimension = 2,
+		MINDEX_analysisPitch = 3,
+		MINDEX_analysisLoudness = 4,
+		MINDEX_analysisShape = 5,
+		MINDEX_analysisMFCC = 6,
+		MINDEX_windowFFTSize = 7,
+		MINDEX_hopFraction = 8,
+		MINDEX_nBands = 9,
+		MINDEX_nCoefs = 10,
+		MINDEX_minFreq = 11,
+		MINDEX_maxFreq = 12,
+		MINDEX_currentDimensionCount = 13,
+		MINDEX_dimensionReductionTarget = 14,
+		MINDEX_maxIterations = 15,
+		MINDEX_dimensionNames = 16,
+		MINDEX_fileList = 17
+	};
+
+	enum MetaTypes {
+		MTYPE_BOOL = 0,
+		MTYPE_INT = 1,
+		MTYPE_STRING_LIST = 2
+	};
+
+	bool hasBeenReduced = false;
+	bool insertionReplacesDuplicates = false;
+	bool timeDimension = false;
+	bool analysisPitch = false;
+	bool analysisLoudness = false;
+	bool analysisShape = false;
+	bool analysisMFCC = false;
+
+	int windowFFTSize = 1024;
+	int hopFraction = 2;
+	int nBands = 40;
+	int nCoefs = 13;
+	int minFreq = 20;
+	int maxFreq = 5000;
+	int currentDimensionCount = 0;
+	int dimensionReductionTarget = 3;
+	int maxIterations = 200;
+
+	std::vector<std::string> dimensionNames = { };
+	std::vector<std::string> fileList = { };
+
+
+	void SetByIndex ( int index, bool value )
 	{
-		switch ( meta )
+		SetAnyByIndex ( index, 0, value, 0, std::vector<std::string> ( ) );
+	}
+
+	void SetByIndex ( int index, int value )
+	{
+		SetAnyByIndex ( index, 1, false, value, std::vector<std::string> ( ) );
+	}
+
+	void SetByIndex ( int index, const std::vector<std::string>& value )
+	{
+		SetAnyByIndex ( index, 2, false, 0, value );
+	}
+
+private:
+	void SetAnyByIndex ( int index, int type, bool bValue, int iValue, const std::vector<std::string> sValue )
+	{
+		switch ( index )
 		{
-		case META_HAS_BEEN_REDUCED: return "hasBeenReduced";
-		case META_TIME_DIMENSION: return "timeDimension";
-		case META_ANALYSIS_PITCH: return "analysisPitch";
-		case META_ANALYSIS_LOUDNESS: return "analysisLoudness";
-		case META_ANALYSIS_SHAPE: return "analysisShape";
-		case META_ANALYSIS_MFCC: return "analysisMFCC";
-		case META_WINDOW_FFT_SIZE: return "windowFFTSize";
-		case META_HOP_FRACTION: return "hopFraction";
-		case META_N_BANDS: return "nBands";
-		case META_N_COEFS: return "nCoefs";
-		case META_MIN_FREQ: return "minFreq";
-		case META_MAX_FREQ: return "maxFreq";
-		case META_REDUCED_DIMENSIONS: return "reducedDimensions";
-		case META_MAX_ITERATIONS: return "maxIterations";
-		case META_INSERTION_REPLACES_DUPLICATES: return "insertionReplacesDuplicates";
-		case META_DIMENSION_NAMES: return "dimensionNames";
-		default: return "unknown";
+		case MINDEX_hasBeenReduced:					assert ( type = MTYPE_BOOL ); hasBeenReduced = bValue;				break;
+		case MINDEX_insertionReplacesDuplicates:	assert ( type = MTYPE_BOOL ); insertionReplacesDuplicates = bValue;	break;
+		case MINDEX_timeDimension:					assert ( type = MTYPE_BOOL ); timeDimension = bValue;				break;
+		case MINDEX_analysisPitch:					assert ( type = MTYPE_BOOL ); analysisPitch = bValue;				break;
+		case MINDEX_analysisLoudness:				assert ( type = MTYPE_BOOL ); analysisLoudness = bValue;			break;
+		case MINDEX_analysisShape:					assert ( type = MTYPE_BOOL ); analysisShape = bValue;				break;
+		case MINDEX_analysisMFCC:					assert ( type = MTYPE_BOOL ); analysisMFCC = bValue;				break;
+		case MINDEX_windowFFTSize:					assert ( type = MTYPE_INT ); windowFFTSize = iValue;				break;
+		case MINDEX_hopFraction:					assert ( type = MTYPE_INT ); hopFraction = iValue;					break;
+		case MINDEX_nBands:							assert ( type = MTYPE_INT ); nBands = iValue;						break;
+		case MINDEX_nCoefs:							assert ( type = MTYPE_INT ); nCoefs = iValue;						break;
+		case MINDEX_minFreq:						assert ( type = MTYPE_INT ); minFreq = iValue;						break;
+		case MINDEX_maxFreq:						assert ( type = MTYPE_INT ); maxFreq = iValue;						break;
+		case MINDEX_currentDimensionCount:			assert ( type = MTYPE_INT ); currentDimensionCount = iValue;		break;
+		case MINDEX_dimensionReductionTarget:		assert ( type = MTYPE_INT ); dimensionReductionTarget = iValue;		break;
+		case MINDEX_maxIterations:					assert ( type = MTYPE_INT ); maxIterations = iValue;				break;
+		case MINDEX_dimensionNames:					assert ( type = MTYPE_STRING_LIST ); dimensionNames = sValue;		break;
+		case MINDEX_fileList:						assert ( type = MTYPE_STRING_LIST ); fileList = sValue;				break;
+		default:									assert ( false );													break;
 		}
 	}
-};
 
-struct Metadata {
-	enum class MetaType { BOOL, INT, DOUBLE, STRING, STR_ARRAY };
-
-	Metadata ( MetaList key, bool value ) :					key ( key ), type ( MetaType::BOOL ), boolValue ( value ),
-															intValue ( 0 ), doubleValue ( 0.0f ), stringValue ( "" ), stringArray ( std::vector<std::string> ( ) ) { }
-	Metadata ( MetaList key, int value ) :					key ( key ), type ( MetaType::INT ), intValue ( value ),
-															boolValue ( false ), doubleValue ( 0.0f ), stringValue ( "" ), stringArray ( std::vector<std::string> ( ) ) { }
-	Metadata ( MetaList key, double value ) :				key ( key ), type ( MetaType::DOUBLE ), doubleValue ( value ),
-															boolValue ( false ), intValue ( 0 ), stringValue ( "" ), stringArray ( std::vector<std::string> ( ) ) { }
-	Metadata ( MetaList key, std::string value ) :			key ( key ), type ( MetaType::STRING ), stringValue ( value ),
-															boolValue ( false ), intValue ( 0 ), doubleValue ( 0.0f ), stringArray ( std::vector<std::string> ( ) ) { }
-	Metadata ( MetaList key, std::vector<std::string> value ) : key ( key ), type ( MetaType::STR_ARRAY ), stringArray ( value ),
-																boolValue ( false ), intValue ( 0 ), doubleValue ( 0.0f ), stringValue ( "" ) { }
-
-	MetaList key;
-	MetaType type;
-
-	bool boolValue;
-	int intValue;
-	double doubleValue;
-	std::string stringValue;
-	std::vector<std::string> stringArray;
+#ifndef META_SET_SIZE_18
+#error "META_SET_SIZE_18 not defined"
+#endif
 };
 
 } // namespace AcorexCorpus

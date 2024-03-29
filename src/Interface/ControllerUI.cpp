@@ -24,7 +24,7 @@ void AcorexInterface::ControllerUI::Reset ( )
 
 	// Variables ----------------------------------
 	{
-		hasBeenReduced = false;
+		mHasBeenReduced = false;
 		inputPath = "";
 		outputPath = "";
 	}
@@ -305,16 +305,16 @@ void AcorexInterface::ControllerUI::Analyse ( )
 		return;
 	}
 
-	std::vector<AcorexCorpus::Metadata> metaset = PackSettingsIntoSet ( );
-	PackDimensionNamesIntoSet ( metaset, false );
+	AcorexCorpus::MetaSetStruct metaset = PackSettingsFromUser ( );
 	bool success = false;
 	if ( !bInsertingIntoCorpus )
 	{
-		success = mController.CreateCorpus ( inputPath, outputPath, metaset );
+		PackDimensionNamesIntoSet ( metaset, false );
+		success = mController.CreateCorpus ( inputPath, outputPath, metaset ); // TODO - CHANGE, METASET CAN'T BE PASSED AS CONST IF FILELIST NEEDS TO BE WRITTEN TO, EITHER SEARCHDIRECTORY HERE OR PASS AS NON-CONST
 	}
 	else
 	{
-		success = mController.InsertIntoCorpus ( inputPath, outputPath, metaset );
+		success = mController.InsertIntoCorpus ( inputPath, outputPath, metaset ); // TODO - SAME AS ABOVE
 	}
 
 	if ( !success )
@@ -324,12 +324,18 @@ void AcorexInterface::ControllerUI::Analyse ( )
 		return;
 	}
 
-	mJSON.WriteMeta ( outputPath, metaset );
+	success = mJSON.WriteMeta ( outputPath, metaset );
+	if ( !success )
+	{
+		ofLogError ( "ControllerUI" ) << "Failed to write metadata";
+		return;
+	}
 
-	ShowMainPanel ( );
-	ofLogNotice ( "ControllerUI" ) << "Corpus created";
 	// TODO - ask if user wants to reduce the data or view it in the corpus viewer
 	// make a new panel for this with two choices
+	ShowMainPanel ( );
+	ofLogNotice ( "ControllerUI" ) << "Corpus created";
+	//------------------------------------------------ TEMPORARY
 }
 
 void AcorexInterface::ControllerUI::Reduce ( )
@@ -339,6 +345,14 @@ void AcorexInterface::ControllerUI::Reduce ( )
 		flashColour = 255;
 		bFlashingInvalidFileSelects = true;
 		ofLogError ( "ControllerUI" ) << "Reduction input or output file not selected";
+		return;
+	}
+
+	if ( mReducedDimensionsField >= mCurrentDimensionCount )
+	{
+		flashColour = 255;
+		bFlashingInvalidAnalysisToggles = true;
+		ofLogError ( "ControllerUI" ) << "Can't reduce to more dimensions than currently exist";
 		return;
 	}
 
@@ -400,12 +414,18 @@ void AcorexInterface::ControllerUI::SelectAnalysisOutputFile ( )
 
 	if ( bInsertingIntoCorpus )
 	{
-		std::vector<AcorexCorpus::Metadata> metaset;
-		mJSON.ReadMeta ( outputFile.getPath ( ), metaset );
-		bool success = SetSettingsFromFile ( metaset, true );
+		AcorexCorpus::MetaSetStruct metaset;
+		bool success = mJSON.ReadMeta ( outputFile.getPath ( ), metaset, false );
 		if ( !success )
 		{
 			ofLogError ( "ControllerUI" ) << "Failed to read metadata";
+			return;
+		}
+
+		success = UnpackSettingsFromFile ( metaset, true );
+		if ( !success )
+		{
+			ofLogError ( "ControllerUI" ) << "Failed to unpack metadata";
 			return;
 		}
 	}
@@ -435,15 +455,21 @@ void AcorexInterface::ControllerUI::SelectReductionInputFile ( )
 		return;
 	}
 
-	std::vector<AcorexCorpus::Metadata> metaset;
-	mJSON.ReadMeta ( inputFile.getPath ( ), metaset );
-	bool success = SetSettingsFromFile ( metaset, true );
+	AcorexCorpus::MetaSetStruct metaset;
+	bool success = mJSON.ReadMeta ( inputFile.getPath ( ), metaset, false );
+
 	if ( !success )
 	{
 		ofLogError ( "ControllerUI" ) << "Failed to read metadata";
 		return;
 	}
+	if ( metaset.currentDimensionCount <= 1 )
+	{
+		ofLogError ( "ControllerUI" ) << "Analysis already contains only one dimension";
+		return;
+	}
 
+	UnpackSettingsFromFile ( metaset, false );
 	inputPath = inputFile.getPath ( );
 	mReductionInputLabel = inputFile.getName ( );
 	bReductionInputSelected = true;
@@ -475,186 +501,114 @@ void AcorexInterface::ControllerUI::SelectReductionOutputFile ( )
 
 // Load and Save Settings -----------------------
 
-bool AcorexInterface::ControllerUI::SetSettingsFromFile ( std::vector<AcorexCorpus::Metadata>& metaset, bool cancelIfAlreadyReduced )
+bool AcorexInterface::ControllerUI::UnpackSettingsFromFile ( AcorexCorpus::MetaSetStruct& metaset, bool cancelIfAlreadyReduced )
 {
-	if ( cancelIfAlreadyReduced )
+	if ( cancelIfAlreadyReduced && metaset.hasBeenReduced )
 	{
-		for ( auto& meta : metaset )
-		{
-			if ( meta.key != AcorexCorpus::META_HAS_BEEN_REDUCED )
-			{
-				continue;
-			}
-
-			if ( meta.boolValue )
-			{
-				ofLogError ( "ControllerUI" ) << "Analysis has already been reduced";
-				return false;
-			}
-		}
-	}
-
-	if ( metaset.size ( ) < 14 )
-	{
-		ofLogError ( "ControllerUI" ) << "Too few metadata entries";
+		ofLogError ( "ControllerUI" ) << "Analysis has already been reduced";
 		return false;
 	}
 
-	bool timeDimension = false;
-	bool analysisPitch = false; bool analysisLoudness = false; bool analysisShape = false; bool analysisMFCC = false;
-	int windowSize = 1024; int hopSizeFraction = 2;
-	int nBands = 40; int nCoefs = 13;
-	int minFreq = 20; int maxFreq = 5000;
-	int reducedDimensions = 3; int maxIterations = 200;
+	mTimeDimensionToggle = metaset.timeDimension;
+	mAnalysisPitchToggle = metaset.analysisPitch;
+	mAnalysisLoudnessToggle = metaset.analysisLoudness;
+	mAnalysisShapeToggle = metaset.analysisShape;
+	mAnalysisMFCCToggle = metaset.analysisMFCC;
+	mWindowFFTField = metaset.windowFFTSize;
+	mHopFractionField = metaset.hopFraction;
+	mNBandsField = metaset.nBands;
+	mNCoefsField = metaset.nCoefs;
+	mMinFreqField = metaset.minFreq;
+	mMaxFreqField = metaset.maxFreq;
+	mCurrentDimensionCount = metaset.currentDimensionCount;
+	mReducedDimensionsField = metaset.dimensionReductionTarget;
+	mMaxIterationsField = metaset.maxIterations;
 
-	for ( auto& meta : metaset )
-	{
-		switch ( meta.key )
-		{
-			case AcorexCorpus::META_HAS_BEEN_REDUCED:
-				break;
-			case AcorexCorpus::META_TIME_DIMENSION:
-				timeDimension = meta.boolValue;
-				break;
-			case AcorexCorpus::META_ANALYSIS_PITCH:
-				analysisPitch = meta.boolValue;
-				break;
-			case AcorexCorpus::META_ANALYSIS_LOUDNESS:
-				analysisLoudness = meta.boolValue;
-				break;
-			case AcorexCorpus::META_ANALYSIS_SHAPE:
-				analysisShape = meta.boolValue;
-				break;
-			case AcorexCorpus::META_ANALYSIS_MFCC:
-				analysisMFCC = meta.boolValue;
-				break;
-			case AcorexCorpus::META_WINDOW_FFT_SIZE:
-				windowSize = meta.intValue;
-				break;
-			case AcorexCorpus::META_HOP_FRACTION:
-				hopSizeFraction = meta.intValue;
-				break;
-			case AcorexCorpus::META_N_BANDS:
-				nBands = meta.intValue;
-				break;
-			case AcorexCorpus::META_N_COEFS:
-				nCoefs = meta.intValue;
-				break;
-			case AcorexCorpus::META_MIN_FREQ:
-				minFreq = meta.intValue;
-				break;
-			case AcorexCorpus::META_MAX_FREQ:
-				maxFreq = meta.intValue;
-				break;
-			case AcorexCorpus::META_REDUCED_DIMENSIONS:
-				reducedDimensions = meta.intValue;
-				break;
-			case AcorexCorpus::META_MAX_ITERATIONS:
-				maxIterations = meta.intValue;
-				break;
-			case AcorexCorpus::META_INSERTION_REPLACES_DUPLICATES:
-				break;
-			case AcorexCorpus::META_DIMENSION_NAMES:
-				break;
-			default:
-				ofLogError ( "ControllerUI" ) << "Invalid metadata key: " << meta.key << " = " << mMetaStrings.getStringFromMeta ( meta.key );
-				return false;
-		}
-	}
-
-	mTimeDimensionToggle = timeDimension;
-	mAnalysisPitchToggle = analysisPitch;
-	mAnalysisLoudnessToggle = analysisLoudness;
-	mAnalysisShapeToggle = analysisShape;
-	mAnalysisMFCCToggle = analysisMFCC;
-	mWindowFFTField = windowSize;
-	mHopFractionField = hopSizeFraction;
-	mNBandsField = nBands;
-	mNCoefsField = nCoefs;
-	mMinFreqField = minFreq;
-	mMaxFreqField = maxFreq;
-	mReducedDimensionsField = reducedDimensions;
-	mMaxIterationsField = maxIterations;
-
-	// TODO - refresh gui?
+#ifndef META_SET_SIZE_18
+#error "incorrect number of metadata entries"
+#endif // !META_SET_SIZE_18
 
 	return true;
 }
 
-std::vector<AcorexCorpus::Metadata> AcorexInterface::ControllerUI::PackSettingsIntoSet ( )
+AcorexCorpus::MetaSetStruct AcorexInterface::ControllerUI::PackSettingsFromUser ( )
 {
-	std::vector<AcorexCorpus::Metadata> metaset;
+	AcorexCorpus::MetaSetStruct metaset;
 
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_HAS_BEEN_REDUCED, hasBeenReduced ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_TIME_DIMENSION, mTimeDimensionToggle ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_ANALYSIS_PITCH, mAnalysisPitchToggle ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_ANALYSIS_LOUDNESS, mAnalysisLoudnessToggle ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_ANALYSIS_SHAPE, mAnalysisShapeToggle ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_ANALYSIS_MFCC, mAnalysisMFCCToggle ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_WINDOW_FFT_SIZE, mWindowFFTField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_HOP_FRACTION, mHopFractionField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_N_BANDS, mNBandsField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_N_COEFS, mNCoefsField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_MIN_FREQ, mMinFreqField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_MAX_FREQ, mMaxFreqField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_REDUCED_DIMENSIONS, mReducedDimensionsField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_MAX_ITERATIONS, mMaxIterationsField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_INSERTION_REPLACES_DUPLICATES, mAnalysisInsertionToggle ) );
+	metaset.hasBeenReduced = mHasBeenReduced;
+	metaset.insertionReplacesDuplicates = mAnalysisInsertionToggle;
+	metaset.timeDimension = mTimeDimensionToggle;
+	metaset.analysisPitch = mAnalysisPitchToggle;
+	metaset.analysisLoudness = mAnalysisLoudnessToggle;
+	metaset.analysisShape = mAnalysisShapeToggle;
+	metaset.analysisMFCC = mAnalysisMFCCToggle;
+	metaset.windowFFTSize = mWindowFFTField;
+	metaset.hopFraction = mHopFractionField;
+	metaset.nBands = mNBandsField;
+	metaset.nCoefs = mNCoefsField;
+	metaset.minFreq = mMinFreqField;
+	metaset.maxFreq = mMaxFreqField;
+	metaset.dimensionReductionTarget = mReducedDimensionsField;
+	metaset.maxIterations = mMaxIterationsField;
+
+#ifndef META_SET_SIZE_18
+#error "incorrect number of metadata entries"
+#endif // !META_SET_SIZE_18
 
 	return metaset;
 }
 
-void AcorexInterface::ControllerUI::PackDimensionNamesIntoSet ( std::vector<AcorexCorpus::Metadata>& metaset, bool reducing )
+void AcorexInterface::ControllerUI::PackDimensionNamesIntoSet ( AcorexCorpus::MetaSetStruct& metaset, bool reducing )
 {
-	std::vector<std::string> dimensionNames;
+	metaset.dimensionNames.clear ( );
 
 	if ( reducing )
 	{
 		if ( mTimeDimensionToggle )
 		{
-			dimensionNames.push_back ( "Samples" );
-			dimensionNames.push_back ( "Time" );
+			metaset.dimensionNames.push_back ( "Samples" );
+			metaset.dimensionNames.push_back ( "Time" );
 		}
 
 		for ( int i = 0; i < mReducedDimensionsField; i++ )
 		{
-			dimensionNames.push_back ( "Dimension " + ofToString ( i ) );
+			metaset.dimensionNames.push_back ( "Dimension " + ofToString ( i ) );
 		}
 	}
 
 	if ( mTimeDimensionToggle )
 	{ 
-		dimensionNames.push_back ( "Samples" );
-		dimensionNames.push_back ( "Time" );
+		metaset.dimensionNames.push_back ( "Samples" );
+		metaset.dimensionNames.push_back ( "Time" );
 
 		if ( mAnalysisPitchToggle )
 		{
-			dimensionNames.push_back ( "Pitch" );
-			dimensionNames.push_back ( "Pitch Confidence" );
+			metaset.dimensionNames.push_back ( "Pitch" );
+			metaset.dimensionNames.push_back ( "Pitch Confidence" );
 		}
 
 		if ( mAnalysisLoudnessToggle )
 		{
-			dimensionNames.push_back ( "Loudness" );
-			dimensionNames.push_back ( "True Peak" );
+			metaset.dimensionNames.push_back ( "Loudness" );
+			metaset.dimensionNames.push_back ( "True Peak" );
 		}
 
 		if ( mAnalysisShapeToggle )
 		{
-			dimensionNames.push_back ( "Spectral Centroid" );
-			dimensionNames.push_back ( "Spectral Spread" );
-			dimensionNames.push_back ( "Spectral Skewness" );
-			dimensionNames.push_back ( "Spectral Kurtosis" );
-			dimensionNames.push_back ( "Spectral Rolloff" );
-			dimensionNames.push_back ( "Spectral Flatness" );
-			dimensionNames.push_back ( "Spectral Crest" );
+			metaset.dimensionNames.push_back ( "Spectral Centroid" );
+			metaset.dimensionNames.push_back ( "Spectral Spread" );
+			metaset.dimensionNames.push_back ( "Spectral Skewness" );
+			metaset.dimensionNames.push_back ( "Spectral Kurtosis" );
+			metaset.dimensionNames.push_back ( "Spectral Rolloff" );
+			metaset.dimensionNames.push_back ( "Spectral Flatness" );
+			metaset.dimensionNames.push_back ( "Spectral Crest" );
 		}
 
 		if ( mAnalysisMFCCToggle )
 		{
 			for ( int i = 0; i < mNCoefsField; i++ )
 			{
-				dimensionNames.push_back ( "MFCC " + ofToString ( i ) );
+				metaset.dimensionNames.push_back ( "MFCC " + ofToString ( i ) );
 			}
 		}
 		
@@ -663,37 +617,35 @@ void AcorexInterface::ControllerUI::PackDimensionNamesIntoSet ( std::vector<Acor
 	{
 		if ( mAnalysisPitchToggle )
 		{
-			Push7Stats ( "Pitch", dimensionNames );
-			Push7Stats ( "Pitch Confidence", dimensionNames );
+			Push7Stats ( "Pitch", metaset.dimensionNames );
+			Push7Stats ( "Pitch Confidence", metaset.dimensionNames );
 		}
 
 		if ( mAnalysisLoudnessToggle )
 		{
-			Push7Stats ( "Loudness", dimensionNames );
-			Push7Stats ( "True Peak", dimensionNames );
+			Push7Stats ( "Loudness", metaset.dimensionNames );
+			Push7Stats ( "True Peak", metaset.dimensionNames );
 		}
 
 		if ( mAnalysisShapeToggle )
 		{
-			Push7Stats ( "Spectral Centroid", dimensionNames );
-			Push7Stats ( "Spectral Spread", dimensionNames );
-			Push7Stats ( "Spectral Skewness", dimensionNames );
-			Push7Stats ( "Spectral Kurtosis", dimensionNames );
-			Push7Stats ( "Spectral Rolloff", dimensionNames );
-			Push7Stats ( "Spectral Flatness", dimensionNames );
-			Push7Stats ( "Spectral Crest", dimensionNames );
+			Push7Stats ( "Spectral Centroid", metaset.dimensionNames );
+			Push7Stats ( "Spectral Spread", metaset.dimensionNames );
+			Push7Stats ( "Spectral Skewness", metaset.dimensionNames );
+			Push7Stats ( "Spectral Kurtosis", metaset.dimensionNames );
+			Push7Stats ( "Spectral Rolloff", metaset.dimensionNames );
+			Push7Stats ( "Spectral Flatness", metaset.dimensionNames );
+			Push7Stats ( "Spectral Crest", metaset.dimensionNames );
 		}
 
 		if ( mAnalysisMFCCToggle )
 		{
 			for ( int i = 0; i < mNCoefsField; i++ )
 			{
-				Push7Stats ( "MFCC " + ofToString ( i ), dimensionNames );
+				Push7Stats ( "MFCC " + ofToString ( i ), metaset.dimensionNames );
 			}
 		}
 	}
-
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_DIMENSION_NAMES, dimensionNames ) );
 }
 
 void AcorexInterface::ControllerUI::Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames )

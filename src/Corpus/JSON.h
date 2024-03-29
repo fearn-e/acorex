@@ -15,13 +15,11 @@ public:
 
 	bool Read ( const std::string& inputFile, fluid::FluidDataSet<std::string, double, 1>& dataset );
 
-	bool WriteMeta ( const std::string& outputFile, std::vector<AcorexCorpus::Metadata>& metaset );
+	bool WriteMeta ( const std::string& outputFile, const AcorexCorpus::MetaSetStruct& metaset );
 
-	bool ReadMeta ( const std::string& inputFile, std::vector<AcorexCorpus::Metadata>& metaset );
+	bool ReadMeta ( const std::string& inputFile, AcorexCorpus::MetaSetStruct& metaset, bool test );
 
 private:
-	MetaStrings mMetaStrings;
-
 	bool ReplaceExtensionToMeta ( std::string& path );
 };
 
