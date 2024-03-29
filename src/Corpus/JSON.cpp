@@ -7,26 +7,42 @@
 
 bool AcorexCorpus::JSON::Write ( const std::string& outputFile, const AcorexCorpus::DataSet& dataset )
 {
-	std::ofstream file ( outputFile );
-	nlohmann::json j = dataset;
+	try
+	{
+		std::ofstream file ( outputFile );
+		nlohmann::json j = dataset;
 
-	file << j.dump ( 4 ) << std::endl;
-	file.close ( );
+		file << j.dump ( 4 ) << std::endl;
+		file.close ( );
+	}
+	catch ( std::exception& e )
+	{
+		ofLogError ( "JSON" ) << "failed to write output to " << outputFile << " : " << e.what ( );
+		return false;
+	}
 
 	return true;
 }
 
 bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::DataSet& dataset )
 {
-	std::ifstream file ( inputFile );
+	try
+	{
+		std::ifstream file ( inputFile );
+		nlohmann::json j;
 
-	nlohmann::json j;
+		file >> j;
+		file.close ( );
 
-	file >> j;
+		dataset = j.template get<AcorexCorpus::DataSet> ( );
+	}
+	catch ( std::exception& e )
+	{
+		ofLogError ( "JSON" ) << "failed to read input " << inputFile << " : " << e.what ( );
+		return false;
+	}
 
-	file.close ( );
-
-	dataset = j.template get<AcorexCorpus::DataSet> ( );
+	return true;
 }
 
 void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::DataSet& a )
