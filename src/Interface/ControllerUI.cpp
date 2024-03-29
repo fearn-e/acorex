@@ -509,7 +509,7 @@ bool AcorexInterface::ControllerUI::UnpackSettingsFromFile ( AcorexCorpus::MetaS
 		return false;
 	}
 
-	mTimeDimensionToggle = metaset.timeDimension;
+	mTimeDimensionToggle = metaset.isTimeAnalysis;
 	mAnalysisPitchToggle = metaset.analysisPitch;
 	mAnalysisLoudnessToggle = metaset.analysisLoudness;
 	mAnalysisShapeToggle = metaset.analysisShape;
@@ -537,7 +537,7 @@ AcorexCorpus::MetaSetStruct AcorexInterface::ControllerUI::PackSettingsFromUser 
 
 	metaset.isReduction = mHasBeenReduced;
 	metaset.insertionReplacesDuplicates = mAnalysisInsertionToggle;
-	metaset.timeDimension = mTimeDimensionToggle;
+	metaset.isTimeAnalysis = mTimeDimensionToggle;
 	metaset.analysisPitch = mAnalysisPitchToggle;
 	metaset.analysisLoudness = mAnalysisLoudnessToggle;
 	metaset.analysisShape = mAnalysisShapeToggle;

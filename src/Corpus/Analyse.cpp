@@ -7,13 +7,13 @@ int AcorexCorpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid
 {
     int filesFailed = 0;
     
-    fluid::index numTimeDimensions = metaset.timeDimension ? 2 : 0;
+    fluid::index numTimeDimensions = metaset.isTimeAnalysis ? 2 : 0;
     fluid::index numPitchDimensions = metaset.analysisPitch ? 2 : 0;
     fluid::index numLoudnessDimensions = metaset.analysisLoudness ? 2 : 0;
     fluid::index numShapeDimensions = metaset.analysisShape ? 7 : 0;
     fluid::index numMFCCDimensions = metaset.analysisMFCC ? metaset.nCoefs : 0;
 
-    if ( !metaset.timeDimension )
+    if ( !metaset.isTimeAnalysis )
     {
         numPitchDimensions *= 7;
         numLoudnessDimensions *= 7;
@@ -120,7 +120,7 @@ int AcorexCorpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid
             }
         }
 
-        if ( metaset.timeDimension )
+        if ( metaset.isTimeAnalysis )
         {
             int maxDigits = (std::to_string ( nFrames )).length ( );
             std::string curFileName = files[fileIndex];
@@ -131,7 +131,7 @@ int AcorexCorpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid
 
                 fluid::index currentDimTracker = 0;
 
-                if ( metaset.timeDimension )
+                if ( metaset.isTimeAnalysis )
                 {
                     double sampleIndex = frameIndex * hopSize;
 					allVectors ( fluid::Slice ( currentDimTracker, numTimeDimensions ) ) <<= fluid::RealVector { sampleIndex, sampleIndex / samplingRate };
