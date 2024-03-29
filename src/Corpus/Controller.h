@@ -15,16 +15,14 @@ public:
 	Controller ( ) { };
 	~Controller ( ) { };
 
-	bool CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<AcorexCorpus::Metadata>& metaset );
+	bool CreateCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::MetaSetStruct& metaset );
 
-	bool ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<AcorexCorpus::Metadata>& metaset );
+	bool ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexCorpus::MetaSetStruct& metaset );
 
-	bool InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<AcorexCorpus::Metadata>& metaset );
+	bool InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::MetaSetStruct& metaset );
 
 private:
 	bool SearchDirectory ( const std::string& directory, std::vector<std::string>& files );
-
-	bool WriteMeta ( const std::string& outputFile, std::vector<AcorexCorpus::Metadata>& metaset );
 
 	AcorexCorpus::JSON mJSON;
 	AcorexCorpus::Analyse mAnalyse;

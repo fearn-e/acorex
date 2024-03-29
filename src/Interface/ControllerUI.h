@@ -37,9 +37,9 @@ private:
 
 	// Load and Save Settings ----------------------
 
-	bool SetSettingsFromFile ( std::vector<AcorexCorpus::Metadata>& metaset, bool cancelIfAlreadyReduced );
-	std::vector<AcorexCorpus::Metadata> PackSettingsIntoSet ( );
-	void PackDimensionNamesIntoSet ( std::vector<AcorexCorpus::Metadata>& metaset, bool reducing );
+	bool UnpackSettingsFromFile ( AcorexCorpus::MetaSetStruct& metaset, bool cancelIfAlreadyReduced );
+	AcorexCorpus::MetaSetStruct PackSettingsFromUser ( );
+	void PackDimensionNamesIntoSet ( AcorexCorpus::MetaSetStruct& metaset, bool reducing );
 	void Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames );
 
 	// UI Value Management -------------------------
@@ -80,7 +80,7 @@ private:
 	//stats - mean, standard deviation, skewness, kurtosis, low percentile, middle (median default), high percentile
 	//int maxSamplingRate = 22050;
 
-	bool hasBeenReduced;
+	bool mHasBeenReduced;
 	ofxToggle mTimeDimensionToggle;
 	ofxToggle mAnalysisPitchToggle;
 	ofxToggle mAnalysisLoudnessToggle;
@@ -92,6 +92,8 @@ private:
 	ofxIntField mNCoefsField;
 	ofxIntField mMinFreqField;
 	ofxIntField mMaxFreqField;
+
+	int mCurrentDimensionCount;
 
 	ofxIntField mReducedDimensionsField;
 	ofxIntField mMaxIterationsField;
@@ -136,7 +138,6 @@ private:
 
 	AcorexCorpus::Controller mController;
 	AcorexCorpus::JSON mJSON;
-	AcorexCorpus::MetaStrings mMetaStrings;
 	AcorexInterface::Colors mColors;
 	AcorexInterface::ControllerUILayout mLayout;
 };

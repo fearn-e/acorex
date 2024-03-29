@@ -4,17 +4,16 @@
 #include <ofLog.h>
 #include <filesystem>
 
-bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<AcorexCorpus::Metadata>& metaset )
+bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::MetaSetStruct& metaset )
 {
 	bool success;
 
-	std::vector<std::string> files;
-	success = SearchDirectory ( inputPath, files );
+	success = SearchDirectory ( inputPath, metaset.fileList );
 	if ( !success ) { return false; }
 	
 	fluid::FluidDataSet<std::string, double, 1> dataset ( 1 );
-	int numFailed = mAnalyse.ProcessFiles ( files, dataset, metaset );
-	if ( numFailed < files.size() && dataset.size() != 0 ) { ofLogNotice ( "Controller" ) << "Processed " << files.size ( ) << " files into " << dataset.size ( ) << " points, with " << numFailed << " files failed."; }
+	int numFailed = mAnalyse.ProcessFiles ( dataset, metaset, metaset.fileList );
+	if ( numFailed < metaset.fileList.size() && dataset.size() != 0 ) { ofLogNotice ( "Controller" ) << "Processed " << metaset.fileList.size ( ) << " files into " << dataset.size ( ) << " points, with " << numFailed << " files failed."; }
 	else 
 	{ 
 		ofLogError ( "Controller" ) << "Failed to process any files.";
@@ -27,25 +26,20 @@ bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, cons
 	return true;
 }
 
-bool AcorexCorpus::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<AcorexCorpus::Metadata>& metaset )
+bool AcorexCorpus::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexCorpus::MetaSetStruct& metaset )
 {
 	bool success;
 
-	fluid::FluidDataSet<std::string, double, 1> dataset ( 168 );
-	fluid::FluidDataSet<std::string, double, 1> reducedDataset ( 3 );
+	int numReducedDimensions = metaset.dimensionReductionTarget + ( metaset.timeDimension ? 2 : 0 );
+
+	fluid::FluidDataSet<std::string, double, 1> dataset ( metaset.currentDimensionCount );
+	fluid::FluidDataSet<std::string, double, 1> reducedDataset ( numReducedDimensions );
 
 	success = mJSON.Read ( inputPath, dataset );
 	if ( !success ) { return false; }
 
-	if ( dataset.dims ( ) == 26 )
-	{
-		reducedDataset.resize ( 5 );
-		mUMAP.FitOverTime ( dataset, reducedDataset );
-	}
-	else
-	{
-		mUMAP.Fit ( dataset, reducedDataset );
-	}
+	if ( metaset.timeDimension ) { mUMAP.FitOverTime ( dataset, reducedDataset ); }
+	else { mUMAP.Fit ( dataset, reducedDataset ); }
 
 	success = mJSON.Write ( outputPath, reducedDataset );
 	if ( !success ) { return false; }
@@ -53,17 +47,44 @@ bool AcorexCorpus::Controller::ReduceCorpus ( const std::string& inputPath, cons
 	return true;
 }
 
-bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const std::vector<AcorexCorpus::Metadata>& metaset )
+bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::MetaSetStruct& metaset )
 {
 	bool success;
 
-	std::vector<std::string> files;
-	success = SearchDirectory ( inputPath, files );
+	std::vector<std::string> newFiles;
+	success = SearchDirectory ( inputPath, newFiles );
 	if ( !success ) { return false; }
 
+	if ( !metaset.insertionReplacesDuplicates )
+	{
+		std::vector<std::string> newFilesTreated;
+
+		for ( auto each : newFiles )
+		{
+			if ( std::find ( metaset.fileList.begin ( ), metaset.fileList.end ( ), each ) != metaset.fileList.end ( ) )
+			{
+				ofLogNotice ( "Controller" ) << "File " << each << " already exists in the corpus, removing it from analysis queue.";
+				continue;
+			}
+
+			newFilesTreated.push_back ( each );
+		}
+
+		if ( newFilesTreated.empty ( ) )
+		{
+			ofLogError ( "Controller" ) << "No new files left to process.";
+			return false;
+		}
+
+		newFiles.clear ( );
+		newFiles = newFilesTreated;
+
+		ofLogNotice ( "Controller" ) << newFiles.size ( ) << " new files left to process.";
+	}
+
 	fluid::FluidDataSet<std::string, double, 1> dataset ( 1 );
-	int numFailed = mAnalyse.ProcessFiles ( files, dataset, metaset );
-	if ( numFailed < files.size ( ) && dataset.size ( ) != 0 ) { ofLogNotice ( "Controller" ) << "Processed " << files.size ( ) << " files into " << dataset.size ( ) << " points, with " << numFailed << " files failed."; }
+	int numFailed = mAnalyse.ProcessFiles ( dataset, metaset, newFiles );
+	if ( numFailed < newFiles.size ( ) && dataset.size ( ) != 0 ) { ofLogNotice ( "Controller" ) << "Processed " << newFiles.size ( ) << " files into " << dataset.size ( ) << " points, with " << numFailed << " files failed."; }
 	else
 	{
 		ofLogError ( "Controller" ) << "Failed to process any files.";
@@ -84,7 +105,7 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 	return true;
 }
 
-bool InsertionTreatFilesList ( std::vector<std::string>& files,  )
+bool InsertionTreatFilesList ( std::vector<std::string>& files ) //add more here
 {
 
 
@@ -117,16 +138,6 @@ bool AcorexCorpus::Controller::SearchDirectory ( const std::string& directory, s
 		ofLogError ( "Controller" ) << "No audio files found in " << directory;
 		return false;
 	}
-
-	return true;
-}
-
-bool AcorexCorpus::Controller::WriteMeta ( const std::string& outputFile, std::vector<AcorexCorpus::Metadata>& metaset )
-{
-	bool success;
-
-	success = mJSON.WriteMeta ( outputFile, metaset );
-	if ( !success ) { return false; }
 
 	return true;
 }
