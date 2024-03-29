@@ -6,7 +6,7 @@
 namespace AcorexCorpus {
 
 struct TimeDataSet {
-	const bool timeDimension = true;
+	const bool isTimeAnalysis = true;
 	bool isReduction = false;
 	int currentDimensionCount = 0;
 
@@ -19,7 +19,7 @@ struct TimeDataSet {
 };
 
 struct StatsDataSet {
-	const bool timeDimension = false;
+	const bool isTimeAnalysis = false;
 	bool isReduction = false;
 	int currentDimensionCount = 0;
 

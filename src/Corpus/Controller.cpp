@@ -30,7 +30,7 @@ bool AcorexCorpus::Controller::ReduceCorpus ( const std::string& inputPath, cons
 {
 	bool success;
 
-	int numReducedDimensions = metaset.dimensionReductionTarget + ( metaset.timeDimension ? 2 : 0 );
+	int numReducedDimensions = metaset.dimensionReductionTarget + ( metaset.isTimeAnalysis ? 2 : 0 );
 
 	fluid::FluidDataSet<std::string, double, 1> dataset ( metaset.currentDimensionCount );
 	fluid::FluidDataSet<std::string, double, 1> reducedDataset ( numReducedDimensions );
@@ -38,7 +38,7 @@ bool AcorexCorpus::Controller::ReduceCorpus ( const std::string& inputPath, cons
 	success = mJSON.Read ( inputPath, dataset );
 	if ( !success ) { return false; }
 
-	if ( metaset.timeDimension ) { mUMAP.FitOverTime ( dataset, reducedDataset ); }
+	if ( metaset.isTimeAnalysis ) { mUMAP.FitOverTime ( dataset, reducedDataset ); }
 	else { mUMAP.Fit ( dataset, reducedDataset ); }
 
 	success = mJSON.Write ( outputPath, reducedDataset );
