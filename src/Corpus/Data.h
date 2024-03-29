@@ -2,13 +2,16 @@
 
 #include <string>
 #include <vector>
+#include <nlohmann/json.hpp>
+
+#define DATA_CHANGE_CHECK_2
 
 namespace AcorexCorpus {
 
-struct TimeDataSet {
-	const bool isTimeAnalysis = true;
-	bool isReduction = false;
-	int currentDimensionCount = 0;
+struct DataSet {
+	bool isTimeAnalysis;
+	bool isReduction;
+	int currentDimensionCount;
 
 	std::vector<std::string> dimensionNames; // [dimension]
 	std::vector<std::string> fileList; // [file]
@@ -16,15 +19,6 @@ struct TimeDataSet {
 	std::vector<std::vector<double>> timePointsSamples; // [file][timepoint]
 	std::vector<std::vector<double>> timePointsSeconds; // [file][timepoint]
 	std::vector<std::vector<std::vector<double>>> data; // [file][timepoint][dimension]
-};
-
-struct StatsDataSet {
-	const bool isTimeAnalysis = false;
-	bool isReduction = false;
-	int currentDimensionCount = 0;
-
-	std::vector<std::string> dimensionNames; // [dimension]
-	std::vector<std::string> fileList; // [file]
 
 	std::vector<std::vector<double>> meanData;				// [file][dimension]
 	std::vector<std::vector<double>> standardDeviationData; // [file][dimension]
@@ -33,10 +27,9 @@ struct StatsDataSet {
 	std::vector<std::vector<double>> lowerQuartileData;		// [file][dimension]
 	std::vector<std::vector<double>> medianData;			// [file][dimension]
 	std::vector<std::vector<double>> upperQuartileData;		// [file][dimension]
-};
 
-#define DATA_ANALYSIS_SETTINGS_COUNT 10
-#define DATA_REDUCTION_SETTINGS_COUNT 2
+	AnalysisSettings analysisSettings;
+};
 
 struct AnalysisSettings {
 	bool analysisToggles[4] = { false, false, false, false }; // [pitch, loudness, shape, mfcc]
