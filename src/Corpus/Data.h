@@ -7,11 +7,37 @@
 
 namespace AcorexCorpus {
 
-struct MetaSetStruct {
+struct TimeDataSet {
+	const bool timeDimension = true;
 
-#define META_SET_SIZE_18
-#define META_SET_FIELD_COUNT 18
-#define META_SET_MAX_INDEX 17
+	std::vector<std::string> dimensionNames; // [dimension]
+	std::vector<std::string> fileList; // [file]
+
+	std::vector<std::vector<double>> timePointsSamples; // [file][timepoint]
+	std::vector<std::vector<double>> timePointsSeconds; // [file][timepoint]
+	std::vector<std::vector<std::vector<double>>> data; // [file][timepoint][dimension]
+};
+
+struct StatsDataSet {
+	const bool timeDimension = false;
+
+	std::vector<std::string> dimensionNames; // [dimension]
+	std::vector<std::string> fileList; // [file]
+
+	std::vector<std::vector<double>> meanData;				// [file][dimension]
+	std::vector<std::vector<double>> standardDeviationData; // [file][dimension]
+	std::vector<std::vector<double>> skewnessData;			// [file][dimension]
+	std::vector<std::vector<double>> kurtosisData;			// [file][dimension]
+	std::vector<std::vector<double>> lowerQuartileData;		// [file][dimension]
+	std::vector<std::vector<double>> medianData;			// [file][dimension]
+	std::vector<std::vector<double>> upperQuartileData;		// [file][dimension]
+};
+
+struct MetaSet {
+
+#define META_SET_SIZE_16
+#define META_SET_FIELD_COUNT 16
+#define META_SET_MAX_INDEX 15
 
 	enum MetaIndex {
 		MINDEX_hasBeenReduced = 0,
@@ -30,14 +56,11 @@ struct MetaSetStruct {
 		MINDEX_currentDimensionCount = 13,
 		MINDEX_dimensionReductionTarget = 14,
 		MINDEX_maxIterations = 15,
-		MINDEX_dimensionNames = 16,
-		MINDEX_fileList = 17
 	};
 
 	enum MetaTypes {
 		MTYPE_BOOL = 0,
 		MTYPE_INT = 1,
-		MTYPE_STRING_LIST = 2
 	};
 
 	bool hasBeenReduced = false;
@@ -58,10 +81,6 @@ struct MetaSetStruct {
 	int dimensionReductionTarget = 3;
 	int maxIterations = 200;
 
-	std::vector<std::string> dimensionNames = { };
-	std::vector<std::string> fileList = { };
-
-
 	void SetByIndex ( int index, bool value )
 	{
 		SetAnyByIndex ( index, 0, value, 0, std::vector<std::string> ( ) );
@@ -70,11 +89,6 @@ struct MetaSetStruct {
 	void SetByIndex ( int index, int value )
 	{
 		SetAnyByIndex ( index, 1, false, value, std::vector<std::string> ( ) );
-	}
-
-	void SetByIndex ( int index, const std::vector<std::string>& value )
-	{
-		SetAnyByIndex ( index, 2, false, 0, value );
 	}
 
 private:
@@ -98,14 +112,12 @@ private:
 		case MINDEX_currentDimensionCount:			assert ( type = MTYPE_INT ); currentDimensionCount = iValue;		break;
 		case MINDEX_dimensionReductionTarget:		assert ( type = MTYPE_INT ); dimensionReductionTarget = iValue;		break;
 		case MINDEX_maxIterations:					assert ( type = MTYPE_INT ); maxIterations = iValue;				break;
-		case MINDEX_dimensionNames:					assert ( type = MTYPE_STRING_LIST ); dimensionNames = sValue;		break;
-		case MINDEX_fileList:						assert ( type = MTYPE_STRING_LIST ); fileList = sValue;				break;
 		default:									assert ( false );													break;
 		}
 	}
 
-#ifndef META_SET_SIZE_18
-#error "META_SET_SIZE_18 not defined"
+#ifndef META_SET_SIZE_16
+#error "META_SET_SIZE_16 not defined"
 #endif
 };
 
