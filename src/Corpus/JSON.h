@@ -19,9 +19,6 @@ public:
 	bool Read ( const std::string& inputFile, AcorexCorpus::DataSet& dataset );
 };
 
-#ifndef DATA_CHANGE_CHECK_2
-#error "data structure changed, please update json serialization"
-#endif
 void to_json ( nlohmann::json& j, const AcorexCorpus::DataSet& a );
 
 void from_json ( const nlohmann::json& j, AcorexCorpus::DataSet& a );

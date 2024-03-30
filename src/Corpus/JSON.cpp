@@ -45,13 +45,21 @@ bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::Data
 	return true;
 }
 
+#ifndef DATA_CHANGE_CHECK_3
+#error "data structure changed, please update json serialization"
+#endif
+
 void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::DataSet& a )
 {
 	j = nlohmann::json {	TO_J ( isTimeAnalysis ), TO_J ( isReduction ), TO_J ( currentDimensionCount ), TO_J ( dimensionNames ),
 							TO_J ( fileList ), TO_J ( timePointsSamples ), TO_J ( timePointsSeconds ), TO_J ( data ),
 							TO_J ( meanData ), TO_J ( standardDeviationData ), TO_J ( skewnessData ), TO_J ( kurtosisData ),
 							TO_J ( lowerQuartileData ), TO_J ( medianData ), TO_J ( upperQuartileData ),
-							TO_J ( analysisSettings.analysisToggles ), TO_J ( analysisSettings.analysisParams ) };
+							TO_J ( analysisSettings.bPitch ), TO_J ( analysisSettings.bLoudness ),
+							TO_J ( analysisSettings.bShape ), TO_J ( analysisSettings.bMFCC ),
+							TO_J ( analysisSettings.windowFFTSize ), TO_J ( analysisSettings.hopFraction ),
+							TO_J ( analysisSettings.nBands ), TO_J ( analysisSettings.nCoefs ),
+							TO_J ( analysisSettings.minFreq ), TO_J ( analysisSettings.maxFreq ) };
 }
 
 void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::DataSet& a )
@@ -71,6 +79,14 @@ void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::DataSet& a
 	TO_A ( lowerQuartileData );
 	TO_A ( medianData );
 	TO_A ( upperQuartileData );
-	TO_A ( analysisSettings.analysisToggles );
-	TO_A ( analysisSettings.analysisParams );
+	TO_A ( analysisSettings.bPitch );
+	TO_A ( analysisSettings.bLoudness );
+	TO_A ( analysisSettings.bShape );
+	TO_A ( analysisSettings.bMFCC );
+	TO_A ( analysisSettings.windowFFTSize );
+	TO_A ( analysisSettings.hopFraction );
+	TO_A ( analysisSettings.nBands );
+	TO_A ( analysisSettings.nCoefs );
+	TO_A ( analysisSettings.minFreq );
+	TO_A ( analysisSettings.maxFreq );
 }

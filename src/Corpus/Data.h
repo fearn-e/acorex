@@ -4,7 +4,7 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 
-#define DATA_CHANGE_CHECK_2
+#define DATA_CHANGE_CHECK_3
 
 namespace AcorexCorpus {
 
@@ -12,6 +12,7 @@ struct DataSet {
 	bool isTimeAnalysis;
 	bool isReduction;
 	int currentDimensionCount;
+	int currentPointCount;
 
 	std::vector<std::string> dimensionNames; // [dimension]
 	std::vector<std::string> fileList; // [file]
@@ -32,12 +33,21 @@ struct DataSet {
 };
 
 struct AnalysisSettings {
-	bool analysisToggles[4] = { false, false, false, false }; // [pitch, loudness, shape, mfcc]
-	int analysisParams[6] = { 1024, 2, 40, 13, 20, 5000 }; // [windowFFTSize, hopFraction, nBands, nCoefs, minFreq, maxFreq]
+	bool bPitch;
+	bool bLoudness;
+	bool bShape;
+	bool bMFCC;
+	int windowFFTSize;
+	int hopFraction;
+	int nBands;
+	int nCoefs;
+	int minFreq;
+	int maxFreq;
 };
 
 struct ReductionSettings {
-	int reductionParams[2] = { 3, 200 }; // [dimensionReductionTarget, maxIterations]
+	int dimensionReductionTarget;
+	int maxIterations;
 };
 
 } // namespace AcorexCorpus
