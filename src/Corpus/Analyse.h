@@ -30,7 +30,7 @@ public:
 private:
 	fluid::RealVector ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats );
 
-	void Push7Stats ( int index, fluid::RealVector& stats, AcorexCorpus::DataSet& dataset, int numDimensions );
+	void Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions );
 };
 
 } // namespace AcorexCorpus

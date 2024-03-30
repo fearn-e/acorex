@@ -3,7 +3,7 @@
 #include "Corpus/Analyse.h"
 #include <ofLog.h>
 
-#ifndef DATA_CHANGE_CHECK_4
+#ifndef DATA_CHANGE_CHECK_5
 #error "Check if dataset is still used correctly"
 #endif
 
@@ -45,14 +45,8 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
     }
     else
     {
-        int reserveSize = dataset.fileList.size ( ) * numDimensions;
-        dataset.sData.mean.reserve ( reserveSize );
-        dataset.sData.stdDev.reserve ( reserveSize );
-        dataset.sData.skewness.reserve ( reserveSize );
-        dataset.sData.kurtosis.reserve ( reserveSize );
-        dataset.sData.loPercent.reserve ( reserveSize );
-        dataset.sData.midPercent.reserve ( reserveSize );
-        dataset.sData.hiPercent.reserve ( reserveSize );
+        int reserveSize = dataset.fileList.size ( ) * numDimensions * DATA_NUM_STATS;
+        dataset.sData.reserve ( reserveSize );
     }
 
     for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
@@ -226,21 +220,15 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
             fluid::RealVector shapeStats = ComputeStats ( shapeMat, stats );
             fluid::RealVector mfccStats = ComputeStats ( mfccMat, stats );
 
-            dataset.sData.mean.push_back ( std::vector<double> ( ) );
-            dataset.sData.stdDev.push_back ( std::vector<double> ( ) );
-            dataset.sData.skewness.push_back ( std::vector<double> ( ) );
-            dataset.sData.kurtosis.push_back ( std::vector<double> ( ) );
-            dataset.sData.loPercent.push_back ( std::vector<double> ( ) );
-            dataset.sData.midPercent.push_back ( std::vector<double> ( ) );
-            dataset.sData.hiPercent.push_back ( std::vector<double> ( ) );
+            dataset.sData.push_back ( std::vector<std::vector<double>> ( ) );
 
-            if ( dataset.analysisSettings.bPitch ) { Push7Stats ( analysedFileIndex, pitchStats, dataset, numPitchDimensions ); }
+            if ( dataset.analysisSettings.bPitch ) { Push7Stats ( pitchStats, dataset.sData[analysedFileIndex], numPitchDimensions ); }
 
-            if ( dataset.analysisSettings.bLoudness ) { Push7Stats ( analysedFileIndex, loudnessStats, dataset, numLoudnessDimensions ); }
+            if ( dataset.analysisSettings.bLoudness ) { Push7Stats ( loudnessStats, dataset.sData[analysedFileIndex], numLoudnessDimensions ); }
 
-            if ( dataset.analysisSettings.bShape ) { Push7Stats ( analysedFileIndex, shapeStats, dataset, numShapeDimensions ); }
+            if ( dataset.analysisSettings.bShape ) { Push7Stats ( shapeStats, dataset.sData[analysedFileIndex], numShapeDimensions ); }
 
-            if ( dataset.analysisSettings.bMFCC ) { Push7Stats ( analysedFileIndex, mfccStats, dataset, numMFCCDimensions ); }
+            if ( dataset.analysisSettings.bMFCC ) { Push7Stats ( mfccStats, dataset.sData[analysedFileIndex], numMFCCDimensions ); }
 
             dataset.currentPointCount++;
         }
@@ -268,18 +256,17 @@ fluid::RealVector AcorexCorpus::Analyse::ComputeStats ( fluid::RealMatrixView ma
     return result;
 }
 
-void AcorexCorpus::Analyse::Push7Stats ( int index, fluid::RealVector& stats, AcorexCorpus::DataSet& dataset, int numDimensions )
+void AcorexCorpus::Analyse::Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions )
 {
-    numDimensions *= 7;
-
-    for ( fluid::index i = 0; i < numDimensions; i += 7 )
+    for ( fluid::index dimension = 0; dimension < numDimensions; dimension++ )
     {
-        dataset.sData.mean[index].push_back ( stats[i] );
-        dataset.sData.stdDev[index].push_back ( stats[i + 1] );
-        dataset.sData.skewness[index].push_back ( stats[i + 2] );
-        dataset.sData.kurtosis[index].push_back ( stats[i + 3] );
-        dataset.sData.loPercent[index].push_back ( stats[i + 4] );
-        dataset.sData.midPercent[index].push_back ( stats[i + 5] );
-        dataset.sData.hiPercent[index].push_back ( stats[i + 6] );
+        fileData.push_back ( std::vector<double> ( ) );
+        int index = fileData.size ( ) - 1;
+
+        for ( fluid::index statistic = 0; statistic < DATA_NUM_STATS; statistic++ )
+		{
+            int statsIndex = ( dimension * 7 ) + statistic;
+            fileData[index].push_back ( stats[statsIndex] );
+		}
     }
 }

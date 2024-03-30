@@ -4,7 +4,9 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 
-#define DATA_CHANGE_CHECK_4
+#define DATA_CHANGE_CHECK_5
+
+#define DATA_NUM_STATS 7
 
 namespace AcorexCorpus {
 
@@ -22,19 +24,9 @@ struct DataSet {
 
 	std::vector<std::vector<std::vector<double>>> tData; // [file][timepoint][dimension]
 
-	StatsData sData;
+	std::vector<std::vector<std::vector<double>>> sData; // [file][dimension][statistic] (mean, stdDev, skewness, kurtosis, loPercent, midPercent, hiPercent)
 
 	AnalysisSettings analysisSettings;
-};
-
-struct StatsData {
-	std::vector<std::vector<double>> mean;			// [file][dimension]
-	std::vector<std::vector<double>> stdDev;		// [file][dimension]
-	std::vector<std::vector<double>> skewness;		// [file][dimension]
-	std::vector<std::vector<double>> kurtosis;		// [file][dimension]
-	std::vector<std::vector<double>> loPercent;		// [file][dimension]
-	std::vector<std::vector<double>> midPercent;	// [file][dimension]
-	std::vector<std::vector<double>> hiPercent;		// [file][dimension]
 };
 
 struct AnalysisSettings {
