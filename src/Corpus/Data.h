@@ -4,7 +4,7 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 
-#define DATA_CHANGE_CHECK_3
+#define DATA_CHANGE_CHECK_4
 
 namespace AcorexCorpus {
 
@@ -19,17 +19,22 @@ struct DataSet {
 
 	std::vector<std::vector<double>> timePointsSamples; // [file][timepoint]
 	std::vector<std::vector<double>> timePointsSeconds; // [file][timepoint]
-	std::vector<std::vector<std::vector<double>>> data; // [file][timepoint][dimension]
 
-	std::vector<std::vector<double>> meanData;				// [file][dimension]
-	std::vector<std::vector<double>> standardDeviationData; // [file][dimension]
-	std::vector<std::vector<double>> skewnessData;			// [file][dimension]
-	std::vector<std::vector<double>> kurtosisData;			// [file][dimension]
-	std::vector<std::vector<double>> lowerQuartileData;		// [file][dimension]
-	std::vector<std::vector<double>> medianData;			// [file][dimension]
-	std::vector<std::vector<double>> upperQuartileData;		// [file][dimension]
+	std::vector<std::vector<std::vector<double>>> tData; // [file][timepoint][dimension]
+
+	StatsData sData;
 
 	AnalysisSettings analysisSettings;
+};
+
+struct StatsData {
+	std::vector<std::vector<double>> mean;			// [file][dimension]
+	std::vector<std::vector<double>> stdDev;		// [file][dimension]
+	std::vector<std::vector<double>> skewness;		// [file][dimension]
+	std::vector<std::vector<double>> kurtosis;		// [file][dimension]
+	std::vector<std::vector<double>> loPercent;		// [file][dimension]
+	std::vector<std::vector<double>> midPercent;	// [file][dimension]
+	std::vector<std::vector<double>> hiPercent;		// [file][dimension]
 };
 
 struct AnalysisSettings {

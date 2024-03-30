@@ -3,7 +3,7 @@
 #include "Corpus/Analyse.h"
 #include <ofLog.h>
 
-#ifndef DATA_CHANGE_CHECK_3
+#ifndef DATA_CHANGE_CHECK_4
 #error "Check if dataset is still used correctly"
 #endif
 
@@ -41,18 +41,18 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
             reserveSize += floor ( (file.frames ( ) + hopSize) / hopSize );
         }
         reserveSize *= numDimensions;
-        dataset.data.reserve ( reserveSize );
+        dataset.tData.reserve ( reserveSize );
     }
     else
     {
         int reserveSize = dataset.fileList.size ( ) * numDimensions;
-        dataset.meanData.reserve ( reserveSize );
-        dataset.standardDeviationData.reserve ( reserveSize );
-        dataset.skewnessData.reserve ( reserveSize );
-        dataset.kurtosisData.reserve ( reserveSize );
-        dataset.lowerQuartileData.reserve ( reserveSize );
-        dataset.medianData.reserve ( reserveSize );
-        dataset.upperQuartileData.reserve ( reserveSize );
+        dataset.sData.mean.reserve ( reserveSize );
+        dataset.sData.stdDev.reserve ( reserveSize );
+        dataset.sData.skewness.reserve ( reserveSize );
+        dataset.sData.kurtosis.reserve ( reserveSize );
+        dataset.sData.loPercent.reserve ( reserveSize );
+        dataset.sData.midPercent.reserve ( reserveSize );
+        dataset.sData.hiPercent.reserve ( reserveSize );
     }
 
     for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
@@ -216,7 +216,7 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
 				currentDimTracker += numMFCCDimensions;
 			}
 
-            dataset.data.push_back ( std::vector<std::vector<double>> ( allVectors.begin ( ), allVectors.end ( ) ) );
+            dataset.tData.push_back ( std::vector<std::vector<double>> ( allVectors.begin ( ), allVectors.end ( ) ) );
             dataset.currentPointCount += nFrames;
         }
         else
@@ -226,13 +226,13 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
             fluid::RealVector shapeStats = ComputeStats ( shapeMat, stats );
             fluid::RealVector mfccStats = ComputeStats ( mfccMat, stats );
 
-            dataset.meanData.push_back ( std::vector<double> ( ) );
-            dataset.standardDeviationData.push_back ( std::vector<double> ( ) );
-            dataset.skewnessData.push_back ( std::vector<double> ( ) );
-            dataset.kurtosisData.push_back ( std::vector<double> ( ) );
-            dataset.lowerQuartileData.push_back ( std::vector<double> ( ) );
-            dataset.medianData.push_back ( std::vector<double> ( ) );
-            dataset.upperQuartileData.push_back ( std::vector<double> ( ) );
+            dataset.sData.mean.push_back ( std::vector<double> ( ) );
+            dataset.sData.stdDev.push_back ( std::vector<double> ( ) );
+            dataset.sData.skewness.push_back ( std::vector<double> ( ) );
+            dataset.sData.kurtosis.push_back ( std::vector<double> ( ) );
+            dataset.sData.loPercent.push_back ( std::vector<double> ( ) );
+            dataset.sData.midPercent.push_back ( std::vector<double> ( ) );
+            dataset.sData.hiPercent.push_back ( std::vector<double> ( ) );
 
             if ( dataset.analysisSettings.bPitch ) { Push7Stats ( analysedFileIndex, pitchStats, dataset, numPitchDimensions ); }
 
@@ -274,12 +274,12 @@ void AcorexCorpus::Analyse::Push7Stats ( int index, fluid::RealVector& stats, Ac
 
     for ( fluid::index i = 0; i < numDimensions; i += 7 )
     {
-        dataset.meanData[index].push_back ( stats[i] );
-        dataset.standardDeviationData[index].push_back ( stats[i + 1] );
-        dataset.skewnessData[index].push_back ( stats[i + 2] );
-        dataset.kurtosisData[index].push_back ( stats[i + 3] );
-        dataset.lowerQuartileData[index].push_back ( stats[i + 4] );
-        dataset.medianData[index].push_back ( stats[i + 5] );
-        dataset.upperQuartileData[index].push_back ( stats[i + 6] );
+        dataset.sData.mean[index].push_back ( stats[i] );
+        dataset.sData.stdDev[index].push_back ( stats[i + 1] );
+        dataset.sData.skewness[index].push_back ( stats[i + 2] );
+        dataset.sData.kurtosis[index].push_back ( stats[i + 3] );
+        dataset.sData.loPercent[index].push_back ( stats[i + 4] );
+        dataset.sData.midPercent[index].push_back ( stats[i + 5] );
+        dataset.sData.hiPercent[index].push_back ( stats[i + 6] );
     }
 }
