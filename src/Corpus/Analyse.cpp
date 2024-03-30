@@ -217,6 +217,7 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
 			}
 
             dataset.data.push_back ( std::vector<std::vector<double>> ( allVectors.begin ( ), allVectors.end ( ) ) );
+            dataset.currentPointCount += nFrames;
         }
         else
         {
@@ -240,6 +241,8 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
             if ( dataset.analysisSettings.bShape ) { Push7Stats ( analysedFileIndex, shapeStats, dataset, numShapeDimensions ); }
 
             if ( dataset.analysisSettings.bMFCC ) { Push7Stats ( analysedFileIndex, mfccStats, dataset, numMFCCDimensions ); }
+
+            dataset.currentPointCount++;
         }
 
         analysedFileIndex++;
