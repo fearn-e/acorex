@@ -4,9 +4,13 @@
 #include <ofLog.h>
 #include <filesystem>
 
-bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::DataSet& dataset )
+bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexCorpus::AnalysisSettings& settings )
 {
 	bool success;
+
+	AcorexCorpus::DataSet dataset;
+
+	dataset.analysisSettings = settings;
 
 	success = SearchDirectory ( inputPath, dataset.fileList );
 	if ( !success ) { return false; }
@@ -20,7 +24,6 @@ bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, cons
 	}
 	else 
 	{ 
-		dataset.currentDimensionCount = 0;
 		ofLogError ( "Controller" ) << "Failed to process any files.";
 		return false;
 	}
@@ -31,42 +34,76 @@ bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, cons
 	return true;
 }
 
-bool AcorexCorpus::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::DataSet& dataset, const AcorexCorpus::ReductionSettings& settings )
+bool AcorexCorpus::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexCorpus::ReductionSettings& settings )
 {
 	bool success;
 
-	success = mJSON.Read ( inputPath, dataset );
-	if ( !success ) { return false; }
+	AcorexCorpus::DataSet dataset;
 
-	mUMAP.Fit ( dataset, settings );
+	success = mJSON.Read ( inputPath, dataset );
+	if ( !success ) 
+	{ 
+		ofLogError ( "Controller" ) << "Failed to read dataset from " << inputPath;
+		return false; 
+	}
+
+	success = mUMAP.Fit ( dataset, settings );
+	if ( !success )
+	{ 
+		ofLogError ( "Controller" ) << "Failed to reduce dataset.";
+		return false; 
+	}
 
 	success = mJSON.Write ( outputPath, dataset );
-	if ( !success ) { return false; }
+	if ( !success )
+	{ 
+		ofLogError ( "Controller" ) << "Failed to write reduced dataset to " << outputPath;
+		return false;
+	}
 
 	return true;
 }
 
-bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::DataSet& dataset )
+bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const bool newReplacesExisting )
 {
 	bool success;
 
+	AcorexCorpus::DataSet existingDataset;
+	success = mJSON.Read ( outputPath, existingDataset );
+	if ( !success )
+	{ 
+		ofLogError ( "Controller" ) << "Failed to read existing dataset from " << outputPath;
+		return false;
+	}
+
 	std::vector<std::string> newFiles;
 	success = SearchDirectory ( inputPath, newFiles );
-	if ( !success ) { return false; }
+	if ( !success )
+	{
+		ofLogError ( "Controller" ) << "Failed to find new files in " << inputPath;
+		return false;
+	}
 
-	if ( !metaset.insertionReplacesDuplicates )
+	// remove new files that already exist if duplicates are not to be analysed again
+	if ( !newReplacesExisting )
 	{
 		std::vector<std::string> newFilesTreated;
 
-		for ( auto each : newFiles )
+		for ( auto eachNew : newFiles )
 		{
-			if ( std::find ( metaset.fileList.begin ( ), metaset.fileList.end ( ), each ) != metaset.fileList.end ( ) )
+			bool exists = false;
+			for ( auto eachExisting : existingDataset.fileList )
 			{
-				ofLogNotice ( "Controller" ) << "File " << each << " already exists in the corpus, removing it from analysis queue.";
-				continue;
+				if ( eachNew == eachExisting )
+				{
+					exists = true;
+					break;
+				}
 			}
 
-			newFilesTreated.push_back ( each );
+			if ( exists ) { continue; }
+
+			newFilesTreated.push_back ( eachNew );
 		}
 
 		if ( newFilesTreated.empty ( ) )
@@ -81,12 +118,23 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 		ofLogNotice ( "Controller" ) << newFiles.size ( ) << " new files left to process.";
 	}
 
-	fluid::FluidDataSet<std::string, double, 1> dataset ( 1 );
-	int numAnalysed = mAnalyse.ProcessFiles ( dataset );
+	AcorexCorpus::DataSet newDataset;
+	newDataset.fileList = newFiles;
+	// copy settings from existing dataset
+	{
+#ifndef DATA_CHANGE_CHECK_7
+#error "check if this is still valid with dataset structure"
+#endif
+		newDataset.currentDimensionCount = existingDataset.currentDimensionCount;
+		newDataset.analysisSettings = existingDataset.analysisSettings;
+	}
+
+	int filesIn = newDataset.fileList.size ( );
+	int numAnalysed = mAnalyse.ProcessFiles ( newDataset );
 	if ( numAnalysed > 0 )
 	{
-		ofLogNotice ( "Controller" ) << "Processed " << dataset.fileList.size ( ) << " files into " << dataset.currentPointCount
-			<< " points, with " << dataset.fileList.size ( ) - numAnalysed << " files failed.";
+		ofLogNotice ( "Controller" ) << "Processed " << filesIn << " files into " << newDataset.currentPointCount
+			<< " points, with " << newDataset.fileList.size ( ) - numAnalysed << " files failed.";
 	}
 	else
 	{
@@ -94,15 +142,80 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 		return false;
 	}
 
-	fluid::FluidDataSet<std::string, double, 1> existingDataset ( 1 );
-	success = mJSON.Read ( outputPath, existingDataset );
-	if ( !success ) { return false; }
+	MergeDatasets ( existingDataset, newDataset, newReplacesExisting );
 
-	fluid::FluidTensorView existingFileNames = existingDataset.getIds ( );
-
-	for ( int i = 0; i < dataset.size ( ); i++ )
+	success = mJSON.Write ( outputPath, existingDataset );
+	if ( !success )
 	{
-		// TODO - check if the file already exists in the dataset
+		ofLogError ( "Controller" ) << "Failed to write updated dataset to " << outputPath;
+		return false;
+	}
+
+	return true;
+}
+
+bool AcorexCorpus::Controller::MergeDatasets ( AcorexCorpus::DataSet& primaryDataset, const AcorexCorpus::DataSet& additionalDataset, const bool additionalReplacesPrimary )
+{
+	for ( int i = 0; i < additionalDataset.fileList.size ( ); i++ )
+	{
+		bool exists = false;
+		int existingIndex = -1;
+		for ( int j = 0; j < primaryDataset.fileList.size ( ); j++ )
+		{
+			if ( additionalDataset.fileList[i] == primaryDataset.fileList[j] )
+			{
+				exists = true;
+				existingIndex = j;
+				break;
+			}
+		}
+		if ( exists && !additionalReplacesPrimary ) { continue; }
+
+		if ( exists && additionalReplacesPrimary )
+		{
+			int pointCountDiff = 0;
+			primaryDataset.fileList[existingIndex] = additionalDataset.fileList[i];
+
+			if ( primaryDataset.analysisSettings.bTime )
+			{ // Time
+				pointCountDiff = additionalDataset.time.raw[i].size ( ) - primaryDataset.time.raw[existingIndex].size ( ); // TODO - DOUBLE CHECK THIS
+				primaryDataset.time.samples[existingIndex] = additionalDataset.time.samples[i];
+				primaryDataset.time.seconds[existingIndex] = additionalDataset.time.seconds[i];
+				primaryDataset.time.raw[existingIndex] = additionalDataset.time.raw[i];
+			}
+			else
+			{ // Stats
+				pointCountDiff = 0;
+				primaryDataset.stats.raw[existingIndex] = additionalDataset.stats.raw[i];
+			}
+
+			primaryDataset.currentPointCount += pointCountDiff;
+
+			continue;
+		}
+
+		if ( !exists )
+		{
+			int pointCountDiff = 0;
+			primaryDataset.fileList.push_back ( additionalDataset.fileList[i] );
+
+			if ( primaryDataset.analysisSettings.bTime )
+			{ // Time
+				pointCountDiff = additionalDataset.time.raw[i].size ( ); // TODO - DOUBLE CHECK THIS
+				primaryDataset.time.samples.push_back ( additionalDataset.time.samples[i] );
+				primaryDataset.time.seconds.push_back ( additionalDataset.time.seconds[i] );
+				primaryDataset.time.raw.push_back ( additionalDataset.time.raw[i] );
+			}
+			else
+			{ // Stats
+				pointCountDiff = 1;
+				primaryDataset.stats.raw.push_back ( additionalDataset.stats.raw[i] );
+			}
+
+			primaryDataset.currentPointCount += pointCountDiff;
+
+			continue;
+		}
 	}
 
 	return true;
@@ -130,11 +243,7 @@ bool AcorexCorpus::Controller::SearchDirectory ( const std::string& directory, s
 		files.push_back ( entry.path ( ).string ( ) );
 	}
 
-	if ( files.empty ( ) )
-	{
-		ofLogError ( "Controller" ) << "No audio files found in " << directory;
-		return false;
-	}
+	if ( files.empty ( ) ) { return false; }
 
 	return true;
 }
