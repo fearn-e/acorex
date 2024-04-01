@@ -9,6 +9,12 @@
 
 int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
 {  
+    dataset.timePointsSamples.clear ( );
+    dataset.timePointsSeconds.clear ( );
+    dataset.tData.clear ( );
+    dataset.sData.clear ( );
+    dataset.sDataReduced.clear ( );
+
     int analysedFileIndex = 0;
     std::vector<std::string> analysedFiles;
 
