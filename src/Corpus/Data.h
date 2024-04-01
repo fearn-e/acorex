@@ -4,7 +4,7 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 
-#define DATA_CHANGE_CHECK_5
+#define DATA_CHANGE_CHECK_6
 
 #define DATA_NUM_STATS 7
 
@@ -25,6 +25,7 @@ struct DataSet {
 	std::vector<std::vector<std::vector<double>>> tData; // [file][timepoint][dimension]
 
 	std::vector<std::vector<std::vector<double>>> sData; // [file][dimension][statistic] (mean, stdDev, skewness, kurtosis, loPercent, midPercent, hiPercent)
+	std::vector<std::vector<double>> sDataReduced; // [file][dimension]
 
 	AnalysisSettings analysisSettings;
 };
