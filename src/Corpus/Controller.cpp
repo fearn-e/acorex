@@ -4,18 +4,23 @@
 #include <ofLog.h>
 #include <filesystem>
 
-bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::MetaSetStruct& metaset )
+bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::DataSet& dataset )
 {
 	bool success;
 
-	success = SearchDirectory ( inputPath, metaset.fileList );
+	success = SearchDirectory ( inputPath, dataset.fileList );
 	if ( !success ) { return false; }
 	
-	fluid::FluidDataSet<std::string, double, 1> dataset ( 1 );
-	int numFailed = mAnalyse.ProcessFiles ( dataset, metaset, metaset.fileList );
-	if ( numFailed < metaset.fileList.size() && dataset.size() != 0 ) { ofLogNotice ( "Controller" ) << "Processed " << metaset.fileList.size ( ) << " files into " << dataset.size ( ) << " points, with " << numFailed << " files failed."; }
+	int filesIn = dataset.fileList.size ( );
+	int numAnalysed = mAnalyse.ProcessFiles ( dataset );
+	if ( numAnalysed > 0 )
+	{
+		ofLogNotice ( "Controller" ) << "Processed " << filesIn << " files into " << dataset.currentPointCount 
+			<< " points, with " << dataset.fileList.size ( ) - numAnalysed << " files failed.";
+	}
 	else 
 	{ 
+		dataset.currentDimensionCount = 0;
 		ofLogError ( "Controller" ) << "Failed to process any files.";
 		return false;
 	}
@@ -26,28 +31,22 @@ bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, cons
 	return true;
 }
 
-bool AcorexCorpus::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexCorpus::MetaSetStruct& metaset )
+bool AcorexCorpus::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::DataSet& dataset, const AcorexCorpus::ReductionSettings& settings )
 {
 	bool success;
-
-	int numReducedDimensions = metaset.dimensionReductionTarget + ( metaset.isTimeAnalysis ? 2 : 0 );
-
-	fluid::FluidDataSet<std::string, double, 1> dataset ( metaset.currentDimensionCount );
-	fluid::FluidDataSet<std::string, double, 1> reducedDataset ( numReducedDimensions );
 
 	success = mJSON.Read ( inputPath, dataset );
 	if ( !success ) { return false; }
 
-	if ( metaset.isTimeAnalysis ) { mUMAP.FitOverTime ( dataset, reducedDataset ); }
-	else { mUMAP.Fit ( dataset, reducedDataset ); }
+	mUMAP.Fit ( dataset, settings );
 
-	success = mJSON.Write ( outputPath, reducedDataset );
+	success = mJSON.Write ( outputPath, dataset );
 	if ( !success ) { return false; }
 
 	return true;
 }
 
-bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::MetaSetStruct& metaset )
+bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::DataSet& dataset )
 {
 	bool success;
 
@@ -83,8 +82,12 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 	}
 
 	fluid::FluidDataSet<std::string, double, 1> dataset ( 1 );
-	int numFailed = mAnalyse.ProcessFiles ( dataset, metaset, newFiles );
-	if ( numFailed < newFiles.size ( ) && dataset.size ( ) != 0 ) { ofLogNotice ( "Controller" ) << "Processed " << newFiles.size ( ) << " files into " << dataset.size ( ) << " points, with " << numFailed << " files failed."; }
+	int numAnalysed = mAnalyse.ProcessFiles ( dataset );
+	if ( numAnalysed > 0 )
+	{
+		ofLogNotice ( "Controller" ) << "Processed " << dataset.fileList.size ( ) << " files into " << dataset.currentPointCount
+			<< " points, with " << dataset.fileList.size ( ) - numAnalysed << " files failed.";
+	}
 	else
 	{
 		ofLogError ( "Controller" ) << "Failed to process any files.";
@@ -105,16 +108,10 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 	return true;
 }
 
-bool InsertionTreatFilesList ( std::vector<std::string>& files ) //add more here
-{
-
-
-
-	return true;
-}
-
 bool AcorexCorpus::Controller::SearchDirectory ( const std::string& directory, std::vector<std::string>& files )
 {
+	files.clear ( );
+
 	using namespace std::filesystem;
 	for ( const auto& entry : recursive_directory_iterator ( directory ) )
 	{
