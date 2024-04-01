@@ -14,13 +14,15 @@ public:
 	Controller ( ) { };
 	~Controller ( ) { };
 
-	bool CreateCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::DataSet& dataset );
+	bool CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexCorpus::AnalysisSettings& settings );
 
-	bool ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::DataSet& dataset, const AcorexCorpus::ReductionSettings& settings );
+	bool ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexCorpus::ReductionSettings& settings );
 
-	bool InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, AcorexCorpus::DataSet& dataset );
+	bool InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const bool newReplacesExisting );
 
 private:
+	bool MergeDatasets ( AcorexCorpus::DataSet& newDataset, const AcorexCorpus::DataSet& existingDataset, const bool newReplacesExisting );
+
 	bool SearchDirectory ( const std::string& directory, std::vector<std::string>& files );
 
 	AcorexCorpus::JSON mJSON;
