@@ -17,10 +17,13 @@ public:
 	bool Write ( const std::string& outputFile, const AcorexCorpus::DataSet& dataset );
 
 	bool Read ( const std::string& inputFile, AcorexCorpus::DataSet& dataset );
+	bool Read ( const std::string& inputFile, AcorexCorpus::AnalysisSettings& settings );
 };
 
 void to_json ( nlohmann::json& j, const AcorexCorpus::DataSet& a );
-
 void from_json ( const nlohmann::json& j, AcorexCorpus::DataSet& a );
+
+void to_json ( nlohmann::json& j, const AcorexCorpus::AnalysisSettings& a );
+void from_json ( const nlohmann::json& j, AcorexCorpus::AnalysisSettings& a );
 
 } // namespace AcorexCorpus
