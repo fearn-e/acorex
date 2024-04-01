@@ -3,7 +3,7 @@
 #include "Corpus/Analyse.h"
 #include <ofLog.h>
 
-#ifndef DATA_CHANGE_CHECK_5
+#ifndef DATA_CHANGE_CHECK_6
 #error "Check if dataset is still used correctly"
 #endif
 
@@ -41,7 +41,7 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
             reserveSize += floor ( (file.frames ( ) + hopSize) / hopSize );
         }
         reserveSize *= numDimensions;
-        dataset.tData.reserve ( reserveSize );
+        dataset.tData.reserve ( reserveSize ); //TODO - double check this works as expected
     }
     else
     {
