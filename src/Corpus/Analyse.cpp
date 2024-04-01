@@ -3,17 +3,22 @@
 #include "Corpus/Analyse.h"
 #include <ofLog.h>
 
-#ifndef DATA_CHANGE_CHECK_6
+#ifndef DATA_CHANGE_CHECK_7
 #error "Check if dataset is still used correctly"
 #endif
 
 int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
 {  
-    dataset.timePointsSamples.clear ( );
-    dataset.timePointsSeconds.clear ( );
-    dataset.tData.clear ( );
-    dataset.sData.clear ( );
-    dataset.sDataReduced.clear ( );
+    if ( dataset.analysisSettings.bTime )
+    {
+        dataset.time.samples.clear ( );
+        dataset.time.seconds.clear ( );
+        dataset.time.raw.clear ( );
+    }
+	else
+	{
+		dataset.stats.raw.clear ( );
+	}
 
     int analysedFileIndex = 0;
     std::vector<std::string> analysedFiles;
@@ -38,7 +43,7 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
     fluid::index hopSize = dataset.analysisSettings.windowFFTSize / dataset.analysisSettings.hopFraction;
     fluid::index halfWindow = dataset.analysisSettings.windowFFTSize / 2;
     
-    if ( dataset.isTimeAnalysis )
+    if ( dataset.analysisSettings.bTime )
     {
         int reserveSize = 0;
         for ( auto each : dataset.fileList )
@@ -47,12 +52,12 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
             reserveSize += floor ( (file.frames ( ) + hopSize) / hopSize );
         }
         reserveSize *= numDimensions;
-        dataset.tData.reserve ( reserveSize ); //TODO - double check this works as expected
+        dataset.time.raw.reserve ( reserveSize ); //TODO - double check this works as expected
     }
     else
     {
         int reserveSize = dataset.fileList.size ( ) * numDimensions * DATA_NUM_STATS;
-        dataset.sData.reserve ( reserveSize );
+        dataset.stats.raw.reserve ( reserveSize );
     }
 
     for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
@@ -143,7 +148,7 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
             }
         }
 
-        if ( dataset.isTimeAnalysis )
+        if ( dataset.analysisSettings.bTime )
         {
             /*
             for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
@@ -182,11 +187,12 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
             }
             */
 
-            dataset.timePointsSamples.push_back ( std::vector<double> ( ) );
+            dataset.time.samples.push_back ( std::vector<double> ( ) );
+            dataset.time.seconds.push_back ( std::vector<double> ( ) );
             for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
             {
-                dataset.timePointsSamples[analysedFileIndex].push_back ( frameIndex * hopSize );
-                dataset.timePointsSeconds[analysedFileIndex].push_back ( (frameIndex * hopSize) / samplingRate );
+                dataset.time.samples[analysedFileIndex].push_back ( frameIndex * hopSize );
+                dataset.time.seconds[analysedFileIndex].push_back ( (frameIndex * hopSize) / samplingRate );
             }
 
             fluid::RealMatrix allVectors ( nFrames, numDimensions );
@@ -216,7 +222,7 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
 				currentDimTracker += numMFCCDimensions;
 			}
 
-            dataset.tData.push_back ( std::vector<std::vector<double>> ( allVectors.begin ( ), allVectors.end ( ) ) );
+            dataset.time.raw.push_back ( std::vector<std::vector<double>> ( allVectors.begin ( ), allVectors.end ( ) ) );
             dataset.currentPointCount += nFrames;
         }
         else
@@ -226,15 +232,15 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
             fluid::RealVector shapeStats = ComputeStats ( shapeMat, stats );
             fluid::RealVector mfccStats = ComputeStats ( mfccMat, stats );
 
-            dataset.sData.push_back ( std::vector<std::vector<double>> ( ) );
+            dataset.stats.raw.push_back ( std::vector<std::vector<double>> ( ) );
 
-            if ( dataset.analysisSettings.bPitch ) { Push7Stats ( pitchStats, dataset.sData[analysedFileIndex], numPitchDimensions ); }
+            if ( dataset.analysisSettings.bPitch ) { Push7Stats ( pitchStats, dataset.stats.raw[analysedFileIndex], numPitchDimensions ); }
 
-            if ( dataset.analysisSettings.bLoudness ) { Push7Stats ( loudnessStats, dataset.sData[analysedFileIndex], numLoudnessDimensions ); }
+            if ( dataset.analysisSettings.bLoudness ) { Push7Stats ( loudnessStats, dataset.stats.raw[analysedFileIndex], numLoudnessDimensions ); }
 
-            if ( dataset.analysisSettings.bShape ) { Push7Stats ( shapeStats, dataset.sData[analysedFileIndex], numShapeDimensions ); }
+            if ( dataset.analysisSettings.bShape ) { Push7Stats ( shapeStats, dataset.stats.raw[analysedFileIndex], numShapeDimensions ); }
 
-            if ( dataset.analysisSettings.bMFCC ) { Push7Stats ( mfccStats, dataset.sData[analysedFileIndex], numMFCCDimensions ); }
+            if ( dataset.analysisSettings.bMFCC ) { Push7Stats ( mfccStats, dataset.stats.raw[analysedFileIndex], numMFCCDimensions ); }
 
             dataset.currentPointCount++;
         }
