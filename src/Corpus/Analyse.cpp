@@ -43,22 +43,22 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
     fluid::index hopSize = dataset.analysisSettings.windowFFTSize / dataset.analysisSettings.hopFraction;
     fluid::index halfWindow = dataset.analysisSettings.windowFFTSize / 2;
     
-    if ( dataset.analysisSettings.bTime )
-    {
-        int reserveSize = 0;
-        for ( auto each : dataset.fileList )
-        {
-            htl::in_audio_file file ( each.c_str ( ) );
-            reserveSize += floor ( (file.frames ( ) + hopSize) / hopSize );
-        }
-        reserveSize *= numDimensions;
-        dataset.time.raw.reserve ( reserveSize ); //TODO - double check this works as expected
-    }
-    else
-    {
-        int reserveSize = dataset.fileList.size ( ) * numDimensions * DATA_NUM_STATS;
-        dataset.stats.raw.reserve ( reserveSize );
-    }
+    //if ( dataset.analysisSettings.bTime )
+    //{
+    //    int reserveSize = 0;
+    //    for ( auto each : dataset.fileList )
+    //    {
+    //        htl::in_audio_file file ( each.c_str ( ) );
+    //        reserveSize += floor ( (file.frames ( ) + hopSize) / hopSize );
+    //    }
+    //    reserveSize *= numDimensions;
+    //    dataset.time.raw.reserve ( reserveSize ); //TODO - double check this works as expected
+    //}
+    //else
+    //{
+    //    int reserveSize = dataset.fileList.size ( ) * numDimensions * DATA_NUM_STATS;
+    //    dataset.stats.raw.reserve ( reserveSize );
+    //}
 
     for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
     {
