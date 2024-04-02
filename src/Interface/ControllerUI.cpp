@@ -4,7 +4,6 @@
 
 void AcorexInterface::ControllerUI::setup ( )
 {
-	Reset ( );
 	ShowMainPanel ( );
 }
 
