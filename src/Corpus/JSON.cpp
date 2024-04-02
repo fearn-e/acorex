@@ -45,7 +45,7 @@ bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::Data
 	return true;
 }
 
-bool Read ( const std::string& inputFile, AcorexCorpus::AnalysisSettings& settings )
+bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::AnalysisSettings& settings )
 {
 	try
 	{
