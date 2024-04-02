@@ -4,6 +4,8 @@
 #include <ofLog.h>
 #include <filesystem>
 
+// Public --------------------------------------------------------------------
+
 bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexCorpus::AnalysisSettings& settings )
 {
 	bool success;
@@ -27,6 +29,8 @@ bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, cons
 		ofLogError ( "Controller" ) << "Failed to process any files.";
 		return false;
 	}
+
+	GenerateDimensionNames ( dataset.dimensionNames, settings );
 
 	success = mJSON.Write ( outputPath, dataset );
 	if ( !success ) { return false; }
@@ -53,6 +57,8 @@ bool AcorexCorpus::Controller::ReduceCorpus ( const std::string& inputPath, cons
 		ofLogError ( "Controller" ) << "Failed to reduce dataset.";
 		return false; 
 	}
+
+	GenerateDimensionNames ( dataset.dimensionNames, settings );
 
 	success = mJSON.Write ( outputPath, dataset );
 	if ( !success )
@@ -154,6 +160,8 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 	return true;
 }
 
+// Private -------------------------------------------------------------------
+
 bool AcorexCorpus::Controller::MergeDatasets ( AcorexCorpus::DataSet& primaryDataset, const AcorexCorpus::DataSet& additionalDataset, const bool additionalReplacesPrimary )
 {
 	for ( int i = 0; i < additionalDataset.fileList.size ( ); i++ )
@@ -246,4 +254,97 @@ bool AcorexCorpus::Controller::SearchDirectory ( const std::string& directory, s
 	if ( files.empty ( ) ) { return false; }
 
 	return true;
+}
+
+void AcorexCorpus::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexCorpus::AnalysisSettings& settings )
+{
+	dimensionNames.clear ( );
+
+	if ( settings.bTime )
+	{ // Time
+		if ( settings.bPitch )
+		{
+			dimensionNames.push_back ( "Pitch" );
+			dimensionNames.push_back ( "Pitch Confidence" );
+		}
+
+		if ( settings.bLoudness )
+		{
+			dimensionNames.push_back ( "Loudness" );
+			dimensionNames.push_back ( "True Peak" );
+		}
+
+		if ( settings.bShape )
+		{
+			dimensionNames.push_back ( "Spectral Centroid" );
+			dimensionNames.push_back ( "Spectral Spread" );
+			dimensionNames.push_back ( "Spectral Skewness" );
+			dimensionNames.push_back ( "Spectral Kurtosis" );
+			dimensionNames.push_back ( "Spectral Rolloff" );
+			dimensionNames.push_back ( "Spectral Flatness" );
+			dimensionNames.push_back ( "Spectral Crest" );
+		}
+
+		if ( settings.bMFCC )
+		{
+			for ( int i = 0; i < settings.nCoefs; i++ )
+			{
+				dimensionNames.push_back ( "MFCC " + std::to_string ( i + 1 ) );
+			}
+		}
+	}
+	else
+	{ // Stats
+		if ( settings.bPitch )
+		{
+			Push7Stats ( "Pitch", dimensionNames );
+			Push7Stats ( "Pitch Confidence", dimensionNames );
+		}
+
+		if ( settings.bLoudness )
+		{
+			Push7Stats ( "Loudness", dimensionNames );
+			Push7Stats ( "True Peak", dimensionNames );
+		}
+
+		if ( settings.bShape )
+		{
+			Push7Stats ( "Spectral Centroid", dimensionNames );
+			Push7Stats ( "Spectral Spread", dimensionNames );
+			Push7Stats ( "Spectral Skewness", dimensionNames );
+			Push7Stats ( "Spectral Kurtosis", dimensionNames );
+			Push7Stats ( "Spectral Rolloff", dimensionNames );
+			Push7Stats ( "Spectral Flatness", dimensionNames );
+			Push7Stats ( "Spectral Crest", dimensionNames );
+		}
+
+		if ( settings.bMFCC )
+		{
+			for ( int i = 0; i < settings.nCoefs; i++ )
+			{
+				Push7Stats ( "MFCC " + std::to_string ( i + 1 ), dimensionNames );
+			}
+		}
+	}
+}
+
+void AcorexCorpus::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexCorpus::ReductionSettings& settings )
+{
+	dimensionNames.clear ( );
+
+	for ( int i = 0; i < settings.dimensionReductionTarget; i++ )
+	{
+		dimensionNames.push_back ( "Dimension " + std::to_string ( i + 1 ) );
+	}
+}
+
+void AcorexCorpus::Controller::Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames )
+{
+	dimensionNames.push_back ( masterDimension + " (Mean)" );
+	dimensionNames.push_back ( masterDimension + " (Standard Deviation)" );
+	dimensionNames.push_back ( masterDimension + " (Skewness)" );
+	dimensionNames.push_back ( masterDimension + " (Kurtosis)" );
+	dimensionNames.push_back ( masterDimension + " (Low %)" );
+	dimensionNames.push_back ( masterDimension + " (Middle %)" );
+	dimensionNames.push_back ( masterDimension + " (High %)" );
 }
