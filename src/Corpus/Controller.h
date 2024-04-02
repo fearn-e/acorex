@@ -21,7 +21,7 @@ public:
 	bool InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const bool newReplacesExisting );
 
 private:
-	bool MergeDatasets ( AcorexCorpus::DataSet& newDataset, const AcorexCorpus::DataSet& existingDataset, const bool newReplacesExisting );
+	std::vector<int> MergeDatasets ( AcorexCorpus::DataSet& newDataset, const AcorexCorpus::DataSet& existingDataset, const bool newReplacesExisting );
 
 	bool SearchDirectory ( const std::string& directory, std::vector<std::string>& files );
 
