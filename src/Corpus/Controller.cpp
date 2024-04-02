@@ -248,7 +248,11 @@ bool AcorexCorpus::Controller::SearchDirectory ( const std::string& directory, s
 		files.push_back ( entry.path ( ).string ( ) );
 	}
 
-	if ( files.empty ( ) ) { return false; }
+	if ( files.empty ( ) )
+	{
+		ofLogError ( "Controller" ) << "No files found in " << directory;
+		return false;
+	}
 
 	return true;
 }
