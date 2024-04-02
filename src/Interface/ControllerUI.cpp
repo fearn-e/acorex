@@ -112,7 +112,7 @@ void AcorexInterface::ControllerUI::Reset ( )
 		mAnalysisInsertionPanel.setup ( "Insertion Question" );
 
 		mAnalysisInsertionPanel.add ( mAnalysisInsertionQuestionLabel.setup ( "For files already existing in the set, which version to use?", "" ) );
-		mAnalysisInsertionPanel.add ( mAnalysisInsertionToggle.setup ( "Existing", false ) );
+		mAnalysisInsertionPanel.add ( mAnalysisInsertionToggle.setup ( "Existing Files", false ) );
 
 		mAnalysisInsertionPanel.setPosition ( mLayout.hiddenPanelPosition );
 		mAnalysisInsertionPanel.setWidthElements ( mLayout.analysisPanelWidth );
@@ -600,8 +600,8 @@ void AcorexInterface::ControllerUI::QuantiseHopFraction ( int& value )
 
 void AcorexInterface::ControllerUI::AnalysisInsertionToggleChanged ( bool& value )
 {
-	if ( value ) { mAnalysisInsertionToggle.setName ( "New" ); }
-	else { mAnalysisInsertionToggle.setName ( "Existing" ); }
+	if ( value ) { mAnalysisInsertionToggle.setName ( "New Files" ); }
+	else { mAnalysisInsertionToggle.setName ( "Existing Files" ); }
 }
 
 // Panel Management ------------------------------
