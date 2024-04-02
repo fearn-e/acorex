@@ -128,7 +128,7 @@ void AcorexInterface::ControllerUI::Reset ( )
 		mReductionPanel.add ( mReductionPickOutputFileButton.setup ( "Pick Output File" ) );
 		mReductionPanel.add ( mReductionOutputLabel.setup ( " ", "?" ) );
 
-		mReductionPanel.add ( mReducedDimensionsField.setup ( "Reduced Dimensions", 3, 1, 10 ) );
+		mReductionPanel.add ( mReducedDimensionsField.setup ( "Reduced Dimensions", 3, 2, 32 ) );
 		mReductionPanel.add ( mMaxIterationsField.setup ( "Max Training Iterations", 200, 1, 1000 ) );
 
 		mReductionPanel.add ( mConfirmReductionButton.setup ( "Confirm" ) );
