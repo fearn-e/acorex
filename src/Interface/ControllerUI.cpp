@@ -307,7 +307,8 @@ void AcorexInterface::ControllerUI::Analyse ( )
 	bool success = false;
 	if ( !bInsertingIntoCorpus )
 	{
-		AcorexCorpus::AnalysisSettings settings = PackSettingsFromUser ( );
+		AcorexCorpus::AnalysisSettings settings;
+		PackSettingsFromUser ( settings );
 		success = mController.CreateCorpus ( inputPath, outputPath, settings );
 	}
 	else
@@ -405,20 +406,21 @@ void AcorexInterface::ControllerUI::SelectAnalysisOutputFile ( )
 
 	if ( bInsertingIntoCorpus )
 	{
-		AcorexCorpus::MetaSetStruct metaset;
-		bool success = mJSON.ReadMeta ( outputFile.getPath ( ), metaset, false );
+		AcorexCorpus::AnalysisSettings settings;
+		bool success = mJSON.Read ( outputFile.getPath ( ), settings );
 		if ( !success )
 		{
 			ofLogError ( "ControllerUI" ) << "Failed to read metadata";
 			return;
 		}
 
-		success = UnpackSettingsFromFile ( metaset, true );
-		if ( !success )
+		if ( settings.hasBeenReduced )
 		{
-			ofLogError ( "ControllerUI" ) << "Failed to unpack metadata";
+			ofLogError ( "ControllerUI" ) << "Can't insert into an already reduced dataset";
 			return;
 		}
+
+		UnpackSettingsFromFile ( settings );
 	}
 
 	ToggleAnalysisUILockout ( bInsertingIntoCorpus );
@@ -446,21 +448,21 @@ void AcorexInterface::ControllerUI::SelectReductionInputFile ( )
 		return;
 	}
 
-	AcorexCorpus::MetaSetStruct metaset;
-	bool success = mJSON.ReadMeta ( inputFile.getPath ( ), metaset, false );
+	AcorexCorpus::AnalysisSettings settings;
+	bool success = mJSON.Read ( inputFile.getPath ( ), settings );
 
 	if ( !success )
 	{
 		ofLogError ( "ControllerUI" ) << "Failed to read metadata";
 		return;
 	}
-	if ( metaset.currentDimensionCount <= 1 )
+	if ( settings.currentDimensionCount <= 1 )
 	{
 		ofLogError ( "ControllerUI" ) << "Analysis already contains only one dimension";
 		return;
 	}
 
-	UnpackSettingsFromFile ( metaset, false );
+	UnpackSettingsFromFile ( settings );
 	inputPath = inputFile.getPath ( );
 	mReductionInputLabel = inputFile.getName ( );
 	bReductionInputSelected = true;
@@ -492,62 +494,57 @@ void AcorexInterface::ControllerUI::SelectReductionOutputFile ( )
 
 // Load and Save Settings -----------------------
 
-bool AcorexInterface::ControllerUI::UnpackSettingsFromFile ( AcorexCorpus::MetaSetStruct& metaset, bool cancelIfAlreadyReduced )
+void AcorexInterface::ControllerUI::UnpackSettingsFromFile ( const AcorexCorpus::AnalysisSettings& settings )
 {
-	if ( cancelIfAlreadyReduced && metaset.isReduction )
-	{
-		ofLogError ( "ControllerUI" ) << "Analysis has already been reduced";
-		return false;
-	}
+	mTimeDimensionToggle = settings.bTime;
+	mAnalysisPitchToggle = settings.bPitch;
+	mAnalysisLoudnessToggle = settings.bLoudness;
+	mAnalysisShapeToggle = settings.bShape;
+	mAnalysisMFCCToggle = settings.bMFCC;
+	mWindowFFTField = settings.windowFFTSize;
+	mHopFractionField = settings.hopFraction;
+	mNBandsField = settings.nBands;
+	mNCoefsField = settings.nCoefs;
+	mMinFreqField = settings.minFreq;
+	mMaxFreqField = settings.maxFreq;
+	mCurrentDimensionCount = settings.currentDimensionCount;
 
-	mTimeDimensionToggle = metaset.isTimeAnalysis;
-	mAnalysisPitchToggle = metaset.analysisPitch;
-	mAnalysisLoudnessToggle = metaset.analysisLoudness;
-	mAnalysisShapeToggle = metaset.analysisShape;
-	mAnalysisMFCCToggle = metaset.analysisMFCC;
-	mWindowFFTField = metaset.windowFFTSize;
-	mHopFractionField = metaset.hopFraction;
-	mNBandsField = metaset.nBands;
-	mNCoefsField = metaset.nCoefs;
-	mMinFreqField = metaset.minFreq;
-	mMaxFreqField = metaset.maxFreq;
-	mCurrentDimensionCount = metaset.currentDimensionCount;
-	mReducedDimensionsField = metaset.dimensionReductionTarget;
-	mMaxIterationsField = metaset.maxIterations;
-
-#ifndef META_SET_SIZE_18
-#error "incorrect number of metadata entries"
-#endif // !META_SET_SIZE_18
-
-	return true;
+#ifndef DATA_CHANGE_CHECK_8
+#error "check if this implementation is still valid for the data struct"
+#endif // !DATA_CHANGE_CHECK_8
 }
 
-AcorexCorpus::MetaSetStruct AcorexInterface::ControllerUI::PackSettingsFromUser ( )
+void AcorexInterface::ControllerUI::PackSettingsFromUser ( AcorexCorpus::AnalysisSettings& settings )
 {
-	AcorexCorpus::MetaSetStruct metaset;
+	settings.insertionReplacesDuplicates = mAnalysisInsertionReplaceWithNewToggle;
+	settings.bTime = mTimeDimensionToggle;
+	settings.bPitch = mAnalysisPitchToggle;
+	settings.bLoudness = mAnalysisLoudnessToggle;
+	settings.bShape = mAnalysisShapeToggle;
+	settings.bMFCC = mAnalysisMFCCToggle;
+	settings.windowFFTSize = mWindowFFTField;
+	settings.hopFraction = mHopFractionField;
+	settings.nBands = mNBandsField;
+	settings.nCoefs = mNCoefsField;
+	settings.minFreq = mMinFreqField;
+	settings.maxFreq = mMaxFreqField;
 
-	metaset.isReduction = mHasBeenReduced;
-	metaset.insertionReplacesDuplicates = mAnalysisInsertionReplaceWithNewToggle;
-	metaset.isTimeAnalysis = mTimeDimensionToggle;
-	metaset.analysisPitch = mAnalysisPitchToggle;
-	metaset.analysisLoudness = mAnalysisLoudnessToggle;
-	metaset.analysisShape = mAnalysisShapeToggle;
-	metaset.analysisMFCC = mAnalysisMFCCToggle;
-	metaset.windowFFTSize = mWindowFFTField;
-	metaset.hopFraction = mHopFractionField;
-	metaset.nBands = mNBandsField;
-	metaset.nCoefs = mNCoefsField;
-	metaset.minFreq = mMinFreqField;
-	metaset.maxFreq = mMaxFreqField;
-	metaset.dimensionReductionTarget = mReducedDimensionsField;
-	metaset.maxIterations = mMaxIterationsField;
 
-#ifndef META_SET_SIZE_18
-#error "incorrect number of metadata entries"
-#endif // !META_SET_SIZE_18
-
-	return metaset;
+#ifndef DATA_CHANGE_CHECK_8
+#error "check if this implementation is still valid for the data struct"
+#endif // !DATA_CHANGE_CHECK_8
 }
+
+void AcorexInterface::ControllerUI::PackSettingsFromUser ( AcorexCorpus::ReductionSettings& settings )
+{
+	settings.dimensionReductionTarget = mReducedDimensionsField;
+	settings.maxIterations = mMaxIterationsField;
+
+#ifndef DATA_CHANGE_CHECK_8
+#error "check if this implementation is still valid for the data struct"
+#endif // !DATA_CHANGE_CHECK_8
+}
+
 
 // UI Value Management -------------------------------
 
