@@ -305,29 +305,21 @@ void AcorexInterface::ControllerUI::Analyse ( )
 		return;
 	}
 
-	AcorexCorpus::MetaSetStruct metaset = PackSettingsFromUser ( );
 	bool success = false;
 	if ( !bInsertingIntoCorpus )
 	{
-		PackDimensionNamesIntoSet ( metaset, false );
-		success = mController.CreateCorpus ( inputPath, outputPath, metaset ); // TODO - CHANGE, METASET CAN'T BE PASSED AS CONST IF FILELIST NEEDS TO BE WRITTEN TO, EITHER SEARCHDIRECTORY HERE OR PASS AS NON-CONST
+		AcorexCorpus::AnalysisSettings settings = PackSettingsFromUser ( );
+		success = mController.CreateCorpus ( inputPath, outputPath, settings );
 	}
 	else
 	{
-		success = mController.InsertIntoCorpus ( inputPath, outputPath, metaset ); // TODO - SAME AS ABOVE
+		success = mController.InsertIntoCorpus ( inputPath, outputPath, mAnalysisInsertionToggle );
 	}
 
 	if ( !success )
 	{
 		ShowMainPanel ( );
 		ofLogError ( "ControllerUI" ) << "Failed to create corpus";
-		return;
-	}
-
-	success = mJSON.WriteMeta ( outputPath, metaset );
-	if ( !success )
-	{
-		ofLogError ( "ControllerUI" ) << "Failed to write metadata";
 		return;
 	}
 
