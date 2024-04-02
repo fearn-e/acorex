@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Corpus/Controller.h"
-#include "Corpus/Metadata.h"
+#include "Corpus/Data.h"
 #include "Corpus/JSON.h"
+#include "Corpus/Controller.h"
 #include "Interface/InterfaceDefs.h"
 #include <ofxGui.h>
 #include <ofSystemUtils.h>
