@@ -195,13 +195,16 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
                 dataset.time.seconds[analysedFileIndex].push_back ( (frameIndex * hopSize) / samplingRate );
             }
 
-            std::vector<std::vector<double>> allVectors ( nFrames, std::vector<double> ( numDimensions ) );
+            std::vector<std::vector<double>> allVectors ( nFrames );
 
 			if ( dataset.analysisSettings.bPitch )
 			{
                 for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
 				{
-					allVectors[frameIndex].assign ( pitchMat.row ( frameIndex ).begin ( ), pitchMat.row ( frameIndex ).end ( ) );
+                    for ( int dimIndex = 0; dimIndex < numPitchDimensions; dimIndex++ )
+                    {
+                        allVectors[frameIndex].push_back ( pitchMat ( frameIndex, dimIndex ) );
+                    }
 				}
 			}
 
@@ -209,7 +212,10 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
 			{
                 for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
                 {
-                    allVectors[frameIndex].assign ( loudnessMat.row ( frameIndex ).begin ( ), loudnessMat.row ( frameIndex ).end ( ) );
+                    for ( int dimIndex = 0; dimIndex < numLoudnessDimensions; dimIndex++ )
+                    {
+                        allVectors[frameIndex].push_back ( loudnessMat ( frameIndex, dimIndex ) );
+                    }
                 }
 			}
 
@@ -217,7 +223,10 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
             {
                 for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
 				{
-					allVectors[frameIndex].assign ( shapeMat.row ( frameIndex ).begin ( ), shapeMat.row ( frameIndex ).end ( ) );
+					for ( int dimIndex = 0; dimIndex < numShapeDimensions; dimIndex++ )
+					{
+						allVectors[frameIndex].push_back ( shapeMat ( frameIndex, dimIndex ) );
+					}
 				}
             }
 
@@ -225,7 +234,10 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
 			{
                 for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
                 {
-                    allVectors[frameIndex].assign ( mfccMat.row ( frameIndex ).begin ( ), mfccMat.row ( frameIndex ).end ( ) );
+                    for ( int dimIndex = 0; dimIndex < numMFCCDimensions; dimIndex++ )
+					{
+						allVectors[frameIndex].push_back ( mfccMat ( frameIndex, dimIndex ) );
+					}
                 }
 			}
 
