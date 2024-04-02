@@ -25,6 +25,10 @@ private:
 
 	bool SearchDirectory ( const std::string& directory, std::vector<std::string>& files );
 
+	void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexCorpus::AnalysisSettings& settings );
+	void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexCorpus::ReductionSettings& settings );
+	void Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames );
+
 	AcorexCorpus::JSON mJSON;
 	AcorexCorpus::Analyse mAnalyse;
 	AcorexCorpus::UMAP mUMAP;
