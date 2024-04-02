@@ -4,14 +4,13 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 
-#define DATA_CHANGE_CHECK_7
+#define DATA_CHANGE_CHECK_8
 
 #define DATA_NUM_STATS 7
 
 namespace AcorexCorpus {
 
 struct DataSet {
-	int currentDimensionCount;
 	int currentPointCount;
 
 	std::vector<std::string> dimensionNames; // [dimension]
@@ -37,6 +36,7 @@ struct StatsData {
 };
 
 struct AnalysisSettings {
+	int currentDimensionCount;
 	bool hasBeenReduced;
 	bool bTime;
 	bool bPitch;

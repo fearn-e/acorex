@@ -7,7 +7,7 @@ bool AcorexCorpus::UMAP::Fit ( AcorexCorpus::DataSet& dataset, const AcorexCorpu
 {
     fluid::algorithm::UMAP algorithm;
 
-	fluid::FluidDataSet<std::string, double, 1> fluidsetIN ( dataset.currentDimensionCount );
+	fluid::FluidDataSet<std::string, double, 1> fluidsetIN ( dataset.analysisSettings.currentDimensionCount );
 	fluid::FluidDataSet<std::string, double, 1> fluidsetOUT ( settings.dimensionReductionTarget );
 
 	std::vector<int> filePointLength ( dataset.analysisSettings.bTime ? dataset.currentPointCount : 0, false );
@@ -48,7 +48,7 @@ void AcorexCorpus::UMAP::CorpusToFluid ( fluid::FluidDataSet<std::string, double
 	{
 		for ( int file = 0; file < dataset.stats.raw.size ( ); file++ )
 		{
-			fluid::RealVector point ( dataset.currentDimensionCount );
+			fluid::RealVector point ( dataset.analysisSettings.currentDimensionCount );
 			
 			for ( int dimension = 0; dimension < dataset.stats.raw[file].size ( ); dimension++ )
 			{

@@ -3,7 +3,7 @@
 #include "Corpus/Analyse.h"
 #include <ofLog.h>
 
-#ifndef DATA_CHANGE_CHECK_7
+#ifndef DATA_CHANGE_CHECK_8
 #error "Check if dataset is still used correctly"
 #endif
 
@@ -30,13 +30,13 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
 
     fluid::index numDimensions = numPitchDimensions + numLoudnessDimensions + numShapeDimensions + numMFCCDimensions;
 
-    if ( dataset.currentDimensionCount > 0 )
+    if ( dataset.analysisSettings.currentDimensionCount > 0 )
     {
-        assert ( numDimensions == dataset.currentDimensionCount );
+        assert ( numDimensions == dataset.analysisSettings.currentDimensionCount );
     }
     else
     {
-		dataset.currentDimensionCount = numDimensions;
+		dataset.analysisSettings.currentDimensionCount = numDimensions;
 	}
 
     fluid::index nBins = dataset.analysisSettings.windowFFTSize / 2 + 1;
