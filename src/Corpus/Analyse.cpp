@@ -195,34 +195,41 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
                 dataset.time.seconds[analysedFileIndex].push_back ( (frameIndex * hopSize) / samplingRate );
             }
 
-            fluid::RealMatrix allVectors ( nFrames, numDimensions );
-            int currentDimTracker = 0;
+            std::vector<std::vector<double>> allVectors ( nFrames, std::vector<double> ( numDimensions ) );
 
 			if ( dataset.analysisSettings.bPitch )
 			{
-				allVectors ( fluid::Slice ( 0, numPitchDimensions ) ) <<= pitchMat;
-				currentDimTracker += numPitchDimensions;
+                for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+				{
+					allVectors[frameIndex].assign ( pitchMat.row ( frameIndex ).begin ( ), pitchMat.row ( frameIndex ).end ( ) );
+				}
 			}
 
             if ( dataset.analysisSettings.bLoudness )
 			{
-				allVectors ( fluid::Slice ( currentDimTracker, numLoudnessDimensions ) ) <<= loudnessMat;
-				currentDimTracker += numLoudnessDimensions;
+                for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+                {
+                    allVectors[frameIndex].assign ( loudnessMat.row ( frameIndex ).begin ( ), loudnessMat.row ( frameIndex ).end ( ) );
+                }
 			}
 
             if ( dataset.analysisSettings.bShape )
             {
-                allVectors ( fluid::Slice ( currentDimTracker, numShapeDimensions ) ) <<= shapeMat;
-                currentDimTracker += numShapeDimensions;
+                for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+				{
+					allVectors[frameIndex].assign ( shapeMat.row ( frameIndex ).begin ( ), shapeMat.row ( frameIndex ).end ( ) );
+				}
             }
 
             if ( dataset.analysisSettings.bMFCC )
 			{
-				allVectors ( fluid::Slice ( currentDimTracker, numMFCCDimensions ) ) <<= mfccMat;
-				currentDimTracker += numMFCCDimensions;
+                for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+                {
+                    allVectors[frameIndex].assign ( mfccMat.row ( frameIndex ).begin ( ), mfccMat.row ( frameIndex ).end ( ) );
+                }
 			}
 
-            dataset.time.raw.push_back ( std::vector<std::vector<double>> ( allVectors.begin ( ), allVectors.end ( ) ) );
+            dataset.time.raw.push_back ( allVectors );
             dataset.currentPointCount += nFrames;
         }
         else
