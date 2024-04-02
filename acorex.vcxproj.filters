@@ -122,7 +122,7 @@
     <ClInclude Include="src\Corpus\UMAP.h">
       <Filter>src\Corpus</Filter>
     </ClInclude>
-    <ClInclude Include="src\Corpus\Metadata.h">
+    <ClInclude Include="src\Corpus\Data.h">
       <Filter>src\Corpus</Filter>
     </ClInclude>
     <ClInclude Include="src\Interface\ControllerUI.h">

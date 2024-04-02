@@ -126,7 +126,7 @@
     <ClInclude Include="src\Corpus\Analyse.h" />
     <ClInclude Include="src\Corpus\Controller.h" />
     <ClInclude Include="src\Corpus\JSON.h" />
-    <ClInclude Include="src\Corpus\Metadata.h" />
+    <ClInclude Include="src\Corpus\Data.h" />
     <ClInclude Include="src\Corpus\UMAP.h" />
     <ClInclude Include="src\Interface\ControllerUI.h" />
     <ClInclude Include="src\Interface\InterfaceDefs.h" />
