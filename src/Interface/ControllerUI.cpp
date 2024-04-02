@@ -44,6 +44,7 @@ void AcorexInterface::ControllerUI::Reset ( )
 
 		bFlashingInvalidFileSelects = false;
 		bFlashingInvalidAnalysisToggles = false;
+		bFlashingInvalidReductionDimensions = false;
 
 		flashColour = 255;
 	}
@@ -228,10 +229,7 @@ void AcorexInterface::ControllerUI::draw ( )
 			mReductionOutputLabel.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
 		}
 
-		//ofDrawBitmapString ( "Invalid field values", 40, 40 );
-
-		flashColour = flashColour - 2;
-		if ( flashColour < 0 )
+		if ( flashColour <= 0 )
 		{
 			flashColour = 255;
 			bFlashingInvalidFileSelects = false;
@@ -249,8 +247,7 @@ void AcorexInterface::ControllerUI::draw ( )
 		mAnalysisShapeToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
 		mAnalysisMFCCToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
 
-		flashColour = flashColour - 2;
-		if ( flashColour < 0 )
+		if ( flashColour <= 0 )
 		{
 			flashColour = 255;
 			bFlashingInvalidAnalysisToggles = false;
@@ -259,6 +256,25 @@ void AcorexInterface::ControllerUI::draw ( )
 			mAnalysisShapeToggle.setBackgroundColor ( ofColor ( 0 ) );
 			mAnalysisMFCCToggle.setBackgroundColor ( ofColor ( 0 ) );
 		}
+	}
+
+	if ( bFlashingInvalidReductionDimensions )
+	{
+		mReducedDimensionsField.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+
+		if ( flashColour <= 0 )
+		{
+			flashColour = 255;
+			bFlashingInvalidReductionDimensions = false;
+			mReducedDimensionsField.setBackgroundColor ( ofColor ( 0 ) );
+		}
+	
+	}
+
+	if ( bFlashingInvalidAnalysisToggles || bFlashingInvalidFileSelects || bFlashingInvalidReductionDimensions )
+	{
+		flashColour -= 2;
+		if ( flashColour < 0 ) { flashColour = 0; }
 	}
 }
 
@@ -323,7 +339,6 @@ void AcorexInterface::ControllerUI::Analyse ( )
 	}
 
 	// TODO - ask if user wants to reduce the data or view it in the corpus viewer
-	// make a new panel for this with two choices
 	ShowMainPanel ( );
 	ofLogNotice ( "ControllerUI" ) << "Corpus created";
 	//------------------------------------------------ TEMPORARY
@@ -342,7 +357,7 @@ void AcorexInterface::ControllerUI::Reduce ( )
 	if ( mReducedDimensionsField >= mCurrentDimensionCount )
 	{
 		flashColour = 255;
-		bFlashingInvalidAnalysisToggles = true;
+		bFlashingInvalidReductionDimensions = true;
 		ofLogError ( "ControllerUI" ) << "Can't reduce to more dimensions than currently exist";
 		return;
 	}
