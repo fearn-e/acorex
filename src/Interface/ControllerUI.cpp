@@ -319,7 +319,6 @@ void AcorexInterface::ControllerUI::Analyse ( )
 	if ( !success )
 	{
 		ShowMainPanel ( );
-		ofLogError ( "ControllerUI" ) << "Failed to create corpus";
 		return;
 	}
 
@@ -408,11 +407,7 @@ void AcorexInterface::ControllerUI::SelectAnalysisOutputFile ( )
 	{
 		AcorexCorpus::AnalysisSettings settings;
 		bool success = mJSON.Read ( outputFile.getPath ( ), settings );
-		if ( !success )
-		{
-			ofLogError ( "ControllerUI" ) << "Failed to read metadata";
-			return;
-		}
+		if ( !success ) { return; }
 
 		if ( settings.hasBeenReduced )
 		{
@@ -450,12 +445,7 @@ void AcorexInterface::ControllerUI::SelectReductionInputFile ( )
 
 	AcorexCorpus::AnalysisSettings settings;
 	bool success = mJSON.Read ( inputFile.getPath ( ), settings );
-
-	if ( !success )
-	{
-		ofLogError ( "ControllerUI" ) << "Failed to read metadata";
-		return;
-	}
+	if ( !success ) { return; }
 	if ( settings.currentDimensionCount <= 1 )
 	{
 		ofLogError ( "ControllerUI" ) << "Analysis already contains only one dimension";

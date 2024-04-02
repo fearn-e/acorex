@@ -45,27 +45,15 @@ bool AcorexCorpus::Controller::ReduceCorpus ( const std::string& inputPath, cons
 	AcorexCorpus::DataSet dataset;
 
 	success = mJSON.Read ( inputPath, dataset );
-	if ( !success ) 
-	{ 
-		ofLogError ( "Controller" ) << "Failed to read dataset from " << inputPath;
-		return false; 
-	}
+	if ( !success ) { return false; }
 
 	success = mUMAP.Fit ( dataset, settings );
-	if ( !success )
-	{ 
-		ofLogError ( "Controller" ) << "Failed to reduce dataset.";
-		return false; 
-	}
+	if ( !success ) { return false; }
 
 	GenerateDimensionNames ( dataset.dimensionNames, settings );
 
 	success = mJSON.Write ( outputPath, dataset );
-	if ( !success )
-	{ 
-		ofLogError ( "Controller" ) << "Failed to write reduced dataset to " << outputPath;
-		return false;
-	}
+	if ( !success ) { return false; }
 
 	return true;
 }
@@ -76,19 +64,11 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 
 	AcorexCorpus::DataSet existingDataset;
 	success = mJSON.Read ( outputPath, existingDataset );
-	if ( !success )
-	{ 
-		ofLogError ( "Controller" ) << "Failed to read existing dataset from " << outputPath;
-		return false;
-	}
+	if ( !success ) { return false; }
 
 	std::vector<std::string> newFiles;
 	success = SearchDirectory ( inputPath, newFiles );
-	if ( !success )
-	{
-		ofLogError ( "Controller" ) << "Failed to find new files in " << inputPath;
-		return false;
-	}
+	if ( !success ) { return false; }
 
 	// remove new files that already exist if duplicates are not to be analysed again
 	if ( !newReplacesExisting )
@@ -147,11 +127,7 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 	MergeDatasets ( existingDataset, newDataset, newReplacesExisting );
 
 	success = mJSON.Write ( outputPath, existingDataset );
-	if ( !success )
-	{
-		ofLogError ( "Controller" ) << "Failed to write updated dataset to " << outputPath;
-		return false;
-	}
+	if ( !success ) { return false; }
 
 	return true;
 }
