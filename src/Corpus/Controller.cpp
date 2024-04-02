@@ -73,6 +73,8 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 	// remove new files that already exist if duplicates are not to be analysed again
 	if ( !newReplacesExisting )
 	{
+		int preTreated = newFiles.size ( );
+
 		std::vector<std::string> newFilesTreated;
 
 		for ( auto eachNew : newFiles )
@@ -101,7 +103,7 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 		newFiles.clear ( );
 		newFiles = newFilesTreated;
 
-		ofLogNotice ( "Controller" ) << newFiles.size ( ) << " new files left to process.";
+		ofLogNotice ( "Controller" ) << newFiles.size ( ) << " new files left to process, with " << preTreated - newFiles.size ( ) << " duplicates removed.";
 	}
 
 	AcorexCorpus::DataSet newDataset;
@@ -124,7 +126,16 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 		return false;
 	}
 
-	MergeDatasets ( existingDataset, newDataset, newReplacesExisting );
+	std::vector<int> mergeInfo = MergeDatasets ( existingDataset, newDataset, newReplacesExisting );
+
+	if ( newReplacesExisting )
+	{
+		ofLogNotice ( "Controller" ) << "Replaced existing dataset with new files, with " << mergeInfo[1] << " not previously existing added and " << mergeInfo[2] << " overwriting existing.";
+	}
+	else
+	{
+		ofLogNotice ( "Controller" ) << "Merged new files into dataset, with " << mergeInfo[0] << " already existing skipped and " << mergeInfo[1] << " not previously existing added.";
+	}
 
 	success = mJSON.Write ( outputPath, existingDataset );
 	if ( !success ) { return false; }
@@ -134,8 +145,12 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 
 // Private -------------------------------------------------------------------
 
-bool AcorexCorpus::Controller::MergeDatasets ( AcorexCorpus::DataSet& primaryDataset, const AcorexCorpus::DataSet& additionalDataset, const bool additionalReplacesPrimary )
+std::vector<int> AcorexCorpus::Controller::MergeDatasets ( AcorexCorpus::DataSet& primaryDataset, const AcorexCorpus::DataSet& additionalDataset, const bool additionalReplacesPrimary )
 {
+	int filesSkipped = 0;
+	int filesAdded = 0;
+	int filesOverwritten = 0;
+
 	for ( int i = 0; i < additionalDataset.fileList.size ( ); i++ )
 	{
 		bool exists = false;
@@ -149,10 +164,18 @@ bool AcorexCorpus::Controller::MergeDatasets ( AcorexCorpus::DataSet& primaryDat
 				break;
 			}
 		}
-		if ( exists && !additionalReplacesPrimary ) { continue; }
+
+		if ( exists && !additionalReplacesPrimary )
+		{ 
+			// Skip
+			filesSkipped++;
+			continue;
+		}
 
 		if ( exists && additionalReplacesPrimary )
 		{
+			// Overwrite
+			filesOverwritten++;
 			int pointCountDiff = 0;
 			primaryDataset.fileList[existingIndex] = additionalDataset.fileList[i];
 
@@ -176,6 +199,8 @@ bool AcorexCorpus::Controller::MergeDatasets ( AcorexCorpus::DataSet& primaryDat
 
 		if ( !exists )
 		{
+			// Add
+			filesAdded++;
 			int pointCountDiff = 0;
 			primaryDataset.fileList.push_back ( additionalDataset.fileList[i] );
 
@@ -198,7 +223,7 @@ bool AcorexCorpus::Controller::MergeDatasets ( AcorexCorpus::DataSet& primaryDat
 		}
 	}
 
-	return true;
+	return std::vector<int> { filesSkipped, filesAdded, filesOverwritten };
 }
 
 bool AcorexCorpus::Controller::SearchDirectory ( const std::string& directory, std::vector<std::string>& files )
