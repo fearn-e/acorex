@@ -10,7 +10,7 @@ bool AcorexCorpus::UMAP::Fit ( AcorexCorpus::DataSet& dataset, const AcorexCorpu
 	fluid::FluidDataSet<std::string, double, 1> fluidsetIN ( dataset.analysisSettings.currentDimensionCount );
 	fluid::FluidDataSet<std::string, double, 1> fluidsetOUT ( settings.dimensionReductionTarget );
 
-	std::vector<int> filePointLength ( dataset.analysisSettings.bTime ? dataset.currentPointCount : 0, false );
+	std::vector<int> filePointLength ( dataset.analysisSettings.bTime ? dataset.fileList.size ( ) : 0, 0 );
 
 	CorpusToFluid ( fluidsetIN, dataset, filePointLength );
 
