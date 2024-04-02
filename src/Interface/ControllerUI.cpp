@@ -112,7 +112,7 @@ void AcorexInterface::ControllerUI::Reset ( )
 		mAnalysisInsertionPanel.setup ( "Insertion Question" );
 
 		mAnalysisInsertionPanel.add ( mAnalysisInsertionQuestionLabel.setup ( "For files already existing in the set, which version to use?", "" ) );
-		mAnalysisInsertionPanel.add ( mAnalysisInsertionToggle.setup ( "Existing Files", false ) );
+		mAnalysisInsertionPanel.add ( mAnalysisInsertionReplaceWithNewToggle.setup ( "Existing Files", false ) );
 
 		mAnalysisInsertionPanel.setPosition ( mLayout.hiddenPanelPosition );
 		mAnalysisInsertionPanel.setWidthElements ( mLayout.analysisPanelWidth );
@@ -153,7 +153,7 @@ void AcorexInterface::ControllerUI::Reset ( )
 		mHopFractionField.addListener ( this, &ControllerUI::QuantiseHopFraction );
 		mConfirmAnalysisButton.addListener ( this, &ControllerUI::Analyse );
 		mConfirmReductionButton.addListener ( this, &ControllerUI::Reduce );
-		mAnalysisInsertionToggle.addListener ( this, &ControllerUI::AnalysisInsertionToggleChanged );
+		mAnalysisInsertionReplaceWithNewToggle.addListener ( this, &ControllerUI::AnalysisInsertionToggleChanged );
 	}
 
 	ToggleAnalysisUILockout ( false );
@@ -282,7 +282,7 @@ void AcorexInterface::ControllerUI::RemoveListeners ( )
 	mHopFractionField.removeListener ( this, &ControllerUI::QuantiseHopFraction );
 	mConfirmAnalysisButton.removeListener ( this, &ControllerUI::Analyse );
 	mConfirmReductionButton.removeListener ( this, &ControllerUI::Reduce );
-	mAnalysisInsertionToggle.removeListener ( this, &ControllerUI::AnalysisInsertionToggleChanged );
+	mAnalysisInsertionReplaceWithNewToggle.removeListener ( this, &ControllerUI::AnalysisInsertionToggleChanged );
 }
 
 // Analyse and Reduce ---------------------------
@@ -313,7 +313,7 @@ void AcorexInterface::ControllerUI::Analyse ( )
 	}
 	else
 	{
-		success = mController.InsertIntoCorpus ( inputPath, outputPath, mAnalysisInsertionToggle );
+		success = mController.InsertIntoCorpus ( inputPath, outputPath, mAnalysisInsertionReplaceWithNewToggle );
 	}
 
 	if ( !success )
@@ -528,7 +528,7 @@ AcorexCorpus::MetaSetStruct AcorexInterface::ControllerUI::PackSettingsFromUser 
 	AcorexCorpus::MetaSetStruct metaset;
 
 	metaset.isReduction = mHasBeenReduced;
-	metaset.insertionReplacesDuplicates = mAnalysisInsertionToggle;
+	metaset.insertionReplacesDuplicates = mAnalysisInsertionReplaceWithNewToggle;
 	metaset.isTimeAnalysis = mTimeDimensionToggle;
 	metaset.analysisPitch = mAnalysisPitchToggle;
 	metaset.analysisLoudness = mAnalysisLoudnessToggle;
@@ -592,8 +592,8 @@ void AcorexInterface::ControllerUI::QuantiseHopFraction ( int& value )
 
 void AcorexInterface::ControllerUI::AnalysisInsertionToggleChanged ( bool& value )
 {
-	if ( value ) { mAnalysisInsertionToggle.setName ( "New Files" ); }
-	else { mAnalysisInsertionToggle.setName ( "Existing Files" ); }
+	if ( value ) { mAnalysisInsertionReplaceWithNewToggle.setName ( "New Files" ); }
+	else { mAnalysisInsertionReplaceWithNewToggle.setName ( "Existing Files" ); }
 }
 
 // Panel Management ------------------------------
