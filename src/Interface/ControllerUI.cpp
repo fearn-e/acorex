@@ -362,9 +362,21 @@ void AcorexInterface::ControllerUI::Reduce ( )
 		return;
 	}
 
-	// TODO - reduce
+	bool success = false;
+	AcorexCorpus::ReductionSettings settings;
+	PackSettingsFromUser ( settings );
+	success = mController.ReduceCorpus ( inputPath, outputPath, settings );
 
-	// TODO - open in corpus viewer
+	if ( !success )
+	{
+		ShowMainPanel ( );
+		return;
+	}
+
+	// TODO - ask if user wants to open the reduced data in the corpus viewer
+	ShowMainPanel ( );
+	ofLogNotice ( "ControllerUI" ) << "Corpus reduced";
+	//------------------------------------------------ TEMPORARY
 }
 
 // File Dialog Button Callbacks -----------------
