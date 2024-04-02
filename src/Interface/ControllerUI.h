@@ -120,7 +120,7 @@ private:
 
 	ofxPanel mAnalysisInsertionPanel;
 	ofxLabel mAnalysisInsertionQuestionLabel;
-	ofxToggle mAnalysisInsertionToggle;
+	ofxToggle mAnalysisInsertionReplaceWithNewToggle;
 
 
 	ofxPanel mReductionPanel;
