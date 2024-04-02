@@ -37,8 +37,9 @@ private:
 
 	// Load and Save Settings ----------------------
 
-	bool UnpackSettingsFromFile ( AcorexCorpus::MetaSetStruct& metaset, bool cancelIfAlreadyReduced );
-	AcorexCorpus::MetaSetStruct PackSettingsFromUser ( );
+	void UnpackSettingsFromFile ( const AcorexCorpus::AnalysisSettings& settings );
+	void PackSettingsFromUser ( AcorexCorpus::AnalysisSettings& settings);
+	void PackSettingsFromUser ( AcorexCorpus::ReductionSettings& settings );
 
 	// UI Value Management -------------------------
 
