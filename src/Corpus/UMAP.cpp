@@ -14,7 +14,14 @@ bool AcorexCorpus::UMAP::Fit ( AcorexCorpus::DataSet& dataset, const AcorexCorpu
 
 	CorpusToFluid ( fluidsetIN, dataset, filePointLength );
 
-	fluidsetOUT = algorithm.train ( fluidsetIN, 15, settings.dimensionReductionTarget, 0.1, settings.maxIterations, 0.1 );
+	fluid::index k = 15;
+
+	if ( dataset.currentPointCount < 15 ) // TODO - double check exactly how k in UMAP works
+	{
+		k = dataset.currentPointCount;
+	}
+
+	fluidsetOUT = algorithm.train ( fluidsetIN, k, settings.dimensionReductionTarget, 0.1, settings.maxIterations, 0.1 );
 
 	FluidToCorpus ( dataset, fluidsetOUT, filePointLength, settings.dimensionReductionTarget );
 
