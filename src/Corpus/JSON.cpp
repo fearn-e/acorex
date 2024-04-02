@@ -75,6 +75,7 @@ void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::DataSet& a )
 {
 	j = nlohmann::json {	TO_J ( currentPointCount), TO_J ( dimensionNames ), TO_J ( fileList ),
 							TO_J ( time.samples ), TO_J ( time.seconds ), TO_J ( time.raw ), TO_J ( stats.raw ), TO_J ( stats.reduced ),
+							TO_J ( analysisSettings.currentDimensionCount ),
 							TO_J ( analysisSettings.hasBeenReduced ), TO_J ( analysisSettings.bTime ),
 							TO_J ( analysisSettings.bPitch ), TO_J ( analysisSettings.bLoudness ),
 							TO_J ( analysisSettings.bShape ), TO_J ( analysisSettings.bMFCC ),
@@ -93,6 +94,7 @@ void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::DataSet& a
 	TO_A ( time.raw );
 	TO_A ( stats.raw );
 	TO_A ( stats.reduced );
+	TO_A ( analysisSettings.currentDimensionCount );
 	TO_A ( analysisSettings.hasBeenReduced );
 	TO_A ( analysisSettings.bTime );
 	TO_A ( analysisSettings.bPitch );
