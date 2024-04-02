@@ -2,175 +2,157 @@
 
 #include "Corpus/JSON.h"
 #include <ofLog.h>
-#include <nlohmann/json.hpp>
 #include <fstream>
 
-bool AcorexCorpus::JSON::Write ( const std::string& outputFile, fluid::FluidDataSet<std::string, double, 1>& dataset )
-{
-	auto outputJSON = fluid::JSONFile ( outputFile, "w" );
-	outputJSON.write ( dataset );
 
-	if ( !outputJSON.ok ( ) )
+bool AcorexCorpus::JSON::Write ( const std::string& outputFile, const AcorexCorpus::DataSet& dataset )
+{
+	try
 	{
-		ofLogError ( "JSON" ) << "failed to write output to " << outputFile;
+		std::ofstream file ( outputFile );
+		nlohmann::json j = dataset;
+
+		file << j.dump ( 4 ) << std::endl;
+		file.close ( );
+	}
+	catch ( std::exception& e )
+	{
+		ofLogError ( "JSON" ) << "failed to write output to " << outputFile << " : " << e.what ( );
 		return false;
 	}
 
 	return true;
 }
 
-bool AcorexCorpus::JSON::Read ( const std::string& inputFile, fluid::FluidDataSet<std::string, double, 1>& dataset )
+bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::DataSet& dataset )
 {
-	auto inputJSON = fluid::JSONFile ( inputFile, "r" );
-	nlohmann::json j = inputJSON.read ( );
-
-	if ( !inputJSON.ok ( ) )
+	try
 	{
-		ofLogError ( "JSON" ) << "failed to read input " << inputFile;
-		return false;
+		std::ifstream file ( inputFile );
+		nlohmann::json j;
+
+		file >> j;
+		file.close ( );
+
+		dataset = j.template get<AcorexCorpus::DataSet> ( );
 	}
-
-	if ( !check_json ( j, dataset ) )
+	catch ( std::exception& e )
 	{
-		ofLogError ( "JSON" ) << "Invalid JSON format";
-		return false;
-	}
-
-	dataset = j.get<fluid::FluidDataSet<std::string, double, 1>> ( );
-
-	return true;
-}
-
-bool AcorexCorpus::JSON::WriteMeta ( const std::string& outputFile, std::vector<AcorexCorpus::Metadata>& metaset )
-{
-	std::string metaPath = outputFile;
-	bool success = ReplaceExtensionToMeta ( metaPath );
-
-	if ( !success )
-	{
-		ofLogError ( "JSON" ) << "Failed to replace extension";
-		return false;
-	}
-
-	std::ofstream file ( metaPath );
-	nlohmann::json j;
-
-	j = nlohmann::json::array ( );
-
-	for ( auto each : metaset )
-	{
-		switch ( each.type )
-		{
-		case AcorexCorpus::Metadata::MetaType::BOOL:
-			j.push_back ( { each.key, mMetaStrings.getStringFromMeta(each.key), each.boolValue } );
-			break;
-		case AcorexCorpus::Metadata::MetaType::INT:
-			j.push_back ( { each.key, mMetaStrings.getStringFromMeta(each.key), each.intValue } );
-			break;
-		case AcorexCorpus::Metadata::MetaType::DOUBLE:
-			j.push_back ( { each.key, mMetaStrings.getStringFromMeta(each.key), each.doubleValue } );
-			break;
-		case AcorexCorpus::Metadata::MetaType::STRING:
-			j.push_back ( { each.key, mMetaStrings.getStringFromMeta(each.key), each.stringValue } );
-			break;
-		case AcorexCorpus::Metadata::MetaType::STR_ARRAY:
-			j.push_back ( { each.key, mMetaStrings.getStringFromMeta(each.key), each.stringArray } );
-			break;
-		}
-	}
-
-	file << j.dump ( 4 );
-	file.close ( );
-
-	std::vector<AcorexCorpus::Metadata> writeTestSet;
-	ReadMeta ( outputFile, writeTestSet );
-
-	if ( metaset.size ( ) != writeTestSet.size ( ) )
-	{
-		ofLogError ( "JSON" ) << "Corpus metadata write failed";
+		ofLogError ( "JSON" ) << "failed to read input " << inputFile << " : " << e.what ( );
 		return false;
 	}
 
 	return true;
 }
 
-bool AcorexCorpus::JSON::ReadMeta ( const std::string& inputFile, std::vector<AcorexCorpus::Metadata>& metaset )
+bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::AnalysisSettings& settings )
 {
-	std::string metaPath = inputFile;
-	bool success = ReplaceExtensionToMeta ( metaPath );
-
-	if ( !success )
+	try
 	{
-		ofLogError ( "JSON" ) << "Failed to replace extension";
-		return false;
+		std::ifstream file ( inputFile );
+		nlohmann::json j;
+
+		file >> j;
+		file.close ( );
+
+		settings = j.template get<AcorexCorpus::AnalysisSettings> ( );
 	}
-
-	auto inputJSON = fluid::JSONFile ( metaPath, "r" );
-	nlohmann::json j = inputJSON.read ( );
-
-	if ( !inputJSON.ok ( ) )
+	catch ( std::exception& e )
 	{
-		ofLogError ( "JSON" ) << "failed to read metadata from " << metaPath;
+		ofLogError ( "JSON" ) << "failed to read input " << inputFile << " : " << e.what ( );
 		return false;
-	}
-
-	if ( !j.is_array ( ) )
-	{
-		ofLogError ( "JSON" ) << "Invalid metadata format";
-		return false;
-	}
-
-	for ( auto each : j )
-	{
-		if ( each.at ( 2 ).is_boolean ( ) )
-		{
-			MetaList key = each.at ( 0 );
-			bool value = each.at ( 2 );
-			metaset.push_back ( AcorexCorpus::Metadata ( key, value ) );
-		}
-		else if ( each.at ( 2 ).is_number_integer ( ) )
-		{
-			MetaList key = each.at ( 0 );
-			int value = each.at ( 2 );
-			metaset.push_back ( AcorexCorpus::Metadata ( key, value ) );
-		}
-		else if ( each.at ( 2 ).is_number_float ( ) )
-		{
-			MetaList key = each.at ( 0 );
-			double value = each.at ( 2 );
-			metaset.push_back ( AcorexCorpus::Metadata ( key, value ) );
-		}
-		else if ( each.at ( 2 ).is_string ( ) )
-		{
-			MetaList key = each.at ( 0 );
-			std::string value = each.at ( 2 );
-			metaset.push_back ( AcorexCorpus::Metadata ( key, value ) );
-		}
-		else if ( each.at ( 2 ).is_array ( ) )
-		{
-			MetaList key = each.at ( 0 );
-			std::vector<std::string> value = each.at ( 2 );
-			metaset.push_back ( AcorexCorpus::Metadata ( key, value ) );
-		}
-		else
-		{
-			ofLogError ( "JSON" ) << "Invalid JSON format at line " << each;
-			return false;
-		}
 	}
 
 	return true;
 }
 
-bool AcorexCorpus::JSON::ReplaceExtensionToMeta ( std::string& path )
+
+#ifndef DATA_CHANGE_CHECK_8
+#error "data structure changed, please update json serialization"
+#endif
+
+void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::DataSet& a )
 {
-	if ( path.find ( ".json" ) == std::string::npos )
-	{
-		ofLogError ( "JSON" ) << "Invalid file extension";
-		return false;
-	}
+	j = nlohmann::json {	
+		TO_J ( currentPointCount),
+		TO_J ( dimensionNames ),
+		TO_J ( fileList ),
+		TO_J ( time.samples ),
+		TO_J ( time.seconds ),
+		TO_J ( time.raw ),
+		TO_J ( stats.raw ),
+		TO_J ( stats.reduced ),
+		TO_J_SETTINGS ( currentDimensionCount ),
+		TO_J_SETTINGS ( hasBeenReduced ),
+		TO_J_SETTINGS ( bTime ),
+		TO_J_SETTINGS ( bPitch ),
+		TO_J_SETTINGS ( bLoudness ),
+		TO_J_SETTINGS ( bShape ),
+		TO_J_SETTINGS ( bMFCC ),
+		TO_J_SETTINGS ( windowFFTSize ),
+		TO_J_SETTINGS ( hopFraction ),
+		TO_J_SETTINGS ( nBands ),
+		TO_J_SETTINGS ( nCoefs ),
+		TO_J_SETTINGS ( minFreq ),
+		TO_J_SETTINGS ( maxFreq ) };
+}
 
-	path.replace ( path.find_last_of ( '.' ), path.length ( ), ".meta" );
+void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::DataSet& a )
+{
+	TO_A ( currentPointCount );
+	TO_A ( dimensionNames );
+	TO_A ( fileList );
+	TO_A ( time.samples );
+	TO_A ( time.seconds );
+	TO_A ( time.raw );
+	TO_A ( stats.raw );
+	TO_A ( stats.reduced );
+	TO_A_SETTINGS ( currentDimensionCount );
+	TO_A_SETTINGS ( hasBeenReduced );
+	TO_A_SETTINGS ( bTime );
+	TO_A_SETTINGS ( bPitch );
+	TO_A_SETTINGS ( bLoudness );
+	TO_A_SETTINGS ( bShape );
+	TO_A_SETTINGS ( bMFCC );
+	TO_A_SETTINGS ( windowFFTSize );
+	TO_A_SETTINGS ( hopFraction );
+	TO_A_SETTINGS ( nBands );
+	TO_A_SETTINGS ( nCoefs );
+	TO_A_SETTINGS ( minFreq );
+	TO_A_SETTINGS ( maxFreq );
+}
 
-	return true;
+void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::AnalysisSettings& a )
+{
+	j = nlohmann::json { 
+		TO_J ( currentDimensionCount ),
+		TO_J ( hasBeenReduced ),
+		TO_J ( bTime ),
+		TO_J ( bPitch ),
+		TO_J ( bLoudness ),
+		TO_J ( bShape ),
+		TO_J ( bMFCC ),
+		TO_J ( windowFFTSize ),
+		TO_J ( hopFraction ),
+		TO_J ( nBands ),
+		TO_J ( nCoefs ),
+		TO_J ( minFreq ),
+		TO_J ( maxFreq ) };
+}
+
+void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::AnalysisSettings& a )
+{ 
+	TO_A ( currentDimensionCount );
+	TO_A ( hasBeenReduced );
+	TO_A ( bTime );
+	TO_A ( bPitch );
+	TO_A ( bLoudness );
+	TO_A ( bShape );
+	TO_A ( bMFCC );
+	TO_A ( windowFFTSize );
+	TO_A ( hopFraction );
+	TO_A ( nBands );
+	TO_A ( nCoefs );
+	TO_A ( minFreq );
+	TO_A ( maxFreq );
 }

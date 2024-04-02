@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Corpus/Metadata.h"
+#include "Corpus/Data.h"
 #include <Eigen/Core>
 #include <algorithms/public/DCT.hpp>
 #include <algorithms/public/Loudness.hpp>
@@ -25,10 +25,12 @@ public:
 	Analyse ( ) { };
 	~Analyse ( ) { };
 
-	int ProcessFiles ( std::vector<std::string>& files, fluid::FluidDataSet<std::string, double, 1>& dataset, const std::vector<AcorexCorpus::Metadata>& metaset );
+	int ProcessFiles ( AcorexCorpus::DataSet& dataset );
 
 private:
 	fluid::RealVector ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats );
+
+	void Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions );
 };
 
 } // namespace AcorexCorpus

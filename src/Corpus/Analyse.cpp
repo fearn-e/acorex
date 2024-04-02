@@ -3,120 +3,104 @@
 #include "Corpus/Analyse.h"
 #include <ofLog.h>
 
-int AcorexCorpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid::FluidDataSet<std::string, double, 1>& dataset, const std::vector<AcorexCorpus::Metadata>& metaset )
-{
-    int filesFailed = 0;
+#ifndef DATA_CHANGE_CHECK_8
+#error "Check if dataset is still used correctly"
+#endif
 
-    bool timeDimension = false;
-    bool analysisPitch = false; bool analysisLoudness = false; bool analysisShape = false; bool analysisMFCC = false;
-    fluid::index windowSize = 0; fluid::index hopFraction = 0;
-    fluid::index nBands = 0; fluid::index nCoefs = 0; fluid::index minFreq = 0; fluid::index maxFreq = 0;
-
-    for ( auto& meta : metaset )
+int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
+{  
+    if ( dataset.analysisSettings.bTime )
     {
-        switch ( meta.key )
-        {
-        case META_TIME_DIMENSION:
-            timeDimension = meta.boolValue;
-            break;
-        case META_ANALYSIS_PITCH:
-            analysisPitch = meta.boolValue;
-            break;
-        case META_ANALYSIS_LOUDNESS:
-            analysisLoudness = meta.boolValue;
-            break;
-        case META_ANALYSIS_SHAPE:
-            analysisShape = meta.boolValue;
-            break;
-        case META_ANALYSIS_MFCC:
-            analysisMFCC = meta.boolValue;
-            break;
-        case META_WINDOW_FFT_SIZE:
-            windowSize = meta.intValue;
-            break;
-        case META_HOP_FRACTION:
-            hopFraction = meta.intValue;
-            break;
-        case META_N_BANDS:
-            nBands = meta.intValue;
-            break;
-        case META_N_COEFS:
-            nCoefs = meta.intValue;
-            break;
-        case META_MIN_FREQ:
-            minFreq = meta.intValue;
-            break;
-        case META_MAX_FREQ:
-            maxFreq = meta.intValue;
-            break;
-		}
+        dataset.time.samples.clear ( );
+        dataset.time.seconds.clear ( );
+        dataset.time.raw.clear ( );
     }
+	else
+	{
+		dataset.stats.raw.clear ( );
+	}
+
+    int analysedFileIndex = 0;
+    std::vector<std::string> analysedFiles;
+
+    fluid::index numPitchDimensions = dataset.analysisSettings.bPitch       ? 2 : 0;
+    fluid::index numLoudnessDimensions = dataset.analysisSettings.bLoudness ? 2 : 0;
+    fluid::index numShapeDimensions = dataset.analysisSettings.bShape       ? 7 : 0;
+    fluid::index numMFCCDimensions = dataset.analysisSettings.bMFCC         ? dataset.analysisSettings.nCoefs : 0;
+
+    fluid::index numDimensions = numPitchDimensions + numLoudnessDimensions + numShapeDimensions + numMFCCDimensions;
+
+    if ( dataset.analysisSettings.currentDimensionCount > 0 )
+    {
+        assert ( numDimensions == dataset.analysisSettings.currentDimensionCount );
+    }
+    else
+    {
+		dataset.analysisSettings.currentDimensionCount = numDimensions;
+	}
+
+    fluid::index nBins = dataset.analysisSettings.windowFFTSize / 2 + 1;
+    fluid::index hopSize = dataset.analysisSettings.windowFFTSize / dataset.analysisSettings.hopFraction;
+    fluid::index halfWindow = dataset.analysisSettings.windowFFTSize / 2;
     
-    fluid::index numTimeDimensions = timeDimension ? 2 : 0;
-    fluid::index numPitchDimensions = analysisPitch ? 2 : 0;
-    fluid::index numLoudnessDimensions = analysisLoudness ? 2 : 0;
-    fluid::index numShapeDimensions = analysisShape ? 7 : 0;
-    fluid::index numMFCCDimensions = analysisMFCC ? nCoefs : 0;
+    //if ( dataset.analysisSettings.bTime )
+    //{
+    //    int reserveSize = 0;
+    //    for ( auto each : dataset.fileList )
+    //    {
+    //        htl::in_audio_file file ( each.c_str ( ) );
+    //        reserveSize += floor ( (file.frames ( ) + hopSize) / hopSize );
+    //    }
+    //    reserveSize *= numDimensions;
+    //    dataset.time.raw.reserve ( reserveSize ); //TODO - double check this works as expected
+    //}
+    //else
+    //{
+    //    int reserveSize = dataset.fileList.size ( ) * numDimensions * DATA_NUM_STATS;
+    //    dataset.stats.raw.reserve ( reserveSize );
+    //}
 
-    if ( !timeDimension )
+    for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
     {
-        numPitchDimensions *= 7;
-        numLoudnessDimensions *= 7;
-        numShapeDimensions *= 7;
-        numMFCCDimensions *= 7;
-    }
-
-    fluid::index numDimensions = numTimeDimensions + numPitchDimensions + numLoudnessDimensions + numShapeDimensions + numMFCCDimensions;
-
-    dataset.resize ( numDimensions );
-
-    fluid::index fftSize = windowSize;
-    fluid::index nBins = fftSize / 2 + 1;
-    fluid::index hopSize = windowSize / hopFraction;
-    fluid::index halfWindow = windowSize / 2;
-
-    for ( int fileIndex = 0; fileIndex < files.size ( ); fileIndex++ )
-    {
-        const char* inputFileName = files[fileIndex].c_str ( );
+        const char* inputFileName = dataset.fileList[fileIndex].c_str ( );
         htl::in_audio_file file ( inputFileName );
 
         if ( !file.is_open ( ) )
         {
             ofLogError ( "Analyse" ) << "input file " << inputFileName << " could not be opened";
-            filesFailed++;
             continue;
         }
 
         if ( file.is_error ( ) )
         {
             ofLogError ( "Analyse" ) << "input file " << inputFileName << " is not supported";
-            filesFailed++;
             continue;
         }
 
         fluid::index nSamples = file.frames ( );
         auto samplingRate = file.sampling_rate ( );
 
-        fluid::algorithm::STFT stft { windowSize, fftSize, hopSize };
-        fluid::algorithm::MelBands bands { nBands, fftSize };
-        fluid::algorithm::DCT dct { nBands, nCoefs };
+        fluid::algorithm::STFT stft { dataset.analysisSettings.windowFFTSize, dataset.analysisSettings.windowFFTSize, hopSize };
+        fluid::algorithm::MelBands bands { dataset.analysisSettings.nBands, dataset.analysisSettings.windowFFTSize };
+        fluid::algorithm::DCT dct { dataset.analysisSettings.nBands, dataset.analysisSettings.nCoefs };
         fluid::algorithm::YINFFT yin { nBins, fluid::FluidDefaultAllocator ( ) };
         fluid::algorithm::SpectralShape shape ( fluid::FluidDefaultAllocator ( ) );
-        fluid::algorithm::Loudness loudness { windowSize };
+        fluid::algorithm::Loudness loudness { dataset.analysisSettings.windowFFTSize };
         fluid::algorithm::MultiStats stats;
 
-        bands.init ( minFreq, maxFreq, nBands, nBins, samplingRate, windowSize );
-        dct.init ( nBands, nCoefs );
+        bands.init ( dataset.analysisSettings.minFreq, dataset.analysisSettings.maxFreq, 
+                    dataset.analysisSettings.nBands, nBins, samplingRate, dataset.analysisSettings.windowFFTSize );
+        dct.init ( dataset.analysisSettings.nBands, dataset.analysisSettings.nCoefs );
         stats.init ( 0, 0, 50, 100 );
-        loudness.init ( windowSize, samplingRate );
+        loudness.init ( dataset.analysisSettings.windowFFTSize, samplingRate );
 
         fluid::RealVector in ( nSamples );
         file.read_channel ( in.data ( ), nSamples, 0 );
-        fluid::RealVector padded ( in.size ( ) + windowSize + hopSize );
-        fluid::index      nFrames = floor ( (padded.size ( ) - windowSize) / hopSize );
+        fluid::RealVector padded ( in.size ( ) + dataset.analysisSettings.windowFFTSize + hopSize );
+        fluid::index      nFrames = floor ( (padded.size ( ) - dataset.analysisSettings.windowFFTSize) / hopSize );
         fluid::RealMatrix pitchMat ( nFrames, 2 );
         fluid::RealMatrix loudnessMat ( nFrames, 2 );
-        fluid::RealMatrix mfccMat ( nFrames, nCoefs );
+        fluid::RealMatrix mfccMat ( nFrames, dataset.analysisSettings.nCoefs );
         fluid::RealMatrix shapeMat ( nFrames, 7 );
         std::fill ( padded.begin ( ), padded.end ( ), 0 );
         padded ( fluid::Slice ( halfWindow, in.size ( ) ) ) <<= in;
@@ -124,94 +108,104 @@ int AcorexCorpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid
         for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
         {
             fluid::RealVector     magnitude ( nBins );
-            fluid::RealVectorView window = padded ( fluid::Slice ( frameIndex * hopSize, windowSize ) );
+            fluid::RealVectorView window = padded ( fluid::Slice ( frameIndex * hopSize, dataset.analysisSettings.windowFFTSize ) );
 
-            if ( analysisPitch || analysisShape || analysisMFCC )
+            if ( dataset.analysisSettings.bPitch || dataset.analysisSettings.bShape || dataset.analysisSettings.bMFCC )
             {
                 fluid::ComplexVector  frame ( nBins );
                 stft.processFrame ( window, frame );
                 stft.magnitude ( frame, magnitude );
             }
 
-            if ( analysisPitch )
+            if ( dataset.analysisSettings.bPitch )
             {
                 fluid::RealVector     pitch ( 2 );
-                yin.processFrame ( magnitude, pitch, minFreq, maxFreq, samplingRate );
+                yin.processFrame ( magnitude, pitch, dataset.analysisSettings.minFreq, dataset.analysisSettings.maxFreq, samplingRate );
                 pitchMat.row ( frameIndex ) <<= pitch;
             }
 
-            if ( analysisLoudness )
+            if ( dataset.analysisSettings.bLoudness )
             {
                 fluid::RealVector     loudnessDesc ( 2 );
                 loudness.processFrame ( window, loudnessDesc, true, true );
                 loudnessMat.row ( frameIndex ) <<= loudnessDesc;
             }
 
-            if ( analysisShape )
+            if ( dataset.analysisSettings.bShape )
             {
                 fluid::RealVector     shapeDesc ( 7 );
                 shape.processFrame ( magnitude, shapeDesc, samplingRate, 0, -1, 0.95, false, false, fluid::FluidDefaultAllocator ( ) );
                 shapeMat.row ( frameIndex ) <<= shapeDesc;
 			}
 
-            if ( analysisMFCC )
+            if ( dataset.analysisSettings.bMFCC )
             {
-                fluid::RealVector     mfccs ( nCoefs );
-                fluid::RealVector     mels ( nBands );
+                fluid::RealVector     mfccs ( dataset.analysisSettings.nCoefs );
+                fluid::RealVector     mels ( dataset.analysisSettings.nBands );
                 bands.processFrame ( magnitude, mels, false, false, true, fluid::FluidDefaultAllocator ( ) );
                 dct.processFrame ( mels, mfccs );
                 mfccMat.row ( frameIndex ) <<= mfccs;
             }
         }
 
-        if ( timeDimension )
+        if ( dataset.analysisSettings.bTime )
         {
-            int maxDigits = (std::to_string ( nFrames )).length ( );
-            std::string curFileName = files[fileIndex];
-
+            dataset.time.samples.push_back ( std::vector<double> ( ) );
+            dataset.time.seconds.push_back ( std::vector<double> ( ) );
             for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
             {
-                fluid::RealVector allVectors ( numDimensions );
-
-                fluid::index currentDimTracker = 0;
-
-                if ( timeDimension )
-                {
-                    double sampleIndex = frameIndex * hopSize;
-					allVectors ( fluid::Slice ( currentDimTracker, numTimeDimensions ) ) <<= fluid::RealVector { sampleIndex, sampleIndex / samplingRate };
-					currentDimTracker += numTimeDimensions;
-				}
-
-                if ( analysisPitch )
-                {
-                    allVectors ( fluid::Slice ( currentDimTracker, numPitchDimensions ) ) <<= pitchMat.row ( frameIndex );
-                    currentDimTracker += numPitchDimensions;
-                }
-
-                if ( analysisLoudness )
-                {
-                    allVectors ( fluid::Slice ( currentDimTracker, numLoudnessDimensions ) ) <<= loudnessMat.row ( frameIndex );
-                    currentDimTracker += numLoudnessDimensions;
-                }
-
-                if ( analysisShape )
-                {
-					allVectors ( fluid::Slice ( currentDimTracker, numShapeDimensions ) ) <<= shapeMat.row ( frameIndex );
-					currentDimTracker += numShapeDimensions;
-				}
-
-                if ( analysisMFCC )
-                {
-					allVectors ( fluid::Slice ( currentDimTracker, numMFCCDimensions ) ) <<= mfccMat.row ( frameIndex );
-					currentDimTracker += numMFCCDimensions;
-				}
-
-                std::string indexString = std::to_string ( frameIndex );
-                int curDigits = indexString.length ( );
-                std::string fullIndexString = std::string ( 1, '#' ) + std::string ( maxDigits - std::min ( maxDigits, curDigits ), '0' ) + indexString;
-
-                dataset.add ( curFileName + fullIndexString, allVectors );
+                dataset.time.samples[analysedFileIndex].push_back ( frameIndex * hopSize );
+                dataset.time.seconds[analysedFileIndex].push_back ( (frameIndex * hopSize) / samplingRate );
             }
+
+            std::vector<std::vector<double>> allVectors ( nFrames );
+
+			if ( dataset.analysisSettings.bPitch )
+			{
+                for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+				{
+                    for ( int dimIndex = 0; dimIndex < numPitchDimensions; dimIndex++ )
+                    {
+                        allVectors[frameIndex].push_back ( pitchMat ( frameIndex, dimIndex ) );
+                    }
+				}
+			}
+
+            if ( dataset.analysisSettings.bLoudness )
+			{
+                for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+                {
+                    for ( int dimIndex = 0; dimIndex < numLoudnessDimensions; dimIndex++ )
+                    {
+                        allVectors[frameIndex].push_back ( loudnessMat ( frameIndex, dimIndex ) );
+                    }
+                }
+			}
+
+            if ( dataset.analysisSettings.bShape )
+            {
+                for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+				{
+					for ( int dimIndex = 0; dimIndex < numShapeDimensions; dimIndex++ )
+					{
+						allVectors[frameIndex].push_back ( shapeMat ( frameIndex, dimIndex ) );
+					}
+				}
+            }
+
+            if ( dataset.analysisSettings.bMFCC )
+			{
+                for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+                {
+                    for ( int dimIndex = 0; dimIndex < numMFCCDimensions; dimIndex++ )
+					{
+						allVectors[frameIndex].push_back ( mfccMat ( frameIndex, dimIndex ) );
+					}
+                }
+			}
+
+            dataset.time.raw.push_back ( allVectors );
+            dataset.currentPointCount += nFrames;
         }
         else
         {
@@ -220,39 +214,27 @@ int AcorexCorpus::Analyse::ProcessFiles ( std::vector<std::string>& files, fluid
             fluid::RealVector shapeStats = ComputeStats ( shapeMat, stats );
             fluid::RealVector mfccStats = ComputeStats ( mfccMat, stats );
 
-            fluid::RealVector allStats ( numDimensions );
+            dataset.stats.raw.push_back ( std::vector<std::vector<double>> ( ) );
 
-            fluid::index currentDimTracker = 0;
+            if ( dataset.analysisSettings.bPitch ) { Push7Stats ( pitchStats, dataset.stats.raw[analysedFileIndex], numPitchDimensions ); }
 
-            if ( analysisPitch )
-            {
-				allStats ( fluid::Slice ( currentDimTracker, numPitchDimensions ) ) <<= pitchStats;
-                currentDimTracker += numPitchDimensions;
-			}
+            if ( dataset.analysisSettings.bLoudness ) { Push7Stats ( loudnessStats, dataset.stats.raw[analysedFileIndex], numLoudnessDimensions ); }
 
-            if ( analysisLoudness )
-            {
-                allStats ( fluid::Slice ( currentDimTracker, numLoudnessDimensions ) ) <<= loudnessStats;
-                currentDimTracker += numLoudnessDimensions;
-            }
+            if ( dataset.analysisSettings.bShape ) { Push7Stats ( shapeStats, dataset.stats.raw[analysedFileIndex], numShapeDimensions ); }
 
-            if ( analysisShape )
-            {
-				allStats ( fluid::Slice ( currentDimTracker, numShapeDimensions ) ) <<= shapeStats;
-                currentDimTracker += numShapeDimensions;
-			}
+            if ( dataset.analysisSettings.bMFCC ) { Push7Stats ( mfccStats, dataset.stats.raw[analysedFileIndex], numMFCCDimensions ); }
 
-            if ( analysisMFCC )
-            {
-                allStats ( fluid::Slice ( currentDimTracker, numMFCCDimensions ) ) <<= mfccStats;
-                currentDimTracker += numMFCCDimensions;
-            }
-
-            dataset.add ( inputFileName, allStats );
+            dataset.currentPointCount++;
         }
+
+        analysedFileIndex++;
+        analysedFiles.push_back ( inputFileName );
     }
 
-    return filesFailed;
+    dataset.fileList.clear ( );
+    dataset.fileList = analysedFiles;
+
+    return analysedFileIndex;
 }
 
 fluid::RealVector AcorexCorpus::Analyse::ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats )
@@ -266,4 +248,19 @@ fluid::RealVector AcorexCorpus::Analyse::ComputeStats ( fluid::RealMatrixView ma
         result ( fluid::Slice ( j * 7, 7 ) ) <<= tmp.row ( j );
     }
     return result;
+}
+
+void AcorexCorpus::Analyse::Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions )
+{
+    for ( fluid::index dimension = 0; dimension < numDimensions; dimension++ )
+    {
+        fileData.push_back ( std::vector<double> ( ) );
+        int index = fileData.size ( ) - 1;
+
+        for ( fluid::index statistic = 0; statistic < DATA_NUM_STATS; statistic++ )
+		{
+            int statsIndex = ( dimension * 7 ) + statistic;
+            fileData[index].push_back ( stats[statsIndex] );
+		}
+    }
 }

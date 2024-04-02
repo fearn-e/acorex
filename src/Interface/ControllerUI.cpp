@@ -4,7 +4,6 @@
 
 void AcorexInterface::ControllerUI::setup ( )
 {
-	Reset ( );
 	ShowMainPanel ( );
 }
 
@@ -24,7 +23,7 @@ void AcorexInterface::ControllerUI::Reset ( )
 
 	// Variables ----------------------------------
 	{
-		hasBeenReduced = false;
+		mHasBeenReduced = false;
 		inputPath = "";
 		outputPath = "";
 	}
@@ -45,6 +44,7 @@ void AcorexInterface::ControllerUI::Reset ( )
 
 		bFlashingInvalidFileSelects = false;
 		bFlashingInvalidAnalysisToggles = false;
+		bFlashingInvalidReductionDimensions = false;
 
 		flashColour = 255;
 	}
@@ -112,7 +112,7 @@ void AcorexInterface::ControllerUI::Reset ( )
 		mAnalysisInsertionPanel.setup ( "Insertion Question" );
 
 		mAnalysisInsertionPanel.add ( mAnalysisInsertionQuestionLabel.setup ( "For files already existing in the set, which version to use?", "" ) );
-		mAnalysisInsertionPanel.add ( mAnalysisInsertionToggle.setup ( "Existing", false ) );
+		mAnalysisInsertionPanel.add ( mAnalysisInsertionReplaceWithNewToggle.setup ( "Existing Files", false ) );
 
 		mAnalysisInsertionPanel.setPosition ( mLayout.hiddenPanelPosition );
 		mAnalysisInsertionPanel.setWidthElements ( mLayout.analysisPanelWidth );
@@ -128,7 +128,7 @@ void AcorexInterface::ControllerUI::Reset ( )
 		mReductionPanel.add ( mReductionPickOutputFileButton.setup ( "Pick Output File" ) );
 		mReductionPanel.add ( mReductionOutputLabel.setup ( " ", "?" ) );
 
-		mReductionPanel.add ( mReducedDimensionsField.setup ( "Reduced Dimensions", 3, 1, 10 ) );
+		mReductionPanel.add ( mReducedDimensionsField.setup ( "Reduced Dimensions", 3, 2, 32 ) );
 		mReductionPanel.add ( mMaxIterationsField.setup ( "Max Training Iterations", 200, 1, 1000 ) );
 
 		mReductionPanel.add ( mConfirmReductionButton.setup ( "Confirm" ) );
@@ -153,7 +153,7 @@ void AcorexInterface::ControllerUI::Reset ( )
 		mHopFractionField.addListener ( this, &ControllerUI::QuantiseHopFraction );
 		mConfirmAnalysisButton.addListener ( this, &ControllerUI::Analyse );
 		mConfirmReductionButton.addListener ( this, &ControllerUI::Reduce );
-		mAnalysisInsertionToggle.addListener ( this, &ControllerUI::AnalysisInsertionToggleChanged );
+		mAnalysisInsertionReplaceWithNewToggle.addListener ( this, &ControllerUI::AnalysisInsertionToggleChanged );
 	}
 
 	ToggleAnalysisUILockout ( false );
@@ -229,10 +229,7 @@ void AcorexInterface::ControllerUI::draw ( )
 			mReductionOutputLabel.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
 		}
 
-		//ofDrawBitmapString ( "Invalid field values", 40, 40 );
-
-		flashColour = flashColour - 2;
-		if ( flashColour < 0 )
+		if ( flashColour <= 0 )
 		{
 			flashColour = 255;
 			bFlashingInvalidFileSelects = false;
@@ -250,8 +247,7 @@ void AcorexInterface::ControllerUI::draw ( )
 		mAnalysisShapeToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
 		mAnalysisMFCCToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
 
-		flashColour = flashColour - 2;
-		if ( flashColour < 0 )
+		if ( flashColour <= 0 )
 		{
 			flashColour = 255;
 			bFlashingInvalidAnalysisToggles = false;
@@ -260,6 +256,25 @@ void AcorexInterface::ControllerUI::draw ( )
 			mAnalysisShapeToggle.setBackgroundColor ( ofColor ( 0 ) );
 			mAnalysisMFCCToggle.setBackgroundColor ( ofColor ( 0 ) );
 		}
+	}
+
+	if ( bFlashingInvalidReductionDimensions )
+	{
+		mReducedDimensionsField.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+
+		if ( flashColour <= 0 )
+		{
+			flashColour = 255;
+			bFlashingInvalidReductionDimensions = false;
+			mReducedDimensionsField.setBackgroundColor ( ofColor ( 0 ) );
+		}
+	
+	}
+
+	if ( bFlashingInvalidAnalysisToggles || bFlashingInvalidFileSelects || bFlashingInvalidReductionDimensions )
+	{
+		flashColour -= 2;
+		if ( flashColour < 0 ) { flashColour = 0; }
 	}
 }
 
@@ -282,7 +297,7 @@ void AcorexInterface::ControllerUI::RemoveListeners ( )
 	mHopFractionField.removeListener ( this, &ControllerUI::QuantiseHopFraction );
 	mConfirmAnalysisButton.removeListener ( this, &ControllerUI::Analyse );
 	mConfirmReductionButton.removeListener ( this, &ControllerUI::Reduce );
-	mAnalysisInsertionToggle.removeListener ( this, &ControllerUI::AnalysisInsertionToggleChanged );
+	mAnalysisInsertionReplaceWithNewToggle.removeListener ( this, &ControllerUI::AnalysisInsertionToggleChanged );
 }
 
 // Analyse and Reduce ---------------------------
@@ -305,31 +320,28 @@ void AcorexInterface::ControllerUI::Analyse ( )
 		return;
 	}
 
-	std::vector<AcorexCorpus::Metadata> metaset = PackSettingsIntoSet ( );
-	PackDimensionNamesIntoSet ( metaset, false );
 	bool success = false;
 	if ( !bInsertingIntoCorpus )
 	{
-		success = mController.CreateCorpus ( inputPath, outputPath, metaset );
+		AcorexCorpus::AnalysisSettings settings;
+		PackSettingsFromUser ( settings );
+		success = mController.CreateCorpus ( inputPath, outputPath, settings );
 	}
 	else
 	{
-		success = mController.InsertIntoCorpus ( inputPath, outputPath, metaset );
+		success = mController.InsertIntoCorpus ( inputPath, outputPath, mAnalysisInsertionReplaceWithNewToggle );
 	}
 
 	if ( !success )
 	{
 		ShowMainPanel ( );
-		ofLogError ( "ControllerUI" ) << "Failed to create corpus";
 		return;
 	}
 
-	mJSON.WriteMeta ( outputPath, metaset );
-
+	// TODO - ask if user wants to reduce the data or view it in the corpus viewer
 	ShowMainPanel ( );
 	ofLogNotice ( "ControllerUI" ) << "Corpus created";
-	// TODO - ask if user wants to reduce the data or view it in the corpus viewer
-	// make a new panel for this with two choices
+	//------------------------------------------------ TEMPORARY
 }
 
 void AcorexInterface::ControllerUI::Reduce ( )
@@ -342,9 +354,29 @@ void AcorexInterface::ControllerUI::Reduce ( )
 		return;
 	}
 
-	// TODO - reduce
+	if ( mReducedDimensionsField >= mCurrentDimensionCount )
+	{
+		flashColour = 255;
+		bFlashingInvalidReductionDimensions = true;
+		ofLogError ( "ControllerUI" ) << "Can't reduce to more dimensions than currently exist";
+		return;
+	}
 
-	// TODO - open in corpus viewer
+	bool success = false;
+	AcorexCorpus::ReductionSettings settings;
+	PackSettingsFromUser ( settings );
+	success = mController.ReduceCorpus ( inputPath, outputPath, settings );
+
+	if ( !success )
+	{
+		ShowMainPanel ( );
+		return;
+	}
+
+	// TODO - ask if user wants to open the reduced data in the corpus viewer
+	ShowMainPanel ( );
+	ofLogNotice ( "ControllerUI" ) << "Corpus reduced";
+	//------------------------------------------------ TEMPORARY
 }
 
 // File Dialog Button Callbacks -----------------
@@ -400,14 +432,17 @@ void AcorexInterface::ControllerUI::SelectAnalysisOutputFile ( )
 
 	if ( bInsertingIntoCorpus )
 	{
-		std::vector<AcorexCorpus::Metadata> metaset;
-		mJSON.ReadMeta ( outputFile.getPath ( ), metaset );
-		bool success = SetSettingsFromFile ( metaset, true );
-		if ( !success )
+		AcorexCorpus::AnalysisSettings settings;
+		bool success = mJSON.Read ( outputFile.getPath ( ), settings );
+		if ( !success ) { return; }
+
+		if ( settings.hasBeenReduced )
 		{
-			ofLogError ( "ControllerUI" ) << "Failed to read metadata";
+			ofLogError ( "ControllerUI" ) << "Can't insert into an already reduced dataset";
 			return;
 		}
+
+		UnpackSettingsFromFile ( settings );
 	}
 
 	ToggleAnalysisUILockout ( bInsertingIntoCorpus );
@@ -435,15 +470,25 @@ void AcorexInterface::ControllerUI::SelectReductionInputFile ( )
 		return;
 	}
 
-	std::vector<AcorexCorpus::Metadata> metaset;
-	mJSON.ReadMeta ( inputFile.getPath ( ), metaset );
-	bool success = SetSettingsFromFile ( metaset, true );
-	if ( !success )
+	AcorexCorpus::AnalysisSettings settings;
+	bool success = mJSON.Read ( inputFile.getPath ( ), settings );
+	if ( !success ) { return; }
+	if ( settings.currentDimensionCount <= 1 )
 	{
-		ofLogError ( "ControllerUI" ) << "Failed to read metadata";
+		ofLogError ( "ControllerUI" ) << "Analysis already contains only one dimension";
 		return;
 	}
 
+	if ( settings.bTime )
+	{
+		mReducedDimensionsField = 2; // time is always included as a dimension with bTime, recommend default 2 dimensions
+	}
+	else
+	{
+		mReducedDimensionsField = 3; // if time is not included, recommend default 3 dimensions
+	}
+
+	UnpackSettingsFromFile ( settings );
 	inputPath = inputFile.getPath ( );
 	mReductionInputLabel = inputFile.getName ( );
 	bReductionInputSelected = true;
@@ -475,237 +520,56 @@ void AcorexInterface::ControllerUI::SelectReductionOutputFile ( )
 
 // Load and Save Settings -----------------------
 
-bool AcorexInterface::ControllerUI::SetSettingsFromFile ( std::vector<AcorexCorpus::Metadata>& metaset, bool cancelIfAlreadyReduced )
+void AcorexInterface::ControllerUI::UnpackSettingsFromFile ( const AcorexCorpus::AnalysisSettings& settings )
 {
-	if ( cancelIfAlreadyReduced )
-	{
-		for ( auto& meta : metaset )
-		{
-			if ( meta.key != AcorexCorpus::META_HAS_BEEN_REDUCED )
-			{
-				continue;
-			}
+	mTimeDimensionToggle = settings.bTime;
+	mAnalysisPitchToggle = settings.bPitch;
+	mAnalysisLoudnessToggle = settings.bLoudness;
+	mAnalysisShapeToggle = settings.bShape;
+	mAnalysisMFCCToggle = settings.bMFCC;
+	mWindowFFTField = settings.windowFFTSize;
+	mHopFractionField = settings.hopFraction;
+	mNBandsField = settings.nBands;
+	mNCoefsField = settings.nCoefs;
+	mMinFreqField = settings.minFreq;
+	mMaxFreqField = settings.maxFreq;
+	mCurrentDimensionCount = settings.currentDimensionCount;
 
-			if ( meta.boolValue )
-			{
-				ofLogError ( "ControllerUI" ) << "Analysis has already been reduced";
-				return false;
-			}
-		}
-	}
-
-	if ( metaset.size ( ) < 14 )
-	{
-		ofLogError ( "ControllerUI" ) << "Too few metadata entries";
-		return false;
-	}
-
-	bool timeDimension = false;
-	bool analysisPitch = false; bool analysisLoudness = false; bool analysisShape = false; bool analysisMFCC = false;
-	int windowSize = 1024; int hopSizeFraction = 2;
-	int nBands = 40; int nCoefs = 13;
-	int minFreq = 20; int maxFreq = 5000;
-	int reducedDimensions = 3; int maxIterations = 200;
-
-	for ( auto& meta : metaset )
-	{
-		switch ( meta.key )
-		{
-			case AcorexCorpus::META_HAS_BEEN_REDUCED:
-				break;
-			case AcorexCorpus::META_TIME_DIMENSION:
-				timeDimension = meta.boolValue;
-				break;
-			case AcorexCorpus::META_ANALYSIS_PITCH:
-				analysisPitch = meta.boolValue;
-				break;
-			case AcorexCorpus::META_ANALYSIS_LOUDNESS:
-				analysisLoudness = meta.boolValue;
-				break;
-			case AcorexCorpus::META_ANALYSIS_SHAPE:
-				analysisShape = meta.boolValue;
-				break;
-			case AcorexCorpus::META_ANALYSIS_MFCC:
-				analysisMFCC = meta.boolValue;
-				break;
-			case AcorexCorpus::META_WINDOW_FFT_SIZE:
-				windowSize = meta.intValue;
-				break;
-			case AcorexCorpus::META_HOP_FRACTION:
-				hopSizeFraction = meta.intValue;
-				break;
-			case AcorexCorpus::META_N_BANDS:
-				nBands = meta.intValue;
-				break;
-			case AcorexCorpus::META_N_COEFS:
-				nCoefs = meta.intValue;
-				break;
-			case AcorexCorpus::META_MIN_FREQ:
-				minFreq = meta.intValue;
-				break;
-			case AcorexCorpus::META_MAX_FREQ:
-				maxFreq = meta.intValue;
-				break;
-			case AcorexCorpus::META_REDUCED_DIMENSIONS:
-				reducedDimensions = meta.intValue;
-				break;
-			case AcorexCorpus::META_MAX_ITERATIONS:
-				maxIterations = meta.intValue;
-				break;
-			case AcorexCorpus::META_INSERTION_REPLACES_DUPLICATES:
-				break;
-			case AcorexCorpus::META_DIMENSION_NAMES:
-				break;
-			default:
-				ofLogError ( "ControllerUI" ) << "Invalid metadata key: " << meta.key << " = " << mMetaStrings.getStringFromMeta ( meta.key );
-				return false;
-		}
-	}
-
-	mTimeDimensionToggle = timeDimension;
-	mAnalysisPitchToggle = analysisPitch;
-	mAnalysisLoudnessToggle = analysisLoudness;
-	mAnalysisShapeToggle = analysisShape;
-	mAnalysisMFCCToggle = analysisMFCC;
-	mWindowFFTField = windowSize;
-	mHopFractionField = hopSizeFraction;
-	mNBandsField = nBands;
-	mNCoefsField = nCoefs;
-	mMinFreqField = minFreq;
-	mMaxFreqField = maxFreq;
-	mReducedDimensionsField = reducedDimensions;
-	mMaxIterationsField = maxIterations;
-
-	// TODO - refresh gui?
-
-	return true;
+#ifndef DATA_CHANGE_CHECK_8
+#error "check if this implementation is still valid for the data struct"
+#endif // !DATA_CHANGE_CHECK_8
 }
 
-std::vector<AcorexCorpus::Metadata> AcorexInterface::ControllerUI::PackSettingsIntoSet ( )
+void AcorexInterface::ControllerUI::PackSettingsFromUser ( AcorexCorpus::AnalysisSettings& settings )
 {
-	std::vector<AcorexCorpus::Metadata> metaset;
+	settings.bTime = mTimeDimensionToggle;
+	settings.bPitch = mAnalysisPitchToggle;
+	settings.bLoudness = mAnalysisLoudnessToggle;
+	settings.bShape = mAnalysisShapeToggle;
+	settings.bMFCC = mAnalysisMFCCToggle;
+	settings.windowFFTSize = mWindowFFTField;
+	settings.hopFraction = mHopFractionField;
+	settings.nBands = mNBandsField;
+	settings.nCoefs = mNCoefsField;
+	settings.minFreq = mMinFreqField;
+	settings.maxFreq = mMaxFreqField;
 
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_HAS_BEEN_REDUCED, hasBeenReduced ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_TIME_DIMENSION, mTimeDimensionToggle ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_ANALYSIS_PITCH, mAnalysisPitchToggle ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_ANALYSIS_LOUDNESS, mAnalysisLoudnessToggle ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_ANALYSIS_SHAPE, mAnalysisShapeToggle ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_ANALYSIS_MFCC, mAnalysisMFCCToggle ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_WINDOW_FFT_SIZE, mWindowFFTField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_HOP_FRACTION, mHopFractionField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_N_BANDS, mNBandsField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_N_COEFS, mNCoefsField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_MIN_FREQ, mMinFreqField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_MAX_FREQ, mMaxFreqField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_REDUCED_DIMENSIONS, mReducedDimensionsField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_MAX_ITERATIONS, mMaxIterationsField ) );
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_INSERTION_REPLACES_DUPLICATES, mAnalysisInsertionToggle ) );
 
-	return metaset;
+#ifndef DATA_CHANGE_CHECK_8
+#error "check if this implementation is still valid for the data struct"
+#endif // !DATA_CHANGE_CHECK_8
 }
 
-void AcorexInterface::ControllerUI::PackDimensionNamesIntoSet ( std::vector<AcorexCorpus::Metadata>& metaset, bool reducing )
+void AcorexInterface::ControllerUI::PackSettingsFromUser ( AcorexCorpus::ReductionSettings& settings )
 {
-	std::vector<std::string> dimensionNames;
+	settings.dimensionReductionTarget = mReducedDimensionsField;
+	settings.maxIterations = mMaxIterationsField;
 
-	if ( reducing )
-	{
-		if ( mTimeDimensionToggle )
-		{
-			dimensionNames.push_back ( "Samples" );
-			dimensionNames.push_back ( "Time" );
-		}
-
-		for ( int i = 0; i < mReducedDimensionsField; i++ )
-		{
-			dimensionNames.push_back ( "Dimension " + ofToString ( i ) );
-		}
-	}
-
-	if ( mTimeDimensionToggle )
-	{ 
-		dimensionNames.push_back ( "Samples" );
-		dimensionNames.push_back ( "Time" );
-
-		if ( mAnalysisPitchToggle )
-		{
-			dimensionNames.push_back ( "Pitch" );
-			dimensionNames.push_back ( "Pitch Confidence" );
-		}
-
-		if ( mAnalysisLoudnessToggle )
-		{
-			dimensionNames.push_back ( "Loudness" );
-			dimensionNames.push_back ( "True Peak" );
-		}
-
-		if ( mAnalysisShapeToggle )
-		{
-			dimensionNames.push_back ( "Spectral Centroid" );
-			dimensionNames.push_back ( "Spectral Spread" );
-			dimensionNames.push_back ( "Spectral Skewness" );
-			dimensionNames.push_back ( "Spectral Kurtosis" );
-			dimensionNames.push_back ( "Spectral Rolloff" );
-			dimensionNames.push_back ( "Spectral Flatness" );
-			dimensionNames.push_back ( "Spectral Crest" );
-		}
-
-		if ( mAnalysisMFCCToggle )
-		{
-			for ( int i = 0; i < mNCoefsField; i++ )
-			{
-				dimensionNames.push_back ( "MFCC " + ofToString ( i ) );
-			}
-		}
-		
-	}
-	else
-	{
-		if ( mAnalysisPitchToggle )
-		{
-			Push7Stats ( "Pitch", dimensionNames );
-			Push7Stats ( "Pitch Confidence", dimensionNames );
-		}
-
-		if ( mAnalysisLoudnessToggle )
-		{
-			Push7Stats ( "Loudness", dimensionNames );
-			Push7Stats ( "True Peak", dimensionNames );
-		}
-
-		if ( mAnalysisShapeToggle )
-		{
-			Push7Stats ( "Spectral Centroid", dimensionNames );
-			Push7Stats ( "Spectral Spread", dimensionNames );
-			Push7Stats ( "Spectral Skewness", dimensionNames );
-			Push7Stats ( "Spectral Kurtosis", dimensionNames );
-			Push7Stats ( "Spectral Rolloff", dimensionNames );
-			Push7Stats ( "Spectral Flatness", dimensionNames );
-			Push7Stats ( "Spectral Crest", dimensionNames );
-		}
-
-		if ( mAnalysisMFCCToggle )
-		{
-			for ( int i = 0; i < mNCoefsField; i++ )
-			{
-				Push7Stats ( "MFCC " + ofToString ( i ), dimensionNames );
-			}
-		}
-	}
-
-	metaset.push_back ( AcorexCorpus::Metadata ( AcorexCorpus::META_DIMENSION_NAMES, dimensionNames ) );
+#ifndef DATA_CHANGE_CHECK_8
+#error "check if this implementation is still valid for the data struct"
+#endif // !DATA_CHANGE_CHECK_8
 }
 
-void AcorexInterface::ControllerUI::Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames )
-{
-	dimensionNames.push_back ( masterDimension + " (Mean)" );
-	dimensionNames.push_back ( masterDimension + " (Standard Deviation)" );
-	dimensionNames.push_back ( masterDimension + " (Skewness)" );
-	dimensionNames.push_back ( masterDimension + " (Kurtosis)" );
-	dimensionNames.push_back ( masterDimension + " (Low %)" );
-	dimensionNames.push_back ( masterDimension + " (Middle %)" );
-	dimensionNames.push_back ( masterDimension + " (High %)" );
-}
 
 // UI Value Management -------------------------------
 
@@ -749,8 +613,8 @@ void AcorexInterface::ControllerUI::QuantiseHopFraction ( int& value )
 
 void AcorexInterface::ControllerUI::AnalysisInsertionToggleChanged ( bool& value )
 {
-	if ( value ) { mAnalysisInsertionToggle.setName ( "New" ); }
-	else { mAnalysisInsertionToggle.setName ( "Existing" ); }
+	if ( value ) { mAnalysisInsertionReplaceWithNewToggle.setName ( "New Files" ); }
+	else { mAnalysisInsertionReplaceWithNewToggle.setName ( "Existing Files" ); }
 }
 
 // Panel Management ------------------------------

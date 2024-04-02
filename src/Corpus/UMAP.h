@@ -1,6 +1,6 @@
 #pragma once
 
-#include <algorithms/public/DataSetQuery.hpp>
+#include "Corpus/Data.h"
 #include <algorithms/public/UMAP.hpp>
 #include <Eigen/Core>
 #include <data/FluidDataSet.hpp>
@@ -17,12 +17,12 @@ public:
     UMAP ( ) { };
     ~UMAP ( ) { };
 
-    bool Fit ( fluid::FluidDataSet<std::string, double, 1>& datasetIN, fluid::FluidDataSet<std::string, double, 1>& datasetOUT );
-
-    bool FitOverTime ( fluid::FluidDataSet<std::string, double, 1>& datasetIN, fluid::FluidDataSet<std::string, double, 1>& datasetOUT );
+    bool Fit ( AcorexCorpus::DataSet& dataset, const AcorexCorpus::ReductionSettings& settings );
 
 private:
-    fluid::algorithm::DataSetQuery mQuery;
+    void CorpusToFluid ( fluid::FluidDataSet<std::string, double, 1>& fluidset, const AcorexCorpus::DataSet& dataset, std::vector<int>& filePointLength );
+
+    void FluidToCorpus ( AcorexCorpus::DataSet& dataset, const fluid::FluidDataSet<std::string, double, 1>& fluidset, const std::vector<int>& filePointLength, const int reducedDimensionCount );
 };
 
 } // namespace AcorexCorpus

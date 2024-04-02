@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Corpus/Controller.h"
-#include "Corpus/Metadata.h"
+#include "Corpus/Data.h"
 #include "Corpus/JSON.h"
+#include "Corpus/Controller.h"
 #include "Interface/InterfaceDefs.h"
 #include <ofxGui.h>
 #include <ofSystemUtils.h>
@@ -37,10 +37,9 @@ private:
 
 	// Load and Save Settings ----------------------
 
-	bool SetSettingsFromFile ( std::vector<AcorexCorpus::Metadata>& metaset, bool cancelIfAlreadyReduced );
-	std::vector<AcorexCorpus::Metadata> PackSettingsIntoSet ( );
-	void PackDimensionNamesIntoSet ( std::vector<AcorexCorpus::Metadata>& metaset, bool reducing );
-	void Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames );
+	void UnpackSettingsFromFile ( const AcorexCorpus::AnalysisSettings& settings );
+	void PackSettingsFromUser ( AcorexCorpus::AnalysisSettings& settings);
+	void PackSettingsFromUser ( AcorexCorpus::ReductionSettings& settings );
 
 	// UI Value Management -------------------------
 
@@ -73,6 +72,7 @@ private:
 	
 	bool bFlashingInvalidFileSelects;
 	bool bFlashingInvalidAnalysisToggles;
+	bool bFlashingInvalidReductionDimensions;
 	int flashColour;
 
 	// Metadata -----------------------------------
@@ -80,7 +80,7 @@ private:
 	//stats - mean, standard deviation, skewness, kurtosis, low percentile, middle (median default), high percentile
 	//int maxSamplingRate = 22050;
 
-	bool hasBeenReduced;
+	bool mHasBeenReduced;
 	ofxToggle mTimeDimensionToggle;
 	ofxToggle mAnalysisPitchToggle;
 	ofxToggle mAnalysisLoudnessToggle;
@@ -92,6 +92,8 @@ private:
 	ofxIntField mNCoefsField;
 	ofxIntField mMinFreqField;
 	ofxIntField mMaxFreqField;
+
+	int mCurrentDimensionCount;
 
 	ofxIntField mReducedDimensionsField;
 	ofxIntField mMaxIterationsField;
@@ -120,7 +122,7 @@ private:
 
 	ofxPanel mAnalysisInsertionPanel;
 	ofxLabel mAnalysisInsertionQuestionLabel;
-	ofxToggle mAnalysisInsertionToggle;
+	ofxToggle mAnalysisInsertionReplaceWithNewToggle;
 
 
 	ofxPanel mReductionPanel;
@@ -136,7 +138,6 @@ private:
 
 	AcorexCorpus::Controller mController;
 	AcorexCorpus::JSON mJSON;
-	AcorexCorpus::MetaStrings mMetaStrings;
 	AcorexInterface::Colors mColors;
 	AcorexInterface::ControllerUILayout mLayout;
 };
