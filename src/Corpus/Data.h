@@ -10,19 +10,6 @@
 
 namespace AcorexCorpus {
 
-struct DataSet {
-	int currentPointCount;
-
-	std::vector<std::string> dimensionNames; // [dimension]
-	std::vector<std::string> fileList; // [file]
-
-	TimeData time;
-
-	StatsData stats;
-
-	AnalysisSettings analysisSettings;
-};
-
 struct TimeData {
 	std::vector<std::vector<double>> samples; // [file][timepoint]
 	std::vector<std::vector<double>> seconds; // [file][timepoint]
@@ -54,6 +41,19 @@ struct AnalysisSettings {
 struct ReductionSettings {
 	int dimensionReductionTarget;
 	int maxIterations;
+};
+
+struct DataSet {
+	int currentPointCount;
+
+	std::vector<std::string> dimensionNames; // [dimension]
+	std::vector<std::string> fileList; // [file]
+
+	AcorexCorpus::TimeData time;
+
+	AcorexCorpus::StatsData stats;
+
+	AcorexCorpus::AnalysisSettings analysisSettings;
 };
 
 } // namespace AcorexCorpus
