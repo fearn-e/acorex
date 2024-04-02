@@ -50,6 +50,7 @@ bool AcorexCorpus::Controller::ReduceCorpus ( const std::string& inputPath, cons
 	success = mUMAP.Fit ( dataset, settings );
 	if ( !success ) { return false; }
 
+	dataset.analysisSettings.currentDimensionCount = settings.dimensionReductionTarget;
 	GenerateDimensionNames ( dataset.dimensionNames, settings );
 
 	success = mJSON.Write ( outputPath, dataset );
