@@ -479,6 +479,15 @@ void AcorexInterface::ControllerUI::SelectReductionInputFile ( )
 		return;
 	}
 
+	if ( settings.bTime )
+	{
+		mReducedDimensionsField = 2; // time is always included as a dimension with bTime, recommend default 2 dimensions
+	}
+	else
+	{
+		mReducedDimensionsField = 3; // if time is not included, recommend default 3 dimensions
+	}
+
 	UnpackSettingsFromFile ( settings );
 	inputPath = inputFile.getPath ( );
 	mReductionInputLabel = inputFile.getName ( );
