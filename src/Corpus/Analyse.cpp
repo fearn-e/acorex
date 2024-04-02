@@ -150,43 +150,6 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
 
         if ( dataset.analysisSettings.bTime )
         {
-            /*
-            for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
-            {
-                dataset.timePointsSamples[fileIndex].push_back ( frameIndex * hopSize );
-                dataset.timePointsSeconds[fileIndex].push_back ( (frameIndex * hopSize) / samplingRate );
-
-                fluid::RealVector allVectors ( numDimensions );
-                int currentDimTracker = 0;
-
-                if ( dataset.analysisSettings.bPitch )
-                {
-                    allVectors ( fluid::Slice ( currentDimTracker, numPitchDimensions ) ) <<= pitchMat.row ( frameIndex );
-                    currentDimTracker += numPitchDimensions;
-                }
-
-                if ( dataset.analysisSettings.bLoudness )
-                {
-                    allVectors ( fluid::Slice ( currentDimTracker, numLoudnessDimensions ) ) <<= loudnessMat.row ( frameIndex );
-                    currentDimTracker += numLoudnessDimensions;
-                }
-
-                if ( dataset.analysisSettings.bShape )
-                {
-					allVectors ( fluid::Slice ( currentDimTracker, numShapeDimensions ) ) <<= shapeMat.row ( frameIndex );
-					currentDimTracker += numShapeDimensions;
-				}
-
-                if ( dataset.analysisSettings.bMFCC )
-                {
-					allVectors ( fluid::Slice ( currentDimTracker, numMFCCDimensions ) ) <<= mfccMat.row ( frameIndex );
-					currentDimTracker += numMFCCDimensions;
-				}
-
-                dataset.data[fileIndex][frameIndex] = std::vector<double> ( allVectors.begin ( ), allVectors.end ( ) );
-            }
-            */
-
             dataset.time.samples.push_back ( std::vector<double> ( ) );
             dataset.time.seconds.push_back ( std::vector<double> ( ) );
             for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
