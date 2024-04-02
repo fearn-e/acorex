@@ -73,15 +73,28 @@ bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::Anal
 
 void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::DataSet& a )
 {
-	j = nlohmann::json {	TO_J ( currentPointCount), TO_J ( dimensionNames ), TO_J ( fileList ),
-							TO_J ( time.samples ), TO_J ( time.seconds ), TO_J ( time.raw ), TO_J ( stats.raw ), TO_J ( stats.reduced ),
-							TO_J ( analysisSettings.currentDimensionCount ),
-							TO_J ( analysisSettings.hasBeenReduced ), TO_J ( analysisSettings.bTime ),
-							TO_J ( analysisSettings.bPitch ), TO_J ( analysisSettings.bLoudness ),
-							TO_J ( analysisSettings.bShape ), TO_J ( analysisSettings.bMFCC ),
-							TO_J ( analysisSettings.windowFFTSize ), TO_J ( analysisSettings.hopFraction ),
-							TO_J ( analysisSettings.nBands ), TO_J ( analysisSettings.nCoefs ),
-							TO_J ( analysisSettings.minFreq ), TO_J ( analysisSettings.maxFreq ) };
+	j = nlohmann::json {	
+		TO_J ( currentPointCount),
+		TO_J ( dimensionNames ),
+		TO_J ( fileList ),
+		TO_J ( time.samples ),
+		TO_J ( time.seconds ),
+		TO_J ( time.raw ),
+		TO_J ( stats.raw ),
+		TO_J ( stats.reduced ),
+		TO_J_SETTINGS ( currentDimensionCount ),
+		TO_J_SETTINGS ( hasBeenReduced ),
+		TO_J_SETTINGS ( bTime ),
+		TO_J_SETTINGS ( bPitch ),
+		TO_J_SETTINGS ( bLoudness ),
+		TO_J_SETTINGS ( bShape ),
+		TO_J_SETTINGS ( bMFCC ),
+		TO_J_SETTINGS ( windowFFTSize ),
+		TO_J_SETTINGS ( hopFraction ),
+		TO_J_SETTINGS ( nBands ),
+		TO_J_SETTINGS ( nCoefs ),
+		TO_J_SETTINGS ( minFreq ),
+		TO_J_SETTINGS ( maxFreq ) };
 }
 
 void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::DataSet& a )
@@ -94,25 +107,37 @@ void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::DataSet& a
 	TO_A ( time.raw );
 	TO_A ( stats.raw );
 	TO_A ( stats.reduced );
-	TO_A ( analysisSettings.currentDimensionCount );
-	TO_A ( analysisSettings.hasBeenReduced );
-	TO_A ( analysisSettings.bTime );
-	TO_A ( analysisSettings.bPitch );
-	TO_A ( analysisSettings.bLoudness );
-	TO_A ( analysisSettings.bShape );
-	TO_A ( analysisSettings.bMFCC );
-	TO_A ( analysisSettings.windowFFTSize );
-	TO_A ( analysisSettings.hopFraction );
-	TO_A ( analysisSettings.nBands );
-	TO_A ( analysisSettings.nCoefs );
-	TO_A ( analysisSettings.minFreq );
-	TO_A ( analysisSettings.maxFreq );
+	TO_A_SETTINGS ( currentDimensionCount );
+	TO_A_SETTINGS ( hasBeenReduced );
+	TO_A_SETTINGS ( bTime );
+	TO_A_SETTINGS ( bPitch );
+	TO_A_SETTINGS ( bLoudness );
+	TO_A_SETTINGS ( bShape );
+	TO_A_SETTINGS ( bMFCC );
+	TO_A_SETTINGS ( windowFFTSize );
+	TO_A_SETTINGS ( hopFraction );
+	TO_A_SETTINGS ( nBands );
+	TO_A_SETTINGS ( nCoefs );
+	TO_A_SETTINGS ( minFreq );
+	TO_A_SETTINGS ( maxFreq );
 }
 
 void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::AnalysisSettings& a )
 {
-	j = nlohmann::json { TO_J ( currentDimensionCount ), TO_J ( hasBeenReduced ), TO_J ( bTime ), TO_J ( bPitch ), TO_J ( bLoudness ), TO_J ( bShape ), TO_J ( bMFCC ),
-							TO_J ( windowFFTSize ), TO_J ( hopFraction ), TO_J ( nBands ), TO_J ( nCoefs ), TO_J ( minFreq ), TO_J ( maxFreq ) };
+	j = nlohmann::json { 
+		TO_J ( currentDimensionCount ),
+		TO_J ( hasBeenReduced ),
+		TO_J ( bTime ),
+		TO_J ( bPitch ),
+		TO_J ( bLoudness ),
+		TO_J ( bShape ),
+		TO_J ( bMFCC ),
+		TO_J ( windowFFTSize ),
+		TO_J ( hopFraction ),
+		TO_J ( nBands ),
+		TO_J ( nCoefs ),
+		TO_J ( minFreq ),
+		TO_J ( maxFreq ) };
 }
 
 void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::AnalysisSettings& a )
