@@ -516,7 +516,6 @@ void AcorexInterface::ControllerUI::UnpackSettingsFromFile ( const AcorexCorpus:
 
 void AcorexInterface::ControllerUI::PackSettingsFromUser ( AcorexCorpus::AnalysisSettings& settings )
 {
-	settings.insertionReplacesDuplicates = mAnalysisInsertionReplaceWithNewToggle;
 	settings.bTime = mTimeDimensionToggle;
 	settings.bPitch = mAnalysisPitchToggle;
 	settings.bLoudness = mAnalysisLoudnessToggle;
