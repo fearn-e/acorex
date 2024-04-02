@@ -27,6 +27,8 @@ void AcorexCorpus::UMAP::CorpusToFluid ( fluid::FluidDataSet<std::string, double
 {
 	if ( dataset.analysisSettings.bTime )
 	{	
+		int fileMarker = 0;
+
 		for ( int file = 0; file < dataset.time.raw.size ( ); file++ )
 		{
 			for ( int timepoint = 0; timepoint < dataset.time.raw[file].size ( ); timepoint++ )
@@ -38,10 +40,11 @@ void AcorexCorpus::UMAP::CorpusToFluid ( fluid::FluidDataSet<std::string, double
 					point[dimension] = dataset.time.raw[file][timepoint][dimension];
 				}
 
-				fluidset.add ( std::to_string ( file ), point );
+				fluidset.add ( std::to_string ( fileMarker + timepoint ), point );
 			}
 
-			filePointLength.push_back ( dataset.time.raw[file].size ( ) );
+			filePointLength[file] = dataset.time.raw[file].size ( );
+			fileMarker += dataset.time.raw[file].size ( );
 		}
 	}
 	else
