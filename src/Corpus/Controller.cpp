@@ -126,14 +126,10 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 
 	AcorexCorpus::DataSet newDataset;
 	newDataset.fileList = newFiles;
-	// copy settings from existing dataset
-	{
-#ifndef DATA_CHANGE_CHECK_7
+	newDataset.analysisSettings = existingDataset.analysisSettings;
+#ifndef DATA_CHANGE_CHECK_8
 #error "check if this is still valid with dataset structure"
 #endif
-		newDataset.currentDimensionCount = existingDataset.currentDimensionCount;
-		newDataset.analysisSettings = existingDataset.analysisSettings;
-	}
 
 	int filesIn = newDataset.fileList.size ( );
 	int numAnalysed = mAnalyse.ProcessFiles ( newDataset );

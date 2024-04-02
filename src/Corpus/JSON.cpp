@@ -67,13 +67,13 @@ bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::Anal
 }
 
 
-#ifndef DATA_CHANGE_CHECK_7
+#ifndef DATA_CHANGE_CHECK_8
 #error "data structure changed, please update json serialization"
 #endif
 
 void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::DataSet& a )
 {
-	j = nlohmann::json {	TO_J ( currentDimensionCount ), TO_J ( currentPointCount), TO_J ( dimensionNames ), TO_J ( fileList ),
+	j = nlohmann::json {	TO_J ( currentPointCount), TO_J ( dimensionNames ), TO_J ( fileList ),
 							TO_J ( time.samples ), TO_J ( time.seconds ), TO_J ( time.raw ), TO_J ( stats.raw ), TO_J ( stats.reduced ),
 							TO_J ( analysisSettings.hasBeenReduced ), TO_J ( analysisSettings.bTime ),
 							TO_J ( analysisSettings.bPitch ), TO_J ( analysisSettings.bLoudness ),
@@ -85,7 +85,6 @@ void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::DataSet& a )
 
 void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::DataSet& a )
 {
-	TO_A ( currentDimensionCount );
 	TO_A ( currentPointCount );
 	TO_A ( dimensionNames );
 	TO_A ( fileList );
@@ -110,12 +109,13 @@ void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::DataSet& a
 
 void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::AnalysisSettings& a )
 {
-	j = nlohmann::json { TO_J ( hasBeenReduced ), TO_J ( bTime ), TO_J ( bPitch ), TO_J ( bLoudness ), TO_J ( bShape ), TO_J ( bMFCC ),
+	j = nlohmann::json { TO_J ( currentDimensionCount ), TO_J ( hasBeenReduced ), TO_J ( bTime ), TO_J ( bPitch ), TO_J ( bLoudness ), TO_J ( bShape ), TO_J ( bMFCC ),
 							TO_J ( windowFFTSize ), TO_J ( hopFraction ), TO_J ( nBands ), TO_J ( nCoefs ), TO_J ( minFreq ), TO_J ( maxFreq ) };
 }
 
 void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::AnalysisSettings& a )
 { 
+	TO_A ( currentDimensionCount );
 	TO_A ( hasBeenReduced );
 	TO_A ( bTime );
 	TO_A ( bPitch );
