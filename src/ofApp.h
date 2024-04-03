@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface/ControllerUI.h"
+#include "Interface/ControllerMenu.h"
 #include <ofMain.h>
 #include <ofxGui.h>
 
@@ -35,5 +35,5 @@ public:
 	//void gotMessage ( ofMessage msg );
 
 private:
-	AcorexInterface::ControllerUI mControllerUI;
+	AcorexInterface::ControllerMenu mControllerMenu;
 };

@@ -5,7 +5,7 @@ void ofApp::setup ( )
 	ofSetVerticalSync ( true );
 	ofBackground ( 30 );
 
-	mControllerUI.setup ( );
+	mControllerMenu.setup ( );
 }
 
 void ofApp::update ( )
@@ -14,12 +14,12 @@ void ofApp::update ( )
 
 void ofApp::draw ( )
 {
-	mControllerUI.draw ( );
+	mControllerMenu.draw ( );
 }
 
 void ofApp::exit ( )
 {
-	mControllerUI.exit ( );
+	mControllerMenu.exit ( );
 }
 
 void ofApp::CreateCorpus ( )

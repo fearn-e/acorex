@@ -9,10 +9,10 @@
 
 namespace AcorexInterface {
 
-class ControllerUI {
+class ControllerMenu {
 public:
-	ControllerUI ( ) { };
-	~ControllerUI ( ) { };
+	ControllerMenu ( ) { };
+	~ControllerMenu ( ) { };
 
 	void setup ( );
 	void draw ( );
