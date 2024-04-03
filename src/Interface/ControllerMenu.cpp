@@ -415,8 +415,9 @@ void AcorexInterface::ControllerMenu::SelectAnalysisOutputFile ( )
 	}
 	if ( outputFile.getName ( ).find ( ".json" ) == std::string::npos )
 	{
-		ofLogError ( "ControllerMenu" ) << "Invalid file extension";
-		return;
+		ofLogNotice ( "ControllerMenu" ) << "Added missing .json extension";
+		outputFile.filePath += ".json";
+		outputFile.fileName += ".json";
 	}
 
 	if ( ofFile::doesFileExist ( outputFile.getPath ( ) ) )
@@ -509,8 +510,9 @@ void AcorexInterface::ControllerMenu::SelectReductionOutputFile ( )
 	}
 	if ( outputFile.getName ( ).find ( ".json" ) == std::string::npos )
 	{
-		ofLogError ( "ControllerMenu" ) << "Invalid file extension";
-		return;
+		ofLogNotice ( "ControllerMenu" ) << "Added missing .json extension";
+		outputFile.filePath += ".json";
+		outputFile.fileName += ".json";
 	}
 
 	outputPath = outputFile.getPath ( );
