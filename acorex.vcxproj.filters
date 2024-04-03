@@ -46,7 +46,7 @@
     <ClCompile Include="src\Corpus\UMAP.cpp">
       <Filter>src\Corpus</Filter>
     </ClCompile>
-    <ClCompile Include="src\Interface\ControllerUI.cpp">
+    <ClCompile Include="src\Interface\ControllerMenu.cpp">
       <Filter>src\Interface</Filter>
     </ClCompile>
     <ClCompile Include="src\Corpus\Controller.cpp">
@@ -125,7 +125,7 @@
     <ClInclude Include="src\Corpus\Data.h">
       <Filter>src\Corpus</Filter>
     </ClInclude>
-    <ClInclude Include="src\Interface\ControllerUI.h">
+    <ClInclude Include="src\Interface\ControllerMenu.h">
       <Filter>src\Interface</Filter>
     </ClInclude>
     <ClInclude Include="src\Interface\InterfaceDefs.h">

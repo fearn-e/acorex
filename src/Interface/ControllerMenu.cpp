@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Interface/ControllerUI.h"
+#include "Interface/ControllerMenu.h"
 
-void AcorexInterface::ControllerUI::setup ( )
+void AcorexInterface::ControllerMenu::setup ( )
 {
 	ShowMainPanel ( );
 }
 
-void AcorexInterface::ControllerUI::Reset ( )
+void AcorexInterface::ControllerMenu::Reset ( )
 {
 	// Clear --------------------------------------
 	{
@@ -141,25 +141,25 @@ void AcorexInterface::ControllerUI::Reset ( )
 
 	// Listeners ----------------------------------
 	{
-		mCreateCorpusButton.addListener ( this, &ControllerUI::ShowAnalysisPanel );
-		mReduceCorpusButton.addListener ( this, &ControllerUI::ShowReductionPanel );
-		mCancelAnalysisButton.addListener ( this, &ControllerUI::ShowMainPanel );
-		mCancelReductionButton.addListener ( this, &ControllerUI::ShowMainPanel );
-		mAnalysisPickDirectoryButton.addListener ( this, &ControllerUI::SelectAnalysisDirectory );
-		mAnalysisPickOutputFileButton.addListener ( this, &ControllerUI::SelectAnalysisOutputFile );
-		mReductionPickInputFileButton.addListener ( this, &ControllerUI::SelectReductionInputFile );
-		mReductionPickOutputFileButton.addListener ( this, &ControllerUI::SelectReductionOutputFile );
-		mWindowFFTField.addListener ( this, &ControllerUI::QuantiseWindowSize );
-		mHopFractionField.addListener ( this, &ControllerUI::QuantiseHopFraction );
-		mConfirmAnalysisButton.addListener ( this, &ControllerUI::Analyse );
-		mConfirmReductionButton.addListener ( this, &ControllerUI::Reduce );
-		mAnalysisInsertionReplaceWithNewToggle.addListener ( this, &ControllerUI::AnalysisInsertionToggleChanged );
+		mCreateCorpusButton.addListener ( this, &ControllerMenu::ShowAnalysisPanel );
+		mReduceCorpusButton.addListener ( this, &ControllerMenu::ShowReductionPanel );
+		mCancelAnalysisButton.addListener ( this, &ControllerMenu::ShowMainPanel );
+		mCancelReductionButton.addListener ( this, &ControllerMenu::ShowMainPanel );
+		mAnalysisPickDirectoryButton.addListener ( this, &ControllerMenu::SelectAnalysisDirectory );
+		mAnalysisPickOutputFileButton.addListener ( this, &ControllerMenu::SelectAnalysisOutputFile );
+		mReductionPickInputFileButton.addListener ( this, &ControllerMenu::SelectReductionInputFile );
+		mReductionPickOutputFileButton.addListener ( this, &ControllerMenu::SelectReductionOutputFile );
+		mWindowFFTField.addListener ( this, &ControllerMenu::QuantiseWindowSize );
+		mHopFractionField.addListener ( this, &ControllerMenu::QuantiseHopFraction );
+		mConfirmAnalysisButton.addListener ( this, &ControllerMenu::Analyse );
+		mConfirmReductionButton.addListener ( this, &ControllerMenu::Reduce );
+		mAnalysisInsertionReplaceWithNewToggle.addListener ( this, &ControllerMenu::AnalysisInsertionToggleChanged );
 	}
 
 	ToggleAnalysisUILockout ( false );
 }
 
-void AcorexInterface::ControllerUI::draw ( )
+void AcorexInterface::ControllerMenu::draw ( )
 {
 	if ( bDrawMainPanel )
 	{
@@ -278,37 +278,37 @@ void AcorexInterface::ControllerUI::draw ( )
 	}
 }
 
-void AcorexInterface::ControllerUI::exit ( )
+void AcorexInterface::ControllerMenu::exit ( )
 {
 	RemoveListeners ( );
 }
 
-void AcorexInterface::ControllerUI::RemoveListeners ( )
+void AcorexInterface::ControllerMenu::RemoveListeners ( )
 {
-	mCreateCorpusButton.removeListener ( this, &ControllerUI::ShowAnalysisPanel );
-	mReduceCorpusButton.removeListener ( this, &ControllerUI::ShowReductionPanel );
-	mCancelAnalysisButton.removeListener ( this, &ControllerUI::ShowMainPanel );
-	mCancelReductionButton.removeListener ( this, &ControllerUI::ShowMainPanel );
-	mAnalysisPickDirectoryButton.removeListener ( this, &ControllerUI::SelectAnalysisDirectory );
-	mAnalysisPickOutputFileButton.removeListener ( this, &ControllerUI::SelectAnalysisOutputFile );
-	mReductionPickInputFileButton.removeListener ( this, &ControllerUI::SelectReductionInputFile );
-	mReductionPickOutputFileButton.removeListener ( this, &ControllerUI::SelectReductionOutputFile );
-	mWindowFFTField.removeListener ( this, &ControllerUI::QuantiseWindowSize );
-	mHopFractionField.removeListener ( this, &ControllerUI::QuantiseHopFraction );
-	mConfirmAnalysisButton.removeListener ( this, &ControllerUI::Analyse );
-	mConfirmReductionButton.removeListener ( this, &ControllerUI::Reduce );
-	mAnalysisInsertionReplaceWithNewToggle.removeListener ( this, &ControllerUI::AnalysisInsertionToggleChanged );
+	mCreateCorpusButton.removeListener ( this, &ControllerMenu::ShowAnalysisPanel );
+	mReduceCorpusButton.removeListener ( this, &ControllerMenu::ShowReductionPanel );
+	mCancelAnalysisButton.removeListener ( this, &ControllerMenu::ShowMainPanel );
+	mCancelReductionButton.removeListener ( this, &ControllerMenu::ShowMainPanel );
+	mAnalysisPickDirectoryButton.removeListener ( this, &ControllerMenu::SelectAnalysisDirectory );
+	mAnalysisPickOutputFileButton.removeListener ( this, &ControllerMenu::SelectAnalysisOutputFile );
+	mReductionPickInputFileButton.removeListener ( this, &ControllerMenu::SelectReductionInputFile );
+	mReductionPickOutputFileButton.removeListener ( this, &ControllerMenu::SelectReductionOutputFile );
+	mWindowFFTField.removeListener ( this, &ControllerMenu::QuantiseWindowSize );
+	mHopFractionField.removeListener ( this, &ControllerMenu::QuantiseHopFraction );
+	mConfirmAnalysisButton.removeListener ( this, &ControllerMenu::Analyse );
+	mConfirmReductionButton.removeListener ( this, &ControllerMenu::Reduce );
+	mAnalysisInsertionReplaceWithNewToggle.removeListener ( this, &ControllerMenu::AnalysisInsertionToggleChanged );
 }
 
 // Analyse and Reduce ---------------------------
 
-void AcorexInterface::ControllerUI::Analyse ( )
+void AcorexInterface::ControllerMenu::Analyse ( )
 {
 	if ( !bAnalysisDirectorySelected || !bAnalysisOutputSelected )
 	{
 		flashColour = 255;
 		bFlashingInvalidFileSelects = true;
-		ofLogError ( "ControllerUI" ) << "Analysis directory or output file not selected";
+		ofLogError ( "ControllerMenu" ) << "Analysis directory or output file not selected";
 		return;
 	}
 
@@ -316,7 +316,7 @@ void AcorexInterface::ControllerUI::Analyse ( )
 	{
 		flashColour = 255;
 		bFlashingInvalidAnalysisToggles = true;
-		ofLogError ( "ControllerUI" ) << "No analysis types selected";
+		ofLogError ( "ControllerMenu" ) << "No analysis types selected";
 		return;
 	}
 
@@ -340,17 +340,17 @@ void AcorexInterface::ControllerUI::Analyse ( )
 
 	// TODO - ask if user wants to reduce the data or view it in the corpus viewer
 	ShowMainPanel ( );
-	ofLogNotice ( "ControllerUI" ) << "Corpus created";
+	ofLogNotice ( "ControllerMenu" ) << "Corpus created";
 	//------------------------------------------------ TEMPORARY
 }
 
-void AcorexInterface::ControllerUI::Reduce ( )
+void AcorexInterface::ControllerMenu::Reduce ( )
 {
 	if ( !bReductionInputSelected || !bReductionOutputSelected )
 	{
 		flashColour = 255;
 		bFlashingInvalidFileSelects = true;
-		ofLogError ( "ControllerUI" ) << "Reduction input or output file not selected";
+		ofLogError ( "ControllerMenu" ) << "Reduction input or output file not selected";
 		return;
 	}
 
@@ -358,7 +358,7 @@ void AcorexInterface::ControllerUI::Reduce ( )
 	{
 		flashColour = 255;
 		bFlashingInvalidReductionDimensions = true;
-		ofLogError ( "ControllerUI" ) << "Can't reduce to more dimensions than currently exist";
+		ofLogError ( "ControllerMenu" ) << "Can't reduce to more dimensions than currently exist";
 		return;
 	}
 
@@ -375,23 +375,23 @@ void AcorexInterface::ControllerUI::Reduce ( )
 
 	// TODO - ask if user wants to open the reduced data in the corpus viewer
 	ShowMainPanel ( );
-	ofLogNotice ( "ControllerUI" ) << "Corpus reduced";
+	ofLogNotice ( "ControllerMenu" ) << "Corpus reduced";
 	//------------------------------------------------ TEMPORARY
 }
 
 // File Dialog Button Callbacks -----------------
 
-void AcorexInterface::ControllerUI::SelectAnalysisDirectory ( )
+void AcorexInterface::ControllerMenu::SelectAnalysisDirectory ( )
 {
 	ofFileDialogResult audioDirectory = ofSystemLoadDialog ( "Select folder containing audio files...", true, ofFilePath::getCurrentWorkingDirectory ( ) );
 	if ( !audioDirectory.bSuccess )
 	{
-		ofLogError ( "ControllerUI" ) << "No folder selected";
+		ofLogError ( "ControllerMenu" ) << "No folder selected";
 		return;
 	}
 	if ( !ofDirectory::doesDirectoryExist ( audioDirectory.getPath ( ) ) )
 	{
-		ofLogError ( "ControllerUI" ) << "Invalid directory";
+		ofLogError ( "ControllerMenu" ) << "Invalid directory";
 		return;
 	}
 
@@ -405,17 +405,17 @@ void AcorexInterface::ControllerUI::SelectAnalysisDirectory ( )
 	//auto resultOut = pfd::save_file::save_file("Saving reduced analysis as...", "reduced_corpus.json", { "JSON Files", "*.json" });
 	//std::string resultOutPath = resultOut.result();
 	//#endif
-void AcorexInterface::ControllerUI::SelectAnalysisOutputFile ( )
+void AcorexInterface::ControllerMenu::SelectAnalysisOutputFile ( )
 {
 	ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus.json", "Save analysed corpus as..." );
 	if ( !outputFile.bSuccess )
 	{
-		ofLogError ( "ControllerUI" ) << "Invalid save query";
+		ofLogError ( "ControllerMenu" ) << "Invalid save query";
 		return;
 	}
 	if ( outputFile.getName ( ).find ( ".json" ) == std::string::npos )
 	{
-		ofLogError ( "ControllerUI" ) << "Invalid file extension";
+		ofLogError ( "ControllerMenu" ) << "Invalid file extension";
 		return;
 	}
 
@@ -438,7 +438,7 @@ void AcorexInterface::ControllerUI::SelectAnalysisOutputFile ( )
 
 		if ( settings.hasBeenReduced )
 		{
-			ofLogError ( "ControllerUI" ) << "Can't insert into an already reduced dataset";
+			ofLogError ( "ControllerMenu" ) << "Can't insert into an already reduced dataset";
 			return;
 		}
 
@@ -451,22 +451,22 @@ void AcorexInterface::ControllerUI::SelectAnalysisOutputFile ( )
 	bAnalysisOutputSelected = true;
 }
 
-void AcorexInterface::ControllerUI::SelectReductionInputFile ( )
+void AcorexInterface::ControllerMenu::SelectReductionInputFile ( )
 {
 	ofFileDialogResult inputFile = ofSystemLoadDialog ( "Select a corpus file...", false, ofFilePath::getCurrentWorkingDirectory ( ) );
 	if ( !inputFile.bSuccess )
 	{
-		ofLogError ( "ControllerUI" ) << "No file selected";
+		ofLogError ( "ControllerMenu" ) << "No file selected";
 		return;
 	}
 	if ( !ofFile::doesFileExist ( inputFile.getPath ( ) ) )
 	{
-		ofLogError ( "ControllerUI" ) << "Invalid file";
+		ofLogError ( "ControllerMenu" ) << "Invalid file";
 		return;
 	}
 	if ( inputFile.getName ( ).find ( ".json" ) == std::string::npos )
 	{
-		ofLogError ( "ControllerUI" ) << "Invalid file extension";
+		ofLogError ( "ControllerMenu" ) << "Invalid file extension";
 		return;
 	}
 
@@ -475,7 +475,7 @@ void AcorexInterface::ControllerUI::SelectReductionInputFile ( )
 	if ( !success ) { return; }
 	if ( settings.currentDimensionCount <= 1 )
 	{
-		ofLogError ( "ControllerUI" ) << "Analysis already contains only one dimension";
+		ofLogError ( "ControllerMenu" ) << "Analysis already contains only one dimension";
 		return;
 	}
 
@@ -499,17 +499,17 @@ void AcorexInterface::ControllerUI::SelectReductionInputFile ( )
 	//auto resultOut = pfd::save_file::save_file("Saving reduced analysis as...", "reduced_corpus.json", { "JSON Files", "*.json" });
 	//std::string resultOutPath = resultOut.result();
 	//#endif
-void AcorexInterface::ControllerUI::SelectReductionOutputFile ( )
+void AcorexInterface::ControllerMenu::SelectReductionOutputFile ( )
 {
 	ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus_reduced.json", "Save reduced corpus as..." );
 	if ( !outputFile.bSuccess )
 	{
-		ofLogError ( "ControllerUI" ) << "Invalid save query";
+		ofLogError ( "ControllerMenu" ) << "Invalid save query";
 		return;
 	}
 	if ( outputFile.getName ( ).find ( ".json" ) == std::string::npos )
 	{
-		ofLogError ( "ControllerUI" ) << "Invalid file extension";
+		ofLogError ( "ControllerMenu" ) << "Invalid file extension";
 		return;
 	}
 
@@ -520,7 +520,7 @@ void AcorexInterface::ControllerUI::SelectReductionOutputFile ( )
 
 // Load and Save Settings -----------------------
 
-void AcorexInterface::ControllerUI::UnpackSettingsFromFile ( const AcorexCorpus::AnalysisSettings& settings )
+void AcorexInterface::ControllerMenu::UnpackSettingsFromFile ( const AcorexCorpus::AnalysisSettings& settings )
 {
 	mTimeDimensionToggle = settings.bTime;
 	mAnalysisPitchToggle = settings.bPitch;
@@ -540,7 +540,7 @@ void AcorexInterface::ControllerUI::UnpackSettingsFromFile ( const AcorexCorpus:
 #endif // !DATA_CHANGE_CHECK_8
 }
 
-void AcorexInterface::ControllerUI::PackSettingsFromUser ( AcorexCorpus::AnalysisSettings& settings )
+void AcorexInterface::ControllerMenu::PackSettingsFromUser ( AcorexCorpus::AnalysisSettings& settings )
 {
 	settings.bTime = mTimeDimensionToggle;
 	settings.bPitch = mAnalysisPitchToggle;
@@ -560,7 +560,7 @@ void AcorexInterface::ControllerUI::PackSettingsFromUser ( AcorexCorpus::Analysi
 #endif // !DATA_CHANGE_CHECK_8
 }
 
-void AcorexInterface::ControllerUI::PackSettingsFromUser ( AcorexCorpus::ReductionSettings& settings )
+void AcorexInterface::ControllerMenu::PackSettingsFromUser ( AcorexCorpus::ReductionSettings& settings )
 {
 	settings.dimensionReductionTarget = mReducedDimensionsField;
 	settings.maxIterations = mMaxIterationsField;
@@ -573,7 +573,7 @@ void AcorexInterface::ControllerUI::PackSettingsFromUser ( AcorexCorpus::Reducti
 
 // UI Value Management -------------------------------
 
-void AcorexInterface::ControllerUI::QuantiseWindowSize ( int& value )
+void AcorexInterface::ControllerMenu::QuantiseWindowSize ( int& value )
 {
 	//find closest power of 2 between 512 and 8192
 	int closest = 512;
@@ -592,7 +592,7 @@ void AcorexInterface::ControllerUI::QuantiseWindowSize ( int& value )
 	mAnalysisMetadataPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ) );
 }
 
-void AcorexInterface::ControllerUI::QuantiseHopFraction ( int& value )
+void AcorexInterface::ControllerMenu::QuantiseHopFraction ( int& value )
 {
 	//find closest power of 2 between 1 and 16
 	int closest = 1;
@@ -611,7 +611,7 @@ void AcorexInterface::ControllerUI::QuantiseHopFraction ( int& value )
 	mAnalysisMetadataPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ) );
 }
 
-void AcorexInterface::ControllerUI::AnalysisInsertionToggleChanged ( bool& value )
+void AcorexInterface::ControllerMenu::AnalysisInsertionToggleChanged ( bool& value )
 {
 	if ( value ) { mAnalysisInsertionReplaceWithNewToggle.setName ( "New Files" ); }
 	else { mAnalysisInsertionReplaceWithNewToggle.setName ( "Existing Files" ); }
@@ -619,7 +619,7 @@ void AcorexInterface::ControllerUI::AnalysisInsertionToggleChanged ( bool& value
 
 // Panel Management ------------------------------
 
-void AcorexInterface::ControllerUI::ToggleAnalysisUILockout ( bool lock )
+void AcorexInterface::ControllerMenu::ToggleAnalysisUILockout ( bool lock )
 {
 	mTimeDimensionToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
 	mAnalysisPitchToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
@@ -647,14 +647,14 @@ void AcorexInterface::ControllerUI::ToggleAnalysisUILockout ( bool lock )
 	}
 }
 
-void AcorexInterface::ControllerUI::ShowMainPanel ( )
+void AcorexInterface::ControllerMenu::ShowMainPanel ( )
 {
 	Reset ( );
 	bDrawMainPanel = true;
 	mMainPanel.setPosition ( mLayout.defaultPanelPosition );
 }
 
-void AcorexInterface::ControllerUI::ShowAnalysisPanel ( )
+void AcorexInterface::ControllerMenu::ShowAnalysisPanel ( )
 {
 	Reset ( );
 	bDrawAnalysisPanel = true;
@@ -663,19 +663,19 @@ void AcorexInterface::ControllerUI::ShowAnalysisPanel ( )
 	mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout.interPanelSpacing );
 }
 
-void AcorexInterface::ControllerUI::ShowAnalysisInsertionPanel ( )
+void AcorexInterface::ControllerMenu::ShowAnalysisInsertionPanel ( )
 {
 	bDrawAnalysisInsertionPanel = true;
 	mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout.interPanelSpacing );
 }
 
-void AcorexInterface::ControllerUI::HideAnalysisInsertionPanel ( )
+void AcorexInterface::ControllerMenu::HideAnalysisInsertionPanel ( )
 {
 	bDrawAnalysisInsertionPanel = false;
 	mAnalysisInsertionPanel.setPosition ( mLayout.hiddenPanelPosition );
 }
 
-void AcorexInterface::ControllerUI::ShowReductionPanel ( )
+void AcorexInterface::ControllerMenu::ShowReductionPanel ( )
 {
 	Reset ( );
 	bDrawReductionPanel = true;

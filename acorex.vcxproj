@@ -108,7 +108,7 @@
     <ClCompile Include="src\Corpus\Controller.cpp" />
     <ClCompile Include="src\Corpus\JSON.cpp" />
     <ClCompile Include="src\Corpus\UMAP.cpp" />
-    <ClCompile Include="src\Interface\ControllerUI.cpp" />
+    <ClCompile Include="src\Interface\ControllerMenu.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxBaseGui.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxButton.cpp" />
@@ -128,7 +128,7 @@
     <ClInclude Include="src\Corpus\JSON.h" />
     <ClInclude Include="src\Corpus\Data.h" />
     <ClInclude Include="src\Corpus\UMAP.h" />
-    <ClInclude Include="src\Interface\ControllerUI.h" />
+    <ClInclude Include="src\Interface\ControllerMenu.h" />
     <ClInclude Include="src\Interface\InterfaceDefs.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h" />
