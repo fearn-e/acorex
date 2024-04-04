@@ -2,7 +2,7 @@
 
 #include "Interface/ControllerMenu.h"
 
-void AcorexInterface::ControllerMenu::setup ( )
+void AcorexInterface::ControllerMenu::Setup ( )
 {
 	ShowMainPanel ( );
 }
@@ -159,7 +159,7 @@ void AcorexInterface::ControllerMenu::Reset ( )
 	ToggleAnalysisUILockout ( false );
 }
 
-void AcorexInterface::ControllerMenu::draw ( )
+void AcorexInterface::ControllerMenu::Draw ( )
 {
 	if ( bDrawMainPanel )
 	{
@@ -278,7 +278,7 @@ void AcorexInterface::ControllerMenu::draw ( )
 	}
 }
 
-void AcorexInterface::ControllerMenu::exit ( )
+void AcorexInterface::ControllerMenu::Exit ( )
 {
 	RemoveListeners ( );
 }
