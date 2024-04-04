@@ -28,6 +28,8 @@ public:
 	int ProcessFiles ( AcorexCorpus::DataSet& dataset );
 
 private:
+	void MixDownToMono ( fluid::RealVector& output, htl::in_audio_file& file );
+
 	fluid::RealVector ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats );
 
 	void Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions );

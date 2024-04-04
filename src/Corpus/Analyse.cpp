@@ -2,6 +2,7 @@
 
 #include "Corpus/Analyse.h"
 #include <ofLog.h>
+#include <omp.h>
 
 #ifndef DATA_CHANGE_CHECK_8
 #error "Check if dataset is still used correctly"
@@ -77,8 +78,9 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
             continue;
         }
 
-        fluid::index nSamples = file.frames ( );
         auto samplingRate = file.sampling_rate ( );
+        fluid::RealVector in ( file.frames ( ) );
+        MixDownToMono ( in, file );
 
         fluid::algorithm::STFT stft { dataset.analysisSettings.windowFFTSize, dataset.analysisSettings.windowFFTSize, hopSize };
         fluid::algorithm::MelBands bands { dataset.analysisSettings.nBands, dataset.analysisSettings.windowFFTSize };
@@ -94,8 +96,6 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
         stats.init ( 0, 0, 50, 100 );
         loudness.init ( dataset.analysisSettings.windowFFTSize, samplingRate );
 
-        fluid::RealVector in ( nSamples );
-        file.read_channel ( in.data ( ), nSamples, 0 );
         fluid::RealVector padded ( in.size ( ) + dataset.analysisSettings.windowFFTSize + hopSize );
         fluid::index      nFrames = floor ( (padded.size ( ) - dataset.analysisSettings.windowFFTSize) / hopSize );
         fluid::RealMatrix pitchMat ( nFrames, 2 );
@@ -235,6 +235,31 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
     dataset.fileList = analysedFiles;
 
     return analysedFileIndex;
+}
+
+void AcorexCorpus::Analyse::MixDownToMono ( fluid::RealVector& output, htl::in_audio_file& file )
+{
+    int numChannels = file.channels ( );
+    int numSamples = file.frames ( );
+    std::fill ( output.begin ( ), output.end ( ), 0 );
+
+    std::vector<std::vector<double>> allChannels ( numChannels, std::vector<double> ( numSamples ) );
+
+    for ( int channel = 0; channel < numChannels; channel++ )
+	{
+		file.read_channel ( allChannels[channel].data ( ), numSamples, channel );
+	}
+
+#pragma omp parallel for
+    for ( int sample = 0; sample < numSamples; sample++ )
+    {
+        for ( int channel = 0; channel < numChannels; channel++ )
+		{
+			output[sample] += allChannels[channel][sample];
+		}
+        output[sample] /= numChannels;
+    }
+
 }
 
 fluid::RealVector AcorexCorpus::Analyse::ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats )
