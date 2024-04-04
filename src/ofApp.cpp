@@ -5,7 +5,7 @@ void ofApp::setup ( )
 	ofSetVerticalSync ( true );
 	ofBackground ( 30 );
 
-	mControllerMenu.setup ( );
+	mControllerMenu.Setup ( );
 }
 
 void ofApp::update ( )
@@ -14,10 +14,10 @@ void ofApp::update ( )
 
 void ofApp::draw ( )
 {
-	mControllerMenu.draw ( );
+	mControllerMenu.Draw ( );
 }
 
 void ofApp::exit ( )
 {
-	mControllerMenu.exit ( );
+	mControllerMenu.Exit ( );
 }

@@ -14,9 +14,9 @@ public:
 	ControllerMenu ( ) { };
 	~ControllerMenu ( ) { };
 
-	void setup ( );
-	void draw ( );
-	void exit ( );
+	void Setup ( );
+	void Draw ( );
+	void Exit ( );
 
 private:
 	// Setup --------------------------------------
