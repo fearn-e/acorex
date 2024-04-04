@@ -21,18 +21,3 @@ void ofApp::exit ( )
 {
 	mControllerMenu.exit ( );
 }
-
-void ofApp::CreateCorpus ( )
-{
-
-}
-
-void ofApp::ReduceCorpus ( )
-{
-
-}
-
-void ofApp::InsertIntoCorpus ( )
-{
-
-}

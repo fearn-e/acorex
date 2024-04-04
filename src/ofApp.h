@@ -15,10 +15,6 @@ public:
 	void draw ( );
 	void exit ( );
 
-	void CreateCorpus ( );
-	void ReduceCorpus ( );
-	void InsertIntoCorpus ( );
-
 	//void audioIn ( float* input, int bufferSize, int nChannels );
 	//void audioOut ( float* buffer, int bufferSize, int nChannels );
 
