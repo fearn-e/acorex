@@ -1,3 +1,15 @@
+set -o nounset
+set -o errexit
+
+# Check Current Directory
+    CURRENT_FOLDER=${PWD##*/}
+    if [ "$CURRENT_FOLDER" != "acorex" ]; then
+        echo "Incorrect working directory"
+        exit
+    fi
+#
+
+
 # Optional args
     FORCE_DOWNLOAD=false
     FORCE_COMPILE=false
@@ -22,7 +34,12 @@
         currentOS="win"
     else
         # Unknown, cygwin, linux-gnu
-        echo "no official support for this OS, script functionality may not be as expected"
+        echo "no official support for this OS, script functionality may not be as expected, continue? (y/n)"
+        CONFIRM="n"
+        read -p "" CONFIRM
+        if [ ! "$CONFIRM" == "y" ] && [ ! "$CONFIRM" == "Y" ]; then
+            exit 
+        fi
     fi
 #
 
@@ -36,11 +53,11 @@ echo "OS discovered as $currentOS"
     declare -i FORCE_DOWNLOAD_TIP=0
 
     if [ $FORCE_DOWNLOAD == true ] && [ -d "deps-pre-build" ]; then
-        rm -r -f deps-pre-build
+        rm -rfv deps-pre-build
     fi
 
     if [ ! -d "deps-pre-build" ]; then
-        mkdir deps-pre-build
+        mkdir -v deps-pre-build
     fi
 
     cd deps-pre-build
@@ -100,13 +117,13 @@ echo "OS discovered as $currentOS"
     MEMORY_CMAKE_NEEDED=false
 
     if [ $FORCE_COMPILE == true ] && [ -d "compiled-memory" ]; then
-        rm -r -f compiled-memory
-        cp -r memory/ compiled-memory/
+        rm -rfv compiled-memory
+        cp -rv memory/ compiled-memory/
         MEMORY_CMAKE_NEEDED=true
     fi
 
     if [ ! -d "compiled-memory" ]; then
-        cp -r memory/ compiled-memory/
+        cp -rv memory/ compiled-memory/
         MEMORY_CMAKE_NEEDED=true
     fi
 
@@ -152,35 +169,35 @@ echo "OS discovered as $currentOS"
     echo "installing dependencies and libraries"
     echo ""
     if [ -d "deps" ]; then
-        rm -r -f deps
+        rm -rfv deps
     fi
-    mkdir deps
+    mkdir -v deps
 
     if [ -d "libs" ]; then
-        rm -r -f libs
+        rm -rfv libs
     fi
-    mkdir libs
+    mkdir -v libs
 
     #copy dependency headerfiles
-    cp -r   deps-pre-build/eigen/Eigen/                                         deps/Eigen/
-    cp -r   deps-pre-build/eigen/unsupported/                                   deps/unsupported/
-    cp -r   deps-pre-build/flucoma-core/include/                                deps/flucoma-core/
-    cp -r   deps-pre-build/memory/include/foonathan/memory/                     deps/memory/
-    cp -r   deps-pre-build/hisstools_library/include/                           deps/hisstools_library/
-    cp -r   deps-pre-build/spectra/include/Spectra/                             deps/Spectra/
-    cp -r   deps-pre-build/json/include/nlohmann/                               deps/nlohmann/
+    cp -rv   deps-pre-build/eigen/Eigen/                                         deps/Eigen/
+    cp -rv   deps-pre-build/eigen/unsupported/                                   deps/unsupported/
+    cp -rv   deps-pre-build/flucoma-core/include/                                deps/flucoma-core/
+    cp -rv   deps-pre-build/memory/include/foonathan/memory/                     deps/memory/
+    cp -rv   deps-pre-build/hisstools_library/include/                           deps/hisstools_library/
+    cp -rv   deps-pre-build/spectra/include/Spectra/                             deps/Spectra/
+    cp -rv   deps-pre-build/json/include/nlohmann/                               deps/nlohmann/
 
     #copy foonathan_memory compiled lib files
     if [ "$currentOS" == "win" ]; then
-        cp  deps-pre-build/compiled-memory/src/Debug/*                          libs/
-        cp  deps-pre-build/compiled-memory/src/Release/*                        libs/
+        cp -v  deps-pre-build/compiled-memory/src/Debug/*                          libs/
+        cp -v  deps-pre-build/compiled-memory/src/Release/*                        libs/
     elif [ "$currentOS" == "mac" ]; then
-        cp  deps-pre-build/compiled-memory/src/foonathan_memory-*.a             libs/
+        cp -v  deps-pre-build/compiled-memory/src/foonathan_memory-*.a             libs/
     fi
     
     #copy extra compiled foonathan_memory headers
-    cp      deps-pre-build/compiled-memory/src/config_impl.hpp                  deps/memory/
-    cp      deps-pre-build/compiled-memory/src/container_node_sizes_impl.hpp    deps/memory/
+    cp -v      deps-pre-build/compiled-memory/src/config_impl.hpp                  deps/memory/
+    cp -v      deps-pre-build/compiled-memory/src/container_node_sizes_impl.hpp    deps/memory/
 #
 
 echo "--------------------------------------------------"
