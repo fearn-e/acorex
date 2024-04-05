@@ -5,7 +5,7 @@ void ofApp::setup ( )
 	ofSetVerticalSync ( true );
 	ofBackground ( 30 );
 
-	mControllerMenu.Setup ( );
+	mControllerMenu.Show ( );
 }
 
 void ofApp::update ( )
