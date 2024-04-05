@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Corpus/Analyse.h"
+#include "Corpus/GenAnalysis.h"
 #include <ofLog.h>
 #include <omp.h>
 
@@ -8,7 +8,7 @@
 #error "Check if dataset is still used correctly"
 #endif
 
-int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
+int AcorexCorpus::GenAnalysis::ProcessFiles ( AcorexCorpus::DataSet& dataset )
 {  
     if ( dataset.analysisSettings.bTime )
     {
@@ -68,13 +68,13 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
 
         if ( !file.is_open ( ) )
         {
-            ofLogError ( "Analyse" ) << "input file " << inputFileName << " could not be opened";
+            ofLogError ( "GenAnalysis" ) << "input file " << inputFileName << " could not be opened";
             continue;
         }
 
         if ( file.is_error ( ) )
         {
-            ofLogError ( "Analyse" ) << "input file " << inputFileName << " is not supported";
+            ofLogError ( "GenAnalysis" ) << "input file " << inputFileName << " is not supported";
             continue;
         }
 
@@ -237,7 +237,7 @@ int AcorexCorpus::Analyse::ProcessFiles ( AcorexCorpus::DataSet& dataset )
     return analysedFileIndex;
 }
 
-void AcorexCorpus::Analyse::MixDownToMono ( fluid::RealVector& output, htl::in_audio_file& file )
+void AcorexCorpus::GenAnalysis::MixDownToMono ( fluid::RealVector& output, htl::in_audio_file& file )
 {
     int numChannels = file.channels ( );
     int numSamples = file.frames ( );
@@ -262,7 +262,7 @@ void AcorexCorpus::Analyse::MixDownToMono ( fluid::RealVector& output, htl::in_a
 
 }
 
-fluid::RealVector AcorexCorpus::Analyse::ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats )
+fluid::RealVector AcorexCorpus::GenAnalysis::ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats )
 {
     fluid::index      dim = matrix.cols ( );
     fluid::RealMatrix tmp ( dim, 7 );
@@ -275,7 +275,7 @@ fluid::RealVector AcorexCorpus::Analyse::ComputeStats ( fluid::RealMatrixView ma
     return result;
 }
 
-void AcorexCorpus::Analyse::Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions )
+void AcorexCorpus::GenAnalysis::Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions )
 {
     for ( fluid::index dimension = 0; dimension < numDimensions; dimension++ )
     {

@@ -37,20 +37,20 @@
     <ClCompile Include="src\ofApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Corpus\JSON.cpp">
-      <Filter>src\Corpus</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Corpus\Analyse.cpp">
-      <Filter>src\Corpus</Filter>
+    <ClCompile Include="src\Corpus\GenAnalysis.cpp">
+      <Filter>src\Analyse</Filter>
     </ClCompile>
     <ClCompile Include="src\Corpus\UMAP.cpp">
-      <Filter>src\Corpus</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Interface\ControllerMenu.cpp">
-      <Filter>src\Interface</Filter>
+      <Filter>src\Analyse</Filter>
     </ClCompile>
     <ClCompile Include="src\Corpus\Controller.cpp">
-      <Filter>src\Corpus</Filter>
+      <Filter>src\Analyse</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Corpus\JSON.cpp">
+      <Filter>src\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Interface\ControllerMenu.cpp">
+      <Filter>src\Analyse</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -66,11 +66,14 @@
     <Filter Include="addons\ofxGui\src">
       <UniqueIdentifier>{C50E7B39--31C-6-41-96-8-2DD-928FBADCE7DA}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Corpus">
-      <UniqueIdentifier>{b1bc8163-7718-4c38-8894-a98c9cc3034e}</UniqueIdentifier>
+    <Filter Include="src\Utils">
+      <UniqueIdentifier>{02fb1086-f6a1-4d11-aa11-0e24eab34fd5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Interface">
-      <UniqueIdentifier>{6155338d-f0e2-42b9-9f17-80bba8b367bc}</UniqueIdentifier>
+    <Filter Include="src\Explore">
+      <UniqueIdentifier>{33a79c1f-627f-4007-ba22-4c89441d9ce3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Analyse">
+      <UniqueIdentifier>{b1bc8163-7718-4c38-8894-a98c9cc3034e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -113,26 +116,26 @@
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h">
       <Filter>addons\ofxGui\src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Corpus\Analyse.h">
-      <Filter>src\Corpus</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Corpus\JSON.h">
-      <Filter>src\Corpus</Filter>
+    <ClInclude Include="src\Corpus\GenAnalysis.h">
+      <Filter>src\Analyse</Filter>
     </ClInclude>
     <ClInclude Include="src\Corpus\UMAP.h">
-      <Filter>src\Corpus</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Corpus\Data.h">
-      <Filter>src\Corpus</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Interface\ControllerMenu.h">
-      <Filter>src\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Interface\InterfaceDefs.h">
-      <Filter>src\Interface</Filter>
+      <Filter>src\Analyse</Filter>
     </ClInclude>
     <ClInclude Include="src\Corpus\Controller.h">
-      <Filter>src\Corpus</Filter>
+      <Filter>src\Analyse</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Corpus\JSON.h">
+      <Filter>src\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Corpus\Data.h">
+      <Filter>src\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Interface\InterfaceDefs.h">
+      <Filter>src\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Interface\ControllerMenu.h">
+      <Filter>src\Analyse</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

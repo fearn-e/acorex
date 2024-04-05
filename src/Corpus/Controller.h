@@ -2,7 +2,7 @@
 
 #include "Corpus/Data.h"
 #include "Corpus/JSON.h"
-#include "Corpus/Analyse.h"
+#include "Corpus/GenAnalysis.h"
 #include "Corpus/UMAP.h"
 #include <vector>
 #include <string>
@@ -30,7 +30,7 @@ private:
 	void Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames );
 
 	AcorexCorpus::JSON mJSON;
-	AcorexCorpus::Analyse mAnalyse;
+	AcorexCorpus::GenAnalysis mGenAnalysis;
 	AcorexCorpus::UMAP mUMAP;
 };
 
