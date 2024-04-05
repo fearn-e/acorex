@@ -37,19 +37,19 @@
     <ClCompile Include="src\ofApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Corpus\GenAnalysis.cpp">
-      <Filter>src\Analyse</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Corpus\UMAP.cpp">
-      <Filter>src\Analyse</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Corpus\Controller.cpp">
-      <Filter>src\Analyse</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Corpus\JSON.cpp">
+    <ClCompile Include="src\Utils\JSON.cpp">
       <Filter>src\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\Interface\ControllerMenu.cpp">
+    <ClCompile Include="src\Analyse\GenAnalysis.cpp">
+      <Filter>src\Analyse</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Analyse\UMAP.cpp">
+      <Filter>src\Analyse</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Analyse\Controller.cpp">
+      <Filter>src\Analyse</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Analyse\ControllerMenu.cpp">
       <Filter>src\Analyse</Filter>
     </ClCompile>
   </ItemGroup>
@@ -116,25 +116,25 @@
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h">
       <Filter>addons\ofxGui\src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Corpus\GenAnalysis.h">
-      <Filter>src\Analyse</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Corpus\UMAP.h">
-      <Filter>src\Analyse</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Corpus\Controller.h">
-      <Filter>src\Analyse</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Corpus\JSON.h">
+    <ClInclude Include="src\Utils\Data.h">
       <Filter>src\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\Corpus\Data.h">
+    <ClInclude Include="src\Utils\InterfaceDefs.h">
       <Filter>src\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\Interface\InterfaceDefs.h">
+    <ClInclude Include="src\Utils\JSON.h">
       <Filter>src\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\Interface\ControllerMenu.h">
+    <ClInclude Include="src\Analyse\GenAnalysis.h">
+      <Filter>src\Analyse</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Analyse\UMAP.h">
+      <Filter>src\Analyse</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Analyse\Controller.h">
+      <Filter>src\Analyse</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Analyse\ControllerMenu.h">
       <Filter>src\Analyse</Filter>
     </ClInclude>
   </ItemGroup>
