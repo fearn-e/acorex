@@ -7,7 +7,7 @@
 #include <ofxGui.h>
 #include <ofSystemUtils.h>
 
-namespace AcorexInterface {
+namespace AcorexAnalyse {
 
 class ControllerMenu {
 public:
@@ -37,9 +37,9 @@ private:
 
 	// Load and Save Settings ----------------------
 
-	void UnpackSettingsFromFile ( const AcorexCorpus::AnalysisSettings& settings );
-	void PackSettingsFromUser ( AcorexCorpus::AnalysisSettings& settings);
-	void PackSettingsFromUser ( AcorexCorpus::ReductionSettings& settings );
+	void UnpackSettingsFromFile ( const AcorexUtils::AnalysisSettings& settings );
+	void PackSettingsFromUser ( AcorexUtils::AnalysisSettings& settings);
+	void PackSettingsFromUser ( AcorexUtils::ReductionSettings& settings );
 
 	// UI Value Management -------------------------
 
@@ -136,10 +136,10 @@ private:
 
 
 
-	AcorexCorpus::Controller mController;
-	AcorexCorpus::JSON mJSON;
-	AcorexInterface::Colors mColors;
-	AcorexInterface::ControllerUILayout mLayout;
+	AcorexAnalyse::Controller mController;
+	AcorexUtils::JSON mJSON;
+	AcorexUtils::Colors mColors;
+	AcorexUtils::ControllerUILayout mLayout;
 };
 
-} // namespace interface
+} // namespace AcorexAnalyse

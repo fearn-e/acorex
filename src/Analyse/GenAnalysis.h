@@ -18,14 +18,14 @@
 #include <vector>
 #include <string>
 
-namespace AcorexCorpus {
+namespace AcorexAnalyse {
 
 class GenAnalysis {
 public:
 	GenAnalysis ( ) { };
 	~GenAnalysis ( ) { };
 
-	int ProcessFiles ( AcorexCorpus::DataSet& dataset );
+	int ProcessFiles ( AcorexUtils::DataSet& dataset );
 
 private:
 	void MixDownToMono ( fluid::RealVector& output, htl::in_audio_file& file );
@@ -35,4 +35,4 @@ private:
 	void Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions );
 };
 
-} // namespace AcorexCorpus
+} // namespace AcorexAnalyse

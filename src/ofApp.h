@@ -31,5 +31,5 @@ public:
 	//void gotMessage ( ofMessage msg );
 
 private:
-	AcorexInterface::ControllerMenu mControllerMenu;
+	AcorexAnalyse::ControllerMenu mControllerMenu;
 };
