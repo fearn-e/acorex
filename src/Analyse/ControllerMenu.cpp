@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface/ControllerMenu.h"
+#include "./ControllerMenu.h"
 
 void AcorexInterface::ControllerMenu::Setup ( )
 {

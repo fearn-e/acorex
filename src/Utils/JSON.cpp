@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Corpus/JSON.h"
+#include "./JSON.h"
 #include <ofLog.h>
 #include <fstream>
 

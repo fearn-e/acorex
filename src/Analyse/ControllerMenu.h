@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Corpus/Data.h"
-#include "Corpus/JSON.h"
-#include "Corpus/Controller.h"
-#include "Interface/InterfaceDefs.h"
+#include "Utils/Data.h"
+#include "Utils/JSON.h"
+#include "Analyse/Controller.h"
+#include "Utils/InterfaceDefs.h"
 #include <ofxGui.h>
 #include <ofSystemUtils.h>
 

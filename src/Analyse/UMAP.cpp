@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UMAP.h"
+#include "./UMAP.h"
 #include "ofLog.h"
 
 bool AcorexCorpus::UMAP::Fit ( AcorexCorpus::DataSet& dataset, const AcorexCorpus::ReductionSettings& settings )

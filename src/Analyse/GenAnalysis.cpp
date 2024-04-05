@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Corpus/GenAnalysis.h"
+#include "./GenAnalysis.h"
 #include <ofLog.h>
 #include <omp.h>
 
