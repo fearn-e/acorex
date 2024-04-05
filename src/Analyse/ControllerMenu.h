@@ -141,7 +141,7 @@ private:
 	AcorexAnalyse::Controller mController;
 	AcorexUtils::JSON mJSON;
 	AcorexUtils::Colors mColors;
-	AcorexUtils::ControllerUILayout mLayout;
+	AcorexUtils::MenuLayout mLayout;
 };
 
 } // namespace AcorexAnalyse

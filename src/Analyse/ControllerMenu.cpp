@@ -60,8 +60,11 @@ void AcorexAnalyse::ControllerMenu::Reset ( )
 		mMainPanel.add ( mCreateCorpusButton.setup ( "Analyse Corpus" ) );
 		mMainPanel.add ( mReduceCorpusButton.setup ( "Reduce Corpus" ) );
 
+		mCreateCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mReduceCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
 		mMainPanel.setPosition ( mLayout.hiddenPanelPosition );
-		mMainPanel.setWidthElements ( mLayout.mainPanelWidth );
+		mMainPanel.setWidthElements ( mLayout.analyseMainPanelWidth );
 		mMainPanel.disableHeader ( );
 	}
 
@@ -73,6 +76,11 @@ void AcorexAnalyse::ControllerMenu::Reset ( )
 		mAnalysisPanel.add ( mAnalysisDirectoryLabel.setup ( "", "?" ) );
 		mAnalysisPanel.add ( mAnalysisPickOutputFileButton.setup ( "Pick Output File" ) );
 		mAnalysisPanel.add ( mAnalysisOutputLabel.setup ( "", "?" ) );
+
+		mAnalysisPickDirectoryButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mAnalysisDirectoryLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mAnalysisPickOutputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mAnalysisOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
 		mAnalysisPanel.setPosition ( mLayout.hiddenPanelPosition );
 		mAnalysisPanel.setWidthElements ( 315 );
@@ -95,8 +103,20 @@ void AcorexAnalyse::ControllerMenu::Reset ( )
 		mAnalysisMetadataPanel.add ( mMinFreqField.setup ( "Min Freq: ", 20, 20, 2000 ) );
 		mAnalysisMetadataPanel.add ( mMaxFreqField.setup ( "Max Freq: ", 5000, 20, 20000 ) );
 
+		mTimeDimensionToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mAnalysisPitchToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mAnalysisLoudnessToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mAnalysisShapeToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mAnalysisMFCCToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mWindowFFTField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mHopFractionField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mNBandsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mNCoefsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mMinFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mMaxFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
 		mAnalysisMetadataPanel.setPosition ( mLayout.hiddenPanelPosition );
-		mAnalysisMetadataPanel.setWidthElements ( mLayout.analysisPanelWidth );
+		mAnalysisMetadataPanel.setWidthElements ( mLayout.analyseAnalysisPanelWidth );
 		mAnalysisMetadataPanel.disableHeader ( );
 
 
@@ -105,8 +125,11 @@ void AcorexAnalyse::ControllerMenu::Reset ( )
 		mAnalysisConfirmPanel.add ( mConfirmAnalysisButton.setup ( "Confirm" ) );
 		mAnalysisConfirmPanel.add ( mCancelAnalysisButton.setup ( "Cancel" ) );
 
+		mConfirmAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mCancelAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
 		mAnalysisConfirmPanel.setPosition ( mLayout.hiddenPanelPosition );
-		mAnalysisConfirmPanel.setWidthElements ( mLayout.analysisPanelWidth );
+		mAnalysisConfirmPanel.setWidthElements ( mLayout.analyseAnalysisPanelWidth );
 		mAnalysisConfirmPanel.disableHeader ( );
 	}
 
@@ -117,8 +140,11 @@ void AcorexAnalyse::ControllerMenu::Reset ( )
 		mAnalysisInsertionPanel.add ( mAnalysisInsertionQuestionLabel.setup ( "For files already existing in the set, which version to use?", "" ) );
 		mAnalysisInsertionPanel.add ( mAnalysisInsertionReplaceWithNewToggle.setup ( "Existing Files", false ) );
 
+		mAnalysisInsertionQuestionLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mAnalysisInsertionReplaceWithNewToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
 		mAnalysisInsertionPanel.setPosition ( mLayout.hiddenPanelPosition );
-		mAnalysisInsertionPanel.setWidthElements ( mLayout.analysisPanelWidth );
+		mAnalysisInsertionPanel.setWidthElements ( mLayout.analyseAnalysisPanelWidth );
 		mAnalysisInsertionPanel.disableHeader ( );
 	}
 
@@ -137,8 +163,17 @@ void AcorexAnalyse::ControllerMenu::Reset ( )
 		mReductionPanel.add ( mConfirmReductionButton.setup ( "Confirm" ) );
 		mReductionPanel.add ( mCancelReductionButton.setup ( "Cancel" ) );
 
+		mReductionPickInputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mReductionInputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mReductionPickOutputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mReductionOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mReducedDimensionsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mMaxIterationsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mConfirmReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mCancelReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
 		mReductionPanel.setPosition ( mLayout.hiddenPanelPosition );
-		mReductionPanel.setWidthElements ( mLayout.reductionPanelWidth );
+		mReductionPanel.setWidthElements ( mLayout.analyseReductionPanelWidth );
 		mReductionPanel.disableHeader ( );
 	}
 
@@ -169,7 +204,7 @@ void AcorexAnalyse::ControllerMenu::Draw ( )
 	if ( bDrawMainPanel )
 	{
 		//draw background rectangle around main panel
-		ofSetColor ( mColors.panelBackgroundColor );
+		ofSetColor ( mColors.interfaceBackgroundColor );
 		ofDrawRectangle ( 
 			mMainPanel.getPosition ( ).x - mLayout.panelBackgroundMargin, 
 			mMainPanel.getPosition ( ).y - mLayout.panelBackgroundMargin, 
@@ -190,7 +225,7 @@ void AcorexAnalyse::ControllerMenu::Draw ( )
 			mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout.interPanelSpacing );
 		}
 		
-		ofSetColor ( mColors.panelBackgroundColor );
+		ofSetColor ( mColors.interfaceBackgroundColor );
 		ofDrawRectangle (
 			mAnalysisPanel.getPosition ( ).x - mLayout.panelBackgroundMargin, 
 			mAnalysisPanel.getPosition ( ).y - mLayout.panelBackgroundMargin, 
@@ -205,7 +240,7 @@ void AcorexAnalyse::ControllerMenu::Draw ( )
 
 	if ( bDrawReductionPanel ) 
 	{
-		ofSetColor ( mColors.panelBackgroundColor );
+		ofSetColor ( mColors.interfaceBackgroundColor );
 		ofDrawRectangle (
 			mReductionPanel.getPosition ( ).x - mLayout.panelBackgroundMargin,
 			mReductionPanel.getPosition ( ).y - mLayout.panelBackgroundMargin,
@@ -238,10 +273,10 @@ void AcorexAnalyse::ControllerMenu::Draw ( )
 		{
 			flashColour = 255;
 			bFlashingInvalidFileSelects = false;
-			mAnalysisDirectoryLabel.setBackgroundColor ( ofColor ( 0 ) );
-			mAnalysisOutputLabel.setBackgroundColor ( ofColor ( 0 ) );
-			mReductionInputLabel.setBackgroundColor ( ofColor ( 0 ) );
-			mReductionOutputLabel.setBackgroundColor ( ofColor ( 0 ) );
+			mAnalysisDirectoryLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mAnalysisOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mReductionInputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mReductionOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		}
 	}
 
@@ -256,10 +291,10 @@ void AcorexAnalyse::ControllerMenu::Draw ( )
 		{
 			flashColour = 255;
 			bFlashingInvalidAnalysisToggles = false;
-			mAnalysisLoudnessToggle.setBackgroundColor ( ofColor ( 0 ) );
-			mAnalysisPitchToggle.setBackgroundColor ( ofColor ( 0 ) );
-			mAnalysisShapeToggle.setBackgroundColor ( ofColor ( 0 ) );
-			mAnalysisMFCCToggle.setBackgroundColor ( ofColor ( 0 ) );
+			mAnalysisLoudnessToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mAnalysisPitchToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mAnalysisShapeToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mAnalysisMFCCToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		}
 	}
 
@@ -271,7 +306,7 @@ void AcorexAnalyse::ControllerMenu::Draw ( )
 		{
 			flashColour = 255;
 			bFlashingInvalidReductionDimensions = false;
-			mReducedDimensionsField.setBackgroundColor ( ofColor ( 0 ) );
+			mReducedDimensionsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		}
 	
 	}
@@ -667,7 +702,7 @@ void AcorexAnalyse::ControllerMenu::ShowMainPanel ( )
 	Reset ( );
 	bDraw = true;
 	bDrawMainPanel = true;
-	mMainPanel.setPosition ( mLayout.defaultPanelPosition );
+	mMainPanel.setPosition ( mLayout.analysePanelOriginX, mLayout.analysePanelOriginY );
 }
 
 void AcorexAnalyse::ControllerMenu::ShowAnalysisPanel ( )
@@ -675,7 +710,7 @@ void AcorexAnalyse::ControllerMenu::ShowAnalysisPanel ( )
 	Reset ( );
 	bDraw = true;
 	bDrawAnalysisPanel = true;
-	mAnalysisPanel.setPosition ( mLayout.defaultPanelPosition );
+	mAnalysisPanel.setPosition ( mLayout.analysePanelOriginX, mLayout.analysePanelOriginY );
 	mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout.interPanelSpacing );
 	mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout.interPanelSpacing );
 }
@@ -697,5 +732,5 @@ void AcorexAnalyse::ControllerMenu::ShowReductionPanel ( )
 	Reset ( );
 	bDraw = true;
 	bDrawReductionPanel = true;
-	mReductionPanel.setPosition ( mLayout.defaultPanelPosition );
+	mReductionPanel.setPosition ( mLayout.analysePanelOriginX, mLayout.analysePanelOriginY );
 }
