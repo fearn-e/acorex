@@ -18,7 +18,7 @@ bool AcorexCorpus::Controller::CreateCorpus ( const std::string& inputPath, cons
 	if ( !success ) { return false; }
 	
 	int filesIn = dataset.fileList.size ( );
-	int numAnalysed = mAnalyse.ProcessFiles ( dataset );
+	int numAnalysed = mGenAnalysis.ProcessFiles ( dataset );
 	if ( numAnalysed > 0 )
 	{
 		ofLogNotice ( "Controller" ) << "Processed " << filesIn << " files into " << dataset.currentPointCount 
@@ -115,7 +115,7 @@ bool AcorexCorpus::Controller::InsertIntoCorpus ( const std::string& inputPath, 
 #endif
 
 	int filesIn = newDataset.fileList.size ( );
-	int numAnalysed = mAnalyse.ProcessFiles ( newDataset );
+	int numAnalysed = mGenAnalysis.ProcessFiles ( newDataset );
 	if ( numAnalysed > 0 )
 	{
 		ofLogNotice ( "Controller" ) << "Processed " << filesIn << " files into " << newDataset.currentPointCount

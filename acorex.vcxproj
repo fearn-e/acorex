@@ -106,7 +106,7 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Corpus\Analyse.cpp" />
+    <ClCompile Include="src\Corpus\GenAnalysis.cpp" />
     <ClCompile Include="src\Corpus\Controller.cpp" />
     <ClCompile Include="src\Corpus\JSON.cpp" />
     <ClCompile Include="src\Corpus\UMAP.cpp" />
@@ -125,7 +125,7 @@
     <ClCompile Include="src\ofApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Corpus\Analyse.h" />
+    <ClInclude Include="src\Corpus\GenAnalysis.h" />
     <ClInclude Include="src\Corpus\Controller.h" />
     <ClInclude Include="src\Corpus\JSON.h" />
     <ClInclude Include="src\Corpus\Data.h" />

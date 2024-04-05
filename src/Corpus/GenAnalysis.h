@@ -20,10 +20,10 @@
 
 namespace AcorexCorpus {
 
-class Analyse {
+class GenAnalysis {
 public:
-	Analyse ( ) { };
-	~Analyse ( ) { };
+	GenAnalysis ( ) { };
+	~GenAnalysis ( ) { };
 
 	int ProcessFiles ( AcorexCorpus::DataSet& dataset );
 
