@@ -57,6 +57,9 @@ private:
 
 	// State --------------------------------------
 
+	bool bDraw;
+	bool bProcessing;
+
 	bool bDrawMainPanel;
 	bool bDrawAnalysisPanel;
 	bool bDrawAnalysisInsertionPanel;
