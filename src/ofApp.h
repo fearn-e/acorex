@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface/ControllerMenu.h"
+#include "Analyse/ControllerMenu.h"
 #include <ofMain.h>
 #include <ofxGui.h>
 

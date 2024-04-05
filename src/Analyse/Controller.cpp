@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Corpus/Controller.h"
+#include "./Controller.h"
 #include <ofLog.h>
 #include <filesystem>
 

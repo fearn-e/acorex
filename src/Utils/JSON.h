@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Corpus/Data.h"
+#include "Utils/Data.h"
 #include <nlohmann/json.hpp>
 
 namespace AcorexCorpus {

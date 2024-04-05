@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Corpus/Data.h"
-#include "Corpus/JSON.h"
-#include "Corpus/GenAnalysis.h"
-#include "Corpus/UMAP.h"
+#include "Utils/Data.h"
+#include "Utils/JSON.h"
+#include "Analyse/GenAnalysis.h"
+#include "Analyse/UMAP.h"
 #include <vector>
 #include <string>
 
