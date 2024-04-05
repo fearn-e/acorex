@@ -106,11 +106,10 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Corpus\GenAnalysis.cpp" />
-    <ClCompile Include="src\Corpus\Controller.cpp" />
-    <ClCompile Include="src\Corpus\JSON.cpp" />
-    <ClCompile Include="src\Corpus\UMAP.cpp" />
-    <ClCompile Include="src\Interface\ControllerMenu.cpp" />
+    <ClCompile Include="src\Analyse\Controller.cpp" />
+    <ClCompile Include="src\Analyse\ControllerMenu.cpp" />
+    <ClCompile Include="src\Analyse\GenAnalysis.cpp" />
+    <ClCompile Include="src\Analyse\UMAP.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxBaseGui.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxButton.cpp" />
@@ -123,15 +122,13 @@
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
+    <ClCompile Include="src\Utils\JSON.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Corpus\GenAnalysis.h" />
-    <ClInclude Include="src\Corpus\Controller.h" />
-    <ClInclude Include="src\Corpus\JSON.h" />
-    <ClInclude Include="src\Corpus\Data.h" />
-    <ClInclude Include="src\Corpus\UMAP.h" />
-    <ClInclude Include="src\Interface\ControllerMenu.h" />
-    <ClInclude Include="src\Interface\InterfaceDefs.h" />
+    <ClInclude Include="src\Analyse\Controller.h" />
+    <ClInclude Include="src\Analyse\ControllerMenu.h" />
+    <ClInclude Include="src\Analyse\GenAnalysis.h" />
+    <ClInclude Include="src\Analyse\UMAP.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxButton.h" />
@@ -145,6 +142,9 @@
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h" />
+    <ClInclude Include="src\Utils\Data.h" />
+    <ClInclude Include="src\Utils\InterfaceDefs.h" />
+    <ClInclude Include="src\Utils\JSON.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
