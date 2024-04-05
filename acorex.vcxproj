@@ -110,6 +110,7 @@
     <ClCompile Include="src\Analyse\ControllerMenu.cpp" />
     <ClCompile Include="src\Analyse\GenAnalysis.cpp" />
     <ClCompile Include="src\Analyse\UMAP.cpp" />
+    <ClCompile Include="src\Explore\RawView.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxBaseGui.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxButton.cpp" />
@@ -129,6 +130,7 @@
     <ClInclude Include="src\Analyse\ControllerMenu.h" />
     <ClInclude Include="src\Analyse\GenAnalysis.h" />
     <ClInclude Include="src\Analyse\UMAP.h" />
+    <ClInclude Include="src\Explore\RawView.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxButton.h" />

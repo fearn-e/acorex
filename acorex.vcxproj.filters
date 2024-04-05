@@ -52,6 +52,9 @@
     <ClCompile Include="src\Analyse\ControllerMenu.cpp">
       <Filter>src\Analyse</Filter>
     </ClCompile>
+    <ClCompile Include="src\Explore\RawView.cpp">
+      <Filter>src\Explore</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -136,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="src\Analyse\ControllerMenu.h">
       <Filter>src\Analyse</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Explore\RawView.h">
+      <Filter>src\Explore</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
