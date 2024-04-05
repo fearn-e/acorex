@@ -72,7 +72,7 @@ void AcorexAnalyse::ControllerMenu::Reset ( )
 		mAnalysisPanel.add ( mAnalysisPickDirectoryButton.setup ( "Pick Audio Directory" ) );
 		mAnalysisPanel.add ( mAnalysisDirectoryLabel.setup ( "", "?" ) );
 		mAnalysisPanel.add ( mAnalysisPickOutputFileButton.setup ( "Pick Output File" ) );
-		mAnalysisPanel.add ( mAnalysisOutputLabel.setup ( " ", "?" ) );
+		mAnalysisPanel.add ( mAnalysisOutputLabel.setup ( "", "?" ) );
 
 		mAnalysisPanel.setPosition ( mLayout.hiddenPanelPosition );
 		mAnalysisPanel.setWidthElements ( 315 );
@@ -129,7 +129,7 @@ void AcorexAnalyse::ControllerMenu::Reset ( )
 		mReductionPanel.add ( mReductionPickInputFileButton.setup ( "Pick Input File" ) );
 		mReductionPanel.add ( mReductionInputLabel.setup ( "", "?" ) );
 		mReductionPanel.add ( mReductionPickOutputFileButton.setup ( "Pick Output File" ) );
-		mReductionPanel.add ( mReductionOutputLabel.setup ( " ", "?" ) );
+		mReductionPanel.add ( mReductionOutputLabel.setup ( "", "?" ) );
 
 		mReductionPanel.add ( mReducedDimensionsField.setup ( "Reduced Dimensions", 3, 2, 32 ) );
 		mReductionPanel.add ( mMaxIterationsField.setup ( "Max Training Iterations", 200, 1, 1000 ) );
