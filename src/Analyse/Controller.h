@@ -7,31 +7,31 @@
 #include <vector>
 #include <string>
 
-namespace AcorexCorpus {
+namespace AcorexAnalyse {
 
 class Controller {
 public:
 	Controller ( ) { };
 	~Controller ( ) { };
 
-	bool CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexCorpus::AnalysisSettings& settings );
+	bool CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexUtils::AnalysisSettings& settings );
 
-	bool ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexCorpus::ReductionSettings& settings );
+	bool ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexUtils::ReductionSettings& settings );
 
 	bool InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const bool newReplacesExisting );
 
 private:
-	std::vector<int> MergeDatasets ( AcorexCorpus::DataSet& newDataset, const AcorexCorpus::DataSet& existingDataset, const bool newReplacesExisting );
+	std::vector<int> MergeDatasets ( AcorexUtils::DataSet& newDataset, const AcorexUtils::DataSet& existingDataset, const bool newReplacesExisting );
 
 	bool SearchDirectory ( const std::string& directory, std::vector<std::string>& files );
 
-	void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexCorpus::AnalysisSettings& settings );
-	void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexCorpus::ReductionSettings& settings );
+	void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexUtils::AnalysisSettings& settings );
+	void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexUtils::ReductionSettings& settings );
 	void Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames );
 
-	AcorexCorpus::JSON mJSON;
-	AcorexCorpus::GenAnalysis mGenAnalysis;
-	AcorexCorpus::UMAP mUMAP;
+	AcorexUtils::JSON mJSON;
+	AcorexAnalyse::GenAnalysis mGenAnalysis;
+	AcorexAnalyse::UMAP mUMAP;
 };
 
-} // namespace AcorexCorpus
+} // namespace AcorexAnalyse

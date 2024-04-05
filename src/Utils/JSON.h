@@ -3,7 +3,7 @@
 #include "Utils/Data.h"
 #include <nlohmann/json.hpp>
 
-namespace AcorexCorpus {
+namespace AcorexUtils {
 
 class JSON {
 
@@ -17,16 +17,16 @@ public:
 	JSON ( ) { };
 	~JSON ( ) { };
 
-	bool Write ( const std::string& outputFile, const AcorexCorpus::DataSet& dataset );
+	bool Write ( const std::string& outputFile, const DataSet& dataset );
 
-	bool Read ( const std::string& inputFile, AcorexCorpus::DataSet& dataset );
-	bool Read ( const std::string& inputFile, AcorexCorpus::AnalysisSettings& settings );
+	bool Read ( const std::string& inputFile, DataSet& dataset );
+	bool Read ( const std::string& inputFile, AnalysisSettings& settings );
 };
 
-void to_json ( nlohmann::json& j, const AcorexCorpus::DataSet& a );
-void from_json ( const nlohmann::json& j, AcorexCorpus::DataSet& a );
+void to_json ( nlohmann::json& j, const DataSet& a );
+void from_json ( const nlohmann::json& j, DataSet& a );
 
-void to_json ( nlohmann::json& j, const AcorexCorpus::AnalysisSettings& a );
-void from_json ( const nlohmann::json& j, AcorexCorpus::AnalysisSettings& a );
+void to_json ( nlohmann::json& j, const AnalysisSettings& a );
+void from_json ( const nlohmann::json& j, AnalysisSettings& a );
 
-} // namespace AcorexCorpus
+} // namespace AcorexUtils

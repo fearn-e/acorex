@@ -2,7 +2,7 @@
 
 #include <ofxGui.h>
 
-namespace AcorexInterface {
+namespace AcorexUtils {
 
 	struct Colors {
 		// normal and locked text colour
@@ -25,4 +25,4 @@ namespace AcorexInterface {
 		int analysisPanelWidth = 315;
 		int reductionPanelWidth = 300;
 	};
-} // namespace interface
+} // namespace AcorexUtils

@@ -5,7 +5,7 @@
 #include <fstream>
 
 
-bool AcorexCorpus::JSON::Write ( const std::string& outputFile, const AcorexCorpus::DataSet& dataset )
+bool AcorexUtils::JSON::Write ( const std::string& outputFile, const DataSet& dataset )
 {
 	try
 	{
@@ -24,7 +24,7 @@ bool AcorexCorpus::JSON::Write ( const std::string& outputFile, const AcorexCorp
 	return true;
 }
 
-bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::DataSet& dataset )
+bool AcorexUtils::JSON::Read ( const std::string& inputFile, DataSet& dataset )
 {
 	try
 	{
@@ -34,7 +34,7 @@ bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::Data
 		file >> j;
 		file.close ( );
 
-		dataset = j.template get<AcorexCorpus::DataSet> ( );
+		dataset = j.template get<DataSet> ( );
 	}
 	catch ( std::exception& e )
 	{
@@ -45,7 +45,7 @@ bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::Data
 	return true;
 }
 
-bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::AnalysisSettings& settings )
+bool AcorexUtils::JSON::Read ( const std::string& inputFile, AnalysisSettings& settings )
 {
 	try
 	{
@@ -55,7 +55,7 @@ bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::Anal
 		file >> j;
 		file.close ( );
 
-		settings = j.template get<AcorexCorpus::AnalysisSettings> ( );
+		settings = j.template get<AnalysisSettings> ( );
 	}
 	catch ( std::exception& e )
 	{
@@ -71,7 +71,7 @@ bool AcorexCorpus::JSON::Read ( const std::string& inputFile, AcorexCorpus::Anal
 #error "data structure changed, please update json serialization"
 #endif
 
-void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::DataSet& a )
+void AcorexUtils::to_json ( nlohmann::json& j, const DataSet& a )
 {
 	j = nlohmann::json {	
 		TO_J ( currentPointCount),
@@ -97,7 +97,7 @@ void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::DataSet& a )
 		TO_J_SETTINGS ( maxFreq ) };
 }
 
-void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::DataSet& a )
+void AcorexUtils::from_json ( const nlohmann::json& j, DataSet& a )
 {
 	TO_A ( currentPointCount );
 	TO_A ( dimensionNames );
@@ -122,7 +122,7 @@ void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::DataSet& a
 	TO_A_SETTINGS ( maxFreq );
 }
 
-void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::AnalysisSettings& a )
+void AcorexUtils::to_json ( nlohmann::json& j, const AnalysisSettings& a )
 {
 	j = nlohmann::json { 
 		TO_J ( currentDimensionCount ),
@@ -140,7 +140,7 @@ void AcorexCorpus::to_json ( nlohmann::json& j, const AcorexCorpus::AnalysisSett
 		TO_J ( maxFreq ) };
 }
 
-void AcorexCorpus::from_json ( const nlohmann::json& j, AcorexCorpus::AnalysisSettings& a )
+void AcorexUtils::from_json ( const nlohmann::json& j, AnalysisSettings& a )
 { 
 	TO_A ( currentDimensionCount );
 	TO_A ( hasBeenReduced );
