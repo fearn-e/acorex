@@ -31,5 +31,13 @@ public:
 	//void gotMessage ( ofMessage msg );
 
 private:
+	void AnalyseToggled ( bool& value );
+	void ExploreToggled ( bool& value );
+
 	AcorexAnalyse::ControllerMenu mControllerMenu;
+	AcorexUtils::MenuLayout mLayout;
+	AcorexUtils::Colors mColors;
+
+	ofxToggle mAnalyseToggle;
+	ofxToggle mExploreToggle;
 };
