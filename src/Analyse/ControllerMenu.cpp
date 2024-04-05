@@ -30,6 +30,9 @@ void AcorexAnalyse::ControllerMenu::Reset ( )
 
 	// States -------------------------------------
 	{
+		bDraw = false;
+		bProcessing = false;
+
 		bDrawMainPanel = false;
 		bDrawAnalysisPanel = false;
 		bDrawReductionPanel = false;
@@ -161,6 +164,8 @@ void AcorexAnalyse::ControllerMenu::Reset ( )
 
 void AcorexAnalyse::ControllerMenu::Draw ( )
 {
+	if ( !bDraw ) { return; }
+
 	if ( bDrawMainPanel )
 	{
 		//draw background rectangle around main panel
@@ -320,6 +325,8 @@ void AcorexAnalyse::ControllerMenu::Analyse ( )
 		return;
 	}
 
+	bProcessing = true;
+
 	bool success = false;
 	if ( !bInsertingIntoCorpus )
 	{
@@ -331,6 +338,8 @@ void AcorexAnalyse::ControllerMenu::Analyse ( )
 	{
 		success = mController.InsertIntoCorpus ( inputPath, outputPath, mAnalysisInsertionReplaceWithNewToggle );
 	}
+
+	bProcessing = false;
 
 	if ( !success )
 	{
@@ -362,10 +371,14 @@ void AcorexAnalyse::ControllerMenu::Reduce ( )
 		return;
 	}
 
+	bProcessing = true;
+
 	bool success = false;
 	AcorexUtils::ReductionSettings settings;
 	PackSettingsFromUser ( settings );
 	success = mController.ReduceCorpus ( inputPath, outputPath, settings );
+
+	bProcessing = false;
 
 	if ( !success )
 	{
@@ -652,6 +665,7 @@ void AcorexAnalyse::ControllerMenu::ToggleAnalysisUILockout ( bool lock )
 void AcorexAnalyse::ControllerMenu::ShowMainPanel ( )
 {
 	Reset ( );
+	bDraw = true;
 	bDrawMainPanel = true;
 	mMainPanel.setPosition ( mLayout.defaultPanelPosition );
 }
@@ -659,6 +673,7 @@ void AcorexAnalyse::ControllerMenu::ShowMainPanel ( )
 void AcorexAnalyse::ControllerMenu::ShowAnalysisPanel ( )
 {
 	Reset ( );
+	bDraw = true;
 	bDrawAnalysisPanel = true;
 	mAnalysisPanel.setPosition ( mLayout.defaultPanelPosition );
 	mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout.interPanelSpacing );
@@ -680,6 +695,7 @@ void AcorexAnalyse::ControllerMenu::HideAnalysisInsertionPanel ( )
 void AcorexAnalyse::ControllerMenu::ShowReductionPanel ( )
 {
 	Reset ( );
+	bDraw = true;
 	bDrawReductionPanel = true;
 	mReductionPanel.setPosition ( mLayout.defaultPanelPosition );
 }
