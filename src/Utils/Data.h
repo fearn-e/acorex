@@ -49,11 +49,11 @@ struct DataSet {
 	std::vector<std::string> dimensionNames; // [dimension]
 	std::vector<std::string> fileList; // [file]
 
-	AcorexCorpus::TimeData time;
+	TimeData time;
 
-	AcorexCorpus::StatsData stats;
+	StatsData stats;
 
-	AcorexCorpus::AnalysisSettings analysisSettings;
+	AnalysisSettings analysisSettings;
 };
 
 } // namespace AcorexCorpus
