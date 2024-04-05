@@ -2,7 +2,7 @@
 
 #include "./ControllerMenu.h"
 
-void AcorexAnalyse::ControllerMenu::Setup ( )
+void AcorexAnalyse::ControllerMenu::Show ( )
 {
 	ShowMainPanel ( );
 }

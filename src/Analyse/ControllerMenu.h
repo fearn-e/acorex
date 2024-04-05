@@ -14,13 +14,12 @@ public:
 	ControllerMenu ( ) { };
 	~ControllerMenu ( ) { };
 
-	void Setup ( );
+	void Show ( );
+	void Reset ( );
 	void Draw ( );
 	void Exit ( );
 
 private:
-	// Setup --------------------------------------
-	void Reset ( );
 	void RemoveListeners ( );
 
 	// Analyse and Reduce --------------------------
