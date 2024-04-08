@@ -18,7 +18,7 @@
 #include <vector>
 #include <string>
 
-namespace AcorexAnalyse {
+namespace AcorexAnalyser {
 
 class GenAnalysis {
 public:
@@ -35,4 +35,4 @@ private:
 	void Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions );
 };
 
-} // namespace AcorexAnalyse
+} // namespace AcorexAnalyser

@@ -6,7 +6,7 @@
 
 // Public --------------------------------------------------------------------
 
-bool AcorexAnalyse::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexUtils::AnalysisSettings& settings )
+bool AcorexAnalyser::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexUtils::AnalysisSettings& settings )
 {
 	bool success;
 
@@ -38,7 +38,7 @@ bool AcorexAnalyse::Controller::CreateCorpus ( const std::string& inputPath, con
 	return true;
 }
 
-bool AcorexAnalyse::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexUtils::ReductionSettings& settings )
+bool AcorexAnalyser::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexUtils::ReductionSettings& settings )
 {
 	bool success;
 
@@ -59,7 +59,7 @@ bool AcorexAnalyse::Controller::ReduceCorpus ( const std::string& inputPath, con
 	return true;
 }
 
-bool AcorexAnalyse::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const bool newReplacesExisting )
+bool AcorexAnalyser::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const bool newReplacesExisting )
 {
 	bool success;
 
@@ -146,7 +146,7 @@ bool AcorexAnalyse::Controller::InsertIntoCorpus ( const std::string& inputPath,
 
 // Private -------------------------------------------------------------------
 
-std::vector<int> AcorexAnalyse::Controller::MergeDatasets ( AcorexUtils::DataSet& primaryDataset, const AcorexUtils::DataSet& additionalDataset, const bool additionalReplacesPrimary )
+std::vector<int> AcorexAnalyser::Controller::MergeDatasets ( AcorexUtils::DataSet& primaryDataset, const AcorexUtils::DataSet& additionalDataset, const bool additionalReplacesPrimary )
 {
 	int filesSkipped = 0;
 	int filesAdded = 0;
@@ -227,7 +227,7 @@ std::vector<int> AcorexAnalyse::Controller::MergeDatasets ( AcorexUtils::DataSet
 	return std::vector<int> { filesSkipped, filesAdded, filesOverwritten };
 }
 
-bool AcorexAnalyse::Controller::SearchDirectory ( const std::string& directory, std::vector<std::string>& files )
+bool AcorexAnalyser::Controller::SearchDirectory ( const std::string& directory, std::vector<std::string>& files )
 {
 	files.clear ( );
 
@@ -258,7 +258,7 @@ bool AcorexAnalyse::Controller::SearchDirectory ( const std::string& directory, 
 	return true;
 }
 
-void AcorexAnalyse::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexUtils::AnalysisSettings& settings )
+void AcorexAnalyser::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexUtils::AnalysisSettings& settings )
 {
 	dimensionNames.clear ( );
 
@@ -330,7 +330,7 @@ void AcorexAnalyse::Controller::GenerateDimensionNames ( std::vector<std::string
 	}
 }
 
-void AcorexAnalyse::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexUtils::ReductionSettings& settings )
+void AcorexAnalyser::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexUtils::ReductionSettings& settings )
 {
 	dimensionNames.clear ( );
 
@@ -340,7 +340,7 @@ void AcorexAnalyse::Controller::GenerateDimensionNames ( std::vector<std::string
 	}
 }
 
-void AcorexAnalyse::Controller::Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames )
+void AcorexAnalyser::Controller::Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames )
 {
 	dimensionNames.push_back ( masterDimension + " (Mean)" );
 	dimensionNames.push_back ( masterDimension + " (Standard Deviation)" );

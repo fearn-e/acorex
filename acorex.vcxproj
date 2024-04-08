@@ -106,11 +106,11 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Analyse\Controller.cpp" />
-    <ClCompile Include="src\Analyse\ControllerMenu.cpp" />
-    <ClCompile Include="src\Analyse\GenAnalysis.cpp" />
-    <ClCompile Include="src\Analyse\UMAP.cpp" />
-    <ClCompile Include="src\Explore\RawView.cpp" />
+    <ClCompile Include="src\Analyser\Controller.cpp" />
+    <ClCompile Include="src\Analyser\ControllerMenu.cpp" />
+    <ClCompile Include="src\Analyser\GenAnalysis.cpp" />
+    <ClCompile Include="src\Analyser\UMAP.cpp" />
+    <ClCompile Include="src\Explorer\RawView.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxBaseGui.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxButton.cpp" />
@@ -126,11 +126,11 @@
     <ClCompile Include="src\Utils\JSON.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Analyse\Controller.h" />
-    <ClInclude Include="src\Analyse\ControllerMenu.h" />
-    <ClInclude Include="src\Analyse\GenAnalysis.h" />
-    <ClInclude Include="src\Analyse\UMAP.h" />
-    <ClInclude Include="src\Explore\RawView.h" />
+    <ClInclude Include="src\Analyser\Controller.h" />
+    <ClInclude Include="src\Analyser\ControllerMenu.h" />
+    <ClInclude Include="src\Analyser\GenAnalysis.h" />
+    <ClInclude Include="src\Analyser\UMAP.h" />
+    <ClInclude Include="src\Explorer\RawView.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxButton.h" />

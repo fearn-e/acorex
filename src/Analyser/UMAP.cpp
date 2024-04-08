@@ -3,7 +3,7 @@
 #include "./UMAP.h"
 #include "ofLog.h"
 
-bool AcorexAnalyse::UMAP::Fit ( AcorexUtils::DataSet& dataset, const AcorexUtils::ReductionSettings& settings )
+bool AcorexAnalyser::UMAP::Fit ( AcorexUtils::DataSet& dataset, const AcorexUtils::ReductionSettings& settings )
 {
     fluid::algorithm::UMAP algorithm;
 
@@ -30,7 +30,7 @@ bool AcorexAnalyse::UMAP::Fit ( AcorexUtils::DataSet& dataset, const AcorexUtils
     return true;
 }
 
-void AcorexAnalyse::UMAP::CorpusToFluid ( fluid::FluidDataSet<std::string, double, 1>& fluidset, const AcorexUtils::DataSet& dataset, std::vector<int>& filePointLength )
+void AcorexAnalyser::UMAP::CorpusToFluid ( fluid::FluidDataSet<std::string, double, 1>& fluidset, const AcorexUtils::DataSet& dataset, std::vector<int>& filePointLength )
 {
 	if ( dataset.analysisSettings.bTime )
 	{	
@@ -73,7 +73,7 @@ void AcorexAnalyse::UMAP::CorpusToFluid ( fluid::FluidDataSet<std::string, doubl
 	}
 }
 
-void AcorexAnalyse::UMAP::FluidToCorpus ( AcorexUtils::DataSet& dataset, const fluid::FluidDataSet<std::string, double, 1>& fluidset, const std::vector<int>& filePointLength, const int reducedDimensionCount )
+void AcorexAnalyser::UMAP::FluidToCorpus ( AcorexUtils::DataSet& dataset, const fluid::FluidDataSet<std::string, double, 1>& fluidset, const std::vector<int>& filePointLength, const int reducedDimensionCount )
 {
 	if ( dataset.analysisSettings.bTime )
 	{
