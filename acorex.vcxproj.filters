@@ -40,20 +40,20 @@
     <ClCompile Include="src\Utils\JSON.cpp">
       <Filter>src\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\Analyse\GenAnalysis.cpp">
-      <Filter>src\Analyse</Filter>
+    <ClCompile Include="src\Explorer\RawView.cpp">
+      <Filter>src\Explorer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Analyse\UMAP.cpp">
-      <Filter>src\Analyse</Filter>
+    <ClCompile Include="src\Analyser\UMAP.cpp">
+      <Filter>src\Analyser</Filter>
     </ClCompile>
-    <ClCompile Include="src\Analyse\Controller.cpp">
-      <Filter>src\Analyse</Filter>
+    <ClCompile Include="src\Analyser\Controller.cpp">
+      <Filter>src\Analyser</Filter>
     </ClCompile>
-    <ClCompile Include="src\Analyse\ControllerMenu.cpp">
-      <Filter>src\Analyse</Filter>
+    <ClCompile Include="src\Analyser\ControllerMenu.cpp">
+      <Filter>src\Analyser</Filter>
     </ClCompile>
-    <ClCompile Include="src\Explore\RawView.cpp">
-      <Filter>src\Explore</Filter>
+    <ClCompile Include="src\Analyser\GenAnalysis.cpp">
+      <Filter>src\Analyser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -72,11 +72,11 @@
     <Filter Include="src\Utils">
       <UniqueIdentifier>{02fb1086-f6a1-4d11-aa11-0e24eab34fd5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Explore">
-      <UniqueIdentifier>{33a79c1f-627f-4007-ba22-4c89441d9ce3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Analyse">
+    <Filter Include="src\Analyser">
       <UniqueIdentifier>{b1bc8163-7718-4c38-8894-a98c9cc3034e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Explorer">
+      <UniqueIdentifier>{33a79c1f-627f-4007-ba22-4c89441d9ce3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -128,20 +128,20 @@
     <ClInclude Include="src\Utils\JSON.h">
       <Filter>src\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\Analyse\GenAnalysis.h">
-      <Filter>src\Analyse</Filter>
+    <ClInclude Include="src\Explorer\RawView.h">
+      <Filter>src\Explorer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Analyse\UMAP.h">
-      <Filter>src\Analyse</Filter>
+    <ClInclude Include="src\Analyser\GenAnalysis.h">
+      <Filter>src\Analyser</Filter>
     </ClInclude>
-    <ClInclude Include="src\Analyse\Controller.h">
-      <Filter>src\Analyse</Filter>
+    <ClInclude Include="src\Analyser\UMAP.h">
+      <Filter>src\Analyser</Filter>
     </ClInclude>
-    <ClInclude Include="src\Analyse\ControllerMenu.h">
-      <Filter>src\Analyse</Filter>
+    <ClInclude Include="src\Analyser\Controller.h">
+      <Filter>src\Analyser</Filter>
     </ClInclude>
-    <ClInclude Include="src\Explore\RawView.h">
-      <Filter>src\Explore</Filter>
+    <ClInclude Include="src\Analyser\ControllerMenu.h">
+      <Filter>src\Analyser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

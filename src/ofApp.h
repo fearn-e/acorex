@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Analyse/ControllerMenu.h"
+#include "Analyser/ControllerMenu.h"
 #include <ofMain.h>
 #include <ofxGui.h>
 
@@ -34,7 +34,7 @@ private:
 	void AnalyseToggled ( bool& value );
 	void ExploreToggled ( bool& value );
 
-	AcorexAnalyse::ControllerMenu mControllerMenu;
+	AcorexAnalyser::ControllerMenu mControllerMenu;
 	AcorexUtils::MenuLayout mLayout;
 	AcorexUtils::Colors mColors;
 

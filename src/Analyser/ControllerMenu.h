@@ -2,12 +2,12 @@
 
 #include "Utils/Data.h"
 #include "Utils/JSON.h"
-#include "Analyse/Controller.h"
+#include "Analyser/Controller.h"
 #include "Utils/InterfaceDefs.h"
 #include <ofxGui.h>
 #include <ofSystemUtils.h>
 
-namespace AcorexAnalyse {
+namespace AcorexAnalyser {
 
 class ControllerMenu {
 public:
@@ -138,10 +138,10 @@ private:
 
 
 
-	AcorexAnalyse::Controller mController;
+	AcorexAnalyser::Controller mController;
 	AcorexUtils::JSON mJSON;
 	AcorexUtils::Colors mColors;
 	AcorexUtils::MenuLayout mLayout;
 };
 
-} // namespace AcorexAnalyse
+} // namespace AcorexAnalyser

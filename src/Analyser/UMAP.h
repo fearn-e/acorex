@@ -10,7 +10,7 @@
 #include <data/TensorTypes.hpp>
 #include <vector>
 
-namespace AcorexAnalyse {
+namespace AcorexAnalyser {
 
 class UMAP {
 public:
@@ -25,4 +25,4 @@ private:
     void FluidToCorpus ( AcorexUtils::DataSet& dataset, const fluid::FluidDataSet<std::string, double, 1>& fluidset, const std::vector<int>& filePointLength, const int reducedDimensionCount );
 };
 
-} // namespace AcorexAnalyse
+} // namespace AcorexAnalyser

@@ -2,12 +2,12 @@
 
 #include "./ControllerMenu.h"
 
-void AcorexAnalyse::ControllerMenu::Show ( )
+void AcorexAnalyser::ControllerMenu::Show ( )
 {
 	ShowMainPanel ( );
 }
 
-void AcorexAnalyse::ControllerMenu::Reset ( )
+void AcorexAnalyser::ControllerMenu::Reset ( )
 {
 	// Clear --------------------------------------
 	{
@@ -197,7 +197,7 @@ void AcorexAnalyse::ControllerMenu::Reset ( )
 	ToggleAnalysisUILockout ( false );
 }
 
-void AcorexAnalyse::ControllerMenu::Draw ( )
+void AcorexAnalyser::ControllerMenu::Draw ( )
 {
 	if ( !bDraw ) { return; }
 
@@ -318,12 +318,12 @@ void AcorexAnalyse::ControllerMenu::Draw ( )
 	}
 }
 
-void AcorexAnalyse::ControllerMenu::Exit ( )
+void AcorexAnalyser::ControllerMenu::Exit ( )
 {
 	RemoveListeners ( );
 }
 
-void AcorexAnalyse::ControllerMenu::RemoveListeners ( )
+void AcorexAnalyser::ControllerMenu::RemoveListeners ( )
 {
 	mCreateCorpusButton.removeListener ( this, &ControllerMenu::ShowAnalysisPanel );
 	mReduceCorpusButton.removeListener ( this, &ControllerMenu::ShowReductionPanel );
@@ -342,7 +342,7 @@ void AcorexAnalyse::ControllerMenu::RemoveListeners ( )
 
 // Analyse and Reduce ---------------------------
 
-void AcorexAnalyse::ControllerMenu::Analyse ( )
+void AcorexAnalyser::ControllerMenu::Analyse ( )
 {
 	if ( !bAnalysisDirectorySelected || !bAnalysisOutputSelected )
 	{
@@ -388,7 +388,7 @@ void AcorexAnalyse::ControllerMenu::Analyse ( )
 	//------------------------------------------------ TEMPORARY
 }
 
-void AcorexAnalyse::ControllerMenu::Reduce ( )
+void AcorexAnalyser::ControllerMenu::Reduce ( )
 {
 	if ( !bReductionInputSelected || !bReductionOutputSelected )
 	{
@@ -429,7 +429,7 @@ void AcorexAnalyse::ControllerMenu::Reduce ( )
 
 // File Dialog Button Callbacks -----------------
 
-void AcorexAnalyse::ControllerMenu::SelectAnalysisDirectory ( )
+void AcorexAnalyser::ControllerMenu::SelectAnalysisDirectory ( )
 {
 	ofFileDialogResult audioDirectory = ofSystemLoadDialog ( "Select folder containing audio files...", true, ofFilePath::getCurrentWorkingDirectory ( ) );
 	if ( !audioDirectory.bSuccess )
@@ -453,7 +453,7 @@ void AcorexAnalyse::ControllerMenu::SelectAnalysisDirectory ( )
 	//auto resultOut = pfd::save_file::save_file("Saving reduced analysis as...", "reduced_corpus.json", { "JSON Files", "*.json" });
 	//std::string resultOutPath = resultOut.result();
 	//#endif
-void AcorexAnalyse::ControllerMenu::SelectAnalysisOutputFile ( )
+void AcorexAnalyser::ControllerMenu::SelectAnalysisOutputFile ( )
 {
 	ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus.json", "Save analysed corpus as..." );
 	if ( !outputFile.bSuccess )
@@ -500,7 +500,7 @@ void AcorexAnalyse::ControllerMenu::SelectAnalysisOutputFile ( )
 	bAnalysisOutputSelected = true;
 }
 
-void AcorexAnalyse::ControllerMenu::SelectReductionInputFile ( )
+void AcorexAnalyser::ControllerMenu::SelectReductionInputFile ( )
 {
 	ofFileDialogResult inputFile = ofSystemLoadDialog ( "Select a corpus file...", false, ofFilePath::getCurrentWorkingDirectory ( ) );
 	if ( !inputFile.bSuccess )
@@ -548,7 +548,7 @@ void AcorexAnalyse::ControllerMenu::SelectReductionInputFile ( )
 	//auto resultOut = pfd::save_file::save_file("Saving reduced analysis as...", "reduced_corpus.json", { "JSON Files", "*.json" });
 	//std::string resultOutPath = resultOut.result();
 	//#endif
-void AcorexAnalyse::ControllerMenu::SelectReductionOutputFile ( )
+void AcorexAnalyser::ControllerMenu::SelectReductionOutputFile ( )
 {
 	ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus_reduced.json", "Save reduced corpus as..." );
 	if ( !outputFile.bSuccess )
@@ -570,7 +570,7 @@ void AcorexAnalyse::ControllerMenu::SelectReductionOutputFile ( )
 
 // Load and Save Settings -----------------------
 
-void AcorexAnalyse::ControllerMenu::UnpackSettingsFromFile ( const AcorexUtils::AnalysisSettings& settings )
+void AcorexAnalyser::ControllerMenu::UnpackSettingsFromFile ( const AcorexUtils::AnalysisSettings& settings )
 {
 	mTimeDimensionToggle = settings.bTime;
 	mAnalysisPitchToggle = settings.bPitch;
@@ -590,7 +590,7 @@ void AcorexAnalyse::ControllerMenu::UnpackSettingsFromFile ( const AcorexUtils::
 #endif // !DATA_CHANGE_CHECK_8
 }
 
-void AcorexAnalyse::ControllerMenu::PackSettingsFromUser ( AcorexUtils::AnalysisSettings& settings )
+void AcorexAnalyser::ControllerMenu::PackSettingsFromUser ( AcorexUtils::AnalysisSettings& settings )
 {
 	settings.bTime = mTimeDimensionToggle;
 	settings.bPitch = mAnalysisPitchToggle;
@@ -610,7 +610,7 @@ void AcorexAnalyse::ControllerMenu::PackSettingsFromUser ( AcorexUtils::Analysis
 #endif // !DATA_CHANGE_CHECK_8
 }
 
-void AcorexAnalyse::ControllerMenu::PackSettingsFromUser ( AcorexUtils::ReductionSettings& settings )
+void AcorexAnalyser::ControllerMenu::PackSettingsFromUser ( AcorexUtils::ReductionSettings& settings )
 {
 	settings.dimensionReductionTarget = mReducedDimensionsField;
 	settings.maxIterations = mMaxIterationsField;
@@ -623,7 +623,7 @@ void AcorexAnalyse::ControllerMenu::PackSettingsFromUser ( AcorexUtils::Reductio
 
 // UI Value Management -------------------------------
 
-void AcorexAnalyse::ControllerMenu::QuantiseWindowSize ( int& value )
+void AcorexAnalyser::ControllerMenu::QuantiseWindowSize ( int& value )
 {
 	//find closest power of 2 between 512 and 8192
 	int closest = 512;
@@ -642,7 +642,7 @@ void AcorexAnalyse::ControllerMenu::QuantiseWindowSize ( int& value )
 	mAnalysisMetadataPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ) );
 }
 
-void AcorexAnalyse::ControllerMenu::QuantiseHopFraction ( int& value )
+void AcorexAnalyser::ControllerMenu::QuantiseHopFraction ( int& value )
 {
 	//find closest power of 2 between 1 and 16
 	int closest = 1;
@@ -661,7 +661,7 @@ void AcorexAnalyse::ControllerMenu::QuantiseHopFraction ( int& value )
 	mAnalysisMetadataPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ) );
 }
 
-void AcorexAnalyse::ControllerMenu::AnalysisInsertionToggleChanged ( bool& value )
+void AcorexAnalyser::ControllerMenu::AnalysisInsertionToggleChanged ( bool& value )
 {
 	if ( value ) { mAnalysisInsertionReplaceWithNewToggle.setName ( "New Files" ); }
 	else { mAnalysisInsertionReplaceWithNewToggle.setName ( "Existing Files" ); }
@@ -669,7 +669,7 @@ void AcorexAnalyse::ControllerMenu::AnalysisInsertionToggleChanged ( bool& value
 
 // Panel Management ------------------------------
 
-void AcorexAnalyse::ControllerMenu::ToggleAnalysisUILockout ( bool lock )
+void AcorexAnalyser::ControllerMenu::ToggleAnalysisUILockout ( bool lock )
 {
 	mTimeDimensionToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
 	mAnalysisPitchToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
@@ -697,7 +697,7 @@ void AcorexAnalyse::ControllerMenu::ToggleAnalysisUILockout ( bool lock )
 	}
 }
 
-void AcorexAnalyse::ControllerMenu::ShowMainPanel ( )
+void AcorexAnalyser::ControllerMenu::ShowMainPanel ( )
 {
 	Reset ( );
 	bDraw = true;
@@ -705,7 +705,7 @@ void AcorexAnalyse::ControllerMenu::ShowMainPanel ( )
 	mMainPanel.setPosition ( mLayout.analysePanelOriginX, mLayout.analysePanelOriginY );
 }
 
-void AcorexAnalyse::ControllerMenu::ShowAnalysisPanel ( )
+void AcorexAnalyser::ControllerMenu::ShowAnalysisPanel ( )
 {
 	Reset ( );
 	bDraw = true;
@@ -715,19 +715,19 @@ void AcorexAnalyse::ControllerMenu::ShowAnalysisPanel ( )
 	mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout.interPanelSpacing );
 }
 
-void AcorexAnalyse::ControllerMenu::ShowAnalysisInsertionPanel ( )
+void AcorexAnalyser::ControllerMenu::ShowAnalysisInsertionPanel ( )
 {
 	bDrawAnalysisInsertionPanel = true;
 	mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout.interPanelSpacing );
 }
 
-void AcorexAnalyse::ControllerMenu::HideAnalysisInsertionPanel ( )
+void AcorexAnalyser::ControllerMenu::HideAnalysisInsertionPanel ( )
 {
 	bDrawAnalysisInsertionPanel = false;
 	mAnalysisInsertionPanel.setPosition ( mLayout.hiddenPanelPosition );
 }
 
-void AcorexAnalyse::ControllerMenu::ShowReductionPanel ( )
+void AcorexAnalyser::ControllerMenu::ShowReductionPanel ( )
 {
 	Reset ( );
 	bDraw = true;

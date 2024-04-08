@@ -3,7 +3,7 @@
 #include "Utils/Data.h"
 #include "Utils/JSON.h"
 
-namespace AcorexExplore {
+namespace AcorexExplorer {
 
 class RawView {
 public:
@@ -19,4 +19,4 @@ private:
 	AcorexUtils::JSON mJSON;
 };
 
-} // namespace AcorexExplore
+} // namespace AcorexExplorer

@@ -2,12 +2,12 @@
 
 #include "Utils/Data.h"
 #include "Utils/JSON.h"
-#include "Analyse/GenAnalysis.h"
-#include "Analyse/UMAP.h"
+#include "Analyser/GenAnalysis.h"
+#include "Analyser/UMAP.h"
 #include <vector>
 #include <string>
 
-namespace AcorexAnalyse {
+namespace AcorexAnalyser {
 
 class Controller {
 public:
@@ -30,8 +30,8 @@ private:
 	void Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames );
 
 	AcorexUtils::JSON mJSON;
-	AcorexAnalyse::GenAnalysis mGenAnalysis;
-	AcorexAnalyse::UMAP mUMAP;
+	AcorexAnalyser::GenAnalysis mGenAnalysis;
+	AcorexAnalyser::UMAP mUMAP;
 };
 
-} // namespace AcorexAnalyse
+} // namespace AcorexAnalyser

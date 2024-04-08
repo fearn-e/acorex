@@ -8,7 +8,7 @@
 #error "Check if dataset is still used correctly"
 #endif
 
-int AcorexAnalyse::GenAnalysis::ProcessFiles ( AcorexUtils::DataSet& dataset )
+int AcorexAnalyser::GenAnalysis::ProcessFiles ( AcorexUtils::DataSet& dataset )
 {  
     if ( dataset.analysisSettings.bTime )
     {
@@ -237,7 +237,7 @@ int AcorexAnalyse::GenAnalysis::ProcessFiles ( AcorexUtils::DataSet& dataset )
     return analysedFileIndex;
 }
 
-void AcorexAnalyse::GenAnalysis::MixDownToMono ( fluid::RealVector& output, htl::in_audio_file& file )
+void AcorexAnalyser::GenAnalysis::MixDownToMono ( fluid::RealVector& output, htl::in_audio_file& file )
 {
     int numChannels = file.channels ( );
     int numSamples = file.frames ( );
@@ -262,7 +262,7 @@ void AcorexAnalyse::GenAnalysis::MixDownToMono ( fluid::RealVector& output, htl:
 
 }
 
-fluid::RealVector AcorexAnalyse::GenAnalysis::ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats )
+fluid::RealVector AcorexAnalyser::GenAnalysis::ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats )
 {
     fluid::index      dim = matrix.cols ( );
     fluid::RealMatrix tmp ( dim, 7 );
@@ -275,7 +275,7 @@ fluid::RealVector AcorexAnalyse::GenAnalysis::ComputeStats ( fluid::RealMatrixVi
     return result;
 }
 
-void AcorexAnalyse::GenAnalysis::Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions )
+void AcorexAnalyser::GenAnalysis::Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions )
 {
     for ( fluid::index dimension = 0; dimension < numDimensions; dimension++ )
     {
