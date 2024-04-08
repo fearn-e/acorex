@@ -4,13 +4,15 @@
 #include <ofLog.h>
 #include <filesystem>
 
+using namespace Acorex;
+
 // Public --------------------------------------------------------------------
 
-bool AcorexAnalyser::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexUtils::AnalysisSettings& settings )
+bool Analyser::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const Utils::AnalysisSettings& settings )
 {
 	bool success;
 
-	AcorexUtils::DataSet dataset;
+	Utils::DataSet dataset;
 
 	dataset.analysisSettings = settings;
 
@@ -38,11 +40,11 @@ bool AcorexAnalyser::Controller::CreateCorpus ( const std::string& inputPath, co
 	return true;
 }
 
-bool AcorexAnalyser::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexUtils::ReductionSettings& settings )
+bool Analyser::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const Utils::ReductionSettings& settings )
 {
 	bool success;
 
-	AcorexUtils::DataSet dataset;
+	Utils::DataSet dataset;
 
 	success = mJSON.Read ( inputPath, dataset );
 	if ( !success ) { return false; }
@@ -59,11 +61,11 @@ bool AcorexAnalyser::Controller::ReduceCorpus ( const std::string& inputPath, co
 	return true;
 }
 
-bool AcorexAnalyser::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const bool newReplacesExisting )
+bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const bool newReplacesExisting )
 {
 	bool success;
 
-	AcorexUtils::DataSet existingDataset;
+	Utils::DataSet existingDataset;
 	success = mJSON.Read ( outputPath, existingDataset );
 	if ( !success ) { return false; }
 
@@ -107,7 +109,7 @@ bool AcorexAnalyser::Controller::InsertIntoCorpus ( const std::string& inputPath
 		ofLogNotice ( "Controller" ) << newFiles.size ( ) << " new files left to process, with " << preTreated - newFiles.size ( ) << " duplicates removed.";
 	}
 
-	AcorexUtils::DataSet newDataset;
+	Utils::DataSet newDataset;
 	newDataset.fileList = newFiles;
 	newDataset.analysisSettings = existingDataset.analysisSettings;
 #ifndef DATA_CHANGE_CHECK_8
@@ -146,7 +148,7 @@ bool AcorexAnalyser::Controller::InsertIntoCorpus ( const std::string& inputPath
 
 // Private -------------------------------------------------------------------
 
-std::vector<int> AcorexAnalyser::Controller::MergeDatasets ( AcorexUtils::DataSet& primaryDataset, const AcorexUtils::DataSet& additionalDataset, const bool additionalReplacesPrimary )
+std::vector<int> Analyser::Controller::MergeDatasets ( Utils::DataSet& primaryDataset, const Utils::DataSet& additionalDataset, const bool additionalReplacesPrimary )
 {
 	int filesSkipped = 0;
 	int filesAdded = 0;
@@ -227,7 +229,7 @@ std::vector<int> AcorexAnalyser::Controller::MergeDatasets ( AcorexUtils::DataSe
 	return std::vector<int> { filesSkipped, filesAdded, filesOverwritten };
 }
 
-bool AcorexAnalyser::Controller::SearchDirectory ( const std::string& directory, std::vector<std::string>& files )
+bool Analyser::Controller::SearchDirectory ( const std::string& directory, std::vector<std::string>& files )
 {
 	files.clear ( );
 
@@ -258,7 +260,7 @@ bool AcorexAnalyser::Controller::SearchDirectory ( const std::string& directory,
 	return true;
 }
 
-void AcorexAnalyser::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexUtils::AnalysisSettings& settings )
+void Analyser::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::AnalysisSettings& settings )
 {
 	dimensionNames.clear ( );
 
@@ -330,7 +332,7 @@ void AcorexAnalyser::Controller::GenerateDimensionNames ( std::vector<std::strin
 	}
 }
 
-void AcorexAnalyser::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexUtils::ReductionSettings& settings )
+void Analyser::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::ReductionSettings& settings )
 {
 	dimensionNames.clear ( );
 
@@ -340,7 +342,7 @@ void AcorexAnalyser::Controller::GenerateDimensionNames ( std::vector<std::strin
 	}
 }
 
-void AcorexAnalyser::Controller::Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames )
+void Analyser::Controller::Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames )
 {
 	dimensionNames.push_back ( masterDimension + " (Mean)" );
 	dimensionNames.push_back ( masterDimension + " (Standard Deviation)" );

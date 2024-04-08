@@ -4,8 +4,9 @@
 #include <ofSystemUtils.h>
 #include <ofLog.h>
 
+using namespace Acorex;
 
-bool AcorexExplorer::RawView::LoadCorpus ( )
+bool Explorer::RawView::LoadCorpus ( )
 {
 	ofFileDialogResult corpusFile = ofSystemLoadDialog ( "Select corpus file" );
 	if ( !corpusFile.bSuccess )
@@ -19,7 +20,7 @@ bool AcorexExplorer::RawView::LoadCorpus ( )
 	return success;
 }
 
-bool AcorexExplorer::RawView::LoadCorpus ( const std::string& path, const std::string& name )
+bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string& name )
 {
 	if ( name.find ( ".json" ) == std::string::npos )
 	{

@@ -2,7 +2,8 @@
 
 #include <ofxGui.h>
 
-namespace AcorexUtils {
+namespace Acorex {
+namespace Utils {
 
 	struct Colors {
 		// normal and locked text colour
@@ -30,4 +31,5 @@ namespace AcorexUtils {
 		// int explorePanelOriginX = ofGetWidth ( ) - explorePanelWidth; int explorePanelOriginY = topBarHeight + interPanelSpacing;
 		glm::vec3 hiddenPanelPosition = { -1000, -1000, 0 };
 	};
-} // namespace AcorexUtils
+} // namespace Utils
+} // namespace Acorex

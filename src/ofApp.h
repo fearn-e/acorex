@@ -35,8 +35,8 @@ private:
 	void ExploreToggled ( bool& value );
 
 	AcorexAnalyser::ControllerMenu mControllerMenu;
-	AcorexUtils::MenuLayout mLayout;
-	AcorexUtils::Colors mColors;
+	Acorex::Utils::MenuLayout mLayout;
+	Acorex::Utils::Colors mColors;
 
 	ofxToggle mAnalyseToggle;
 	ofxToggle mExploreToggle;
