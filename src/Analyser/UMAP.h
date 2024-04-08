@@ -10,19 +10,21 @@
 #include <data/TensorTypes.hpp>
 #include <vector>
 
-namespace AcorexAnalyser {
+namespace Acorex {
+namespace Analyser {
 
 class UMAP {
 public:
     UMAP ( ) { };
     ~UMAP ( ) { };
 
-    bool Fit ( AcorexUtils::DataSet& dataset, const AcorexUtils::ReductionSettings& settings );
+    bool Fit ( Utils::DataSet& dataset, const Utils::ReductionSettings& settings );
 
 private:
-    void CorpusToFluid ( fluid::FluidDataSet<std::string, double, 1>& fluidset, const AcorexUtils::DataSet& dataset, std::vector<int>& filePointLength );
+    void CorpusToFluid ( fluid::FluidDataSet<std::string, double, 1>& fluidset, const Utils::DataSet& dataset, std::vector<int>& filePointLength );
 
-    void FluidToCorpus ( AcorexUtils::DataSet& dataset, const fluid::FluidDataSet<std::string, double, 1>& fluidset, const std::vector<int>& filePointLength, const int reducedDimensionCount );
+    void FluidToCorpus ( Utils::DataSet& dataset, const fluid::FluidDataSet<std::string, double, 1>& fluidset, const std::vector<int>& filePointLength, const int reducedDimensionCount );
 };
 
-} // namespace AcorexAnalyser
+} // namespace Analyser
+} // namespace Acorex

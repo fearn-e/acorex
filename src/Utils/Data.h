@@ -8,7 +8,8 @@
 
 #define DATA_NUM_STATS 7
 
-namespace AcorexUtils {
+namespace Acorex {
+namespace Utils {
 
 struct TimeData {
 	std::vector<std::vector<double>> samples; // [file][timepoint]
@@ -56,4 +57,5 @@ struct DataSet {
 	AnalysisSettings analysisSettings;
 };
 
-} // namespace AcorexUtils
+} // namespace Utils
+} // namespace Acorex

@@ -3,7 +3,8 @@
 #include "Utils/Data.h"
 #include "Utils/JSON.h"
 
-namespace AcorexExplorer {
+namespace Acorex {
+namespace Explorer {
 
 class RawView {
 public:
@@ -14,9 +15,10 @@ public:
 	bool LoadCorpus ( const std::string& path, const std::string& name ); // load corpus from file path
 
 private:
-	AcorexUtils::DataSet mDataset;
+	Utils::DataSet mDataset;
 
-	AcorexUtils::JSON mJSON;
+	Utils::JSON mJSON;
 };
 
-} // namespace AcorexExplorer
+} // namespace Explorer
+} // namespace Acorex

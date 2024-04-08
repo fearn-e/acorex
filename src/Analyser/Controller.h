@@ -7,31 +7,33 @@
 #include <vector>
 #include <string>
 
-namespace AcorexAnalyser {
+namespace Acorex {
+namespace Analyser {
 
 class Controller {
 public:
 	Controller ( ) { };
 	~Controller ( ) { };
 
-	bool CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexUtils::AnalysisSettings& settings );
+	bool CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const Utils::AnalysisSettings& settings );
 
-	bool ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexUtils::ReductionSettings& settings );
+	bool ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const Utils::ReductionSettings& settings );
 
 	bool InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const bool newReplacesExisting );
 
 private:
-	std::vector<int> MergeDatasets ( AcorexUtils::DataSet& newDataset, const AcorexUtils::DataSet& existingDataset, const bool newReplacesExisting );
+	std::vector<int> MergeDatasets ( Utils::DataSet& newDataset, const Utils::DataSet& existingDataset, const bool newReplacesExisting );
 
 	bool SearchDirectory ( const std::string& directory, std::vector<std::string>& files );
 
-	void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexUtils::AnalysisSettings& settings );
-	void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexUtils::ReductionSettings& settings );
+	void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::AnalysisSettings& settings );
+	void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::ReductionSettings& settings );
 	void Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames );
 
-	AcorexUtils::JSON mJSON;
-	AcorexAnalyser::GenAnalysis mGenAnalysis;
-	AcorexAnalyser::UMAP mUMAP;
+	Utils::JSON mJSON;
+	Analyser::GenAnalysis mGenAnalysis;
+	Analyser::UMAP mUMAP;
 };
 
-} // namespace AcorexAnalyser
+} // namespace Analyser
+} // namespace Acorex
