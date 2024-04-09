@@ -32,7 +32,14 @@ void ExplorerMenu::RemoveListeners ( )
 
 void ExplorerMenu::OpenCorpus ( )
 {
+	if ( bIsCorpusOpen )
+	{
+		; // TODO - warn user that they are about to close the current corpus
+	}
+
 	mRawView.LoadCorpus ( );
+
+	bIsCorpusOpen = true;
 }
 
 void ExplorerMenu::SwapDimension ( )
