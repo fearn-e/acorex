@@ -23,6 +23,10 @@ private:
 	void OpenCorpus ( );
 	void SwapDimension ( );
 
+	// States --------------------------------------
+
+	bool bIsCorpusOpen = false;
+
 	// Acorex Objects ------------------------------
 
 	Explorer::RawView mRawView;
