@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Explorer/RawView.h"
+
 namespace Acorex {
 
 class ExplorerMenu {
@@ -21,6 +23,7 @@ private:
 	void OpenCorpus ( );
 	void SwapDimension ( );
 
+	Explorer::RawView mRawView;
 };
 
 } // namespace Acorex

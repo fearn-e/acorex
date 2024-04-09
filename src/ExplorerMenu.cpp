@@ -32,6 +32,7 @@ void ExplorerMenu::RemoveListeners ( )
 
 void ExplorerMenu::OpenCorpus ( )
 {
+	mRawView.LoadCorpus ( );
 }
 
 void ExplorerMenu::SwapDimension ( )
