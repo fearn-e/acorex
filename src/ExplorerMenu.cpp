@@ -21,6 +21,7 @@ void ExplorerMenu::Draw ( )
 
 void ExplorerMenu::Exit ( )
 {
+	RemoveListeners ( );
 }
 
 void ExplorerMenu::RemoveListeners ( )
