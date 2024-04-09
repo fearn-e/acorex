@@ -1,5 +1,3 @@
-#pragma once
-
 #include "./GenAnalysis.h"
 #include <ofLog.h>
 #include <omp.h>

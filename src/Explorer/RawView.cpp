@@ -1,5 +1,3 @@
-#pragma once
-
 #include "./RawView.h"
 #include <ofSystemUtils.h>
 #include <ofLog.h>

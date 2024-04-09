@@ -1,5 +1,3 @@
-#pragma once
-
 #include "./Controller.h"
 #include <ofLog.h>
 #include <filesystem>
