@@ -23,6 +23,8 @@ private:
 	void OpenCorpus ( );
 	void SwapDimension ( );
 
+	// Acorex Objects ------------------------------
+
 	Explorer::RawView mRawView;
 };
 
