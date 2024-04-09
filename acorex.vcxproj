@@ -106,8 +106,8 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\AnalyserMenu.cpp" />
     <ClCompile Include="src\Analyser\Controller.cpp" />
-    <ClCompile Include="src\Analyser\ControllerMenu.cpp" />
     <ClCompile Include="src\Analyser\GenAnalysis.cpp" />
     <ClCompile Include="src\Analyser\UMAP.cpp" />
     <ClCompile Include="src\Explorer\RawView.cpp" />
@@ -126,8 +126,8 @@
     <ClCompile Include="src\Utils\JSON.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AnalyserMenu.h" />
     <ClInclude Include="src\Analyser\Controller.h" />
-    <ClInclude Include="src\Analyser\ControllerMenu.h" />
     <ClInclude Include="src\Analyser\GenAnalysis.h" />
     <ClInclude Include="src\Analyser\UMAP.h" />
     <ClInclude Include="src\Explorer\RawView.h" />

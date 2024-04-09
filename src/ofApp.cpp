@@ -25,7 +25,7 @@ void ofApp::draw ( )
 {
 	if ( mAnalyseToggle )
 	{
-		mControllerMenu.Draw ( );
+		mAnalyserMenu.Draw ( );
 	}
 	
 	if ( mExploreToggle )
@@ -44,18 +44,18 @@ void ofApp::draw ( )
 
 void ofApp::exit ( )
 {
-	mControllerMenu.Exit ( );
+	mAnalyserMenu.Exit ( );
 }
 
 void ofApp::AnalyseToggled ( bool& value )
 {
 	if ( value )
 	{
-		mControllerMenu.Show ( );
+		mAnalyserMenu.Show ( );
 	}
 	else
 	{
-		mControllerMenu.Reset ( );
+		mAnalyserMenu.Reset ( );
 	}
 }
 

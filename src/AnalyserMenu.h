@@ -7,12 +7,12 @@
 #include <ofxGui.h>
 #include <ofSystemUtils.h>
 
-namespace AcorexAnalyser {
+namespace Acorex {
 
-class ControllerMenu {
+class AnalyserMenu {
 public:
-	ControllerMenu ( ) { };
-	~ControllerMenu ( ) { };
+	AnalyserMenu ( ) { };
+	~AnalyserMenu ( ) { };
 
 	void Show ( );
 	void Reset ( );
@@ -36,9 +36,9 @@ private:
 
 	// Load and Save Settings ----------------------
 
-	void UnpackSettingsFromFile ( const AcorexUtils::AnalysisSettings& settings );
-	void PackSettingsFromUser ( AcorexUtils::AnalysisSettings& settings);
-	void PackSettingsFromUser ( AcorexUtils::ReductionSettings& settings );
+	void UnpackSettingsFromFile ( const Utils::AnalysisSettings& settings );
+	void PackSettingsFromUser ( Utils::AnalysisSettings& settings);
+	void PackSettingsFromUser ( Utils::ReductionSettings& settings );
 
 	// UI Value Management -------------------------
 
@@ -138,10 +138,10 @@ private:
 
 
 
-	AcorexAnalyser::Controller mController;
-	AcorexUtils::JSON mJSON;
-	AcorexUtils::Colors mColors;
-	AcorexUtils::MenuLayout mLayout;
+	Analyser::Controller mController;
+	Utils::JSON mJSON;
+	Utils::Colors mColors;
+	Utils::MenuLayout mLayout;
 };
 
-} // namespace AcorexAnalyser
+} // namespace Acorex

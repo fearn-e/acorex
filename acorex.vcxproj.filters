@@ -49,11 +49,11 @@
     <ClCompile Include="src\Analyser\Controller.cpp">
       <Filter>src\Analyser</Filter>
     </ClCompile>
-    <ClCompile Include="src\Analyser\ControllerMenu.cpp">
-      <Filter>src\Analyser</Filter>
-    </ClCompile>
     <ClCompile Include="src\Analyser\GenAnalysis.cpp">
       <Filter>src\Analyser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AnalyserMenu.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -140,8 +140,8 @@
     <ClInclude Include="src\Analyser\Controller.h">
       <Filter>src\Analyser</Filter>
     </ClInclude>
-    <ClInclude Include="src\Analyser\ControllerMenu.h">
-      <Filter>src\Analyser</Filter>
+    <ClInclude Include="src\AnalyserMenu.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
