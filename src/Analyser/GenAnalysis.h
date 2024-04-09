@@ -29,7 +29,7 @@ public:
 	int ProcessFiles ( Utils::DataSet& dataset );
 
 private:
-	void MixDownToMono ( fluid::RealVector& output, htl::in_audio_file& file );
+	void ReadMono ( fluid::RealVector& output, htl::in_audio_file& file );
 
 	fluid::RealVector ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats );
 
