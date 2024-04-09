@@ -2,11 +2,16 @@
 
 using namespace Acorex;
 
+void ExplorerMenu::Initialise ( )
+{
+}
+
 void ExplorerMenu::Show ( )
 {
 }
 
-void ExplorerMenu::Reset ( )
+// hides menu without resetting
+void ExplorerMenu::Hide ( )
 {
 }
 

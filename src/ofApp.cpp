@@ -5,6 +5,9 @@ void ofApp::setup ( )
 	ofSetVerticalSync ( true );
 	ofBackground ( 30 );
 
+	mAnalyserMenu.Initialise ( );
+	mExplorerMenu.Initialise ( );
+
 	mAnalyseToggle.setup ( "Analyse", false, 100, mLayout.topBarHeight / 2 );
 	mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout.topBarHeight / 4 );
 	mAnalyseToggle.setBackgroundColor ( mColors.transparent );
@@ -27,10 +30,10 @@ void ofApp::draw ( )
 	{
 		mAnalyserMenu.Draw ( );
 	}
-	
+
 	if ( mExploreToggle )
 	{
-		//draw explore menu
+		mExplorerMenu.Draw ( );
 	}
 
 	{
@@ -55,7 +58,7 @@ void ofApp::AnalyseToggled ( bool& value )
 	}
 	else
 	{
-		mAnalyserMenu.Reset ( );
+		mAnalyserMenu.Hide ( );
 	}
 }
 
@@ -63,10 +66,10 @@ void ofApp::ExploreToggled ( bool& value )
 {
 	if ( value )
 	{
-		//show explore menu
+		mExplorerMenu.Show ( );
 	}
 	else
 	{
-		//hide explore menu
+		mExplorerMenu.Hide ( );
 	}
 }
