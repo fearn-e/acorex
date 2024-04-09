@@ -136,8 +136,7 @@ private:
 	ofxButton mConfirmReductionButton;
 	ofxButton mCancelReductionButton;
 
-
-
+	// Acorex Objects ------------------------------
 
 	Analyser::Controller mController;
 	Utils::JSON mJSON;
