@@ -2,12 +2,12 @@
 
 using namespace Acorex;
 
-void AnalyserMenu::Show ( )
+AnalyserMenu::AnalyserMenu ( )
 {
-	ShowMainPanel ( );
+	Initialise ( );
 }
 
-void AnalyserMenu::Reset ( )
+void AnalyserMenu::Initialise ( )
 {
 	// Clear --------------------------------------
 	{
@@ -195,6 +195,17 @@ void AnalyserMenu::Reset ( )
 	}
 
 	ToggleAnalysisUILockout ( false );
+}
+
+void AnalyserMenu::Show ( )
+{
+	ShowMainPanel ( );
+}
+
+// fully resets all values and hides the menu
+void AnalyserMenu::Hide ( )
+{
+	Initialise ( );
 }
 
 void AnalyserMenu::Draw ( )
@@ -699,7 +710,7 @@ void AnalyserMenu::ToggleAnalysisUILockout ( bool lock )
 
 void AnalyserMenu::ShowMainPanel ( )
 {
-	Reset ( );
+	Initialise ( );
 	bDraw = true;
 	bDrawMainPanel = true;
 	mMainPanel.setPosition ( mLayout.analysePanelOriginX, mLayout.analysePanelOriginY );
@@ -707,7 +718,7 @@ void AnalyserMenu::ShowMainPanel ( )
 
 void AnalyserMenu::ShowAnalysisPanel ( )
 {
-	Reset ( );
+	Initialise ( );
 	bDraw = true;
 	bDrawAnalysisPanel = true;
 	mAnalysisPanel.setPosition ( mLayout.analysePanelOriginX, mLayout.analysePanelOriginY );
@@ -729,7 +740,7 @@ void AnalyserMenu::HideAnalysisInsertionPanel ( )
 
 void AnalyserMenu::ShowReductionPanel ( )
 {
-	Reset ( );
+	Initialise ( );
 	bDraw = true;
 	bDrawReductionPanel = true;
 	mReductionPanel.setPosition ( mLayout.analysePanelOriginX, mLayout.analysePanelOriginY );

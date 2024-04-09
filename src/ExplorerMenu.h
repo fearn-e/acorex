@@ -7,8 +7,9 @@ public:
 	ExplorerMenu ( ) { };
 	~ExplorerMenu ( ) { };
 
+	void Initialise ( );
 	void Show ( );
-	void Reset ( );
+	void Hide ( );
 	void Draw ( );
 	void Exit ( );
 

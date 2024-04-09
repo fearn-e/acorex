@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AnalyserMenu.h"
+#include "ExplorerMenu.h"
 #include <ofMain.h>
 #include <ofxGui.h>
 
@@ -35,6 +36,7 @@ private:
 	void ExploreToggled ( bool& value );
 
 	Acorex::AnalyserMenu mAnalyserMenu;
+	Acorex::ExplorerMenu mExplorerMenu;
 	Acorex::Utils::MenuLayout mLayout;
 	Acorex::Utils::Colors mColors;
 

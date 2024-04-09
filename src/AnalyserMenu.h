@@ -11,11 +11,12 @@ namespace Acorex {
 
 class AnalyserMenu {
 public:
-	AnalyserMenu ( ) { };
+	AnalyserMenu ( );
 	~AnalyserMenu ( ) { };
 
+	void Initialise ( );
 	void Show ( );
-	void Reset ( );
+	void Hide ( );
 	void Draw ( );
 	void Exit ( );
 
