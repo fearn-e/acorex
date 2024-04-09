@@ -82,7 +82,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 
         auto samplingRate = file.sampling_rate ( );
         fluid::RealVector in ( file.frames ( ) );
-        MixDownToMono ( in, file );
+        ReadMono ( in, file );
 
         fluid::algorithm::STFT stft { dataset.analysisSettings.windowFFTSize, dataset.analysisSettings.windowFFTSize, hopSize };
         fluid::algorithm::MelBands bands { dataset.analysisSettings.nBands, dataset.analysisSettings.windowFFTSize };
@@ -239,10 +239,17 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
     return analysedFileIndex;
 }
 
-void Analyser::GenAnalysis::MixDownToMono ( fluid::RealVector& output, htl::in_audio_file& file )
+void Analyser::GenAnalysis::ReadMono ( fluid::RealVector& output, htl::in_audio_file& file )
 {
     int numChannels = file.channels ( );
     int numSamples = file.frames ( );
+
+    if ( numChannels == 1 )
+    {
+        file.read_channel ( output.data ( ), numSamples, 0 );
+        return;
+    }
+
     std::fill ( output.begin ( ), output.end ( ), 0 );
 
     std::vector<std::vector<double>> allChannels ( numChannels, std::vector<double> ( numSamples ) );
