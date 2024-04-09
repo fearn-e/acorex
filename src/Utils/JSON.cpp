@@ -1,5 +1,3 @@
-#pragma once
-
 #include "./JSON.h"
 #include <ofLog.h>
 #include <fstream>

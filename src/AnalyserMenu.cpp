@@ -1,5 +1,3 @@
-#pragma once
-
 #include "./AnalyserMenu.h"
 
 using namespace Acorex;
