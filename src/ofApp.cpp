@@ -22,12 +22,13 @@ void ofApp::setup ( )
 
 void ofApp::update ( )
 {
+	mExplorerMenu.Update ( );
 }
 
 void ofApp::draw ( )
-	{
-		mAnalyserMenu.Draw ( );
-		mExplorerMenu.Draw ( );
+{
+	mAnalyserMenu.Draw ( );
+	mExplorerMenu.Draw ( );
 
 	{
 		ofSetColor ( mColors.interfaceBackgroundColor );

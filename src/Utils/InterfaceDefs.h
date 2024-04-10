@@ -22,13 +22,13 @@ namespace Utils {
 		int analyseAnalysisPanelWidth = 315;
 		int analyseReductionPanelWidth = 300;
 
-		//explore panel widths
+		int explorePanelWidth = 200;
 
 		int interPanelSpacing = 5;
 		int panelBackgroundMargin = 5;
 
 		int analysePanelOriginX = 0; int analysePanelOriginY = topBarHeight + interPanelSpacing;
-		// int explorePanelOriginX = ofGetWidth ( ) - explorePanelWidth; int explorePanelOriginY = topBarHeight + interPanelSpacing;
+		int explorePanelOriginX = ofGetWidth ( ) - explorePanelWidth; int explorePanelOriginY = topBarHeight + interPanelSpacing;
 		glm::vec3 hiddenPanelPosition = { -1000, -1000, 0 };
 	};
 } // namespace Utils
