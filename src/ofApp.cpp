@@ -25,16 +25,9 @@ void ofApp::update ( )
 }
 
 void ofApp::draw ( )
-{
-	if ( mAnalyseToggle )
 	{
 		mAnalyserMenu.Draw ( );
-	}
-
-	if ( mExploreToggle )
-	{
 		mExplorerMenu.Draw ( );
-	}
 
 	{
 		ofSetColor ( mColors.interfaceBackgroundColor );
