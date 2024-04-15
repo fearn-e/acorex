@@ -181,14 +181,24 @@ void ExplorerMenu::OpenCorpus ( )
 	Initialise ( );
 
 	bIsCorpusOpen = true;
+
+	mLiveView.CreatePoints ( );
+	mDimensionDropdownX->setSelectedValueByIndex ( 0, true );
+	mDimensionDropdownY->setSelectedValueByIndex ( 1, true );
+	if ( mRawView->GetDimensions ( ).size ( ) > 2 )
+	{
+		mDimensionDropdownZ->setSelectedValueByIndex ( 2, true );
+	}
 }
+
+// TODO - retrain point picker at the end of each SwapDimension call
 
 void ExplorerMenu::SwapDimensionX ( string& dimension )
 {
 	if ( !bIsCorpusOpen ) { return; }
 
 	ofLogNotice ( "ExplorerMenu" ) << "Swapping X dimension to " << dimension;
-	//TODO: Implement
+	mLiveView.FillDimension ( dimension, Explorer::LiveView::Axis::X );
 }
 
 void ExplorerMenu::SwapDimensionY ( string& dimension )
@@ -196,7 +206,7 @@ void ExplorerMenu::SwapDimensionY ( string& dimension )
 	if ( !bIsCorpusOpen ) { return; }
 
 	ofLogNotice ( "ExplorerMenu" ) << "Swapping Y dimension to " << dimension;
-	//TODO: Implement
+	mLiveView.FillDimension ( dimension, Explorer::LiveView::Axis::Y );
 }
 
 void ExplorerMenu::SwapDimensionZ ( string& dimension )
@@ -204,5 +214,5 @@ void ExplorerMenu::SwapDimensionZ ( string& dimension )
 	if ( !bIsCorpusOpen ) { return; }
 
 	ofLogNotice ( "ExplorerMenu" ) << "Swapping Z dimension to " << dimension;
-	//TODO: Implement
+	mLiveView.FillDimension ( dimension, Explorer::LiveView::Axis::Z );
 }
