@@ -38,12 +38,32 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
 	return success;
 }
 
-std::vector<std::string> Explorer::RawView::GetDimensions ( )
+bool Explorer::RawView::IsTimeAnalysis ( ) const
+{
+	return mDataset.analysisSettings.bTime;
+}
+
+bool Explorer::RawView::IsReduction ( ) const
+{
+	return mDataset.analysisSettings.hasBeenReduced;
+}
+
+std::vector<std::string> Explorer::RawView::GetDimensions ( ) const
 {
 	return mDataset.dimensionNames;
 }
 
-std::string Explorer::RawView::GetCorpusName ( )
+std::string Explorer::RawView::GetCorpusName ( ) const
 {
 	return mCorpusName;
+}
+
+Utils::TimeData Explorer::RawView::GetTimeData ( ) const
+{
+	return mDataset.time;
+}
+
+Utils::StatsData Explorer::RawView::GetStatsData ( ) const
+{
+	return mDataset.stats;
 }
