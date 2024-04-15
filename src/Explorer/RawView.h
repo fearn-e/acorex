@@ -14,8 +14,12 @@ public:
 	bool LoadCorpus ( ); // asks user for file path, calls function below
 	bool LoadCorpus ( const std::string& path, const std::string& name ); // load corpus from file path
 
-	std::vector<std::string> GetDimensions ( ); // get dimensions from dataset
-	std::string GetCorpusName ( ); // get corpus name
+	bool IsTimeAnalysis ( ) const; // check if dataset is time analysis
+	bool IsReduction ( ) const; // check if dataset is a reduced corpus
+	std::vector<std::string> GetDimensions ( ) const; // get dimensions from dataset
+	std::string GetCorpusName ( ) const; // get corpus name
+	Utils::TimeData GetTimeData ( ) const; // get time data from dataset
+	Utils::StatsData GetStatsData ( ) const; // get stats data from dataset
 
 private:
 	std::string mCorpusName;
