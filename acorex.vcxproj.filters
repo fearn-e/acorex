@@ -1,156 +1,183 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup>
-    <ClCompile Include="src\main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxBaseGui.cpp">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxButton.cpp">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxColorPicker.cpp">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxGuiGroup.cpp">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxInputField.cpp">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxLabel.cpp">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxPanel.cpp">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSlider.cpp">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.cpp">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ofApp.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Utils\JSON.cpp">
-      <Filter>src\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Explorer\RawView.cpp">
-      <Filter>src\Explorer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Analyser\UMAP.cpp">
-      <Filter>src\Analyser</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Analyser\Controller.cpp">
-      <Filter>src\Analyser</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Analyser\GenAnalysis.cpp">
-      <Filter>src\Analyser</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AnalyserMenu.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ExplorerMenu.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="src">
-      <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="addons">
-      <UniqueIdentifier>{053FE75D--463-F-49-11-B-D2B-6B3A0A8E419A}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="addons\ofxGui">
-      <UniqueIdentifier>{D60A246F--EA5-B-44-56-A-2C0-A6A8544B63BB}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="addons\ofxGui\src">
-      <UniqueIdentifier>{C50E7B39--31C-6-41-96-8-2DD-928FBADCE7DA}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Utils">
-      <UniqueIdentifier>{02fb1086-f6a1-4d11-aa11-0e24eab34fd5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Analyser">
-      <UniqueIdentifier>{b1bc8163-7718-4c38-8894-a98c9cc3034e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Explorer">
-      <UniqueIdentifier>{33a79c1f-627f-4007-ba22-4c89441d9ce3}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\ofApp.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxButton.h">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxColorPicker.h">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxGui.h">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxGuiGroup.h">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxGuiUtils.h">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxInputField.h">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxLabel.h">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxPanel.h">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.h">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h">
-      <Filter>addons\ofxGui\src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Utils\Data.h">
-      <Filter>src\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Utils\InterfaceDefs.h">
-      <Filter>src\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Utils\JSON.h">
-      <Filter>src\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Explorer\RawView.h">
-      <Filter>src\Explorer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Analyser\GenAnalysis.h">
-      <Filter>src\Analyser</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Analyser\UMAP.h">
-      <Filter>src\Analyser</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Analyser\Controller.h">
-      <Filter>src\Analyser</Filter>
-    </ClInclude>
-    <ClInclude Include="src\AnalyserMenu.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ExplorerMenu.h">
-      <Filter>src</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="icon.rc" />
-  </ItemGroup>
+	<ItemGroup>
+		<ClCompile Include="src\ofApp.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\main.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\AnalyserMenu.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\Analyser\Controller.cpp">
+			<Filter>src\Analyser</Filter>
+		</ClCompile>
+		<ClCompile Include="src\Analyser\GenAnalysis.cpp">
+			<Filter>src\Analyser</Filter>
+		</ClCompile>
+		<ClCompile Include="src\Analyser\UMAP.cpp">
+			<Filter>src\Analyser</Filter>
+		</ClCompile>
+		<ClCompile Include="src\ExplorerMenu.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\Explorer\RawView.cpp">
+			<Filter>src\Explorer</Filter>
+		</ClCompile>
+		<ClCompile Include="src\Utils\JSON.cpp">
+			<Filter>src\Utils</Filter>
+		</ClCompile>
+		<ClCompile Include="src\main.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\ofApp.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxDropdown\src\ofxDropdown.cpp">
+			<Filter>addons\ofxDropdown\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxDropdown\src\ofxDropdownOption.cpp">
+			<Filter>addons\ofxDropdown\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxBaseGui.cpp">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxButton.cpp">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxColorPicker.cpp">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxGuiGroup.cpp">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxInputField.cpp">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxLabel.cpp">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxPanel.cpp">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxSlider.cpp">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.cpp">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClCompile>
+	</ItemGroup>
+	<ItemGroup>
+		<Filter Include="src">
+			<UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="src\Analyser">
+			<UniqueIdentifier>{ADFA51B7--BB3-6-4F-76-8-AFD-093B3E26AF3E}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="src\Explorer">
+			<UniqueIdentifier>{73534E39--CB0-3-48-D2-B-831-546D4165038C}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="src\Utils">
+			<UniqueIdentifier>{8C35766F--9C8-B-45-52-8-9A7-6FAF689CFC00}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons">
+			<UniqueIdentifier>{459A6D52--774-7-4F-25-B-BD8-F31960CEE8CD}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxDropdown">
+			<UniqueIdentifier>{8551362C--D41-B-48-4C-A-15F-0079D1838449}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxDropdown\src">
+			<UniqueIdentifier>{701FB549--CF4-C-4B-D3-A-D47-03B138CA81B5}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxGui">
+			<UniqueIdentifier>{707943FF--EFE-9-45-B1-8-B73-274967281BD0}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxGui\src">
+			<UniqueIdentifier>{873E2D9A--A4E-9-41-CD-8-A8B-6049953CEB90}</UniqueIdentifier>
+		</Filter>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="src\ofApp.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="src\AnalyserMenu.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="src\Analyser\Controller.h">
+			<Filter>src\Analyser</Filter>
+		</ClInclude>
+		<ClInclude Include="src\Analyser\GenAnalysis.h">
+			<Filter>src\Analyser</Filter>
+		</ClInclude>
+		<ClInclude Include="src\Analyser\UMAP.h">
+			<Filter>src\Analyser</Filter>
+		</ClInclude>
+		<ClInclude Include="src\ExplorerMenu.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="src\Explorer\RawView.h">
+			<Filter>src\Explorer</Filter>
+		</ClInclude>
+		<ClInclude Include="src\Utils\Data.h">
+			<Filter>src\Utils</Filter>
+		</ClInclude>
+		<ClInclude Include="src\Utils\InterfaceDefs.h">
+			<Filter>src\Utils</Filter>
+		</ClInclude>
+		<ClInclude Include="src\Utils\JSON.h">
+			<Filter>src\Utils</Filter>
+		</ClInclude>
+		<ClInclude Include="src\ofApp.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxDropdown\src\ofxDropdown.h">
+			<Filter>addons\ofxDropdown\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxDropdown\src\ofxDropdownOption.hpp">
+			<Filter>addons\ofxDropdown\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxButton.h">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxColorPicker.h">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxGui.h">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxGuiGroup.h">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxGuiUtils.h">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxInputField.h">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxLabel.h">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxPanel.h">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.h">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h">
+			<Filter>addons\ofxGui\src</Filter>
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ResourceCompile Include="icon.rc" />
+	</ItemGroup>
 </Project>
