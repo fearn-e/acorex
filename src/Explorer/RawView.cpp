@@ -32,6 +32,8 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
 	}
 
 	bool success = mJSON.Read ( path, mDataset );
+
+	if ( success ) { mCorpusName = name.substr ( 0, name.size ( ) - 5 ); }
 	
 	return success;
 }
@@ -39,4 +41,9 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
 std::vector<std::string> Explorer::RawView::GetDimensions ( )
 {
 	return mDataset.dimensionNames;
+}
+
+std::string Explorer::RawView::GetCorpusName ( )
+{
+	return mCorpusName;
 }
