@@ -33,7 +33,7 @@ void ExplorerMenu::Initialise ( )
 
 		mMainPanel.setup ( );
 
-		mMainPanel.add ( mCorpusNameLabel.setup ( "", "" ) );
+		mMainPanel.add ( mCorpusNameLabel.setup ( "", bInitialiseShouldLoad ? mRawView.GetCorpusName ( ) : "No Corpus Loaded" ) );
 		mMainPanel.add ( mOpenCorpusButton.setup ( "Open Corpus" ) );
 
 		mOpenCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
