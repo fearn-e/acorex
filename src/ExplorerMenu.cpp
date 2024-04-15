@@ -5,11 +5,23 @@ using namespace Acorex;
 
 void ExplorerMenu::Initialise ( )
 {
+	// Pointer Sharing -----------------------------
+	{
+		if ( !bViewPointerShared )
+		{
+			mRawView = std::make_shared<Explorer::RawView> ( );
+			mLiveView.SetRawView ( mRawView );
+			bViewPointerShared = true;
+		}
+	}
+
 	// Clear --------------------------------------
 	{
 		RemoveListeners ( );
 
 		mMainPanel.clear ( );
+
+		mLiveView.Initialise ( );
 	}
 
 	// Variables ----------------------------------
@@ -33,7 +45,7 @@ void ExplorerMenu::Initialise ( )
 
 		mMainPanel.setup ( );
 
-		mMainPanel.add ( mCorpusNameLabel.setup ( "", bInitialiseShouldLoad ? mRawView.GetCorpusName ( ) : "No Corpus Loaded" ) );
+		mMainPanel.add ( mCorpusNameLabel.setup ( "", bInitialiseShouldLoad ? mRawView->GetCorpusName ( ) : "No Corpus Loaded" ) );
 		mMainPanel.add ( mOpenCorpusButton.setup ( "Open Corpus" ) );
 
 		mCorpusNameLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
@@ -49,7 +61,7 @@ void ExplorerMenu::Initialise ( )
 
 		if ( bInitialiseShouldLoad )
 		{
-			for ( auto& dimension : mRawView.GetDimensions ( ) )
+			for ( auto& dimension : mRawView->GetDimensions ( ) )
 			{
 				mDimensionDropdownX->add ( dimension );
 				mDimensionDropdownY->add ( dimension );
@@ -162,7 +174,7 @@ void ExplorerMenu::OpenCorpus ( )
 	bOpenCorpusDrawWarning = false;
 	mOpenCorpusButton.setName ( "Open Corpus" );
 
-	bool success = mRawView.LoadCorpus ( );
+	bool success = mRawView->LoadCorpus ( );
 	if ( !success ) { return; }
 	
 	bInitialiseShouldLoad = true;

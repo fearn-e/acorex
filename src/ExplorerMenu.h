@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Explorer/RawView.h"
+#include "Explorer/LiveView.h"
 #include "Utils/InterfaceDefs.h"
 #include <ofxGui.h>
 #include <ofxDropdown.h>
@@ -38,6 +39,8 @@ private:
 	bool bOpenCorpusDrawWarning = false;
 	bool bInitialiseShouldLoad = false;
 	bool bListenersAdded = false;
+	
+	bool bViewPointerShared = false;
 
 	// Timing --------------------------------------
 
@@ -58,7 +61,8 @@ private:
 
 	// Acorex Objects ------------------------------
 
-	Explorer::RawView mRawView;
+	std::shared_ptr<Explorer::RawView> mRawView;
+	Explorer::LiveView mLiveView;
 	Utils::Colors mColors;
 	Utils::MenuLayout mLayout;
 };
