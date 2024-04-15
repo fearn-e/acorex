@@ -27,8 +27,8 @@ void ofApp::update ( )
 
 void ofApp::draw ( )
 {
-	mAnalyserMenu.Draw ( );
 	mExplorerMenu.Draw ( );
+	mAnalyserMenu.Draw ( );
 
 	{
 		ofSetColor ( mColors.interfaceBackgroundColor );
