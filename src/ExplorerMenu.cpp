@@ -71,8 +71,6 @@ void ExplorerMenu::Initialise ( )
 			mMainPanel.add ( mDimensionDropdownX.get ( ) );
 			mMainPanel.add ( mDimensionDropdownY.get ( ) );
 			mMainPanel.add ( mDimensionDropdownZ.get ( ) );
-
-			bInitialiseShouldLoad = false;
 		}
 
 		mDimensionDropdownX->disableMultipleSelection ( );
@@ -104,6 +102,8 @@ void ExplorerMenu::Initialise ( )
 		mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SwapDimensionZ );
 		bListenersAdded = true;
 	}
+
+	bInitialiseShouldLoad = false;
 }
 
 void ExplorerMenu::Show ( )
