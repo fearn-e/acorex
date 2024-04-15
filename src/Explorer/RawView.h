@@ -14,6 +14,7 @@ public:
 	bool LoadCorpus ( ); // asks user for file path, calls function below
 	bool LoadCorpus ( const std::string& path, const std::string& name ); // load corpus from file path
 
+	std::vector<std::string> GetDimensions ( ); // get dimensions from dataset
 private:
 	Utils::DataSet mDataset;
 

@@ -29,12 +29,50 @@ void ExplorerMenu::Initialise ( )
 
 	// Main Panel --------------------------------
 	{
+		int dropdownScrollSpeed = 32;
+
 		mMainPanel.setup ( );
 
 		mMainPanel.add ( mCorpusNameLabel.setup ( "", "" ) );
 		mMainPanel.add ( mOpenCorpusButton.setup ( "Open Corpus" ) );
 
 		mOpenCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+		mDimensionDropdownX.reset ( );
+		mDimensionDropdownY.reset ( );
+		mDimensionDropdownZ.reset ( );
+
+		mDimensionDropdownX = make_unique<ofxDropdown> ( "X Dimension", dropdownScrollSpeed );
+		mDimensionDropdownY = make_unique<ofxDropdown> ( "Y Dimension", dropdownScrollSpeed );
+		mDimensionDropdownZ = make_unique<ofxDropdown> ( "Z Dimension", dropdownScrollSpeed );
+
+		if ( bInitialiseShouldLoad )
+		{
+			for ( auto& dimension : mRawView.GetDimensions ( ) )
+			{
+				mDimensionDropdownX->add ( dimension );
+				mDimensionDropdownY->add ( dimension );
+				mDimensionDropdownZ->add ( dimension );
+			}
+
+			mMainPanel.add ( mDimensionDropdownX.get ( ) );
+			mMainPanel.add ( mDimensionDropdownY.get ( ) );
+			mMainPanel.add ( mDimensionDropdownZ.get ( ) );
+
+			bInitialiseShouldLoad = false;
+		}
+
+		mDimensionDropdownX->disableMultipleSelection ( );
+		mDimensionDropdownY->disableMultipleSelection ( );
+		mDimensionDropdownZ->disableMultipleSelection ( );
+
+		mDimensionDropdownX->enableCollapseOnSelection ( );
+		mDimensionDropdownY->enableCollapseOnSelection ( );
+		mDimensionDropdownZ->enableCollapseOnSelection ( );
+
+		mDimensionDropdownX->setDropDownPosition ( ofxDropdown::DD_LEFT );
+		mDimensionDropdownY->setDropDownPosition ( ofxDropdown::DD_LEFT );
+		mDimensionDropdownZ->setDropDownPosition ( ofxDropdown::DD_LEFT );
 
 		mMainPanel.setPosition ( mLayout.explorePanelOriginX, mLayout.explorePanelOriginY );
 		mMainPanel.setWidthElements ( mLayout.explorePanelWidth );
@@ -110,11 +148,35 @@ void ExplorerMenu::OpenCorpus ( )
 	bOpenCorpusDrawWarning = false;
 	mOpenCorpusButton.setName ( "Open Corpus" );
 
-	mRawView.LoadCorpus ( );
+	bool success = mRawView.LoadCorpus ( );
+	if ( !success ) { return; }
+	
+	bInitialiseShouldLoad = true;
+	Initialise ( );
 
 	bIsCorpusOpen = true;
 }
 
-void ExplorerMenu::SwapDimension ( )
+void ExplorerMenu::SwapDimensionX ( string& dimension )
 {
+	if ( !bIsCorpusOpen ) { return; }
+
+	ofLogNotice ( "ExplorerMenu" ) << "Swapping X dimension to " << dimension;
+	//TODO: Implement
+}
+
+void ExplorerMenu::SwapDimensionY ( string& dimension )
+{
+	if ( !bIsCorpusOpen ) { return; }
+
+	ofLogNotice ( "ExplorerMenu" ) << "Swapping Y dimension to " << dimension;
+	//TODO: Implement
+}
+
+void ExplorerMenu::SwapDimensionZ ( string& dimension )
+{
+	if ( !bIsCorpusOpen ) { return; }
+
+	ofLogNotice ( "ExplorerMenu" ) << "Swapping Z dimension to " << dimension;
+	//TODO: Implement
 }

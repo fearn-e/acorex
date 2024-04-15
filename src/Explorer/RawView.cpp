@@ -35,3 +35,8 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
 	
 	return success;
 }
+
+std::vector<std::string> Explorer::RawView::GetDimensions ( )
+{
+	return mDataset.dimensionNames;
+}
