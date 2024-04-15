@@ -58,9 +58,11 @@ void Explorer::LiveView::CreatePoints ( )
 		for ( int file = 0; file < time.raw.size ( ); file++ )
 		{
 			ofMesh mesh;
+			ofColor color = ofColor::fromHsb ( ofRandom ( 255 ), 255, 255 ); // TEMP
 			for ( int timepoint = 0; timepoint < time.raw[file].size ( ); timepoint++ )
 			{
 				mesh.addVertex ( { 0, 0, 0 } );
+				mesh.addColor ( color ); // TEMP
 			}
 			mTimeCorpus.push_back ( mesh );
 		}
