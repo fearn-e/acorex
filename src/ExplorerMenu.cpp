@@ -36,6 +36,7 @@ void ExplorerMenu::Initialise ( )
 		mMainPanel.add ( mCorpusNameLabel.setup ( "", bInitialiseShouldLoad ? mRawView.GetCorpusName ( ) : "No Corpus Loaded" ) );
 		mMainPanel.add ( mOpenCorpusButton.setup ( "Open Corpus" ) );
 
+		mCorpusNameLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mOpenCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
 		mDimensionDropdownX.reset ( );
@@ -73,6 +74,10 @@ void ExplorerMenu::Initialise ( )
 		mDimensionDropdownX->setDropDownPosition ( ofxDropdown::DD_LEFT );
 		mDimensionDropdownY->setDropDownPosition ( ofxDropdown::DD_LEFT );
 		mDimensionDropdownZ->setDropDownPosition ( ofxDropdown::DD_LEFT );
+
+		mDimensionDropdownX->setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mDimensionDropdownY->setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mDimensionDropdownZ->setBackgroundColor ( mColors.interfaceBackgroundColor );
 
 		mMainPanel.setPosition ( mLayout.explorePanelOriginX, mLayout.explorePanelOriginY );
 		mMainPanel.setWidthElements ( mLayout.explorePanelWidth );
