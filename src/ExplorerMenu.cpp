@@ -121,7 +121,7 @@ void ExplorerMenu::Draw ( )
 {
 	if ( !bDraw ) { return; }
 
-	// Draw live view
+	mLiveView.Draw ( );
 
 	mMainPanel.draw ( );
 }

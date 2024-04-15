@@ -1,5 +1,7 @@
 #include "./LiveView.h"
 #include <ofLog.h>
+#include "ofGraphics.h"
+#include <of3dUtils.h>
 
 using namespace Acorex;
 
@@ -12,6 +14,39 @@ void Explorer::LiveView::Initialise ( )
 {
 	mStatsCorpus.clear ( );
 	mTimeCorpus.clear ( );
+
+	mTemporaryCam.setPosition ( 250, 250, 250 );
+	mTemporaryCam.lookAt ( { 0, 0, 0 } );
+	mTemporaryCam.setNearClip ( 0.1 );
+	mTemporaryCam.setFarClip ( 10000 );
+}
+
+void Explorer::LiveView::Draw ( )
+{
+	if ( !bDraw ) { return; }
+	
+	ofEnableDepthTest ( );
+	mTemporaryCam.begin ( );
+	ofDrawAxis ( 1000 );
+
+	if ( mRawView->IsTimeAnalysis ( ) )
+	{
+		for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
+		{
+			mTimeCorpus[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
+			mTimeCorpus[file].draw ( );
+			mTimeCorpus[file].setMode ( OF_PRIMITIVE_POINTS );
+			mTimeCorpus[file].draw ( );
+		}
+	}
+	else
+	{
+		mStatsCorpus.setMode ( OF_PRIMITIVE_POINTS );
+		mStatsCorpus.draw ( );
+	}
+
+	mTemporaryCam.end ( );
+	ofDisableDepthTest ( );
 }
 
 void Explorer::LiveView::CreatePoints ( )
@@ -30,6 +65,7 @@ void Explorer::LiveView::CreatePoints ( )
 			mTimeCorpus.push_back ( mesh );
 		}
 
+		bDraw = true;
 		return;
 	}
 	// ------------------------------
@@ -46,6 +82,7 @@ void Explorer::LiveView::CreatePoints ( )
 			}
 		}
 
+		bDraw = true;
 		return;
 	}
 	// ------------------------------
@@ -57,6 +94,8 @@ void Explorer::LiveView::CreatePoints ( )
 			mStatsCorpus.addVertex ( { 0, 0, 0 } );
 		}
 	}
+
+	bDraw = true;
 }
 
 void Explorer::LiveView::FillDimension ( std::string& dimension, Axis axis )
