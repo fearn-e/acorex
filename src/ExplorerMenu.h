@@ -3,6 +3,7 @@
 #include "Explorer/RawView.h"
 #include "Utils/InterfaceDefs.h"
 #include <ofxGui.h>
+#include <ofxDropdown.h>
 
 namespace Acorex {
 
@@ -25,7 +26,9 @@ private:
 	// Main Functions ------------------------------
 
 	void OpenCorpus ( );
-	void SwapDimension ( );
+	void SwapDimensionX ( string& dimension );
+	void SwapDimensionY ( string& dimension );
+	void SwapDimensionZ ( string& dimension );
 
 	// States --------------------------------------
 
@@ -33,6 +36,7 @@ private:
 
 	bool bIsCorpusOpen = false;
 	bool bOpenCorpusDrawWarning = false;
+	bool bInitialiseShouldLoad = false;
 
 	// Timing --------------------------------------
 
@@ -47,6 +51,9 @@ private:
 	ofxPanel mMainPanel;
 	ofxLabel mCorpusNameLabel;
 	ofxButton mOpenCorpusButton;
+	unique_ptr<ofxDropdown> mDimensionDropdownX;
+	unique_ptr<ofxDropdown> mDimensionDropdownY;
+	unique_ptr<ofxDropdown> mDimensionDropdownZ;
 
 	// Acorex Objects ------------------------------
 
