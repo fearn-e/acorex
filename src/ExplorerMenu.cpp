@@ -82,6 +82,10 @@ void ExplorerMenu::Initialise ( )
 	// Listeners --------------------------------
 	{
 		mOpenCorpusButton.addListener ( this, &ExplorerMenu::OpenCorpus );
+		mDimensionDropdownX->addListener ( this, &ExplorerMenu::SwapDimensionX );
+		mDimensionDropdownY->addListener ( this, &ExplorerMenu::SwapDimensionY );
+		mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SwapDimensionZ );
+		bListenersAdded = true;
 	}
 }
 
@@ -130,7 +134,12 @@ void ExplorerMenu::Exit ( )
 
 void ExplorerMenu::RemoveListeners ( )
 {
+	if ( !bListenersAdded ) { return; }
 	mOpenCorpusButton.removeListener ( this, &ExplorerMenu::OpenCorpus );
+	mDimensionDropdownX->removeListener ( this, &ExplorerMenu::SwapDimensionX );
+	mDimensionDropdownY->removeListener ( this, &ExplorerMenu::SwapDimensionY );
+	mDimensionDropdownZ->removeListener ( this, &ExplorerMenu::SwapDimensionZ );
+	bListenersAdded = false;
 }
 
 // Main Functions ------------------------------

@@ -37,6 +37,7 @@ private:
 	bool bIsCorpusOpen = false;
 	bool bOpenCorpusDrawWarning = false;
 	bool bInitialiseShouldLoad = false;
+	bool bListenersAdded = false;
 
 	// Timing --------------------------------------
 
