@@ -9,8 +9,8 @@ namespace Acorex {
 
 class ExplorerMenu {
 public:
-	ExplorerMenu ( ) { };
-	~ExplorerMenu ( ) { };
+	ExplorerMenu ( ) { }
+	~ExplorerMenu ( ) { }
 
 	void Initialise ( );
 	void Show ( );
