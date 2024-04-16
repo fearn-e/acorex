@@ -61,7 +61,7 @@
       <PreprocessorDefinitions>_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);deps/flucoma-core;deps/hisstools_library;deps;src;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxDropdown\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);deps/flucoma-core;deps/hisstools_library;deps;src;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxDropdown\src;..\..\..\addons\ofxAudioFile\libs;..\..\..\addons\ofxAudioFile\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)\Build\%(RelativeDir)\$(Configuration)\</ObjectFileName>
@@ -85,7 +85,7 @@
       <PreprocessorDefinitions>_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);deps/flucoma-core;deps/hisstools_library;deps;src;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxDropdown\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);deps/flucoma-core;deps/hisstools_library;deps;src;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxDropdown\src;..\..\..\addons\ofxAudioFile\libs;..\..\..\addons\ofxAudioFile\src</AdditionalIncludeDirectories> 
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)\Build\%(RelativeDir)\$(Configuration)\</ObjectFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -106,7 +106,6 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Explorer\LiveView.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\AnalyserMenu.cpp" />
@@ -114,8 +113,10 @@
     <ClCompile Include="src\Analyser\GenAnalysis.cpp" />
     <ClCompile Include="src\Analyser\UMAP.cpp" />
     <ClCompile Include="src\ExplorerMenu.cpp" />
+    <ClCompile Include="src\Explorer\LiveView.cpp" />
     <ClCompile Include="src\Explorer\RawView.cpp" />
     <ClCompile Include="src\Utils\JSON.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDropdown\src\ofxDropdown.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDropdown\src\ofxDropdownOption.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxBaseGui.cpp" />
@@ -130,17 +131,22 @@
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Explorer\LiveView.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\AnalyserMenu.h" />
     <ClInclude Include="src\Analyser\Controller.h" />
     <ClInclude Include="src\Analyser\GenAnalysis.h" />
     <ClInclude Include="src\Analyser\UMAP.h" />
     <ClInclude Include="src\ExplorerMenu.h" />
+    <ClInclude Include="src\Explorer\LiveView.h" />
     <ClInclude Include="src\Explorer\RawView.h" />
     <ClInclude Include="src\Utils\Data.h" />
     <ClInclude Include="src\Utils\InterfaceDefs.h" />
     <ClInclude Include="src\Utils\JSON.h" />
+    <ClInclude Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.h" />
+    <ClInclude Include="..\..\..\addons\ofxAudioFile\libs\dr_flac.h" />
+    <ClInclude Include="..\..\..\addons\ofxAudioFile\libs\dr_mp3.h" />
+    <ClInclude Include="..\..\..\addons\ofxAudioFile\libs\dr_wav.h" />
+    <ClInclude Include="..\..\..\addons\ofxAudioFile\libs\stb_vorbis.h" />
     <ClInclude Include="..\..\..\addons\ofxDropdown\src\ofxDropdown.h" />
     <ClInclude Include="..\..\..\addons\ofxDropdown\src\ofxDropdownOption.hpp" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h" />
