@@ -29,7 +29,8 @@ void Explorer::LiveView::Draw ( )
 	mTemporaryCam.begin ( );
 	ofDrawAxis ( 1000 );
 
-	if ( mRawView->IsTimeAnalysis ( ) )
+	// Draw points ------------------------------
+	if ( mRawView->IsTimeAnalysis ( ) ) // Time
 	{
 		for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
 		{
@@ -39,7 +40,7 @@ void Explorer::LiveView::Draw ( )
 			mTimeCorpus[file].draw ( );
 		}
 	}
-	else
+	else // Stats
 	{
 		mStatsCorpus.setMode ( OF_PRIMITIVE_POINTS );
 		mStatsCorpus.draw ( );
