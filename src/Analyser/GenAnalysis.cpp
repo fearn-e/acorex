@@ -63,24 +63,10 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 
     for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
     {
-        const char* inputFileName = dataset.fileList[fileIndex].c_str ( );
-        htl::in_audio_file file ( inputFileName );
-
-        if ( !file.is_open ( ) )
-        {
-            ofLogError ( "GenAnalysis" ) << "input file " << inputFileName << " could not be opened";
-            continue;
-        }
-
-        if ( file.is_error ( ) )
-        {
-            ofLogError ( "GenAnalysis" ) << "input file " << inputFileName << " is not supported";
-            continue;
-        }
-
-        auto samplingRate = file.sampling_rate ( );
-        fluid::RealVector in ( file.frames ( ) );
-        ReadMono ( in, file );
+        double samplingRate = 0;
+        fluid::RealVector in ( 0 );
+        bool success = ReadFile ( dataset.fileList[fileIndex], in, samplingRate );
+        if ( !success ) { continue; }
 
         fluid::algorithm::STFT stft { dataset.analysisSettings.windowFFTSize, dataset.analysisSettings.windowFFTSize, hopSize };
         fluid::algorithm::MelBands bands { dataset.analysisSettings.nBands, dataset.analysisSettings.windowFFTSize };
@@ -228,7 +214,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
         }
 
         analysedFileIndex++;
-        analysedFiles.push_back ( inputFileName );
+        analysedFiles.push_back ( dataset.fileList[fileIndex] );
     }
 
     dataset.fileList.clear ( );
@@ -237,7 +223,59 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
     return analysedFileIndex;
 }
 
-void Analyser::GenAnalysis::ReadMono ( fluid::RealVector& output, htl::in_audio_file& file )
+bool Analyser::GenAnalysis::ReadFile ( std::string filename, fluid::RealVector& output, double& sampleRate )
+{
+    //if file ends in .wav, .aiff, .flac - use htl::in_audio_file
+    //if file ends in .mp3, .ogg - use ofxAudioFile
+
+    if ( !ofFile::doesFileExist ( filename ) )
+    {
+		ofLogError ( "GenAnalysis" ) << "input file " << filename << " does not exist";
+		return false;
+	}
+
+    if ( filename.find ( ".wav" ) != std::string::npos || filename.find ( ".aiff" ) != std::string::npos || filename.find ( ".flac" ) != std::string::npos )
+    {
+        htl::in_audio_file file ( filename.c_str ( ) );
+
+        if ( !file.is_open ( ) )
+        {
+            ofLogError ( "GenAnalysis" ) << "input file " << filename << " could not be opened";
+            return false;
+        }
+
+        if ( file.is_error ( ) )
+        {
+            ofLogError ( "GenAnalysis" ) << "input file " << filename << " is not supported";
+            return false;
+        }
+
+        output.resize ( file.frames ( ) );
+        sampleRate = file.sampling_rate ( );
+
+        ReadToMono ( output, file );
+    }
+    else if ( filename.find ( ".mp3" ) != std::string::npos || filename.find ( ".ogg" ) != std::string::npos )
+    {
+		ofxAudioFile file;
+		file.load ( filename );
+
+        if ( !file.loaded ( ) )
+        {
+			ofLogError ( "GenAnalysis" ) << "input file " << filename << " could not be opened";
+			return false;
+		}
+
+		output.resize ( file.length ( ) );
+		sampleRate = file.samplerate ( );
+
+		ReadToMono ( output, file );
+	}
+
+    return true;
+}
+
+void Analyser::GenAnalysis::ReadToMono ( fluid::RealVector& output, htl::in_audio_file& file )
 {
     int numChannels = file.channels ( );
     int numSamples = file.frames ( );
@@ -267,6 +305,33 @@ void Analyser::GenAnalysis::ReadMono ( fluid::RealVector& output, htl::in_audio_
         output[sample] /= numChannels;
     }
 
+}
+
+void Analyser::GenAnalysis::ReadToMono ( fluid::RealVector& output, ofxAudioFile& file )
+{
+    int numChannels = file.channels ( );
+    int numSamples = file.length ( );
+
+    if ( numChannels == 1 )
+    {
+        for ( int sample = 0; sample < numSamples; sample++ )
+        {
+			output[sample] = file.sample ( sample, 0 );
+		}
+        return;
+    }
+
+    std::fill ( output.begin ( ), output.end ( ), 0 );
+
+#pragma omp parallel for
+    for ( int sample = 0; sample < numSamples; sample++ )
+    {
+        for ( int channel = 0; channel < numChannels; channel++ )
+        {
+			output[sample] += file.sample ( sample, channel );
+		}
+		output[sample] /= numChannels;
+	}
 }
 
 fluid::RealVector Analyser::GenAnalysis::ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats )
