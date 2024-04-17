@@ -15,6 +15,7 @@
 #include <data/FluidJSON.hpp>
 #include <data/FluidMemory.hpp>
 #include <data/TensorTypes.hpp>
+#include <ofxAudioFile.h>
 #include <vector>
 #include <string>
 
@@ -29,7 +30,10 @@ public:
 	int ProcessFiles ( Utils::DataSet& dataset );
 
 private:
-	void ReadMono ( fluid::RealVector& output, htl::in_audio_file& file );
+	bool ReadFile ( std::string filename, fluid::RealVector& output, double& sampleRate );
+
+	void ReadToMono ( fluid::RealVector& output, htl::in_audio_file& file );
+	void ReadToMono ( fluid::RealVector& output, ofxAudioFile& file );
 
 	fluid::RealVector ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats );
 
