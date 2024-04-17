@@ -21,7 +21,7 @@ bool Analyser::UMAP::Fit ( Utils::DataSet& dataset, const Utils::ReductionSettin
 		k = dataset.currentPointCount;
 	}
 
-	fluidsetOUT = algorithm.train ( fluidsetIN, k, settings.dimensionReductionTarget, 0.1, settings.maxIterations, 0.1 );
+	fluidsetOUT = algorithm.train ( fluidsetIN, k, settings.dimensionReductionTarget, 0.1, settings.maxIterations, 0.1 ); // TODO - check if this can be parallelised
 
 	FluidToCorpus ( dataset, fluidsetOUT, filePointLength, settings.dimensionReductionTarget );
 
