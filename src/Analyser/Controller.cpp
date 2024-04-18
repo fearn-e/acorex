@@ -344,11 +344,9 @@ void Analyser::Controller::GenerateDimensionNames ( std::vector<std::string>& di
 
 void Analyser::Controller::Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames )
 {
-	dimensionNames.push_back ( masterDimension + " (Mean)" );
-	dimensionNames.push_back ( masterDimension + " (Standard Deviation)" );
-	dimensionNames.push_back ( masterDimension + " (Skewness)" );
-	dimensionNames.push_back ( masterDimension + " (Kurtosis)" );
-	dimensionNames.push_back ( masterDimension + " (Low %)" );
-	dimensionNames.push_back ( masterDimension + " (Middle %)" );
-	dimensionNames.push_back ( masterDimension + " (High %)" );
+	Utils::DataSet temp;
+	for ( int i = 0; i < temp.statisticNames.size ( ); i++ )
+	{
+		dimensionNames.push_back ( masterDimension + " (" + temp.statisticNames[i] + ")" );
+	}
 }
