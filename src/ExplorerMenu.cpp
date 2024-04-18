@@ -123,6 +123,8 @@ void ExplorerMenu::Draw ( )
 
 	mLiveView.Draw ( );
 
+	// call pointpicker draw
+
 	mMainPanel.draw ( );
 }
 
