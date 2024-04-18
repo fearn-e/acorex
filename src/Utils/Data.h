@@ -48,6 +48,7 @@ struct DataSet {
 	int currentPointCount = 0;
 
 	std::vector<std::string> dimensionNames; // [dimension]
+	std::vector<std::string> statisticNames = { "Mean Average", "Standard Deviation", "Skewness", "Kurtosis", "Low Quartile", "Median", "High Quartile" }; // [statistic]
 	std::vector<std::string> fileList; // [file]
 
 	TimeData time;
