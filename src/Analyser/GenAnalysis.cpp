@@ -347,7 +347,7 @@ fluid::RealVector Analyser::GenAnalysis::ComputeStats ( fluid::RealMatrixView ma
     return result;
 }
 
-void Analyser::GenAnalysis::Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions )
+void Analyser::GenAnalysis::Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>>& fileData, int numDimensions )
 {
     for ( fluid::index dimension = 0; dimension < numDimensions; dimension++ )
     {
