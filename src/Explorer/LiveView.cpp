@@ -59,11 +59,10 @@ void Explorer::LiveView::CreatePoints ( )
 		for ( int file = 0; file < time.raw.size ( ); file++ )
 		{
 			ofMesh mesh;
-			ofColor color = ofColor::fromHsb ( ofRandom ( 255 ), 255, 255 ); // TEMP
 			for ( int timepoint = 0; timepoint < time.raw[file].size ( ); timepoint++ )
 			{
 				mesh.addVertex ( { 0, 0, 0 } );
-				mesh.addColor ( color ); // TEMP
+				mesh.addColor ( { 255, 255, 255 } );
 			}
 			mTimeCorpus.push_back ( mesh );
 		}
@@ -82,6 +81,7 @@ void Explorer::LiveView::CreatePoints ( )
 			for ( int point = 0; point < stats.raw[file].size ( ); point++ )
 			{
 				mStatsCorpus.addVertex ( { 0, 0, 0 } );
+				mStatsCorpus.addColor ( { 255, 255, 255 } );
 			}
 		}
 
@@ -90,63 +90,133 @@ void Explorer::LiveView::CreatePoints ( )
 	}
 	// ------------------------------
 
-	for ( int file = 0; file < stats.reduced.size ( ); file++ )
 	{
-		for ( int point = 0; point < stats.reduced[file].size ( ); point++ )
+		for ( int file = 0; file < stats.reduced.size ( ); file++ )
 		{
-			mStatsCorpus.addVertex ( { 0, 0, 0 } );
+			for ( int point = 0; point < stats.reduced[file].size ( ); point++ )
+			{
+				mStatsCorpus.addVertex ( { 0, 0, 0 } );
+				mStatsCorpus.addColor ( { 255, 255, 255 } );
+			}
 		}
-	}
 
-	bDraw = true;
+		bDraw = true;
+		return;
+	}
 }
 
-void Explorer::LiveView::FillDimension ( std::string& dimension, Axis axis )
+void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Axis axis )
 {
-	int dimensionIndex = GetDimensionIndex ( dimension );
+	Utils::TimeData time = mRawView->GetTimeData ( );
 
-	if ( mRawView->IsTimeAnalysis ( ) )
+	for ( int file = 0; file < time.raw.size ( ); file++ )
 	{
-		Utils::TimeData time = mRawView->GetTimeData ( );
-
-		for ( int file = 0; file < time.raw.size ( ); file++ )
+		for ( int timepoint = 0; timepoint < time.raw[file].size ( ); timepoint++ )
 		{
-			for ( int timepoint = 0; timepoint < time.raw[file].size ( ); timepoint++ )
+			double value = 0.0;
+			if ( dimensionIndex == -1 ) { value = time.seconds[file][timepoint]; }
+			else { value = time.raw[file][timepoint][dimensionIndex]; }
+
+			if ( axis == Axis::COLOR )
+			{
+				ofColor currentColor = mTimeCorpus[file].getColor ( timepoint );
+				currentColor.setHsb ( value, 255, 255 );
+				mTimeCorpus[file].setColor ( timepoint, currentColor );
+			}
+			else
 			{
 				glm::vec3 currentPoint = mTimeCorpus[file].getVertex ( timepoint );
-				currentPoint[axis] = time.raw[file][timepoint][dimensionIndex];
+				currentPoint[axis] = value;
 				mTimeCorpus[file].setVertex ( timepoint, currentPoint );
+			}
+		}
+	}
+}
+
+void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Axis axis )
+{
+	int statisticIndex = dimensionIndex % mRawView->GetStatistics ( ).size ( );
+	dimensionIndex /= mRawView->GetStatistics ( ).size ( );
+
+	Utils::StatsData stats = mRawView->GetStatsData ( );
+
+	for ( int file = 0; file < stats.raw.size ( ); file++ )
+	{
+		if ( axis == Axis::COLOR )
+		{
+			ofColor currentColor = mStatsCorpus.getColor ( file );
+			currentColor.setHsb ( stats.raw[file][dimensionIndex][statisticIndex], 255, 255 );
+			mStatsCorpus.setColor ( file, currentColor );
+		}
+		else
+		{
+			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
+			currentPoint[axis] = stats.raw[file][dimensionIndex][statisticIndex];
+			mStatsCorpus.setVertex ( file, currentPoint );
+		}
+	}
+}
+
+void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Axis axis )
+{
+	Utils::StatsData stats = mRawView->GetStatsData ( );
+
+	for ( int file = 0; file < stats.reduced.size ( ); file++ )
+	{
+		if ( axis == Axis::COLOR )
+		{
+			ofColor currentColor = mStatsCorpus.getColor ( file );
+			currentColor.setHsb ( stats.reduced[file][dimensionIndex], 255, 255 );
+			mStatsCorpus.setColor ( file, currentColor );
+		}
+		else
+		{
+			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
+			currentPoint[axis] = stats.reduced[file][dimensionIndex];
+			mStatsCorpus.setVertex ( file, currentPoint );
+		}
+	}
+}
+
+void Explorer::LiveView::FillDimensionNone ( Axis axis )
+{
+	if ( mRawView->IsTimeAnalysis ( ) )
+	{
+		for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
+		{
+			for ( int timepoint = 0; timepoint < mTimeCorpus[file].getNumVertices ( ); timepoint++ )
+			{
+				if ( axis == Axis::COLOR )
+				{
+					ofColor currentColor = mTimeCorpus[file].getColor ( timepoint );
+					currentColor.set ( 255, 255, 255 );
+					mTimeCorpus[file].setColor ( timepoint, currentColor );
+				}
+				else
+				{
+					glm::vec3 currentPoint = mTimeCorpus[file].getVertex ( timepoint );
+					currentPoint[axis] = 0;
+					mTimeCorpus[file].setVertex ( timepoint, currentPoint );
+				}
 			}
 		}
 	}
 	else
 	{
-		Utils::StatsData stats = mRawView->GetStatsData ( );
-
-		if ( !mRawView->IsReduction ( ) )
+		for ( int file = 0; file < mStatsCorpus.getNumVertices ( ); file++ )
 		{
-			// TODO - needs extra GUI to select statistic
-		}
-		else
-		{
-			for ( int file = 0; file < stats.reduced.size ( ); file++ )
+			if ( axis == Axis::COLOR )
+			{
+				ofColor currentColor = mStatsCorpus.getColor ( file );
+				currentColor.set ( 255, 255, 255 );
+				mStatsCorpus.setColor ( file, currentColor );
+			}
+			else
 			{
 				glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
-				currentPoint[axis] = stats.reduced[file][dimensionIndex];
+				currentPoint[axis] = 0;
 				mStatsCorpus.setVertex ( file, currentPoint );
 			}
 		}
 	}
-}
-
-int Explorer::LiveView::GetDimensionIndex ( std::string& dimension )
-{
-	for ( int i = 0; i < mRawView->GetDimensions ( ).size ( ); i++ )
-	{
-		if ( mRawView->GetDimensions ( )[i] == dimension )
-		{
-			return i;
-		}
-	}
-	ofLogWarning ( "LiveView" ) << "Dimension " << dimension << " not found";
 }

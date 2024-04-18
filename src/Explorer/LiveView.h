@@ -12,7 +12,8 @@ public:
 	enum Axis {
 		X = 0,
 		Y = 1,
-		Z = 2
+		Z = 2,
+		COLOR = 3
 	};
 
 	LiveView ( ) { }
@@ -25,11 +26,13 @@ public:
 
 	void CreatePoints ( );
 
-	void FillDimension ( std::string& dimension, Axis axis );
+	void FillDimensionTime ( int dimensionIndex, Axis axis );
+	void FillDimensionStats ( int dimensionIndex, Axis axis );
+	void FillDimensionStatsReduced ( int dimensionIndex, Axis axis );
+	void FillDimensionNone ( Axis axis );
 
 private:
 	bool bDraw = false;
-	int GetDimensionIndex ( std::string& dimension );
 
 	std::shared_ptr<RawView> mRawView; // might need to be weak_ptr?
 	std::vector<ofMesh> mTimeCorpus;
