@@ -29,6 +29,7 @@ private:
 	void OpenCorpus ( );
 	void SwapDimension ( string dimension, Explorer::LiveView::Axis axis );
 	int GetDimensionIndex ( std::string& dimension );
+	void CameraSwitcher ( );
 
 	// Listener Functions --------------------------
 
@@ -41,12 +42,14 @@ private:
 
 	bool bDraw = false;
 
-	bool bIsCorpusOpen = false;
+	bool bIsCorpusOpen = false; bool bOpeningCorpusInProgress = false;
 	bool bOpenCorpusDrawWarning = false;
 	bool bInitialiseShouldLoad = false;
 	bool bListenersAdded = false;
 	
 	bool bViewPointerShared = false;
+
+	Explorer::LiveView::Axis mDisabledAxis = Explorer::LiveView::NONE;
 
 	// Timing --------------------------------------
 
