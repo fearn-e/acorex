@@ -190,6 +190,8 @@ void ExplorerMenu::RemoveListeners ( )
 
 void ExplorerMenu::OpenCorpus ( )
 {
+	bOpeningCorpusInProgress = true;
+
 	if ( bIsCorpusOpen && !bOpenCorpusDrawWarning )
 	{
 		bOpenCorpusDrawWarning = true;
@@ -238,47 +240,36 @@ void ExplorerMenu::OpenCorpus ( )
 	mDimensionDropdownY->setSelectedValueByIndex ( yDimensionIndex, true );
 	mDimensionDropdownZ->setSelectedValueByIndex ( zDimensionIndex, true );
 	mDimensionDropdownColor->setSelectedValueByIndex ( colorDimensionIndex, true );
+
+	SwapDimension ( mRawView->GetDimensions ( )[xDimensionIndex], Explorer::LiveView::Axis::X );
+	SwapDimension ( mRawView->GetDimensions ( )[yDimensionIndex], Explorer::LiveView::Axis::Y );
+	SwapDimension ( mRawView->GetDimensions ( )[zDimensionIndex], Explorer::LiveView::Axis::Z );
+
+	bOpeningCorpusInProgress = false; // set this now so aux tasks inside SwapDimension can be done once
+
+	SwapDimension ( mRawView->GetDimensions ( )[colorDimensionIndex], Explorer::LiveView::Axis::COLOR );
 }
 
 void ExplorerMenu::SwapDimension ( string dimension, Explorer::LiveView::Axis axis )
 {
 	if ( !bIsCorpusOpen ) { return; }
 
-	if ( dimension == "None" )
+	if ( dimension == "None" )					{ mLiveView.FillDimensionNone ( axis ); }
+	else if ( dimension == "Time" )				{ mLiveView.FillDimensionTime ( -1, axis ); }
+	else
 	{
-		mLiveView.FillDimensionNone ( axis );
-		// TODO - if axis != COLOR, retrain point picker
-		return;
-	}
+		int dimensionIndex = GetDimensionIndex ( dimension );
+		if ( dimensionIndex == -1 ) { return; }
 
-	if ( dimension == "Time" )
-	{
-		mLiveView.FillDimensionTime ( -1, axis );
-		// TODO - if axis != COLOR, retrain point picker
-		return;
-	}
-
-	int dimensionIndex = GetDimensionIndex ( dimension );
-	if ( dimensionIndex == -1 ) { return; }
-
-	if ( mRawView->IsTimeAnalysis ( ) )
-	{
-		mLiveView.FillDimensionTime ( dimensionIndex, axis );
-		// TODO - if axis != COLOR, retrain point picker
-		return;
+		if ( mRawView->IsTimeAnalysis ( ) )		{ mLiveView.FillDimensionTime ( dimensionIndex, axis ); }
+		else if ( !mRawView->IsReduction ( ) )	{ mLiveView.FillDimensionStats ( dimensionIndex, axis ); }
+		else									{ mLiveView.FillDimensionStatsReduced ( dimensionIndex, axis ); }
 	}
 	
-	if ( !mRawView->IsReduction ( ) )
+	if ( !bOpeningCorpusInProgress )
 	{
-		mLiveView.FillDimensionStats ( dimensionIndex, axis );
+		CameraSwitcher ( );
 		// TODO - if axis != COLOR, retrain point picker
-		return;
-	}
-
-	{
-		mLiveView.FillDimensionStatsReduced ( dimensionIndex, axis );
-		// TODO - if axis != COLOR, retrain point picker
-		return;
 	}
 }
 
@@ -293,6 +284,40 @@ int ExplorerMenu::GetDimensionIndex ( std::string& dimension )
 	}
 	ofLogWarning ( "LiveView" ) << "Dimension " << dimension << " not found";
 	return -1;
+}
+
+void ExplorerMenu::CameraSwitcher ( )
+{
+	bool isXNone = mDimensionDropdownX->getAllSelected ( )[0] == "None";
+	bool isYNone = mDimensionDropdownY->getAllSelected ( )[0] == "None";
+	bool isZNone = mDimensionDropdownZ->getAllSelected ( )[0] == "None";
+	int numDisabledAxes = isXNone + isYNone + isZNone;
+
+	Explorer::LiveView::Axis			  disabledAxis = Explorer::LiveView::Axis::NONE;
+	if		( isXNone )					{ disabledAxis = Explorer::LiveView::Axis::X; }
+	else if ( isYNone )					{ disabledAxis = Explorer::LiveView::Axis::Y; }
+	else if ( isZNone )					{ disabledAxis = Explorer::LiveView::Axis::Z; }
+	else if ( numDisabledAxes > 1 )		{ disabledAxis = Explorer::LiveView::Axis::MULTIPLE; }
+
+	bool current3D = mLiveView.Is3D ( );
+
+	if ( disabledAxis == Explorer::LiveView::Axis::NONE || disabledAxis == Explorer::LiveView::Axis::MULTIPLE )
+	{
+		if ( !mLiveView.Is3D ( ) )
+		{
+			mLiveView.Set3D ( true );
+			mLiveView.Init3DCam ( );
+		}
+	}
+	else
+	{
+		if ( mLiveView.Is3D ( ) || disabledAxis != mDisabledAxis )
+		{
+			mLiveView.Set3D ( false );
+			mLiveView.Init2DCam ( disabledAxis );
+			mDisabledAxis = disabledAxis;
+		}
+	}
 }
 
 // Listener Functions --------------------------

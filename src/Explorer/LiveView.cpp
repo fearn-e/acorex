@@ -15,10 +15,8 @@ void Explorer::LiveView::Initialise ( )
 	mStatsCorpus.clear ( );
 	mTimeCorpus.clear ( );
 
-	mTemporaryCam.setPosition ( 250, 250, 250 );
-	mTemporaryCam.lookAt ( { 0, 0, 0 } );
-	mTemporaryCam.setNearClip ( 0.1 );
-	mTemporaryCam.setFarClip ( 10000 );
+	b3D = true;
+	Init3DCam ( );
 }
 
 void Explorer::LiveView::Draw ( )
@@ -26,7 +24,8 @@ void Explorer::LiveView::Draw ( )
 	if ( !bDraw ) { return; }
 	
 	ofEnableDepthTest ( );
-	mTemporaryCam.begin ( );
+	if ( b3D ) { m3DCam.begin ( ); }
+	else { m2DCam.begin ( ); }
 	ofDrawAxis ( 1000 );
 
 	// Draw points ------------------------------
@@ -46,7 +45,8 @@ void Explorer::LiveView::Draw ( )
 		mStatsCorpus.draw ( );
 	}
 
-	mTemporaryCam.end ( );
+	if ( b3D ) { m3DCam.end ( ); }
+	else { m2DCam.end ( ); }
 	ofDisableDepthTest ( );
 }
 
@@ -219,4 +219,23 @@ void Explorer::LiveView::FillDimensionNone ( Axis axis )
 			}
 		}
 	}
+}
+
+void Explorer::LiveView::Init3DCam ( )
+{ 
+	m3DCam.setPosition ( midSpacePoint, midSpacePoint, midSpacePoint ); 
+	m3DCam.lookAt ( { 0, 0, 0 } ); 
+	m3DCam.setNearClip ( 0.01 ); 
+	m3DCam.setFarClip ( 99999 ); 
+}
+
+void Explorer::LiveView::Init2DCam ( Axis disabledAxis )
+{ 
+	m2DCam.setPosition ( midSpacePoint, midSpacePoint, midSpacePoint ); 
+	if ( disabledAxis == Axis::X ) { m2DCam.lookAt ( { 0, midSpacePoint, midSpacePoint } ); }
+	else if ( disabledAxis == Axis::Y ) { m2DCam.lookAt ( { midSpacePoint, 0, midSpacePoint } ); }
+	else { m2DCam.lookAt ( { midSpacePoint, midSpacePoint, 0 } ); }
+	m2DCam.setNearClip ( 0.01 ); 
+	m2DCam.setFarClip ( 99999 );
+	m2DCam.enableOrtho ( );
 }
