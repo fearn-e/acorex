@@ -54,40 +54,63 @@ void ExplorerMenu::Initialise ( )
 		mDimensionDropdownX.reset ( );
 		mDimensionDropdownY.reset ( );
 		mDimensionDropdownZ.reset ( );
+		mDimensionDropdownColor.reset ( );
 
 		mDimensionDropdownX = make_unique<ofxDropdown> ( "X Dimension", dropdownScrollSpeed );
 		mDimensionDropdownY = make_unique<ofxDropdown> ( "Y Dimension", dropdownScrollSpeed );
 		mDimensionDropdownZ = make_unique<ofxDropdown> ( "Z Dimension", dropdownScrollSpeed );
+		mDimensionDropdownColor = make_unique<ofxDropdown> ( "Color Dimension", dropdownScrollSpeed );
 
 		if ( bInitialiseShouldLoad )
 		{
+			mDimensionDropdownX->add ( "None" );
+			mDimensionDropdownY->add ( "None" );
+			mDimensionDropdownZ->add ( "None" );
+			mDimensionDropdownColor->add ( "None" );
+
+			if ( mRawView->IsTimeAnalysis ( ) )
+			{
+				mDimensionDropdownX->add ( "Time" );
+				mDimensionDropdownY->add ( "Time" );
+				mDimensionDropdownZ->add ( "Time" );
+				mDimensionDropdownColor->add ( "Time" );
+			}
+
 			for ( auto& dimension : mRawView->GetDimensions ( ) )
 			{
 				mDimensionDropdownX->add ( dimension );
 				mDimensionDropdownY->add ( dimension );
 				mDimensionDropdownZ->add ( dimension );
+				mDimensionDropdownColor->add ( dimension );
 			}
+
+			bool needStatisticDropdowns = !mRawView->IsTimeAnalysis ( ) && !mRawView->IsReduction ( );
 
 			mMainPanel.add ( mDimensionDropdownX.get ( ) );
 			mMainPanel.add ( mDimensionDropdownY.get ( ) );
 			mMainPanel.add ( mDimensionDropdownZ.get ( ) );
+			mMainPanel.add ( mDimensionDropdownColor.get ( ) );
 		}
 
 		mDimensionDropdownX->disableMultipleSelection ( );
 		mDimensionDropdownY->disableMultipleSelection ( );
 		mDimensionDropdownZ->disableMultipleSelection ( );
+		mDimensionDropdownColor->disableMultipleSelection ( );
 
 		mDimensionDropdownX->enableCollapseOnSelection ( );
 		mDimensionDropdownY->enableCollapseOnSelection ( );
 		mDimensionDropdownZ->enableCollapseOnSelection ( );
+		mDimensionDropdownColor->enableCollapseOnSelection ( );
 
 		mDimensionDropdownX->setDropDownPosition ( ofxDropdown::DD_LEFT );
 		mDimensionDropdownY->setDropDownPosition ( ofxDropdown::DD_LEFT );
 		mDimensionDropdownZ->setDropDownPosition ( ofxDropdown::DD_LEFT );
+		mDimensionDropdownColor->setDropDownPosition ( ofxDropdown::DD_LEFT );
 
 		mDimensionDropdownX->setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mDimensionDropdownY->setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mDimensionDropdownZ->setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mDimensionDropdownColor->setBackgroundColor ( mColors.interfaceBackgroundColor );
 
 		mMainPanel.setPosition ( mLayout.explorePanelOriginX, mLayout.explorePanelOriginY );
 		mMainPanel.setWidthElements ( mLayout.explorePanelWidth );
@@ -100,6 +123,7 @@ void ExplorerMenu::Initialise ( )
 		mDimensionDropdownX->addListener ( this, &ExplorerMenu::SwapDimensionX );
 		mDimensionDropdownY->addListener ( this, &ExplorerMenu::SwapDimensionY );
 		mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SwapDimensionZ );
+		mDimensionDropdownColor->addListener ( this, &ExplorerMenu::SwapDimensionColor );
 		bListenersAdded = true;
 	}
 
@@ -158,6 +182,7 @@ void ExplorerMenu::RemoveListeners ( )
 	mDimensionDropdownX->removeListener ( this, &ExplorerMenu::SwapDimensionX );
 	mDimensionDropdownY->removeListener ( this, &ExplorerMenu::SwapDimensionY );
 	mDimensionDropdownZ->removeListener ( this, &ExplorerMenu::SwapDimensionZ );
+	mDimensionDropdownColor->removeListener ( this, &ExplorerMenu::SwapDimensionColor );
 	bListenersAdded = false;
 }
 
@@ -185,36 +210,109 @@ void ExplorerMenu::OpenCorpus ( )
 	bIsCorpusOpen = true;
 
 	mLiveView.CreatePoints ( );
-	mDimensionDropdownX->setSelectedValueByIndex ( 0, true );
-	mDimensionDropdownY->setSelectedValueByIndex ( 1, true );
-	if ( mRawView->GetDimensions ( ).size ( ) > 2 )
+
+	// set default dropdown values
+	int xDimensionIndex = 0, yDimensionIndex = 0, zDimensionIndex = 0, colorDimensionIndex = 0;
 	{
-		mDimensionDropdownZ->setSelectedValueByIndex ( 2, true );
+		int dimensionCount = mRawView->GetDimensions ( ).size ( );
+		if ( mRawView->IsTimeAnalysis ( ) || mRawView->IsReduction ( ) )
+		{
+			// dimension 0 is always none and 1 is always time
+			if ( dimensionCount > 1 ) { xDimensionIndex = 1; } else { xDimensionIndex = 0; }
+			if ( dimensionCount > 2 ) { yDimensionIndex = 2; } else { yDimensionIndex = 0; }
+			if ( dimensionCount > 3 ) { zDimensionIndex = 3; } else { zDimensionIndex = 0; }
+			if ( dimensionCount > 4 ) { colorDimensionIndex = 4; } else { colorDimensionIndex = 0; }
+		}
+		else
+		{
+			// dimension 0 is always none, then it goes up in sets of 7
+			if ( dimensionCount > 1 ) { xDimensionIndex = 1; } else { xDimensionIndex = 0; }
+			if ( dimensionCount > 8 ) { yDimensionIndex = 8; } else { yDimensionIndex = 0; }
+			if ( dimensionCount > 15 ) { zDimensionIndex = 15; } else { zDimensionIndex = 0; }
+			if ( dimensionCount > 22 ) { colorDimensionIndex = 22; } else { colorDimensionIndex = 0; }
+		}
+		
 	}
+
+	mDimensionDropdownX->setSelectedValueByIndex ( xDimensionIndex, true );
+	mDimensionDropdownY->setSelectedValueByIndex ( yDimensionIndex, true );
+	mDimensionDropdownZ->setSelectedValueByIndex ( zDimensionIndex, true );
+	mDimensionDropdownColor->setSelectedValueByIndex ( colorDimensionIndex, true );
 }
 
-// TODO - retrain point picker at the end of each SwapDimension call
-
-void ExplorerMenu::SwapDimensionX ( string& dimension )
+void ExplorerMenu::SwapDimension ( string dimension, Explorer::LiveView::Axis axis )
 {
 	if ( !bIsCorpusOpen ) { return; }
 
-	ofLogNotice ( "ExplorerMenu" ) << "Swapping X dimension to " << dimension;
-	mLiveView.FillDimension ( dimension, Explorer::LiveView::Axis::X );
+	if ( dimension == "None" )
+	{
+		mLiveView.FillDimensionNone ( axis );
+		// TODO - if axis != COLOR, retrain point picker
+		return;
+	}
+
+	if ( dimension == "Time" )
+	{
+		mLiveView.FillDimensionTime ( -1, axis );
+		// TODO - if axis != COLOR, retrain point picker
+		return;
+	}
+
+	int dimensionIndex = GetDimensionIndex ( dimension );
+	if ( dimensionIndex == -1 ) { return; }
+
+	if ( mRawView->IsTimeAnalysis ( ) )
+	{
+		mLiveView.FillDimensionTime ( dimensionIndex, axis );
+		// TODO - if axis != COLOR, retrain point picker
+		return;
+	}
+	
+	if ( !mRawView->IsReduction ( ) )
+	{
+		mLiveView.FillDimensionStats ( dimensionIndex, axis );
+		// TODO - if axis != COLOR, retrain point picker
+		return;
+	}
+
+	{
+		mLiveView.FillDimensionStatsReduced ( dimensionIndex, axis );
+		// TODO - if axis != COLOR, retrain point picker
+		return;
+	}
+}
+
+int ExplorerMenu::GetDimensionIndex ( std::string& dimension )
+{
+	for ( int i = 0; i < mRawView->GetDimensions ( ).size ( ); i++ )
+	{
+		if ( mRawView->GetDimensions ( )[i] == dimension )
+		{
+			return i;
+		}
+	}
+	ofLogWarning ( "LiveView" ) << "Dimension " << dimension << " not found";
+	return -1;
+}
+
+// Listener Functions --------------------------
+
+void ExplorerMenu::SwapDimensionX ( string& dimension )
+{
+	SwapDimension ( dimension, Explorer::LiveView::Axis::X );
 }
 
 void ExplorerMenu::SwapDimensionY ( string& dimension )
 {
-	if ( !bIsCorpusOpen ) { return; }
-
-	ofLogNotice ( "ExplorerMenu" ) << "Swapping Y dimension to " << dimension;
-	mLiveView.FillDimension ( dimension, Explorer::LiveView::Axis::Y );
+	SwapDimension ( dimension, Explorer::LiveView::Axis::Y );
 }
 
 void ExplorerMenu::SwapDimensionZ ( string& dimension )
 {
-	if ( !bIsCorpusOpen ) { return; }
+	SwapDimension ( dimension, Explorer::LiveView::Axis::Z );
+}
 
-	ofLogNotice ( "ExplorerMenu" ) << "Swapping Z dimension to " << dimension;
-	mLiveView.FillDimension ( dimension, Explorer::LiveView::Axis::Z );
+void ExplorerMenu::SwapDimensionColor ( string& dimension )
+{
+	SwapDimension ( dimension, Explorer::LiveView::Axis::COLOR );
 }

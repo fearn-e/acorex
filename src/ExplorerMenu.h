@@ -27,9 +27,15 @@ private:
 	// Main Functions ------------------------------
 
 	void OpenCorpus ( );
+	void SwapDimension ( string dimension, Explorer::LiveView::Axis axis );
+	int GetDimensionIndex ( std::string& dimension );
+
+	// Listener Functions --------------------------
+
 	void SwapDimensionX ( string& dimension );
 	void SwapDimensionY ( string& dimension );
 	void SwapDimensionZ ( string& dimension );
+	void SwapDimensionColor ( string& dimension );
 
 	// States --------------------------------------
 
@@ -58,6 +64,7 @@ private:
 	unique_ptr<ofxDropdown> mDimensionDropdownX;
 	unique_ptr<ofxDropdown> mDimensionDropdownY;
 	unique_ptr<ofxDropdown> mDimensionDropdownZ;
+	unique_ptr<ofxDropdown> mDimensionDropdownColor;
 
 	// Acorex Objects ------------------------------
 
