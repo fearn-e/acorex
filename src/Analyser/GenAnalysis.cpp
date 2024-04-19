@@ -2,7 +2,7 @@
 #include <ofLog.h>
 #include <omp.h>
 
-#ifndef DATA_CHANGE_CHECK_8
+#ifndef DATA_CHANGE_CHECK_9
 #error "Check if dataset is still used correctly"
 #endif
 
@@ -12,8 +12,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 {  
     if ( dataset.analysisSettings.bTime )
     {
-        dataset.time.samples.clear ( );
-        dataset.time.seconds.clear ( );
+        dataset.time.sampleRates.clear ( );
         dataset.time.raw.clear ( );
     }
 	else
@@ -42,6 +41,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 
     fluid::index nBins = dataset.analysisSettings.windowFFTSize / 2 + 1;
     fluid::index hopSize = dataset.analysisSettings.windowFFTSize / dataset.analysisSettings.hopFraction;
+    if ( dataset.analysisSettings.bTime ) { dataset.time.hopSize = hopSize; }
     fluid::index halfWindow = dataset.analysisSettings.windowFFTSize / 2;
     
     //if ( dataset.analysisSettings.bTime )
@@ -136,13 +136,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 
         if ( dataset.analysisSettings.bTime )
         {
-            dataset.time.samples.push_back ( std::vector<double> ( ) );
-            dataset.time.seconds.push_back ( std::vector<double> ( ) );
-            for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
-            {
-                dataset.time.samples[analysedFileIndex].push_back ( frameIndex * hopSize );
-                dataset.time.seconds[analysedFileIndex].push_back ( (frameIndex * hopSize) / samplingRate );
-            }
+            dataset.time.sampleRates.push_back ( samplingRate );
 
             std::vector<std::vector<double>> allVectors ( nFrames );
 

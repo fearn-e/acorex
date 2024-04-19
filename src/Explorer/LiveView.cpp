@@ -114,7 +114,7 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Axis axis )
 		for ( int timepoint = 0; timepoint < time.raw[file].size ( ); timepoint++ )
 		{
 			double value = 0.0;
-			if ( dimensionIndex == -1 ) { value = time.seconds[file][timepoint]; }
+			if ( dimensionIndex == -1 ) { value = ( timepoint * time.hopSize ) / time.sampleRates[file]; }
 			else { value = time.raw[file][timepoint][dimensionIndex]; }
 
 			if ( axis == Axis::COLOR )

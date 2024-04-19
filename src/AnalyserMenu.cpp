@@ -596,9 +596,9 @@ void AnalyserMenu::UnpackSettingsFromFile ( const Utils::AnalysisSettings& setti
 	mMaxFreqField = settings.maxFreq;
 	mCurrentDimensionCount = settings.currentDimensionCount;
 
-#ifndef DATA_CHANGE_CHECK_8
+#ifndef DATA_CHANGE_CHECK_9
 #error "check if this implementation is still valid for the data struct"
-#endif // !DATA_CHANGE_CHECK_8
+#endif // !DATA_CHANGE_CHECK_9
 }
 
 void AnalyserMenu::PackSettingsFromUser ( Utils::AnalysisSettings& settings )
@@ -616,9 +616,9 @@ void AnalyserMenu::PackSettingsFromUser ( Utils::AnalysisSettings& settings )
 	settings.maxFreq = mMaxFreqField;
 
 
-#ifndef DATA_CHANGE_CHECK_8
+#ifndef DATA_CHANGE_CHECK_9
 #error "check if this implementation is still valid for the data struct"
-#endif // !DATA_CHANGE_CHECK_8
+#endif // !DATA_CHANGE_CHECK_9
 }
 
 void AnalyserMenu::PackSettingsFromUser ( Utils::ReductionSettings& settings )
@@ -626,9 +626,9 @@ void AnalyserMenu::PackSettingsFromUser ( Utils::ReductionSettings& settings )
 	settings.dimensionReductionTarget = mReducedDimensionsField;
 	settings.maxIterations = mMaxIterationsField;
 
-#ifndef DATA_CHANGE_CHECK_8
+#ifndef DATA_CHANGE_CHECK_9
 #error "check if this implementation is still valid for the data struct"
-#endif // !DATA_CHANGE_CHECK_8
+#endif // !DATA_CHANGE_CHECK_9
 }
 
 

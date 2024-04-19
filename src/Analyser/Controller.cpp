@@ -110,7 +110,7 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
 	Utils::DataSet newDataset;
 	newDataset.fileList = newFiles;
 	newDataset.analysisSettings = existingDataset.analysisSettings;
-#ifndef DATA_CHANGE_CHECK_8
+#ifndef DATA_CHANGE_CHECK_9
 #error "check if this is still valid with dataset structure"
 #endif
 
@@ -182,9 +182,9 @@ std::vector<int> Analyser::Controller::MergeDatasets ( Utils::DataSet& primaryDa
 
 			if ( primaryDataset.analysisSettings.bTime )
 			{ // Time
+				primaryDataset.time.hopSize = additionalDataset.time.hopSize;
 				pointCountDiff = additionalDataset.time.raw[i].size ( ) - primaryDataset.time.raw[existingIndex].size ( ); // TODO - DOUBLE CHECK THIS
-				primaryDataset.time.samples[existingIndex] = additionalDataset.time.samples[i];
-				primaryDataset.time.seconds[existingIndex] = additionalDataset.time.seconds[i];
+				primaryDataset.time.sampleRates[existingIndex] = additionalDataset.time.sampleRates[i];
 				primaryDataset.time.raw[existingIndex] = additionalDataset.time.raw[i];
 			}
 			else
@@ -207,9 +207,9 @@ std::vector<int> Analyser::Controller::MergeDatasets ( Utils::DataSet& primaryDa
 
 			if ( primaryDataset.analysisSettings.bTime )
 			{ // Time
+				primaryDataset.time.hopSize = additionalDataset.time.hopSize;
 				pointCountDiff = additionalDataset.time.raw[i].size ( ); // TODO - DOUBLE CHECK THIS
-				primaryDataset.time.samples.push_back ( additionalDataset.time.samples[i] );
-				primaryDataset.time.seconds.push_back ( additionalDataset.time.seconds[i] );
+				primaryDataset.time.sampleRates.push_back ( additionalDataset.time.sampleRates[i] );
 				primaryDataset.time.raw.push_back ( additionalDataset.time.raw[i] );
 			}
 			else
