@@ -4,7 +4,7 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 
-#define DATA_CHANGE_CHECK_8
+#define DATA_CHANGE_CHECK_9
 
 #define DATA_NUM_STATS 7
 
@@ -12,8 +12,8 @@ namespace Acorex {
 namespace Utils {
 
 struct TimeData {
-	std::vector<std::vector<double>> samples; // [file][timepoint]
-	std::vector<std::vector<double>> seconds; // [file][timepoint]
+	int hopSize = 0;
+	std::vector<double> sampleRates; // [file]
 
 	std::vector<std::vector<std::vector<double>>> raw; // [file][timepoint][dimension]
 };
