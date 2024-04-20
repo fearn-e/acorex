@@ -33,6 +33,8 @@ public:
 	void FillDimensionStatsReduced ( int dimensionIndex, Axis axis );
 	void FillDimensionNone ( Axis axis );
 
+	void FindScaling ( int dimensionIndex, int statisticIndex, double& min, double& max );
+
 	void Set3D ( bool is3D ) { b3D = is3D; }
 	void Init3DCam ( );
 	void Init2DCam ( Axis disabledAxis );
@@ -49,7 +51,8 @@ private:
 
 	ofEasyCam m3DCam;
 	ofEasyCam m2DCam;
-	int midSpacePoint = 500;
+	double mSpaceMin = 0; double mSpaceMax = 1000;
+	double mColorMin = 0; double mColorMax = 255;
 };
 
 } // namespace Explorer
