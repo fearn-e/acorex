@@ -11,7 +11,7 @@ bool Utils::JSON::Write ( const std::string& outputFile, const DataSet& dataset 
 		std::ofstream file ( outputFile );
 		nlohmann::json j = dataset;
 
-		file << j.dump ( 4 ) << std::endl;
+		file << j.dump ( 0 ) << std::endl;
 		file.close ( );
 	}
 	catch ( std::exception& e )
