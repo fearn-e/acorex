@@ -42,7 +42,7 @@ private:
 
 	bool bDraw = false;
 
-	bool bIsCorpusOpen = false; bool bOpeningCorpusInProgress = false;
+	bool bIsCorpusOpen = false; bool bBlockDimensionFilling = false;
 	bool bOpenCorpusDrawWarning = false;
 	bool bInitialiseShouldLoad = false;
 	bool bListenersAdded = false;
