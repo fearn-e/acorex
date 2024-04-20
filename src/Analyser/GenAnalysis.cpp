@@ -209,6 +209,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 
         analysedFileIndex++;
         analysedFiles.push_back ( dataset.fileList[fileIndex] );
+        ofLogNotice ( "GenAnalysis" ) << analysedFileIndex / (float)dataset.fileList.size ( ) * 100 << "% | Analysed " << dataset.fileList[fileIndex];
     }
 
     dataset.fileList.clear ( );
