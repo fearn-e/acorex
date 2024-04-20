@@ -190,7 +190,7 @@ void ExplorerMenu::RemoveListeners ( )
 
 void ExplorerMenu::OpenCorpus ( )
 {
-	bOpeningCorpusInProgress = true;
+	bBlockDimensionFilling = true;
 
 	if ( bIsCorpusOpen && !bOpenCorpusDrawWarning )
 	{
@@ -208,8 +208,6 @@ void ExplorerMenu::OpenCorpus ( )
 	
 	bInitialiseShouldLoad = true;
 	Initialise ( );
-
-	bIsCorpusOpen = true;
 
 	mLiveView.CreatePoints ( );
 
@@ -241,18 +239,20 @@ void ExplorerMenu::OpenCorpus ( )
 	mDimensionDropdownZ->setSelectedValueByIndex ( zDimensionIndex, true );
 	mDimensionDropdownColor->setSelectedValueByIndex ( colorDimensionIndex, true );
 
+	bBlockDimensionFilling = false;
+
 	SwapDimension ( mRawView->GetDimensions ( )[xDimensionIndex], Explorer::LiveView::Axis::X );
 	SwapDimension ( mRawView->GetDimensions ( )[yDimensionIndex], Explorer::LiveView::Axis::Y );
 	SwapDimension ( mRawView->GetDimensions ( )[zDimensionIndex], Explorer::LiveView::Axis::Z );
 
-	bOpeningCorpusInProgress = false; // set this now so aux tasks inside SwapDimension can be done once
+	bIsCorpusOpen = true;
 
 	SwapDimension ( mRawView->GetDimensions ( )[colorDimensionIndex], Explorer::LiveView::Axis::COLOR );
 }
 
 void ExplorerMenu::SwapDimension ( string dimension, Explorer::LiveView::Axis axis )
 {
-	if ( !bIsCorpusOpen ) { return; }
+	if ( bBlockDimensionFilling ) { return; }
 
 	if ( dimension == "None" )					{ mLiveView.FillDimensionNone ( axis ); }
 	else if ( dimension == "Time" )				{ mLiveView.FillDimensionTime ( -1, axis ); }
@@ -266,7 +266,7 @@ void ExplorerMenu::SwapDimension ( string dimension, Explorer::LiveView::Axis ax
 		else									{ mLiveView.FillDimensionStatsReduced ( dimensionIndex, axis ); }
 	}
 	
-	if ( !bOpeningCorpusInProgress )
+	if ( bIsCorpusOpen )
 	{
 		CameraSwitcher ( );
 		// TODO - if axis != COLOR, retrain point picker
