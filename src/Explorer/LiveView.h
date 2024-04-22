@@ -45,6 +45,9 @@ private:
 	bool bDraw = false;
 	bool b3D = true;
 
+	Axis mDisabledAxis = NONE;
+	std::string xLabel = "X", yLabel = "Y", zLabel = "Z";
+
 	std::shared_ptr<RawView> mRawView; // might need to be weak_ptr?
 	std::vector<ofMesh> mTimeCorpus;
 	ofMesh mStatsCorpus;
