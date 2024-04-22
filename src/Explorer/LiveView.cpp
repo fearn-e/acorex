@@ -26,7 +26,16 @@ void Explorer::LiveView::Draw ( )
 	ofEnableDepthTest ( );
 	if ( b3D ) { m3DCam.begin ( ); }
 	else { m2DCam.begin ( ); }
-	ofDrawAxis ( 1000 );
+	ofSetColor ( 255, 255, 255 );
+
+	if ( mDisabledAxis != Axis::X ) { ofDrawLine ( { mSpaceMin, 0, 0 }, { mSpaceMax, 0, 0 } ); }
+	if ( mDisabledAxis != Axis::Y ) { ofDrawLine ( { 0, mSpaceMin, 0 }, { 0, mSpaceMax, 0 } ); }
+	if ( mDisabledAxis != Axis::Z ) { ofDrawLine ( { 0, 0, mSpaceMin }, { 0, 0, mSpaceMax } ); }
+
+	if ( mDisabledAxis != Axis::X ) { ofDrawBitmapString ( xLabel , { mSpaceMax, 0, 0 } ); }
+	if ( mDisabledAxis != Axis::Y ) { ofDrawBitmapString ( yLabel , { 0, mSpaceMax, 0 } ); }
+	if ( mDisabledAxis != Axis::Z ) { ofDrawBitmapString ( zLabel , { 0, 0, mSpaceMax } ); }
+	
 
 	// Draw points ------------------------------
 	if ( mRawView->IsTimeAnalysis ( ) ) // Time
@@ -107,6 +116,11 @@ void Explorer::LiveView::CreatePoints ( )
 
 void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Axis axis )
 {
+	std::string dimensionName = dimensionIndex == -1 ? "Time" : mRawView->GetDimensions ( )[dimensionIndex];
+	if ( axis == Axis::X ) { xLabel = dimensionName; }
+	else if ( axis == Axis::Y ) { yLabel = dimensionName; }
+	else if ( axis == Axis::Z ) { zLabel = dimensionName; }
+
 	Utils::TimeData* time = mRawView->GetTimeData ( );
 
 	double min = 0, max = 0;
@@ -140,6 +154,11 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Axis axis )
 
 void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Axis axis )
 {
+	std::string dimensionName = mRawView->GetDimensions ( )[dimensionIndex];
+	if ( axis == Axis::X ) { xLabel = dimensionName; }
+	else if ( axis == Axis::Y ) { yLabel = dimensionName; }
+	else if ( axis == Axis::Z ) { zLabel = dimensionName; }
+
 	int statisticIndex = dimensionIndex % mRawView->GetStatistics ( ).size ( );
 	dimensionIndex /= mRawView->GetStatistics ( ).size ( );
 
@@ -169,6 +188,11 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Axis axis )
 
 void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Axis axis )
 {
+	std::string dimensioName = mRawView->GetDimensions ( )[dimensionIndex];
+	if ( axis == Axis::X ) { xLabel = dimensioName; }
+	else if ( axis == Axis::Y ) { yLabel = dimensioName; }
+	else if ( axis == Axis::Z ) { zLabel = dimensioName; }
+
 	Utils::StatsData* stats = mRawView->GetStatsData ( );
 
 	double min = 0, max = 0;
@@ -195,6 +219,10 @@ void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Axis ax
 
 void Explorer::LiveView::FillDimensionNone ( Axis axis )
 {
+	if ( axis == Axis::X ) { xLabel = ""; }
+	else if ( axis == Axis::Y ) { yLabel = ""; }
+	else if ( axis == Axis::Z ) { zLabel = ""; }
+
 	if ( mRawView->IsTimeAnalysis ( ) )
 	{
 		for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
