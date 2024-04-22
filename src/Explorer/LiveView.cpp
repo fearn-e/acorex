@@ -278,7 +278,9 @@ void Explorer::LiveView::FindScaling ( int dimensionIndex, int statisticIndex, d
 		min = std::numeric_limits<double>::max ( );
 		max = std::numeric_limits<double>::max ( ) * -1;
 
-		for ( int file = 0; file < stats->raw.size ( ); file++ )
+		int loopSize = mRawView->IsReduction ( ) ? stats->reduced.size ( ) : stats->raw.size ( );
+
+		for ( int file = 0; file < loopSize; file++ )
 		{
 			double value = 0.0;
 			if ( !mRawView->IsReduction ( ) && statisticIndex > -1 ) { value = stats->raw[file][dimensionIndex][statisticIndex]; }
