@@ -212,42 +212,47 @@ void ExplorerMenu::OpenCorpus ( )
 	mLiveView.CreatePoints ( );
 
 	// set default dropdown values
-	int xDimensionIndex = 0, yDimensionIndex = 0, zDimensionIndex = 0, colorDimensionIndex = 0;
+	std::string xDimension = "Time", yDimension = "None", zDimension = "None", colorDimension = "None";
 	{
 		int dimensionCount = mRawView->GetDimensions ( ).size ( );
-		if ( mRawView->IsTimeAnalysis ( ) || mRawView->IsReduction ( ) )
+		if ( mRawView->IsTimeAnalysis ( ) )
 		{
-			// dimension 0 is always none and 1 is always time
-			if ( dimensionCount > 1 ) { xDimensionIndex = 1; } else { xDimensionIndex = 0; }
-			if ( dimensionCount > 2 ) { yDimensionIndex = 2; } else { yDimensionIndex = 0; }
-			if ( dimensionCount > 3 ) { zDimensionIndex = 3; } else { zDimensionIndex = 0; }
-			if ( dimensionCount > 4 ) { colorDimensionIndex = 4; } else { colorDimensionIndex = 0; }
+			xDimension = "Time";
+			yDimension = mRawView->GetDimensions ( ).size ( ) > 0 ? mRawView->GetDimensions ( )[0] : "None";
+			zDimension = mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : "None";
+			colorDimension = mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : "None";
+		}
+		else if ( mRawView->IsReduction ( ) )
+		{
+			xDimension = mRawView->GetDimensions ( ).size ( ) > 0 ? mRawView->GetDimensions ( )[0] : "None";
+			yDimension = mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : "None";
+			zDimension = mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : "None";
+			colorDimension = mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : "None";
 		}
 		else
 		{
-			// dimension 0 is always none, then it goes up in sets of 7
-			if ( dimensionCount > 1 ) { xDimensionIndex = 1; } else { xDimensionIndex = 0; }
-			if ( dimensionCount > 8 ) { yDimensionIndex = 8; } else { yDimensionIndex = 0; }
-			if ( dimensionCount > 15 ) { zDimensionIndex = 15; } else { zDimensionIndex = 0; }
-			if ( dimensionCount > 22 ) { colorDimensionIndex = 22; } else { colorDimensionIndex = 0; }
+			xDimension = mRawView->GetDimensions ( ).size ( ) > 0 ? mRawView->GetDimensions ( )[0] : "None";
+			yDimension = mRawView->GetDimensions ( ).size ( ) > 7 ? mRawView->GetDimensions ( )[7] : "None";
+			zDimension = mRawView->GetDimensions ( ).size ( ) > 14 ? mRawView->GetDimensions ( )[14] : "None";
+			colorDimension = mRawView->GetDimensions ( ).size ( ) > 21 ? mRawView->GetDimensions ( )[21] : "None";
 		}
 		
 	}
 
-	mDimensionDropdownX->setSelectedValueByIndex ( xDimensionIndex, true );
-	mDimensionDropdownY->setSelectedValueByIndex ( yDimensionIndex, true );
-	mDimensionDropdownZ->setSelectedValueByIndex ( zDimensionIndex, true );
-	mDimensionDropdownColor->setSelectedValueByIndex ( colorDimensionIndex, true );
+	mDimensionDropdownX->setSelectedValueByName ( xDimension, true );
+	mDimensionDropdownY->setSelectedValueByName ( yDimension, true );
+	mDimensionDropdownZ->setSelectedValueByName ( zDimension, true );
+	mDimensionDropdownColor->setSelectedValueByName ( colorDimension, true );
 
 	bBlockDimensionFilling = false;
 
-	SwapDimension ( mRawView->GetDimensions ( )[xDimensionIndex], Explorer::LiveView::Axis::X );
-	SwapDimension ( mRawView->GetDimensions ( )[yDimensionIndex], Explorer::LiveView::Axis::Y );
-	SwapDimension ( mRawView->GetDimensions ( )[zDimensionIndex], Explorer::LiveView::Axis::Z );
+	SwapDimension ( xDimension, Explorer::LiveView::Axis::X );
+	SwapDimension ( yDimension, Explorer::LiveView::Axis::Y );
+	SwapDimension ( zDimension, Explorer::LiveView::Axis::Z );
 
 	bIsCorpusOpen = true;
 
-	SwapDimension ( mRawView->GetDimensions ( )[colorDimensionIndex], Explorer::LiveView::Axis::COLOR );
+	SwapDimension ( colorDimension, Explorer::LiveView::Axis::COLOR );
 }
 
 void ExplorerMenu::SwapDimension ( string dimension, Explorer::LiveView::Axis axis )
