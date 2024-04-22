@@ -215,6 +215,9 @@
     <ClInclude Include="src\Utils\DatasetConversion.h">
       <Filter>src\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\Explorer\PointPicker.h">
+      <Filter>src\Explorer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
