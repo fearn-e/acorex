@@ -2,6 +2,7 @@
 #include <ofLog.h>
 #include "ofGraphics.h"
 #include <of3dUtils.h>
+#include <ofEvents.h>
 
 using namespace Acorex;
 
@@ -17,12 +18,66 @@ void Explorer::LiveView::Initialise ( )
 
 	b3D = true;
 	Init3DCam ( );
+
+	ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
+	ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
+	ofAddListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
+	ofAddListener ( ofEvents ( ).mouseReleased, this, &Explorer::LiveView::MouseEvent );
+	ofAddListener ( ofEvents ( ).mouseScrolled, this, &Explorer::LiveView::MouseEvent );
+	ofAddListener ( ofEvents ( ).keyPressed, this, &Explorer::LiveView::KeyEvent );
+	ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
 }
+
+void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
+{
+	//types: 0-pressed, 1-moved, 2-released, 3-dragged, 4-scrolled
+	//buttons: 0-left, 1-middle, 2-right
+	//modifiers: 0-none, 1-shift, 2-ctrl, 4-alt (and combinations of them are added together)
+	//position: x, y
+	//scroll direction: x, y
+
+	if ( b3D )
+	{
+		if ( args.type == 4 )
+		{
+			mCamera.dolly ( args.scrollY * mCamZoomSpeed3D );
+		}
+		else if ( args.type == 3 )
+		{
+
+		}
+	}
+	else
+	{
+		if ( args.type == 4 )
+		{
+			mCamera.setScale ( mCamera.getScale ( ) + args.scrollY * mCamZoomSpeed2D );
+			if ( mCamera.getScale ( ).x < 0.1 ) { mCamera.setScale ( 0.1 ); }
+			mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera.getScale ( ).x;
+		}
+		else if ( args.type == 3 )
+		{
+			mCamera.boom ( ( args.y - mLastMouseY ) * mCamMoveSpeedScaleAdjusted );
+			mCamera.truck ( ( args.x - mLastMouseX ) * mCamMoveSpeedScaleAdjusted * -1 );
+		}
+	}
+
+	mLastMouseX = args.x;
+	mLastMouseY = args.y;
+}
+
+void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
+{
+	//type: 0-pressed, 1-released
+	//key: no modifiers, just the raw key
+	//scancode: includes all modifiers
+}
+
 
 void Explorer::LiveView::Draw ( )
 {
 	if ( !bDraw ) { return; }
-	
+
 	ofEnableDepthTest ( );
 	mCamera.begin ( );
 
@@ -327,6 +382,7 @@ void Explorer::LiveView::Init3DCam ( )
 	mCamera.setNearClip ( 0.01 ); 
 	mCamera.setFarClip ( 99999 ); 
 	mCamera.disableOrtho ( );
+	mCamera.setScale ( 1 );
 }
 
 void Explorer::LiveView::Init2DCam ( Axis disabledAxis )
@@ -339,4 +395,6 @@ void Explorer::LiveView::Init2DCam ( Axis disabledAxis )
 	mCamera.setNearClip ( 0.01 ); 
 	mCamera.setFarClip ( 99999 );
 	mCamera.enableOrtho ( );
+	mCamera.setScale ( 1 );
+	mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera.getScale ( ).x;
 }
