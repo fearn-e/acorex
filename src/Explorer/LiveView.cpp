@@ -54,12 +54,12 @@ void Explorer::LiveView::CreatePoints ( )
 {
 	if ( mRawView->IsTimeAnalysis ( ) )
 	{
-		Utils::TimeData time = mRawView->GetTimeData ( );
+		Utils::TimeData* time = mRawView->GetTimeData ( );
 
-		for ( int file = 0; file < time.raw.size ( ); file++ )
+		for ( int file = 0; file < time->raw.size ( ); file++ )
 		{
 			ofMesh mesh;
-			for ( int timepoint = 0; timepoint < time.raw[file].size ( ); timepoint++ )
+			for ( int timepoint = 0; timepoint < time->raw[file].size ( ); timepoint++ )
 			{
 				mesh.addVertex ( { 0, 0, 0 } );
 				mesh.addColor ( { 255, 255, 255 } );
@@ -72,13 +72,13 @@ void Explorer::LiveView::CreatePoints ( )
 	}
 	// ------------------------------
 
-	Utils::StatsData stats = mRawView->GetStatsData ( );
+	Utils::StatsData* stats = mRawView->GetStatsData ( );
 
 	if ( !mRawView->IsReduction ( ) )
 	{
-		for ( int file = 0; file < stats.raw.size ( ); file++ )
+		for ( int file = 0; file < stats->raw.size ( ); file++ )
 		{
-			for ( int point = 0; point < stats.raw[file].size ( ); point++ )
+			for ( int point = 0; point < stats->raw[file].size ( ); point++ )
 			{
 				mStatsCorpus.addVertex ( { 0, 0, 0 } );
 				mStatsCorpus.addColor ( { 255, 255, 255 } );
@@ -91,9 +91,9 @@ void Explorer::LiveView::CreatePoints ( )
 	// ------------------------------
 
 	{
-		for ( int file = 0; file < stats.reduced.size ( ); file++ )
+		for ( int file = 0; file < stats->reduced.size ( ); file++ )
 		{
-			for ( int point = 0; point < stats.reduced[file].size ( ); point++ )
+			for ( int point = 0; point < stats->reduced[file].size ( ); point++ )
 			{
 				mStatsCorpus.addVertex ( { 0, 0, 0 } );
 				mStatsCorpus.addColor ( { 255, 255, 255 } );
@@ -107,18 +107,18 @@ void Explorer::LiveView::CreatePoints ( )
 
 void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Axis axis )
 {
-	Utils::TimeData time = mRawView->GetTimeData ( );
+	Utils::TimeData* time = mRawView->GetTimeData ( );
 
 	double min = 0, max = 0;
 	FindScaling ( dimensionIndex, -1, min, max );
 
-	for ( int file = 0; file < time.raw.size ( ); file++ )
+	for ( int file = 0; file < time->raw.size ( ); file++ )
 	{
-		for ( int timepoint = 0; timepoint < time.raw[file].size ( ); timepoint++ )
+		for ( int timepoint = 0; timepoint < time->raw[file].size ( ); timepoint++ )
 		{
 			double value = 0.0;
-			if ( dimensionIndex == -1 ) { value = ( timepoint * time.hopSize ) / time.sampleRates[file]; }
-			else { value = time.raw[file][timepoint][dimensionIndex]; }
+			if ( dimensionIndex == -1 ) { value = ( timepoint * time->hopSize ) / time->sampleRates[file]; }
+			else { value = time->raw[file][timepoint][dimensionIndex]; }
 
 			if ( axis == Axis::COLOR )
 			{
@@ -143,23 +143,23 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Axis axis )
 	int statisticIndex = dimensionIndex % mRawView->GetStatistics ( ).size ( );
 	dimensionIndex /= mRawView->GetStatistics ( ).size ( );
 
-	Utils::StatsData stats = mRawView->GetStatsData ( );
+	Utils::StatsData* stats = mRawView->GetStatsData ( );
 
 	double min = 0, max = 0;
 	FindScaling ( dimensionIndex, statisticIndex, min, max );
 
-	for ( int file = 0; file < stats.raw.size ( ); file++ )
+	for ( int file = 0; file < stats->raw.size ( ); file++ )
 	{
 		if ( axis == Axis::COLOR )
 		{
-			double value = ofMap ( stats.raw[file][dimensionIndex][statisticIndex], min, max, mColorMin, mColorMax);
+			double value = ofMap ( stats->raw[file][dimensionIndex][statisticIndex], min, max, mColorMin, mColorMax);
 			ofColor currentColor = mStatsCorpus.getColor ( file );
 			currentColor.setHsb ( value, 255, 255 );
 			mStatsCorpus.setColor ( file, currentColor );
 		}
 		else
 		{
-			double value = ofMap ( stats.raw[file][dimensionIndex][statisticIndex], min, max, mSpaceMin, mSpaceMax );
+			double value = ofMap ( stats->raw[file][dimensionIndex][statisticIndex], min, max, mSpaceMin, mSpaceMax );
 			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
 			currentPoint[axis] = value;
 			mStatsCorpus.setVertex ( file, currentPoint );
@@ -169,23 +169,23 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Axis axis )
 
 void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Axis axis )
 {
-	Utils::StatsData stats = mRawView->GetStatsData ( );
+	Utils::StatsData* stats = mRawView->GetStatsData ( );
 
 	double min = 0, max = 0;
 	FindScaling ( dimensionIndex, -1, min, max );
 
-	for ( int file = 0; file < stats.reduced.size ( ); file++ )
+	for ( int file = 0; file < stats->reduced.size ( ); file++ )
 	{
 		if ( axis == Axis::COLOR )
 		{
-			double value = ofMap ( stats.reduced[file][dimensionIndex], min, max, mColorMin, mColorMax );
+			double value = ofMap ( stats->reduced[file][dimensionIndex], min, max, mColorMin, mColorMax );
 			ofColor currentColor = mStatsCorpus.getColor ( file );
 			currentColor.setHsb ( value, 255, 255 );
 			mStatsCorpus.setColor ( file, currentColor );
 		}
 		else
 		{
-			double value = ofMap ( stats.reduced[file][dimensionIndex], min, max, mSpaceMin, mSpaceMax );
+			double value = ofMap ( stats->reduced[file][dimensionIndex], min, max, mSpaceMin, mSpaceMax );
 			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
 			currentPoint[axis] = value;
 			mStatsCorpus.setVertex ( file, currentPoint );
@@ -240,7 +240,7 @@ void Explorer::LiveView::FindScaling ( int dimensionIndex, int statisticIndex, d
 {
 	if ( mRawView->IsTimeAnalysis ( ) )
 	{
-		Utils::TimeData time = mRawView->GetTimeData ( );
+		Utils::TimeData* time = mRawView->GetTimeData ( );
 
 		if ( dimensionIndex == -1 ) { min = 0; max = 0; }
 		else
@@ -249,20 +249,20 @@ void Explorer::LiveView::FindScaling ( int dimensionIndex, int statisticIndex, d
 			max = std::numeric_limits<double>::max ( ) * -1;
 		}
 
-		for ( int file = 0; file < time.raw.size ( ); file++ )
+		for ( int file = 0; file < time->raw.size ( ); file++ )
 		{
 			// If we're looking at time, we need to find the max timepoint
 			if ( dimensionIndex == -1 )
 			{
-				double fileMax = time.raw[file].size ( ) * time.hopSize / time.sampleRates[file];
+				double fileMax = time->raw[file].size ( ) * time->hopSize / time->sampleRates[file];
 				if ( fileMax > max ) { max = fileMax; }
 				continue;
 			}
 
 			// Otherwise, we're looking at a dimension
-			for ( int timepoint = 0; timepoint < time.raw[file].size ( ); timepoint++ )
+			for ( int timepoint = 0; timepoint < time->raw[file].size ( ); timepoint++ )
 			{
-				double value = time.raw[file][timepoint][dimensionIndex];
+				double value = time->raw[file][timepoint][dimensionIndex];
 
 				if ( value < min ) { min = value; }
 				if ( value > max ) { max = value; }
@@ -273,16 +273,16 @@ void Explorer::LiveView::FindScaling ( int dimensionIndex, int statisticIndex, d
 	}
 
 	{
-		Utils::StatsData stats = mRawView->GetStatsData ( );
+		Utils::StatsData* stats = mRawView->GetStatsData ( );
 
 		min = std::numeric_limits<double>::max ( );
 		max = std::numeric_limits<double>::max ( ) * -1;
 
-		for ( int file = 0; file < stats.raw.size ( ); file++ )
+		for ( int file = 0; file < stats->raw.size ( ); file++ )
 		{
 			double value = 0.0;
-			if ( !mRawView->IsReduction ( ) && statisticIndex > -1 ) { value = stats.raw[file][dimensionIndex][statisticIndex]; }
-			else { value = stats.reduced[file][dimensionIndex]; }
+			if ( !mRawView->IsReduction ( ) && statisticIndex > -1 ) { value = stats->raw[file][dimensionIndex][statisticIndex]; }
+			else { value = stats->reduced[file][dimensionIndex]; }
 
 			if ( value < min ) { min = value; }
 			if ( value > max ) { max = value; }

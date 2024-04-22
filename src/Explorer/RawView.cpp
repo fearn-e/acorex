@@ -63,12 +63,12 @@ std::string Explorer::RawView::GetCorpusName ( ) const
 	return mCorpusName;
 }
 
-Utils::TimeData Explorer::RawView::GetTimeData ( ) const
+Utils::TimeData* Explorer::RawView::GetTimeData ( )
 {
-	return mDataset.time;
+	return &mDataset.time;
 }
 
-Utils::StatsData Explorer::RawView::GetStatsData ( ) const
+Utils::StatsData* Explorer::RawView::GetStatsData ( )
 {
-	return mDataset.stats;
+	return &mDataset.stats;
 }
