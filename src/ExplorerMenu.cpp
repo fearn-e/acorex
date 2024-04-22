@@ -175,6 +175,7 @@ void ExplorerMenu::SlowUpdate ( )
 void ExplorerMenu::Exit ( )
 {
 	RemoveListeners ( );
+	mLiveView.Exit ( );
 }
 
 void ExplorerMenu::RemoveListeners ( )

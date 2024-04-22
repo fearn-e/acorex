@@ -23,6 +23,8 @@ public:
 
 	void SetRawView ( std::shared_ptr<RawView>& rawPointer );
 	void Initialise ( );
+	void Exit ( );
+	void RemoveListeners ( );
 
 	void Update ( );
 	void Draw ( );
