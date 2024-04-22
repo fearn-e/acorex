@@ -8,11 +8,6 @@
 
 using namespace Acorex;
 
-void Explorer::LiveView::SetRawView ( std::shared_ptr<RawView>& rawPointer )
-{
-	mRawView = rawPointer;
-}
-
 void Explorer::LiveView::Initialise ( )
 {
 	mStatsCorpus.clear ( );
@@ -45,6 +40,8 @@ void Explorer::LiveView::RemoveListeners ( )
 	ofRemoveListener ( ofEvents ( ).keyPressed, this, &Explorer::LiveView::KeyEvent );
 	ofRemoveListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
 }
+
+// Process Functions ---------------------------
 
 void Explorer::LiveView::Update ( )
 {
@@ -115,6 +112,8 @@ void Explorer::LiveView::Draw ( )
 	mCamera.end ( );
 	ofDisableDepthTest ( );
 }
+
+// Filler Functions ----------------------------
 
 void Explorer::LiveView::CreatePoints ( )
 {
@@ -377,6 +376,8 @@ void Explorer::LiveView::FindScaling ( int dimensionIndex, int statisticIndex, d
 	}
 }
 
+// Camera Functions ----------------------------
+
 void Explorer::LiveView::Init3DCam ( )
 { 
 	double outsidePoint = mSpaceMax * 1.5;
@@ -453,6 +454,8 @@ void Explorer::LiveView::Pan3DCam ( int x, int y, bool mouse )
 	mCamPivot += rightNormalized * moveX;
 	mCamPivot += upNormalized * moveY;
 }
+
+// Listener Functions --------------------------
 
 void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 {

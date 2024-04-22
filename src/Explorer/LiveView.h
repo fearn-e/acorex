@@ -21,13 +21,16 @@ public:
 	LiveView ( ) { }
 	~LiveView ( ) { }
 
-	void SetRawView ( std::shared_ptr<RawView>& rawPointer );
 	void Initialise ( );
 	void Exit ( );
 	void RemoveListeners ( );
 
+	// Process Functions ---------------------------
+
 	void Update ( );
 	void Draw ( );
+
+	// Filler Functions ----------------------------
 
 	void CreatePoints ( );
 
@@ -38,17 +41,21 @@ public:
 
 	void FindScaling ( int dimensionIndex, int statisticIndex, double& min, double& max );
 
-	void Set3D ( bool is3D ) { b3D = is3D; }
+	// Camera Functions ----------------------------
+
 	void Init3DCam ( );
 	void Init2DCam ( Axis disabledAxis );
-
-	bool Is3D ( ) const { return b3D; }
-
-	// Camera Functions ----------------------------
 
 	void Zoom3DCam ( int y );
 	void Rotate3DCam ( int x, int y );
 	void Pan3DCam ( int x, int y, bool mouse );
+
+	// Setters & Getters ----------------------------
+
+	void SetRawView ( std::shared_ptr<RawView>& rawPointer ) { mRawView = rawPointer; }
+	void Set3D ( bool is3D ) { b3D = is3D; }
+
+	bool Is3D ( ) const { return b3D; }
 
 	// Listener Functions --------------------------
 
