@@ -80,17 +80,17 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 	{
 		if ( args.type == 0 )
 		{
-			if ( args.key == 'w' ) { mKeyboardMoveState[0] = true; }
-			if ( args.key == 'a' ) { mKeyboardMoveState[1] = true; }
-			if ( args.key == 's' ) { mKeyboardMoveState[2] = true; }
-			if ( args.key == 'd' ) { mKeyboardMoveState[3] = true; }
+			if ( args.key == 'w' || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = true; }
+			if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = true; }
+			if ( args.key == 's' || args.key == OF_KEY_DOWN ) { mKeyboardMoveState[2] = true; }
+			if ( args.key == 'd' || args.key == OF_KEY_RIGHT ) { mKeyboardMoveState[3] = true; }
 		}
 		else if ( args.type == 1 )
 		{
-			if ( args.key == 'w' ) { mKeyboardMoveState[0] = false; }
-			if ( args.key == 'a' ) { mKeyboardMoveState[1] = false; }
-			if ( args.key == 's' ) { mKeyboardMoveState[2] = false; }
-			if ( args.key == 'd' ) { mKeyboardMoveState[3] = false; }
+			if ( args.key == 'w' || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = false; }
+			if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = false; }
+			if ( args.key == 's' || args.key == OF_KEY_DOWN ) { mKeyboardMoveState[2] = false; }
+			if ( args.key == 'd' || args.key == OF_KEY_RIGHT ) { mKeyboardMoveState[3] = false; }
 		}
 	}
 }
