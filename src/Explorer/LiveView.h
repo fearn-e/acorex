@@ -52,8 +52,8 @@ private:
 	std::vector<ofMesh> mTimeCorpus;
 	ofMesh mStatsCorpus;
 
-	ofEasyCam m3DCam;
-	ofEasyCam m2DCam;
+	ofCamera mCamera;
+	float mCamZoomSpeed3D = 12.0; float mCamZoomSpeed2D = 0.1;
 	double mSpaceMin = 0; double mSpaceMax = 1000;
 	double mColorMin = 0; double mColorMax = 255;
 };
