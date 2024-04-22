@@ -440,8 +440,8 @@ void Explorer::LiveView::FindScaling ( int dimensionIndex, int statisticIndex, d
 
 void Explorer::LiveView::Init3DCam ( )
 { 
-	double midSpacePoint = ( mSpaceMax + mSpaceMin ) / 2;
-	mCamera.setPosition ( midSpacePoint, midSpacePoint, midSpacePoint ); 
+	double outsidePoint = mSpaceMax * 1.5;
+	mCamera.setPosition ( outsidePoint, outsidePoint, outsidePoint );
 	mCamPivot = ofPoint ( mSpaceMin, mSpaceMin, mSpaceMin );
 	mCamera.lookAt ( mCamPivot ); 
 	mCamera.setNearClip ( 0.01 ); 
