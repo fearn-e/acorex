@@ -44,6 +44,12 @@ public:
 
 	bool Is3D ( ) const { return b3D; }
 
+	// Camera Functions ----------------------------
+
+	void Zoom3DCam ( int y );
+	void Rotate3DCam ( int x, int y );
+	void Pan3DCam ( int x, int y, bool mouse );
+
 	// Listener Functions --------------------------
 
 	void KeyEvent ( ofKeyEventArgs& args );
@@ -76,7 +82,7 @@ private:
 	float mZoomMin2D = 0.1; float mZoomMax2D = 10.0;
 	float mCamMoveSpeed = 1.0; float mCamMoveSpeedScaleAdjusted = mCamMoveSpeed;
 	float mCamRotateSpeed = 0.006;
-	bool mKeyboardMoveState[4] = { 0, 0, 0, 0 }; float mKeyboardSpeedMulti = 400.0;
+	bool mKeyboardMoveState[4] = { 0, 0, 0, 0 }; float mKeyboardSpeedMulti = 800.0;
 
 	// Space and Color Limits --------------------
 
