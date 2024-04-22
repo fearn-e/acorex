@@ -44,23 +44,28 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 		}
 		else if ( args.type == 3 && args.button == 0 )
 		{
-			glm::vec3 up = glm::normalize ( mCamera.getUpDir ( ) );
-			glm::vec3 right = glm::normalize ( mCamera.getSideDir ( ) );
+			// get vectors
+			glm::vec3 upNormalized = glm::normalize ( mCamera.getUpDir ( ) );
+			glm::vec3 rightNormalized = glm::normalize ( mCamera.getSideDir ( ) );
 			glm::vec3 focus = mCamera.getGlobalPosition ( ) - mCamPivot;
+			glm::vec3 focusNormalized = glm::normalize ( focus );
 
+			// calculate rotation angles
 			float yawAngle = (args.x - mLastMouseX) * mCamRotateSpeed;
 			float pitchAngle = (args.y - mLastMouseY) * mCamRotateSpeed;
 
-			glm::quat yaw = glm::angleAxis ( yawAngle, up );
-			glm::quat pitch = glm::angleAxis ( pitchAngle, right );
+			// calculate quaternions
+			glm::quat yaw = glm::angleAxis ( yawAngle, upNormalized );
+			glm::quat pitch = glm::angleAxis ( pitchAngle, rightNormalized );
 
-			// check if we're not going over the top or under the bottom
-			glm::vec3 focusNormalized = glm::normalize ( focus );
+			// check if we're not going over the top or under the bottom, if not, cross focus with pitch
 			if ( focusNormalized.y < 0.90 && pitchAngle > 0 ) { focus = glm::cross ( focus, pitch ); }
 			else if ( focusNormalized.y > -0.90 && pitchAngle < 0 ) { focus = glm::cross ( focus, pitch ); }
 
+			// cross focus with yaw
 			focus = glm::cross ( focus, yaw );
 
+			// set new camera position and look at pivot point
 			mCamera.setPosition ( mCamPivot + focus );
 			mCamera.lookAt ( mCamPivot );
 		}
