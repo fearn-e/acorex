@@ -70,6 +70,8 @@ private:
 	// Camera Adjustments --------------------
 
 	float mCamZoomSpeed3D = 24.0; float mCamZoomSpeed2D = 0.1;
+	float mZoomMin3D = 50.0; float mZoomMax3D = 5000.0;
+	float mZoomMin2D = 0.1; float mZoomMax2D = 10.0;
 	float mCamMoveSpeed = 1.0; float mCamMoveSpeedScaleAdjusted = mCamMoveSpeed;
 	float mCamRotateSpeed = 0.006;
 	bool mKeyboardMoveState[4] = { 0, 0, 0, 0 }; float mKeyboardSpeedMulti = 400.0;
