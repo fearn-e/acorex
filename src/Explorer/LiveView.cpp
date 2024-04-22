@@ -40,7 +40,9 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 	{
 		if ( args.type == 4 )
 		{
-			mCamera.dolly ( args.scrollY * mCamZoomSpeed3D );
+			float scrollDist = args.scrollY * mCamZoomSpeed3D;
+			if ( mCamPivot.distance ( mCamera.getPosition ( ) ) > mZoomMin3D && scrollDist < 0 ) { mCamera.dolly ( scrollDist ); }
+			else if ( mCamPivot.distance ( mCamera.getPosition ( ) ) < mZoomMax3D && scrollDist > 0 ) { mCamera.dolly ( scrollDist ); }
 		}
 		else if ( args.type == 3 && args.button == 0 )
 		{
@@ -75,7 +77,8 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 		if ( args.type == 4 )
 		{
 			mCamera.setScale ( mCamera.getScale ( ) + args.scrollY * mCamZoomSpeed2D );
-			if ( mCamera.getScale ( ).x < 0.1 ) { mCamera.setScale ( 0.1 ); }
+			if ( mCamera.getScale ( ).x < mZoomMin2D ) { mCamera.setScale ( 0.1 ); }
+			else if ( mCamera.getScale ( ).x > mZoomMax2D ) { mCamera.setScale ( 20.0 ); }
 			mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera.getScale ( ).x;
 		}
 		else if ( args.type == 3 )
