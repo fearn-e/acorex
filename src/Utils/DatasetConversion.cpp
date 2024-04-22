@@ -25,12 +25,15 @@ void Utils::DatasetConversion::CorpusToFluid ( fluid::FluidDataSet<std::string, 
 			filePointLength[file] = dataset.time.raw[file].size ( );
 			fileMarker += dataset.time.raw[file].size ( );
 		}
+
+		return;
 	}
-	else
+	
+	if ( !dataset.analysisSettings.hasBeenReduced )
 	{
 		for ( int file = 0; file < dataset.stats.raw.size ( ); file++ )
 		{
-			fluid::RealVector point ( dataset.analysisSettings.currentDimensionCount );
+			fluid::RealVector point ( dataset.dimensionNames.size ( ) );
 
 			for ( int dimension = 0; dimension < dataset.stats.raw[file].size ( ); dimension++ )
 			{
@@ -38,6 +41,21 @@ void Utils::DatasetConversion::CorpusToFluid ( fluid::FluidDataSet<std::string, 
 				{
 					point[(dimension * DATA_NUM_STATS) + statistic] = dataset.stats.raw[file][dimension][statistic];
 				}
+			}
+
+			fluidset.add ( std::to_string ( file ), point );
+		}
+		return;
+	}
+
+	{
+		for ( int file = 0; file < dataset.stats.reduced.size ( ); file++ )
+		{
+			fluid::RealVector point ( dataset.stats.reduced[file].size ( ) );
+
+			for ( int dimension = 0; dimension < dataset.stats.reduced[file].size ( ); dimension++ )
+			{
+				point[dimension] = dataset.stats.reduced[file][dimension];
 			}
 
 			fluidset.add ( std::to_string ( file ), point );
