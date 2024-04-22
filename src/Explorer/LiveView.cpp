@@ -24,8 +24,8 @@ void Explorer::LiveView::Draw ( )
 	if ( !bDraw ) { return; }
 	
 	ofEnableDepthTest ( );
-	if ( b3D ) { m3DCam.begin ( ); }
-	else { m2DCam.begin ( ); }
+	mCamera.begin ( );
+
 	ofSetColor ( 255, 255, 255 );
 
 	if ( mDisabledAxis != Axis::X ) { ofDrawLine ( { mSpaceMin, 0, 0 }, { mSpaceMax, 0, 0 } ); }
@@ -54,8 +54,7 @@ void Explorer::LiveView::Draw ( )
 		mStatsCorpus.draw ( );
 	}
 
-	if ( b3D ) { m3DCam.end ( ); }
-	else { m2DCam.end ( ); }
+	mCamera.end ( );
 	ofDisableDepthTest ( );
 }
 
@@ -323,20 +322,21 @@ void Explorer::LiveView::FindScaling ( int dimensionIndex, int statisticIndex, d
 void Explorer::LiveView::Init3DCam ( )
 { 
 	double midSpacePoint = ( mSpaceMax + mSpaceMin ) / 2;
-	m3DCam.setPosition ( midSpacePoint, midSpacePoint, midSpacePoint ); 
-	m3DCam.lookAt ( { 0, 0, 0 } ); 
-	m3DCam.setNearClip ( 0.01 ); 
-	m3DCam.setFarClip ( 99999 ); 
+	mCamera.setPosition ( midSpacePoint, midSpacePoint, midSpacePoint ); 
+	mCamera.lookAt ( { 0, 0, 0 } ); 
+	mCamera.setNearClip ( 0.01 ); 
+	mCamera.setFarClip ( 99999 ); 
+	mCamera.disableOrtho ( );
 }
 
 void Explorer::LiveView::Init2DCam ( Axis disabledAxis )
 { 
 	double midSpacePoint = ( mSpaceMax + mSpaceMin ) / 2;
-	m2DCam.setPosition ( midSpacePoint, midSpacePoint, midSpacePoint ); 
-	if ( disabledAxis == Axis::X ) { m2DCam.lookAt ( { 0, midSpacePoint, midSpacePoint } ); }
-	else if ( disabledAxis == Axis::Y ) { m2DCam.lookAt ( { midSpacePoint, 0, midSpacePoint } ); }
-	else { m2DCam.lookAt ( { midSpacePoint, midSpacePoint, 0 } ); }
-	m2DCam.setNearClip ( 0.01 ); 
-	m2DCam.setFarClip ( 99999 );
-	m2DCam.enableOrtho ( );
+	mCamera.setPosition ( midSpacePoint, midSpacePoint, midSpacePoint );
+	if ( disabledAxis == Axis::X ) { mCamera.lookAt ( { 0, midSpacePoint, midSpacePoint } ); }
+	else if ( disabledAxis == Axis::Y ) { mCamera.lookAt ( { midSpacePoint, 0, midSpacePoint } ); }
+	else { mCamera.lookAt ( { midSpacePoint, midSpacePoint, 0 } ); }
+	mCamera.setNearClip ( 0.01 ); 
+	mCamera.setFarClip ( 99999 );
+	mCamera.enableOrtho ( );
 }
