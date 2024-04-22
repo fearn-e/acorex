@@ -47,7 +47,7 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 
 		}
 	}
-	else
+	else // 2D
 	{
 		if ( args.type == 4 )
 		{
@@ -71,8 +71,46 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 	//type: 0-pressed, 1-released
 	//key: no modifiers, just the raw key
 	//scancode: includes all modifiers
+
+	if ( b3D )
+	{
+
+	}
+	else // 2D
+	{
+		if ( args.type == 0 )
+		{
+			if ( args.key == 'w' ) { mKeyboardMoveState[0] = true; }
+			if ( args.key == 'a' ) { mKeyboardMoveState[1] = true; }
+			if ( args.key == 's' ) { mKeyboardMoveState[2] = true; }
+			if ( args.key == 'd' ) { mKeyboardMoveState[3] = true; }
+		}
+		else if ( args.type == 1 )
+		{
+			if ( args.key == 'w' ) { mKeyboardMoveState[0] = false; }
+			if ( args.key == 'a' ) { mKeyboardMoveState[1] = false; }
+			if ( args.key == 's' ) { mKeyboardMoveState[2] = false; }
+			if ( args.key == 'd' ) { mKeyboardMoveState[3] = false; }
+		}
+	}
 }
 
+void Explorer::LiveView::Update ( )
+{
+	deltaTime = ofGetElapsedTimef ( ) - lastUpdateTime;
+	lastUpdateTime = ofGetElapsedTimef ( );
+	if ( !bDraw ) { return; }
+
+	if ( b3D )
+	{
+
+	}
+	else
+	{
+		mCamera.boom ( ( mKeyboardMoveState[0] - mKeyboardMoveState[2] ) * mCamMoveSpeedScaleAdjusted * mKeyboardSpeedMulti * deltaTime );
+		mCamera.truck ( ( mKeyboardMoveState[3] - mKeyboardMoveState[1] ) * mCamMoveSpeedScaleAdjusted * mKeyboardSpeedMulti * deltaTime );
+	}
+}
 
 void Explorer::LiveView::Draw ( )
 {

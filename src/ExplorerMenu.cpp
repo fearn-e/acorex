@@ -154,6 +154,8 @@ void ExplorerMenu::Draw ( )
 
 void ExplorerMenu::Update ( )
 {
+	mLiveView.Update ( );
+
 	if ( ofGetElapsedTimeMillis ( ) - mLastUpdateTime > mSlowUpdateInterval )
 	{
 		mLastUpdateTime = ofGetElapsedTimeMillis ( );
