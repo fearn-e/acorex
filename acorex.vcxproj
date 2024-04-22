@@ -85,7 +85,7 @@
       <PreprocessorDefinitions>_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);deps/flucoma-core;deps/hisstools_library;deps;src;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxDropdown\src;..\..\..\addons\ofxAudioFile\libs;..\..\..\addons\ofxAudioFile\src</AdditionalIncludeDirectories> 
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);deps/flucoma-core;deps/hisstools_library;deps;src;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxDropdown\src;..\..\..\addons\ofxAudioFile\libs;..\..\..\addons\ofxAudioFile\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)\Build\%(RelativeDir)\$(Configuration)\</ObjectFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -115,6 +115,7 @@
     <ClCompile Include="src\ExplorerMenu.cpp" />
     <ClCompile Include="src\Explorer\LiveView.cpp" />
     <ClCompile Include="src\Explorer\RawView.cpp" />
+    <ClCompile Include="src\Utils\DatasetConversion.cpp" />
     <ClCompile Include="src\Utils\JSON.cpp" />
     <ClCompile Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDropdown\src\ofxDropdown.cpp" />
@@ -140,6 +141,7 @@
     <ClInclude Include="src\Explorer\LiveView.h" />
     <ClInclude Include="src\Explorer\RawView.h" />
     <ClInclude Include="src\Utils\Data.h" />
+    <ClInclude Include="src\Utils\DatasetConversion.h" />
     <ClInclude Include="src\Utils\InterfaceDefs.h" />
     <ClInclude Include="src\Utils\JSON.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.h" />
