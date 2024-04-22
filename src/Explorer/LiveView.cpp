@@ -4,6 +4,8 @@
 #include <of3dUtils.h>
 #include <ofEvents.h>
 
+#include <of3dGraphics.h>
+
 using namespace Acorex;
 
 void Explorer::LiveView::SetRawView ( std::shared_ptr<RawView>& rawPointer )
@@ -28,111 +30,6 @@ void Explorer::LiveView::Initialise ( )
 	ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
 }
 
-void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
-{
-	//types: 0-pressed, 1-moved, 2-released, 3-dragged, 4-scrolled
-	//buttons: 0-left, 1-middle, 2-right
-	//modifiers: 0-none, 1-shift, 2-ctrl, 4-alt (and combinations of them are added together)
-	//position: x, y
-	//scroll direction: x, y
-
-	if ( b3D )
-	{
-		if ( args.type == 4 ) // scroll - zoom
-		{
-			float scrollDist = args.scrollY * mCamZoomSpeed3D;
-			if ( mCamPivot.distance ( mCamera.getPosition ( ) ) > mZoomMin3D && scrollDist < 0 ) { mCamera.dolly ( scrollDist ); }
-			else if ( mCamPivot.distance ( mCamera.getPosition ( ) ) < mZoomMax3D && scrollDist > 0 ) { mCamera.dolly ( scrollDist ); }
-		}
-		else if ( args.type == 3 && args.button == 0 ) // left click drag - rotate
-		{
-			// get vectors
-			glm::vec3 upNormalized = glm::normalize ( mCamera.getUpDir ( ) );
-			glm::vec3 rightNormalized = glm::normalize ( mCamera.getSideDir ( ) );
-			glm::vec3 focus = mCamera.getGlobalPosition ( ) - mCamPivot;
-			glm::vec3 focusNormalized = glm::normalize ( focus );
-
-			// calculate rotation angles
-			float yawAngle = (args.x - mLastMouseX) * mCamRotateSpeed;
-			float pitchAngle = (args.y - mLastMouseY) * mCamRotateSpeed;
-
-			// calculate quaternions
-			glm::quat yaw = glm::angleAxis ( yawAngle, upNormalized );
-			glm::quat pitch = glm::angleAxis ( pitchAngle, rightNormalized );
-
-			// check if we're not going over the top or under the bottom, if not, cross focus with pitch
-			if ( focusNormalized.y < 0.90 && pitchAngle > 0 ) { focus = glm::cross ( focus, pitch ); }
-			else if ( focusNormalized.y > -0.90 && pitchAngle < 0 ) { focus = glm::cross ( focus, pitch ); }
-
-			// cross focus with yaw
-			focus = glm::cross ( focus, yaw );
-
-			// set new camera position and look at pivot point
-			mCamera.setPosition ( mCamPivot + focus );
-			mCamera.lookAt ( mCamPivot );
-		}
-		else if ( args.type == 3 && args.button == 1 ) // middle click drag - pan
-		{
-			glm::vec3 upNormalized = glm::normalize ( mCamera.getUpDir ( ) );
-			glm::vec3 rightNormalized = glm::normalize ( mCamera.getSideDir ( ) );
-
-			float moveX = ( args.x - mLastMouseX ) * mCamMoveSpeedScaleAdjusted * -1;
-			float moveY = ( args.y - mLastMouseY ) * mCamMoveSpeedScaleAdjusted;
-
-			mCamera.move ( rightNormalized * moveX );
-			mCamera.move ( upNormalized * moveY );
-			mCamPivot += rightNormalized * moveX;
-			mCamPivot += upNormalized * moveY;
-		}
-	}
-	else // 2D
-	{
-		if ( args.type == 4 ) // scroll - zoom
-		{
-			mCamera.setScale ( mCamera.getScale ( ) + args.scrollY * mCamZoomSpeed2D );
-			if ( mCamera.getScale ( ).x < mZoomMin2D ) { mCamera.setScale ( 0.1 ); }
-			else if ( mCamera.getScale ( ).x > mZoomMax2D ) { mCamera.setScale ( 20.0 ); }
-			mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera.getScale ( ).x;
-		}
-		else if ( ( args.type == 3 && args.button == 0 ) || ( args.type == 3 && args.button == 1 ) ) // left/middle button drag - pan
-		{
-			mCamera.boom ( ( args.y - mLastMouseY ) * mCamMoveSpeedScaleAdjusted );
-			mCamera.truck ( ( args.x - mLastMouseX ) * mCamMoveSpeedScaleAdjusted * -1 );
-		}
-	}
-
-	mLastMouseX = args.x;
-	mLastMouseY = args.y;
-}
-
-void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
-{
-	//type: 0-pressed, 1-released
-	//key: no modifiers, just the raw key
-	//scancode: includes all modifiers
-
-	if ( b3D )
-	{
-
-	}
-	else // 2D
-	{
-		if ( args.type == 0 )
-		{
-			if ( args.key == 'w' || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = true; }
-			if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = true; }
-			if ( args.key == 's' || args.key == OF_KEY_DOWN ) { mKeyboardMoveState[2] = true; }
-			if ( args.key == 'd' || args.key == OF_KEY_RIGHT ) { mKeyboardMoveState[3] = true; }
-		}
-		else if ( args.type == 1 )
-		{
-			if ( args.key == 'w' || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = false; }
-			if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = false; }
-			if ( args.key == 's' || args.key == OF_KEY_DOWN ) { mKeyboardMoveState[2] = false; }
-			if ( args.key == 'd' || args.key == OF_KEY_RIGHT ) { mKeyboardMoveState[3] = false; }
-		}
-	}
-
 void Explorer::LiveView::Exit ( )
 {
 	RemoveListeners ( );
@@ -155,14 +52,25 @@ void Explorer::LiveView::Update ( )
 	lastUpdateTime = ofGetElapsedTimef ( );
 	if ( !bDraw ) { return; }
 
+	float keyboardSpeedDelta = mKeyboardSpeedMulti * deltaTime;
+
 	if ( b3D )
 	{
-
+		if ( mKeyboardMoveState[0] || mKeyboardMoveState[1] || mKeyboardMoveState[2] || mKeyboardMoveState[3] )
+		{
+			Pan3DCam (	( mKeyboardMoveState[1] - mKeyboardMoveState[3] ) * keyboardSpeedDelta,
+						( mKeyboardMoveState[0] - mKeyboardMoveState[2] ) * keyboardSpeedDelta,
+						false );
+		}
 	}
 	else
 	{
-		mCamera.boom ( ( mKeyboardMoveState[0] - mKeyboardMoveState[2] ) * mCamMoveSpeedScaleAdjusted * mKeyboardSpeedMulti * deltaTime );
-		mCamera.truck ( ( mKeyboardMoveState[3] - mKeyboardMoveState[1] ) * mCamMoveSpeedScaleAdjusted * mKeyboardSpeedMulti * deltaTime );
+		if ( mKeyboardMoveState[0] || mKeyboardMoveState[1] || mKeyboardMoveState[2] || mKeyboardMoveState[3] )
+		{
+			float adjustedSpeed = mCamMoveSpeedScaleAdjusted * keyboardSpeedDelta;
+			mCamera.boom ( (mKeyboardMoveState[0] - mKeyboardMoveState[2]) * adjustedSpeed );
+			mCamera.truck ( (mKeyboardMoveState[3] - mKeyboardMoveState[1]) * adjustedSpeed );
+		}
 	}
 }
 
@@ -172,6 +80,9 @@ void Explorer::LiveView::Draw ( )
 
 	ofEnableDepthTest ( );
 	mCamera.begin ( );
+
+	ofSetColor ( 255, 0, 0 );
+	ofDrawSphere ( mCamPivot, 10 );
 
 	ofSetColor ( 255, 255, 255 );
 
@@ -490,4 +401,120 @@ void Explorer::LiveView::Init2DCam ( Axis disabledAxis )
 	mCamera.enableOrtho ( );
 	mCamera.setScale ( 1 );
 	mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera.getScale ( ).x;
+}
+
+void Explorer::LiveView::Zoom3DCam ( int y )
+{
+	float scrollDist = y * mCamZoomSpeed3D;
+	if ( mCamPivot.distance ( mCamera.getPosition ( ) ) > mZoomMin3D && scrollDist < 0 ) { mCamera.dolly ( scrollDist ); }
+	else if ( mCamPivot.distance ( mCamera.getPosition ( ) ) < mZoomMax3D && scrollDist > 0 ) { mCamera.dolly ( scrollDist ); }
+}
+
+void Explorer::LiveView::Rotate3DCam ( int x, int y )
+{
+	// get vectors
+	glm::vec3 upNormalized = glm::normalize ( mCamera.getUpDir ( ) );
+	glm::vec3 rightNormalized = glm::normalize ( mCamera.getSideDir ( ) );
+	glm::vec3 focus = mCamera.getGlobalPosition ( ) - mCamPivot;
+	glm::vec3 focusNormalized = glm::normalize ( focus );
+
+	// calculate rotation angles
+	float yawAngle = (x - mLastMouseX) * mCamRotateSpeed;
+	float pitchAngle = (y - mLastMouseY) * mCamRotateSpeed;
+
+	// calculate quaternions
+	glm::quat yaw = glm::angleAxis ( yawAngle, upNormalized );
+	glm::quat pitch = glm::angleAxis ( pitchAngle, rightNormalized );
+
+	// check if we're not going over the top or under the bottom, if not, cross focus with pitch
+	if ( focusNormalized.y < 0.90 && pitchAngle > 0 ) { focus = glm::cross ( focus, pitch ); }
+	else if ( focusNormalized.y > -0.90 && pitchAngle < 0 ) { focus = glm::cross ( focus, pitch ); }
+
+	// cross focus with yaw
+	focus = glm::cross ( focus, yaw );
+
+	// set new camera position and look at pivot point
+	mCamera.setPosition ( mCamPivot + focus );
+	mCamera.lookAt ( mCamPivot );
+}
+
+void Explorer::LiveView::Pan3DCam ( int x, int y, bool mouse )
+{
+	glm::vec3 upNormalized = glm::normalize ( mCamera.getUpDir ( ) );
+	glm::vec3 rightNormalized = glm::normalize ( mCamera.getSideDir ( ) );
+
+	if ( mouse ) { x -= mLastMouseX; y -= mLastMouseY; }
+
+	float moveX = x * mCamMoveSpeedScaleAdjusted * -1;
+	float moveY = y * mCamMoveSpeedScaleAdjusted;
+
+	mCamera.move ( rightNormalized * moveX );
+	mCamera.move ( upNormalized * moveY );
+	mCamPivot += rightNormalized * moveX;
+	mCamPivot += upNormalized * moveY;
+}
+
+void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
+{
+	//types: 0-pressed, 1-moved, 2-released, 3-dragged, 4-scrolled
+	//buttons: 0-left, 1-middle, 2-right
+	//modifiers: 0-none, 1-shift, 2-ctrl, 4-alt (and combinations of them are added together)
+	//position: x, y
+	//scroll direction: x, y
+
+	if ( b3D )
+	{
+		if ( args.type == 4 ) // scroll - zoom
+		{
+			Zoom3DCam ( args.scrollY );
+		}
+		else if ( args.type == 3 && args.button == 0 ) // left click drag - rotate
+		{
+			Rotate3DCam ( args.x, args.y );
+		}
+		else if ( args.type == 3 && args.button == 1 ) // middle click drag - pan
+		{
+			Pan3DCam ( args.x, args.y, true );
+		}
+	}
+	else // 2D
+	{
+		if ( args.type == 4 ) // scroll - zoom
+		{
+			mCamera.setScale ( mCamera.getScale ( ) + args.scrollY * mCamZoomSpeed2D );
+			if ( mCamera.getScale ( ).x < mZoomMin2D ) { mCamera.setScale ( 0.1 ); }
+			else if ( mCamera.getScale ( ).x > mZoomMax2D ) { mCamera.setScale ( 20.0 ); }
+			mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera.getScale ( ).x;
+		}
+		else if ( (args.type == 3 && args.button == 0) || (args.type == 3 && args.button == 1) ) // left/middle button drag - pan
+		{
+			mCamera.boom ( (args.y - mLastMouseY) * mCamMoveSpeedScaleAdjusted );
+			mCamera.truck ( (args.x - mLastMouseX) * mCamMoveSpeedScaleAdjusted * -1 );
+		}
+	}
+
+	mLastMouseX = args.x;
+	mLastMouseY = args.y;
+}
+
+void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
+{
+	//type: 0-pressed, 1-released
+	//key: no modifiers, just the raw key
+	//scancode: includes all modifiers
+
+	if ( args.type == 0 )
+	{
+		if ( args.key == 'w' || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = true; }
+		if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = true; }
+		if ( args.key == 's' || args.key == OF_KEY_DOWN ) { mKeyboardMoveState[2] = true; }
+		if ( args.key == 'd' || args.key == OF_KEY_RIGHT ) { mKeyboardMoveState[3] = true; }
+	}
+	else if ( args.type == 1 )
+	{
+		if ( args.key == 'w' || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = false; }
+		if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = false; }
+		if ( args.key == 's' || args.key == OF_KEY_DOWN ) { mKeyboardMoveState[2] = false; }
+		if ( args.key == 'd' || args.key == OF_KEY_RIGHT ) { mKeyboardMoveState[3] = false; }
+	}
 }
