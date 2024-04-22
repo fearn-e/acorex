@@ -71,6 +71,19 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 			mCamera.setPosition ( mCamPivot + focus );
 			mCamera.lookAt ( mCamPivot );
 		}
+		else if ( args.type == 3 && args.button == 1 )
+		{
+			glm::vec3 upNormalized = glm::normalize ( mCamera.getUpDir ( ) );
+			glm::vec3 rightNormalized = glm::normalize ( mCamera.getSideDir ( ) );
+
+			float moveX = ( args.x - mLastMouseX ) * mCamMoveSpeedScaleAdjusted * -1;
+			float moveY = ( args.y - mLastMouseY ) * mCamMoveSpeedScaleAdjusted;
+
+			mCamera.move ( rightNormalized * moveX );
+			mCamera.move ( upNormalized * moveY );
+			mCamPivot += rightNormalized * moveX;
+			mCamPivot += upNormalized * moveY;
+		}
 	}
 	else // 2D
 	{
