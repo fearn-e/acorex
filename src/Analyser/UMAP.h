@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Utils/Data.h"
+#include "Utils/DatasetConversion.h"
 #include <algorithms/public/UMAP.hpp>
 #include <Eigen/Core>
 #include <data/FluidDataSet.hpp>
@@ -21,9 +22,7 @@ public:
     bool Fit ( Utils::DataSet& dataset, const Utils::ReductionSettings& settings );
 
 private:
-    void CorpusToFluid ( fluid::FluidDataSet<std::string, double, 1>& fluidset, const Utils::DataSet& dataset, std::vector<int>& filePointLength );
-
-    void FluidToCorpus ( Utils::DataSet& dataset, const fluid::FluidDataSet<std::string, double, 1>& fluidset, const std::vector<int>& filePointLength, const int reducedDimensionCount );
+    Utils::DatasetConversion mConversion;
 };
 
 } // namespace Analyser
