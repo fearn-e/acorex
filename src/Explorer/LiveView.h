@@ -61,14 +61,20 @@ private:
 	std::vector<ofMesh> mTimeCorpus;
 	ofMesh mStatsCorpus;
 
+	// Camera ----------------------------------------
+
 	ofCamera mCamera;
 	ofPoint mCamPivot = ofPoint(0, 0, 0);
 	int mLastMouseX = 0, mLastMouseY = 0;
+
+	// Camera Adjustments --------------------
 
 	float mCamZoomSpeed3D = 24.0; float mCamZoomSpeed2D = 0.1;
 	float mCamMoveSpeed = 1.0; float mCamMoveSpeedScaleAdjusted = mCamMoveSpeed;
 	float mCamRotateSpeed = 0.006;
 	bool mKeyboardMoveState[4] = { 0, 0, 0, 0 }; float mKeyboardSpeedMulti = 400.0;
+
+	// Space and Color Limits --------------------
 
 	double mSpaceMin = 0; double mSpaceMax = 1000;
 	double mColorMin = 0; double mColorMax = 255;
