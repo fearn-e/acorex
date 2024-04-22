@@ -24,6 +24,7 @@ public:
 	void SetRawView ( std::shared_ptr<RawView>& rawPointer );
 	void Initialise ( );
 
+	void Update ( );
 	void Draw ( );
 
 	void CreatePoints ( );
@@ -50,6 +51,9 @@ private:
 	bool bDraw = false;
 	bool b3D = true;
 
+	float deltaTime = 0.1;
+	float lastUpdateTime = 0;
+
 	Axis mDisabledAxis = NONE;
 	std::string xLabel = "X", yLabel = "Y", zLabel = "Z";
 
@@ -58,9 +62,11 @@ private:
 	ofMesh mStatsCorpus;
 
 	ofCamera mCamera;
+	int mLastMouseX = 0, mLastMouseY = 0;
+
 	float mCamZoomSpeed3D = 12.0; float mCamZoomSpeed2D = 0.1;
 	float mCamMoveSpeed = 1.0; float mCamMoveSpeedScaleAdjusted = mCamMoveSpeed;
-	int mLastMouseX = 0, mLastMouseY = 0;
+	bool mKeyboardMoveState[4] = { 0, 0, 0, 0 }; float mKeyboardSpeedMulti = 400.0;
 
 	double mSpaceMin = 0; double mSpaceMax = 1000;
 	double mColorMin = 0; double mColorMax = 255;
