@@ -42,9 +42,27 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 		{
 			mCamera.dolly ( args.scrollY * mCamZoomSpeed3D );
 		}
-		else if ( args.type == 3 )
+		else if ( args.type == 3 && args.button == 0 )
 		{
+			glm::vec3 up = glm::normalize ( mCamera.getUpDir ( ) );
+			glm::vec3 right = glm::normalize ( mCamera.getSideDir ( ) );
+			glm::vec3 focus = mCamera.getGlobalPosition ( ) - mCamPivot;
 
+			float yawAngle = (args.x - mLastMouseX) * mCamRotateSpeed;
+			float pitchAngle = (args.y - mLastMouseY) * mCamRotateSpeed;
+
+			glm::quat yaw = glm::angleAxis ( yawAngle, up );
+			glm::quat pitch = glm::angleAxis ( pitchAngle, right );
+
+			// check if we're not going over the top or under the bottom
+			glm::vec3 focusNormalized = glm::normalize ( focus );
+			if ( focusNormalized.y < 0.90 && pitchAngle > 0 ) { focus = glm::cross ( focus, pitch ); }
+			else if ( focusNormalized.y > -0.90 && pitchAngle < 0 ) { focus = glm::cross ( focus, pitch ); }
+
+			focus = glm::cross ( focus, yaw );
+
+			mCamera.setPosition ( mCamPivot + focus );
+			mCamera.lookAt ( mCamPivot );
 		}
 	}
 	else // 2D
@@ -416,7 +434,8 @@ void Explorer::LiveView::Init3DCam ( )
 { 
 	double midSpacePoint = ( mSpaceMax + mSpaceMin ) / 2;
 	mCamera.setPosition ( midSpacePoint, midSpacePoint, midSpacePoint ); 
-	mCamera.lookAt ( { 0, 0, 0 } ); 
+	mCamPivot = ofPoint ( mSpaceMin, mSpaceMin, mSpaceMin );
+	mCamera.lookAt ( mCamPivot ); 
 	mCamera.setNearClip ( 0.01 ); 
 	mCamera.setFarClip ( 99999 ); 
 	mCamera.disableOrtho ( );
