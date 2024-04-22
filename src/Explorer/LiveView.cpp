@@ -38,13 +38,13 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 
 	if ( b3D )
 	{
-		if ( args.type == 4 )
+		if ( args.type == 4 ) // scroll - zoom
 		{
 			float scrollDist = args.scrollY * mCamZoomSpeed3D;
 			if ( mCamPivot.distance ( mCamera.getPosition ( ) ) > mZoomMin3D && scrollDist < 0 ) { mCamera.dolly ( scrollDist ); }
 			else if ( mCamPivot.distance ( mCamera.getPosition ( ) ) < mZoomMax3D && scrollDist > 0 ) { mCamera.dolly ( scrollDist ); }
 		}
-		else if ( args.type == 3 && args.button == 0 )
+		else if ( args.type == 3 && args.button == 0 ) // left click drag - rotate
 		{
 			// get vectors
 			glm::vec3 upNormalized = glm::normalize ( mCamera.getUpDir ( ) );
@@ -71,7 +71,7 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 			mCamera.setPosition ( mCamPivot + focus );
 			mCamera.lookAt ( mCamPivot );
 		}
-		else if ( args.type == 3 && args.button == 1 )
+		else if ( args.type == 3 && args.button == 1 ) // middle click drag - pan
 		{
 			glm::vec3 upNormalized = glm::normalize ( mCamera.getUpDir ( ) );
 			glm::vec3 rightNormalized = glm::normalize ( mCamera.getSideDir ( ) );
@@ -87,14 +87,14 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 	}
 	else // 2D
 	{
-		if ( args.type == 4 )
+		if ( args.type == 4 ) // scroll - zoom
 		{
 			mCamera.setScale ( mCamera.getScale ( ) + args.scrollY * mCamZoomSpeed2D );
 			if ( mCamera.getScale ( ).x < mZoomMin2D ) { mCamera.setScale ( 0.1 ); }
 			else if ( mCamera.getScale ( ).x > mZoomMax2D ) { mCamera.setScale ( 20.0 ); }
 			mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera.getScale ( ).x;
 		}
-		else if ( args.type == 3 )
+		else if ( ( args.type == 3 && args.button == 0 ) || ( args.type == 3 && args.button == 1 ) ) // left/middle button drag - pan
 		{
 			mCamera.boom ( ( args.y - mLastMouseY ) * mCamMoveSpeedScaleAdjusted );
 			mCamera.truck ( ( args.x - mLastMouseX ) * mCamMoveSpeedScaleAdjusted * -1 );
