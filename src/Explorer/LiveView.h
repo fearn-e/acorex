@@ -41,6 +41,11 @@ public:
 
 	bool Is3D ( ) const { return b3D; }
 
+	// Listener Functions --------------------------
+
+	void KeyEvent ( ofKeyEventArgs& args );
+	void MouseEvent ( ofMouseEventArgs& args );
+
 private:
 	bool bDraw = false;
 	bool b3D = true;
@@ -54,6 +59,9 @@ private:
 
 	ofCamera mCamera;
 	float mCamZoomSpeed3D = 12.0; float mCamZoomSpeed2D = 0.1;
+	float mCamMoveSpeed = 1.0; float mCamMoveSpeedScaleAdjusted = mCamMoveSpeed;
+	int mLastMouseX = 0, mLastMouseY = 0;
+
 	double mSpaceMin = 0; double mSpaceMax = 1000;
 	double mColorMin = 0; double mColorMax = 255;
 };
