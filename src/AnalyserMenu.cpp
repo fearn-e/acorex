@@ -533,9 +533,9 @@ void AnalyserMenu::SelectReductionInputFile ( )
 	Utils::AnalysisSettings settings;
 	bool success = mJSON.Read ( inputFile.getPath ( ), settings );
 	if ( !success ) { return; }
-	if ( settings.currentDimensionCount <= 1 )
+	if ( settings.currentDimensionCount <= 2 )
 	{
-		ofLogError ( "AnalyserMenu" ) << "Analysis already contains only one dimension";
+		ofLogError ( "AnalyserMenu" ) << "Analysis already contains the minimum number of dimensions";
 		return;
 	}
 
