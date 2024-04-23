@@ -27,7 +27,7 @@ private:
 	// Main Functions ------------------------------
 
 	void OpenCorpus ( );
-	void SwapDimension ( string dimension, Explorer::LiveView::Axis axis );
+	void SwapDimension ( string dimension, Utils::Axis axis );
 	int GetDimensionIndex ( std::string& dimension );
 	void CameraSwitcher ( );
 
@@ -49,7 +49,7 @@ private:
 	
 	bool bViewPointerShared = false;
 
-	Explorer::LiveView::Axis mDisabledAxis = Explorer::LiveView::NONE;
+	Utils::Axis mDisabledAxis = Utils::Axis::NONE;
 
 	// Timing --------------------------------------
 

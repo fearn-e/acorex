@@ -83,13 +83,13 @@ void Explorer::LiveView::Draw ( )
 
 	ofSetColor ( 255, 255, 255 );
 
-	if ( mDisabledAxis != Axis::X ) { ofDrawLine ( { mSpaceMin, 0, 0 }, { mSpaceMax, 0, 0 } ); }
-	if ( mDisabledAxis != Axis::Y ) { ofDrawLine ( { 0, mSpaceMin, 0 }, { 0, mSpaceMax, 0 } ); }
-	if ( mDisabledAxis != Axis::Z ) { ofDrawLine ( { 0, 0, mSpaceMin }, { 0, 0, mSpaceMax } ); }
+	if ( mDisabledAxis != Utils::Axis::X ) { ofDrawLine ( { mSpaceMin, 0, 0 }, { mSpaceMax, 0, 0 } ); }
+	if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawLine ( { 0, mSpaceMin, 0 }, { 0, mSpaceMax, 0 } ); }
+	if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawLine ( { 0, 0, mSpaceMin }, { 0, 0, mSpaceMax } ); }
 
-	if ( mDisabledAxis != Axis::X ) { ofDrawBitmapString ( xLabel , { mSpaceMax, 0, 0 } ); }
-	if ( mDisabledAxis != Axis::Y ) { ofDrawBitmapString ( yLabel , { 0, mSpaceMax, 0 } ); }
-	if ( mDisabledAxis != Axis::Z ) { ofDrawBitmapString ( zLabel , { 0, 0, mSpaceMax } ); }
+	if ( mDisabledAxis != Utils::Axis::X ) { ofDrawBitmapString ( xLabel , { mSpaceMax, 0, 0 } ); }
+	if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawBitmapString ( yLabel , { 0, mSpaceMax, 0 } ); }
+	if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawBitmapString ( zLabel , { 0, 0, mSpaceMax } ); }
 	
 
 	// Draw points ------------------------------
@@ -170,12 +170,12 @@ void Explorer::LiveView::CreatePoints ( )
 	}
 }
 
-void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Axis axis )
+void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axis )
 {
 	std::string dimensionName = dimensionIndex == -1 ? "Time" : mRawView->GetDimensions ( )[dimensionIndex];
-	if ( axis == Axis::X ) { xLabel = dimensionName; }
-	else if ( axis == Axis::Y ) { yLabel = dimensionName; }
-	else if ( axis == Axis::Z ) { zLabel = dimensionName; }
+	if ( axis == Utils::Axis::X ) { xLabel = dimensionName; }
+	else if ( axis == Utils::Axis::Y ) { yLabel = dimensionName; }
+	else if ( axis == Utils::Axis::Z ) { zLabel = dimensionName; }
 
 	Utils::TimeData* time = mRawView->GetTimeData ( );
 
@@ -190,7 +190,7 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Axis axis )
 			if ( dimensionIndex == -1 ) { value = ( timepoint * time->hopSize ) / time->sampleRates[file]; }
 			else { value = time->raw[file][timepoint][dimensionIndex]; }
 
-			if ( axis == Axis::COLOR )
+			if ( axis == Utils::Axis::COLOR )
 			{
 				value = ofMap ( value, min, max, mColorMin, mColorMax );
 				ofColor currentColor = mTimeCorpus[file].getColor ( timepoint );
@@ -201,19 +201,19 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Axis axis )
 			{
 				value = ofMap ( value, min, max, mSpaceMin, mSpaceMax );
 				glm::vec3 currentPoint = mTimeCorpus[file].getVertex ( timepoint );
-				currentPoint[axis] = value;
+				currentPoint[(int)axis] = value;
 				mTimeCorpus[file].setVertex ( timepoint, currentPoint );
 			}
 		}
 	}
 }
 
-void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Axis axis )
+void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis axis )
 {
 	std::string dimensionName = mRawView->GetDimensions ( )[dimensionIndex];
-	if ( axis == Axis::X ) { xLabel = dimensionName; }
-	else if ( axis == Axis::Y ) { yLabel = dimensionName; }
-	else if ( axis == Axis::Z ) { zLabel = dimensionName; }
+	if ( axis == Utils::Axis::X ) { xLabel = dimensionName; }
+	else if ( axis == Utils::Axis::Y ) { yLabel = dimensionName; }
+	else if ( axis == Utils::Axis::Z ) { zLabel = dimensionName; }
 
 	int statisticIndex = dimensionIndex % mRawView->GetStatistics ( ).size ( );
 	dimensionIndex /= mRawView->GetStatistics ( ).size ( );
@@ -225,7 +225,7 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Axis axis )
 
 	for ( int file = 0; file < stats->raw.size ( ); file++ )
 	{
-		if ( axis == Axis::COLOR )
+		if ( axis == Utils::Axis::COLOR )
 		{
 			double value = ofMap ( stats->raw[file][dimensionIndex][statisticIndex], min, max, mColorMin, mColorMax);
 			ofColor currentColor = mStatsCorpus.getColor ( file );
@@ -236,18 +236,18 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Axis axis )
 		{
 			double value = ofMap ( stats->raw[file][dimensionIndex][statisticIndex], min, max, mSpaceMin, mSpaceMax );
 			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
-			currentPoint[axis] = value;
+			currentPoint[(int)axis] = value;
 			mStatsCorpus.setVertex ( file, currentPoint );
 		}
 	}
 }
 
-void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Axis axis )
+void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::Axis axis )
 {
 	std::string dimensioName = mRawView->GetDimensions ( )[dimensionIndex];
-	if ( axis == Axis::X ) { xLabel = dimensioName; }
-	else if ( axis == Axis::Y ) { yLabel = dimensioName; }
-	else if ( axis == Axis::Z ) { zLabel = dimensioName; }
+	if ( axis == Utils::Axis::X ) { xLabel = dimensioName; }
+	else if ( axis == Utils::Axis::Y ) { yLabel = dimensioName; }
+	else if ( axis == Utils::Axis::Z ) { zLabel = dimensioName; }
 
 	Utils::StatsData* stats = mRawView->GetStatsData ( );
 
@@ -256,7 +256,7 @@ void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Axis ax
 
 	for ( int file = 0; file < stats->reduced.size ( ); file++ )
 	{
-		if ( axis == Axis::COLOR )
+		if ( axis == Utils::Axis::COLOR )
 		{
 			double value = ofMap ( stats->reduced[file][dimensionIndex], min, max, mColorMin, mColorMax );
 			ofColor currentColor = mStatsCorpus.getColor ( file );
@@ -267,17 +267,17 @@ void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Axis ax
 		{
 			double value = ofMap ( stats->reduced[file][dimensionIndex], min, max, mSpaceMin, mSpaceMax );
 			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
-			currentPoint[axis] = value;
+			currentPoint[(int)axis] = value;
 			mStatsCorpus.setVertex ( file, currentPoint );
 		}
 	}
 }
 
-void Explorer::LiveView::FillDimensionNone ( Axis axis )
+void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 {
-	if ( axis == Axis::X ) { xLabel = ""; }
-	else if ( axis == Axis::Y ) { yLabel = ""; }
-	else if ( axis == Axis::Z ) { zLabel = ""; }
+	if ( axis == Utils::Axis::X ) { xLabel = ""; }
+	else if ( axis == Utils::Axis::Y ) { yLabel = ""; }
+	else if ( axis == Utils::Axis::Z ) { zLabel = ""; }
 
 	if ( mRawView->IsTimeAnalysis ( ) )
 	{
@@ -285,7 +285,7 @@ void Explorer::LiveView::FillDimensionNone ( Axis axis )
 		{
 			for ( int timepoint = 0; timepoint < mTimeCorpus[file].getNumVertices ( ); timepoint++ )
 			{
-				if ( axis == Axis::COLOR )
+				if ( axis == Utils::Axis::COLOR )
 				{
 					ofColor currentColor = mTimeCorpus[file].getColor ( timepoint );
 					currentColor.set ( 255, 255, 255 );
@@ -294,7 +294,7 @@ void Explorer::LiveView::FillDimensionNone ( Axis axis )
 				else
 				{
 					glm::vec3 currentPoint = mTimeCorpus[file].getVertex ( timepoint );
-					currentPoint[axis] = 0;
+					currentPoint[(int)axis] = 0;
 					mTimeCorpus[file].setVertex ( timepoint, currentPoint );
 				}
 			}
@@ -304,7 +304,7 @@ void Explorer::LiveView::FillDimensionNone ( Axis axis )
 	{
 		for ( int file = 0; file < mStatsCorpus.getNumVertices ( ); file++ )
 		{
-			if ( axis == Axis::COLOR )
+			if ( axis == Utils::Axis::COLOR )
 			{
 				ofColor currentColor = mStatsCorpus.getColor ( file );
 				currentColor.set ( 255, 255, 255 );
@@ -313,7 +313,7 @@ void Explorer::LiveView::FillDimensionNone ( Axis axis )
 			else
 			{
 				glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
-				currentPoint[axis] = 0;
+				currentPoint[(int)axis] = 0;
 				mStatsCorpus.setVertex ( file, currentPoint );
 			}
 		}
@@ -390,12 +390,12 @@ void Explorer::LiveView::Init3DCam ( )
 	mCamera.setScale ( 1 );
 }
 
-void Explorer::LiveView::Init2DCam ( Axis disabledAxis )
+void Explorer::LiveView::Init2DCam ( Utils::Axis disabledAxis )
 { 
 	double midSpacePoint = ( mSpaceMax + mSpaceMin ) / 2;
 	mCamera.setPosition ( midSpacePoint, midSpacePoint, midSpacePoint );
-	if ( disabledAxis == Axis::X ) { mCamera.lookAt ( { 0, midSpacePoint, midSpacePoint } ); }
-	else if ( disabledAxis == Axis::Y ) { mCamera.lookAt ( { midSpacePoint, 0, midSpacePoint } ); }
+	if ( disabledAxis == Utils::Axis::X ) { mCamera.lookAt ( { 0, midSpacePoint, midSpacePoint } ); }
+	else if ( disabledAxis == Utils::Axis::Y ) { mCamera.lookAt ( { midSpacePoint, 0, midSpacePoint } ); }
 	else { mCamera.lookAt ( { midSpacePoint, midSpacePoint, 0 } ); }
 	mCamera.setNearClip ( 0.01 ); 
 	mCamera.setFarClip ( 99999 );

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./RawView.h"
+#include "Utils/Data.h"
 #include <ofMesh.h>
 #include <ofEasyCam.h>
 
@@ -9,14 +10,6 @@ namespace Explorer {
 
 class LiveView {
 public:
-	enum Axis {
-		X = 0,
-		Y = 1,
-		Z = 2,
-		COLOR = 3,
-		NONE = 4,
-		MULTIPLE = 5
-	};
 
 	LiveView ( ) { }
 	~LiveView ( ) { }
@@ -34,17 +27,17 @@ public:
 
 	void CreatePoints ( );
 
-	void FillDimensionTime ( int dimensionIndex, Axis axis );
-	void FillDimensionStats ( int dimensionIndex, Axis axis );
-	void FillDimensionStatsReduced ( int dimensionIndex, Axis axis );
-	void FillDimensionNone ( Axis axis );
+	void FillDimensionTime ( int dimensionIndex, Utils::Axis axis );
+	void FillDimensionStats ( int dimensionIndex, Utils::Axis axis );
+	void FillDimensionStatsReduced ( int dimensionIndex, Utils::Axis axis );
+	void FillDimensionNone ( Utils::Axis axis );
 
 	void FindScaling ( int dimensionIndex, int statisticIndex, double& min, double& max );
 
 	// Camera Functions ----------------------------
 
 	void Init3DCam ( );
-	void Init2DCam ( Axis disabledAxis );
+	void Init2DCam ( Utils::Axis disabledAxis );
 
 	void Zoom3DCam ( int y );
 	void Rotate3DCam ( int x, int y );
@@ -69,7 +62,7 @@ private:
 	float deltaTime = 0.1;
 	float lastUpdateTime = 0;
 
-	Axis mDisabledAxis = NONE;
+	Utils::Axis mDisabledAxis = Utils::Axis::NONE;
 	std::string xLabel = "X", yLabel = "Y", zLabel = "Z";
 
 	std::shared_ptr<RawView> mRawView; // might need to be weak_ptr?

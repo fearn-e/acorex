@@ -249,16 +249,16 @@ void ExplorerMenu::OpenCorpus ( )
 
 	bBlockDimensionFilling = false;
 
-	SwapDimension ( xDimension, Explorer::LiveView::Axis::X );
-	SwapDimension ( yDimension, Explorer::LiveView::Axis::Y );
-	SwapDimension ( zDimension, Explorer::LiveView::Axis::Z );
+	SwapDimension ( xDimension, Utils::Axis::X );
+	SwapDimension ( yDimension, Utils::Axis::Y );
+	SwapDimension ( zDimension, Utils::Axis::Z );
 
 	bIsCorpusOpen = true;
 
-	SwapDimension ( colorDimension, Explorer::LiveView::Axis::COLOR );
+	SwapDimension ( colorDimension, Utils::Axis::COLOR );
 }
 
-void ExplorerMenu::SwapDimension ( string dimension, Explorer::LiveView::Axis axis )
+void ExplorerMenu::SwapDimension ( string dimension, Utils::Axis axis )
 {
 	if ( bBlockDimensionFilling ) { return; }
 
@@ -301,15 +301,15 @@ void ExplorerMenu::CameraSwitcher ( )
 	bool isZNone = mDimensionDropdownZ->getAllSelected ( )[0] == "None";
 	int numDisabledAxes = isXNone + isYNone + isZNone;
 
-	Explorer::LiveView::Axis			  disabledAxis = Explorer::LiveView::Axis::NONE;
-	if		( isXNone )					{ disabledAxis = Explorer::LiveView::Axis::X; }
-	else if ( isYNone )					{ disabledAxis = Explorer::LiveView::Axis::Y; }
-	else if ( isZNone )					{ disabledAxis = Explorer::LiveView::Axis::Z; }
-	else if ( numDisabledAxes > 1 )		{ disabledAxis = Explorer::LiveView::Axis::MULTIPLE; }
+	Utils::Axis							  disabledAxis = Utils::Axis::NONE;
+	if		( isXNone )					{ disabledAxis = Utils::Axis::X; }
+	else if ( isYNone )					{ disabledAxis = Utils::Axis::Y; }
+	else if ( isZNone )					{ disabledAxis = Utils::Axis::Z; }
+	else if ( numDisabledAxes > 1 )		{ disabledAxis = Utils::Axis::MULTIPLE; }
 
 	bool current3D = mLiveView.Is3D ( );
 
-	if ( disabledAxis == Explorer::LiveView::Axis::NONE || disabledAxis == Explorer::LiveView::Axis::MULTIPLE )
+	if ( disabledAxis == Utils::Axis::NONE || disabledAxis == Utils::Axis::MULTIPLE )
 	{
 		if ( !mLiveView.Is3D ( ) )
 		{
@@ -332,20 +332,20 @@ void ExplorerMenu::CameraSwitcher ( )
 
 void ExplorerMenu::SwapDimensionX ( string& dimension )
 {
-	SwapDimension ( dimension, Explorer::LiveView::Axis::X );
+	SwapDimension ( dimension, Utils::Axis::X );
 }
 
 void ExplorerMenu::SwapDimensionY ( string& dimension )
 {
-	SwapDimension ( dimension, Explorer::LiveView::Axis::Y );
+	SwapDimension ( dimension, Utils::Axis::Y );
 }
 
 void ExplorerMenu::SwapDimensionZ ( string& dimension )
 {
-	SwapDimension ( dimension, Explorer::LiveView::Axis::Z );
+	SwapDimension ( dimension, Utils::Axis::Z );
 }
 
 void ExplorerMenu::SwapDimensionColor ( string& dimension )
 {
-	SwapDimension ( dimension, Explorer::LiveView::Axis::COLOR );
+	SwapDimension ( dimension, Utils::Axis::COLOR );
 }
