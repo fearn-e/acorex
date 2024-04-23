@@ -16,9 +16,9 @@ void Explorer::LiveView::Initialise ( )
 	b3D = true;
 	Init3DCam ( );
 
-	mPointPicker.Initialise ( *mRawView->GetDataset ( ) );
-
 	mDimensionBounds.CalculateBounds ( *mRawView->GetDataset ( ) );
+
+	mPointPicker.Initialise ( *mRawView->GetDataset ( ), mDimensionBounds );
 
 	ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
 	ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );

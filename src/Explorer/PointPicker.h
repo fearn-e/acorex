@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./RawView.h"
+#include "Utils/DimensionBounds.h"
 #include "Utils/DatasetConversion.h"
 #include <algorithms/public/KDTree.hpp>
 #include <data/FluidDataSet.hpp>
@@ -16,7 +17,7 @@ public:
 	PointPicker ( ) { }
 	~PointPicker ( ) { }
 
-	void Initialise ( const Utils::DataSet& dataset );
+	void Initialise ( const Utils::DataSet& dataset, const Utils::DimensionBounds& dimensionBounds );
 
 	void FindNearest ( );
 	void Train ( int dimensionIndex, Utils::Axis axis, bool none );
@@ -31,6 +32,8 @@ public:
 	bool IsTrained ( ) const { return bTrained; }
 
 private:
+	void ScaleDataset ( Utils::DataSet& scaledDataset, const Utils::DimensionBounds& dimensionBounds );
+
 	bool bTrained = false;
 	bool bSkipTraining = true;
 	
