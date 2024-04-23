@@ -87,7 +87,7 @@ private:
 	// Space and Color Limits --------------------
 
 	double mSpaceMin = 0; double mSpaceMax = 1000;
-	double mColorMin = 0; double mColorMax = 255;
+	double mColorMin = 0; double mColorMax = 215;
 
 	// Acorex Objects ------------------------------
 
