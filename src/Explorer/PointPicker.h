@@ -64,7 +64,7 @@ private:
 	int mNearestPoint = -1;
 	double mNearestDistance = -1;
 
-	double maxAllowedDistance = 50;
+	double maxAllowedDistance = 0.05;
 
 	fluid::algorithm::KDTree mKDTree;
 
