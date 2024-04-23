@@ -5,6 +5,8 @@
 #include <algorithms/public/KDTree.hpp>
 #include <data/FluidDataSet.hpp>
 #include <algorithms/public/DataSetQuery.hpp>
+#include <ofCamera.h>
+#include <ofEvents.h>
 
 namespace Acorex {
 namespace Explorer {

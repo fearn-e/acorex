@@ -1,6 +1,4 @@
 #include "./PointPicker.h"
-#include <ofCamera.h>
-#include <ofEvents.h>
 
 using namespace Acorex;
 
