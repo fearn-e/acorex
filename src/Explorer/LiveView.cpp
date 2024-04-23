@@ -54,7 +54,7 @@ void Explorer::LiveView::Update ( )
 	lastUpdateTime = ofGetElapsedTimef ( );
 	if ( !bDraw ) { return; }
 
-	float keyboardSpeedDelta = mKeyboardSpeedMulti * deltaTime;
+	float keyboardSpeedDelta = SpaceDefs::mKeyboardSpeedMulti * deltaTime;
 
 	if ( b3D )
 	{
@@ -93,13 +93,13 @@ void Explorer::LiveView::Draw ( )
 	// Draw Axis ------------------------------
 	ofSetColor ( 255, 255, 255 );
 
-	if ( mDisabledAxis != Utils::Axis::X ) { ofDrawLine ( { mSpaceMin, 0, 0 }, { mSpaceMax, 0, 0 } ); }
-	if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawLine ( { 0, mSpaceMin, 0 }, { 0, mSpaceMax, 0 } ); }
-	if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawLine ( { 0, 0, mSpaceMin }, { 0, 0, mSpaceMax } ); }
+	if ( mDisabledAxis != Utils::Axis::X ) { ofDrawLine ( { SpaceDefs::mSpaceMin, 0, 0 }, { SpaceDefs::mSpaceMax, 0, 0 } ); }
+	if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawLine ( { 0, SpaceDefs::mSpaceMin, 0 }, { 0, SpaceDefs::mSpaceMax, 0 } ); }
+	if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawLine ( { 0, 0, SpaceDefs::mSpaceMin }, { 0, 0, SpaceDefs::mSpaceMax } ); }
 
-	if ( mDisabledAxis != Utils::Axis::X ) { ofDrawBitmapString ( xLabel , { mSpaceMax, 0, 0 } ); }
-	if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawBitmapString ( yLabel , { 0, mSpaceMax, 0 } ); }
-	if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawBitmapString ( zLabel , { 0, 0, mSpaceMax } ); }
+	if ( mDisabledAxis != Utils::Axis::X ) { ofDrawBitmapString ( xLabel , { SpaceDefs::mSpaceMax, 0, 0 } ); }
+	if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawBitmapString ( yLabel , { 0, SpaceDefs::mSpaceMax, 0 } ); }
+	if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawBitmapString ( zLabel , { 0, 0, SpaceDefs::mSpaceMax } ); }
 
 	// Draw points ------------------------------
 	if ( mRawView->IsTimeAnalysis ( ) ) // Time
@@ -205,14 +205,14 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axi
 
 			if ( axis == Utils::Axis::COLOR )
 			{
-				value = ofMap ( value, min, max, mColorMin, mColorMax );
+				value = ofMap ( value, min, max, SpaceDefs::mColorMin, SpaceDefs::mColorMax );
 				ofColor currentColor = mTimeCorpus[file].getColor ( timepoint );
 				currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
 				mTimeCorpus[file].setColor ( timepoint, currentColor );
 			}
 			else
 			{
-				value = ofMap ( value, min, max, mSpaceMin, mSpaceMax );
+				value = ofMap ( value, min, max, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
 				glm::vec3 currentPoint = mTimeCorpus[file].getVertex ( timepoint );
 				currentPoint[(int)axis] = value;
 				mTimeCorpus[file].setVertex ( timepoint, currentPoint );
@@ -242,7 +242,7 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis ax
 			double value = ofMap (	stats->raw[file][dividedDimensionIndex][statisticIndex], 
 									mDimensionBounds.GetMinBound ( dimensionIndex ), 
 									mDimensionBounds.GetMaxBound ( dimensionIndex ), 
-									mColorMin, mColorMax );
+									SpaceDefs::mColorMin, SpaceDefs::mColorMax );
 			ofColor currentColor = mStatsCorpus.getColor ( file );
 			currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
 			mStatsCorpus.setColor ( file, currentColor );
@@ -252,7 +252,7 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis ax
 			double value = ofMap (	stats->raw[file][dividedDimensionIndex][statisticIndex], 
 									mDimensionBounds.GetMinBound ( dimensionIndex ), 
 									mDimensionBounds.GetMaxBound ( dimensionIndex ), 
-									mSpaceMin, mSpaceMax );
+									SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
 			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
 			currentPoint[(int)axis] = value;
 			mStatsCorpus.setVertex ( file, currentPoint );
@@ -278,7 +278,7 @@ void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::
 			double value = ofMap (	stats->reduced[file][dimensionIndex], 
 									mDimensionBounds.GetMinBound ( dimensionIndex ), 
 									mDimensionBounds.GetMaxBound ( dimensionIndex ), 
-									mColorMin, mColorMax );
+									SpaceDefs::mColorMin, SpaceDefs::mColorMax );
 			ofColor currentColor = mStatsCorpus.getColor ( file );
 			currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
 			mStatsCorpus.setColor ( file, currentColor );
@@ -288,7 +288,7 @@ void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::
 			double value = ofMap (	stats->reduced[file][dimensionIndex], 
 									mDimensionBounds.GetMinBound ( dimensionIndex ), 
 									mDimensionBounds.GetMaxBound ( dimensionIndex ),
-									mSpaceMin, mSpaceMax );
+									SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
 			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
 			currentPoint[(int)axis] = value;
 			mStatsCorpus.setVertex ( file, currentPoint );
@@ -349,8 +349,8 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 
 void Explorer::LiveView::Init3DCam ( )
 { 
-	double outsidePoint = mSpaceMax * 1.5;
-	double midSpacePoint = ( mSpaceMax + mSpaceMin ) / 2;
+	double outsidePoint = SpaceDefs::mSpaceMax * 1.5;
+	double midSpacePoint = (SpaceDefs::mSpaceMax + SpaceDefs::mSpaceMin ) / 2;
 	mCamera->setPosition ( outsidePoint, outsidePoint, outsidePoint );
 	mCamPivot = ofPoint ( midSpacePoint, midSpacePoint, midSpacePoint );
 	mCamera->lookAt ( mCamPivot ); 
@@ -362,7 +362,7 @@ void Explorer::LiveView::Init3DCam ( )
 
 void Explorer::LiveView::Init2DCam ( Utils::Axis disabledAxis )
 { 
-	double midSpacePoint = ( mSpaceMax + mSpaceMin ) / 2;
+	double midSpacePoint = (SpaceDefs::mSpaceMax + SpaceDefs::mSpaceMin ) / 2;
 	mCamera->setPosition ( midSpacePoint, midSpacePoint, midSpacePoint );
 	if ( disabledAxis == Utils::Axis::X ) { mCamera->lookAt ( { 0, midSpacePoint, midSpacePoint } ); }
 	else if ( disabledAxis == Utils::Axis::Y ) { mCamera->lookAt ( { midSpacePoint, 0, midSpacePoint } ); }
@@ -371,14 +371,14 @@ void Explorer::LiveView::Init2DCam ( Utils::Axis disabledAxis )
 	mCamera->setFarClip ( 99999 );
 	mCamera->enableOrtho ( );
 	mCamera->setScale ( 1 );
-	mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera->getScale ( ).x;
+	mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed * mCamera->getScale ( ).x;
 }
 
 void Explorer::LiveView::Zoom3DCam ( int y )
 {
-	float scrollDist = y * mCamZoomSpeed3D;
-	if ( mCamPivot.distance ( mCamera->getPosition ( ) ) > mZoomMin3D && scrollDist < 0 ) { mCamera->dolly ( scrollDist ); }
-	else if ( mCamPivot.distance ( mCamera->getPosition ( ) ) < mZoomMax3D && scrollDist > 0 ) { mCamera->dolly ( scrollDist ); }
+	float scrollDist = y * SpaceDefs::mCamZoomSpeed3D;
+	if ( mCamPivot.distance ( mCamera->getPosition ( ) ) > SpaceDefs::mZoomMin3D && scrollDist < 0 ) { mCamera->dolly ( scrollDist ); }
+	else if ( mCamPivot.distance ( mCamera->getPosition ( ) ) < SpaceDefs::mZoomMax3D && scrollDist > 0 ) { mCamera->dolly ( scrollDist ); }
 }
 
 void Explorer::LiveView::Rotate3DCam ( int x, int y )
@@ -390,8 +390,8 @@ void Explorer::LiveView::Rotate3DCam ( int x, int y )
 	glm::vec3 focusNormalized = glm::normalize ( focus );
 
 	// calculate rotation angles
-	float yawAngle = (x - mLastMouseX) * mCamRotateSpeed;
-	float pitchAngle = (y - mLastMouseY) * mCamRotateSpeed;
+	float yawAngle = (x - mLastMouseX) * SpaceDefs::mCamRotateSpeed;
+	float pitchAngle = (y - mLastMouseY) * SpaceDefs::mCamRotateSpeed;
 
 	// calculate quaternions
 	glm::quat yaw = glm::angleAxis ( yawAngle, upNormalized );
@@ -457,10 +457,10 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 	{
 		if ( args.type == 4 ) // scroll - zoom
 		{
-			mCamera->setScale ( mCamera->getScale ( ) + args.scrollY * mCamZoomSpeed2D );
-			if ( mCamera->getScale ( ).x < mZoomMin2D ) { mCamera->setScale ( 0.1 ); }
-			else if ( mCamera->getScale ( ).x > mZoomMax2D ) { mCamera->setScale ( 20.0 ); }
-			mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera->getScale ( ).x;
+			mCamera->setScale ( mCamera->getScale ( ) + args.scrollY * SpaceDefs::mCamZoomSpeed2D );
+			if ( mCamera->getScale ( ).x < SpaceDefs::mZoomMin2D ) { mCamera->setScale ( 0.1 ); }
+			else if ( mCamera->getScale ( ).x > SpaceDefs::mZoomMax2D ) { mCamera->setScale ( 20.0 ); }
+			mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed * mCamera->getScale ( ).x;
 			mPointPicker.SetNearestCheckNeeded ( );
 		}
 		else if ( (args.type == 3 && args.button == 0) || (args.type == 3 && args.button == 1) ) // left/middle button drag - pan

@@ -224,6 +224,9 @@
     <ClInclude Include="src\Utils\DimensionBounds.h">
       <Filter>src\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\Explorer\SpaceDefs.h">
+      <Filter>src\Explorer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

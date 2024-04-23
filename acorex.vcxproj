@@ -134,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Explorer\PointPicker.h" />
+    <ClInclude Include="src\Explorer\SpaceDefs.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\AnalyserMenu.h" />
     <ClInclude Include="src\Analyser\Controller.h" />
