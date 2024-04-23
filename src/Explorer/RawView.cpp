@@ -72,3 +72,8 @@ Utils::StatsData* Explorer::RawView::GetStatsData ( )
 {
 	return &mDataset.stats;
 }
+
+Utils::DataSet* Explorer::RawView::GetDataset ( )
+{
+	return &mDataset;
+}
