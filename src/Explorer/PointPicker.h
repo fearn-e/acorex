@@ -22,6 +22,7 @@ public:
 	void FindNearest ( );
 	void Train ( int dimensionIndex, Utils::Axis axis, bool none );
 
+	void SlowUpdate ( );
 
 	// Setters & Getters ----------------------------
 

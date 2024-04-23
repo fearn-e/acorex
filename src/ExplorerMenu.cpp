@@ -162,6 +162,8 @@ void ExplorerMenu::SlowUpdate ( )
 		bOpenCorpusDrawWarning = false;
 		mOpenCorpusButton.setName ( "Open Corpus" );
 	}
+
+	mLiveView.SlowUpdate ( );
 }
 
 void ExplorerMenu::Exit ( )

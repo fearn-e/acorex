@@ -73,6 +73,11 @@ void Explorer::LiveView::Update ( )
 	}
 }
 
+void Explorer::LiveView::SlowUpdate ( )
+{
+	mPointPicker.SlowUpdate ( );
+}
+
 void Explorer::LiveView::Draw ( )
 {
 	if ( !bDraw ) { return; }
