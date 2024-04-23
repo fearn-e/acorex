@@ -8,6 +8,8 @@ using namespace Acorex;
 
 void Explorer::LiveView::Initialise ( )
 {
+	glPointSize ( 3.0f );
+
 	mStatsCorpus.clear ( );
 	mTimeCorpus.clear ( );
 
