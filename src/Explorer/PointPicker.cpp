@@ -1,4 +1,7 @@
 #include "./PointPicker.h"
+#include "./SpaceDefs.h"
+
+#include <ofGraphics.h>
 
 using namespace Acorex;
 
@@ -119,7 +122,8 @@ void Explorer::PointPicker::SlowUpdate ( )
 
 void Explorer::PointPicker::Draw ( )
 {
-	//
+	ofDrawBitmapStringHighlight ( "Nearest Point: " + std::to_string ( mNearestPoint ), 50, 50 );
+	ofDrawBitmapStringHighlight ( "Nearest Distance: " + std::to_string ( mNearestDistance ), 50, 70 );
 }
 
 void Explorer::PointPicker::FindNearest ( )
@@ -127,5 +131,42 @@ void Explorer::PointPicker::FindNearest ( )
 	if ( !bTrained ) { return; }
 	if ( !bNearestCheckNeeded ) { return; }
 
+	if ( !b3D )
+	{
+		// 2D nearest
+		return;
+	}
 
+	// 3D nearest
+	mNearestPoint = -1;
+	mNearestDistance = std::numeric_limits<double>::max ( );
+
+	int mouseX = ofGetMouseX ( );
+	int mouseY = ofGetMouseY ( );
+
+	for ( int rayPoint = 0; rayPoint < 10; rayPoint++ )
+	{
+		glm::vec3 rayDirection = mCamera->screenToWorld ( glm::vec3 ( mouseX, mouseY, 0 ) );
+		rayDirection = glm::normalize ( rayDirection - mCamera->getPosition ( ) );
+		double depth = rayPoint * 100.0f;
+		glm::vec3 rayPointPosition = mCamera->getPosition ( ) + glm::vec3 ( rayDirection.x * depth, 
+																			rayDirection.y * depth, 
+																			rayDirection.z * depth );
+
+		fluid::RealVector query ( 3 );
+
+		query[0] = ofMap ( rayPointPosition.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+		query[1] = ofMap ( rayPointPosition.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+		query[2] = ofMap ( rayPointPosition.z, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+
+		auto [dist, id] = mKDTree.kNearest ( query, 1, maxAllowedDistance );
+
+		if ( dist.size ( ) == 0 ) { continue; }
+
+		if ( dist[0] < mNearestDistance )
+		{
+			mNearestDistance = dist[0];
+			mNearestPoint = std::stoi ( *id[0] );
+		}
+	}
 }
