@@ -16,6 +16,8 @@ void Explorer::LiveView::Initialise ( )
 	b3D = true;
 	Init3DCam ( );
 
+	mPointPicker.Initialise ( *mRawView->GetDataset ( ) );
+
 	ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
 	ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
 	ofAddListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
@@ -206,10 +208,14 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axi
 			}
 		}
 	}
+
+	mPointPicker.Train ( dimensionIndex, axis, false );
 }
 
 void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis axis )
 {
+	int unchangedDimensionIndex = dimensionIndex;
+
 	std::string dimensionName = mRawView->GetDimensions ( )[dimensionIndex];
 	if ( axis == Utils::Axis::X ) { xLabel = dimensionName; }
 	else if ( axis == Utils::Axis::Y ) { yLabel = dimensionName; }
@@ -240,6 +246,8 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis ax
 			mStatsCorpus.setVertex ( file, currentPoint );
 		}
 	}
+
+	mPointPicker.Train ( unchangedDimensionIndex, axis, false );
 }
 
 void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::Axis axis )
@@ -271,6 +279,8 @@ void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::
 			mStatsCorpus.setVertex ( file, currentPoint );
 		}
 	}
+
+	mPointPicker.Train ( dimensionIndex, axis, false );
 }
 
 void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
@@ -318,6 +328,8 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 			}
 		}
 	}
+
+	mPointPicker.Train ( -1, axis, true );
 }
 
 void Explorer::LiveView::FindScaling ( int dimensionIndex, int statisticIndex, double& min, double& max )

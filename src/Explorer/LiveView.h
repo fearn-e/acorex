@@ -1,5 +1,6 @@
 #pragma once
 
+#include "./PointPicker.h"
 #include "./RawView.h"
 #include "Utils/Data.h"
 #include <ofMesh.h>
@@ -88,6 +89,10 @@ private:
 
 	double mSpaceMin = 0; double mSpaceMax = 1000;
 	double mColorMin = 0; double mColorMax = 255;
+
+	// Acorex Objects ------------------------------
+
+	PointPicker mPointPicker;
 };
 
 } // namespace Explorer

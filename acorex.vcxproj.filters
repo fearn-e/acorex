@@ -76,6 +76,9 @@
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp">
       <Filter>addons\ofxGui\src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Explorer\PointPicker.cpp">
+      <Filter>src\Explorer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Utils\DatasetConversion.cpp">
       <Filter>src\Utils</Filter>
     </ClCompile>
