@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Utils/DimensionBounds.h"
+#include "./SpaceDefs.h"
 #include "./PointPicker.h"
 #include "./RawView.h"
 #include "Utils/Data.h"
@@ -60,6 +61,9 @@ private:
 	bool bDraw = false;
 	bool b3D = true;
 
+	bool mKeyboardMoveState[4] = { 0, 0, 0, 0 };
+	float mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed;
+
 	float deltaTime = 0.1;
 	float lastUpdateTime = 0;
 
@@ -75,20 +79,6 @@ private:
 	std::shared_ptr<ofCamera> mCamera;
 	ofPoint mCamPivot = ofPoint(0, 0, 0);
 	int mLastMouseX = 0, mLastMouseY = 0;
-
-	// Camera Adjustments --------------------
-
-	float mCamZoomSpeed3D = 24.0; float mCamZoomSpeed2D = 0.1;
-	float mZoomMin3D = 50.0; float mZoomMax3D = 5000.0;
-	float mZoomMin2D = 0.1; float mZoomMax2D = 10.0;
-	float mCamMoveSpeed = 1.0; float mCamMoveSpeedScaleAdjusted = mCamMoveSpeed;
-	float mCamRotateSpeed = 0.006;
-	bool mKeyboardMoveState[4] = { 0, 0, 0, 0 }; float mKeyboardSpeedMulti = 800.0;
-
-	// Space and Color Limits --------------------
-
-	double mSpaceMin = 0; double mSpaceMax = 1000;
-	double mColorMin = 0; double mColorMax = 215;
 
 	// Acorex Objects ------------------------------
 
