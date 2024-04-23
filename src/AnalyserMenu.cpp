@@ -157,7 +157,7 @@ void AnalyserMenu::Initialise ( )
 		mReductionPanel.add ( mReductionPickOutputFileButton.setup ( "Pick Output File" ) );
 		mReductionPanel.add ( mReductionOutputLabel.setup ( "", "?" ) );
 
-		mReductionPanel.add ( mReducedDimensionsField.setup ( "Reduced Dimensions", 3, 2, 32 ) );
+		mReductionPanel.add ( mReducedDimensionsField.setup ( "Reduced Dimensions", 4, 2, 32 ) );
 		mReductionPanel.add ( mMaxIterationsField.setup ( "Max Training Iterations", 200, 1, 1000 ) );
 
 		mReductionPanel.add ( mConfirmReductionButton.setup ( "Confirm" ) );
@@ -537,15 +537,6 @@ void AnalyserMenu::SelectReductionInputFile ( )
 	{
 		ofLogError ( "AnalyserMenu" ) << "Analysis already contains the minimum number of dimensions";
 		return;
-	}
-
-	if ( settings.bTime )
-	{
-		mReducedDimensionsField = 2; // time is always included as a dimension with bTime, recommend default 2 dimensions
-	}
-	else
-	{
-		mReducedDimensionsField = 3; // if time is not included, recommend default 3 dimensions
 	}
 
 	UnpackSettingsFromFile ( settings );
