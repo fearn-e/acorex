@@ -23,6 +23,7 @@ public:
 	// Process Functions ---------------------------
 
 	void Update ( );
+	void SlowUpdate ( );
 	void Draw ( );
 
 	// Filler Functions ----------------------------
