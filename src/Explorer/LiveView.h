@@ -72,7 +72,7 @@ private:
 
 	// Camera ----------------------------------------
 
-	ofCamera mCamera;
+	std::shared_ptr<ofCamera> mCamera;
 	ofPoint mCamPivot = ofPoint(0, 0, 0);
 	int mLastMouseX = 0, mLastMouseY = 0;
 

@@ -31,6 +31,7 @@ public:
 
 	// Setters & Getters ----------------------------
 
+	void SetCamera ( std::shared_ptr<ofCamera> camera ) { mCamera = camera; }
 	void SetNearestCheckNeeded ( ) { bNearestCheckNeeded = true; }
 
 	int GetNearestPoint ( ) const { return mNearestPoint; }
@@ -55,6 +56,8 @@ private:
 	bool bDimensionsFilled[3] = { false, false, false };
 
 	// Variables ------------------------------------
+
+	std::shared_ptr<ofCamera> mCamera;
 
 	int mDimensionsIndices[3] = { -1, -1, -1 };
 
