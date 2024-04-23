@@ -21,6 +21,7 @@ public:
 	std::string GetCorpusName ( ) const; // get corpus name
 	Utils::TimeData* GetTimeData ( ); // get time data from dataset
 	Utils::StatsData* GetStatsData ( ); // get stats data from dataset
+	Utils::DataSet* GetDataset ( ); // get dataset
 
 private:
 	std::string mCorpusName;
