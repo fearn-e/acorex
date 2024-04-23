@@ -131,7 +131,8 @@ void Explorer::LiveView::CreatePoints ( )
 			for ( int timepoint = 0; timepoint < time->raw[file].size ( ); timepoint++ )
 			{
 				mesh.addVertex ( { 0, 0, 0 } );
-				mesh.addColor ( { 255, 255, 255 } );
+				ofColor color = ofColor::fromHsb ( 255, 255, 255 );
+				mesh.addColor ( color );
 			}
 			mTimeCorpus.push_back ( mesh );
 		}
@@ -150,7 +151,8 @@ void Explorer::LiveView::CreatePoints ( )
 			for ( int point = 0; point < stats->raw[file].size ( ); point++ )
 			{
 				mStatsCorpus.addVertex ( { 0, 0, 0 } );
-				mStatsCorpus.addColor ( { 255, 255, 255 } );
+				ofColor color = ofColor::fromHsb ( 255, 255, 255 );
+				mStatsCorpus.addColor ( color );
 			}
 		}
 
