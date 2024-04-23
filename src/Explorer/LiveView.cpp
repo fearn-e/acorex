@@ -18,6 +18,8 @@ void Explorer::LiveView::Initialise ( )
 
 	mPointPicker.Initialise ( *mRawView->GetDataset ( ) );
 
+	mDimensionBounds.CalculateBounds ( *mRawView->GetDataset ( ) );
+
 	ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
 	ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
 	ofAddListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
@@ -181,8 +183,8 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axi
 
 	Utils::TimeData* time = mRawView->GetTimeData ( );
 
-	double min = 0, max = 0;
-	FindScaling ( dimensionIndex, -1, min, max );
+	double min = dimensionIndex == -1 ? 0 : mDimensionBounds.GetMinBound ( dimensionIndex );
+	double max = dimensionIndex == -1 ? mDimensionBounds.GetMaxTime ( ) : mDimensionBounds.GetMaxBound ( dimensionIndex );
 
 	for ( int file = 0; file < time->raw.size ( ); file++ )
 	{
@@ -214,40 +216,41 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axi
 
 void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis axis )
 {
-	int unchangedDimensionIndex = dimensionIndex;
-
 	std::string dimensionName = mRawView->GetDimensions ( )[dimensionIndex];
 	if ( axis == Utils::Axis::X ) { xLabel = dimensionName; }
 	else if ( axis == Utils::Axis::Y ) { yLabel = dimensionName; }
 	else if ( axis == Utils::Axis::Z ) { zLabel = dimensionName; }
 
 	int statisticIndex = dimensionIndex % mRawView->GetStatistics ( ).size ( );
-	dimensionIndex /= mRawView->GetStatistics ( ).size ( );
+	int dividedDimensionIndex = dimensionIndex / mRawView->GetStatistics ( ).size ( );
 
 	Utils::StatsData* stats = mRawView->GetStatsData ( );
-
-	double min = 0, max = 0;
-	FindScaling ( dimensionIndex, statisticIndex, min, max );
 
 	for ( int file = 0; file < stats->raw.size ( ); file++ )
 	{
 		if ( axis == Utils::Axis::COLOR )
 		{
-			double value = ofMap ( stats->raw[file][dimensionIndex][statisticIndex], min, max, mColorMin, mColorMax);
+			double value = ofMap (	stats->raw[file][dividedDimensionIndex][statisticIndex], 
+									mDimensionBounds.GetMinBound ( dimensionIndex ), 
+									mDimensionBounds.GetMaxBound ( dimensionIndex ), 
+									mColorMin, mColorMax );
 			ofColor currentColor = mStatsCorpus.getColor ( file );
 			currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
 			mStatsCorpus.setColor ( file, currentColor );
 		}
 		else
 		{
-			double value = ofMap ( stats->raw[file][dimensionIndex][statisticIndex], min, max, mSpaceMin, mSpaceMax );
+			double value = ofMap (	stats->raw[file][dividedDimensionIndex][statisticIndex], 
+									mDimensionBounds.GetMinBound ( dimensionIndex ), 
+									mDimensionBounds.GetMaxBound ( dimensionIndex ), 
+									mSpaceMin, mSpaceMax );
 			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
 			currentPoint[(int)axis] = value;
 			mStatsCorpus.setVertex ( file, currentPoint );
 		}
 	}
 
-	mPointPicker.Train ( unchangedDimensionIndex, axis, false );
+	mPointPicker.Train ( dimensionIndex, axis, false );
 }
 
 void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::Axis axis )
@@ -259,21 +262,24 @@ void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::
 
 	Utils::StatsData* stats = mRawView->GetStatsData ( );
 
-	double min = 0, max = 0;
-	FindScaling ( dimensionIndex, -1, min, max );
-
 	for ( int file = 0; file < stats->reduced.size ( ); file++ )
 	{
 		if ( axis == Utils::Axis::COLOR )
 		{
-			double value = ofMap ( stats->reduced[file][dimensionIndex], min, max, mColorMin, mColorMax );
+			double value = ofMap (	stats->reduced[file][dimensionIndex], 
+									mDimensionBounds.GetMinBound ( dimensionIndex ), 
+									mDimensionBounds.GetMaxBound ( dimensionIndex ), 
+									mColorMin, mColorMax );
 			ofColor currentColor = mStatsCorpus.getColor ( file );
 			currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
 			mStatsCorpus.setColor ( file, currentColor );
 		}
 		else
 		{
-			double value = ofMap ( stats->reduced[file][dimensionIndex], min, max, mSpaceMin, mSpaceMax );
+			double value = ofMap (	stats->reduced[file][dimensionIndex], 
+									mDimensionBounds.GetMinBound ( dimensionIndex ), 
+									mDimensionBounds.GetMaxBound ( dimensionIndex ),
+									mSpaceMin, mSpaceMax );
 			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
 			currentPoint[(int)axis] = value;
 			mStatsCorpus.setVertex ( file, currentPoint );
@@ -330,62 +336,6 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 	}
 
 	mPointPicker.Train ( -1, axis, true );
-}
-
-void Explorer::LiveView::FindScaling ( int dimensionIndex, int statisticIndex, double& min, double& max )
-{
-	if ( mRawView->IsTimeAnalysis ( ) )
-	{
-		Utils::TimeData* time = mRawView->GetTimeData ( );
-
-		if ( dimensionIndex == -1 ) { min = 0; max = 0; }
-		else
-		{
-			min = std::numeric_limits<double>::max ( );
-			max = std::numeric_limits<double>::max ( ) * -1;
-		}
-
-		for ( int file = 0; file < time->raw.size ( ); file++ )
-		{
-			// If we're looking at time, we need to find the max timepoint
-			if ( dimensionIndex == -1 )
-			{
-				double fileMax = time->raw[file].size ( ) * time->hopSize / time->sampleRates[file];
-				if ( fileMax > max ) { max = fileMax; }
-				continue;
-			}
-
-			// Otherwise, we're looking at a dimension
-			for ( int timepoint = 0; timepoint < time->raw[file].size ( ); timepoint++ )
-			{
-				double value = time->raw[file][timepoint][dimensionIndex];
-
-				if ( value < min ) { min = value; }
-				if ( value > max ) { max = value; }
-			}
-		}
-
-		return;
-	}
-
-	{
-		Utils::StatsData* stats = mRawView->GetStatsData ( );
-
-		min = std::numeric_limits<double>::max ( );
-		max = std::numeric_limits<double>::max ( ) * -1;
-
-		int loopSize = mRawView->IsReduction ( ) ? stats->reduced.size ( ) : stats->raw.size ( );
-
-		for ( int file = 0; file < loopSize; file++ )
-		{
-			double value = 0.0;
-			if ( !mRawView->IsReduction ( ) && statisticIndex > -1 ) { value = stats->raw[file][dimensionIndex][statisticIndex]; }
-			else { value = stats->reduced[file][dimensionIndex]; }
-
-			if ( value < min ) { min = value; }
-			if ( value > max ) { max = value; }
-		}
-	}
 }
 
 // Camera Functions ----------------------------

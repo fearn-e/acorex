@@ -144,6 +144,7 @@
     <ClInclude Include="src\Explorer\RawView.h" />
     <ClInclude Include="src\Utils\Data.h" />
     <ClInclude Include="src\Utils\DatasetConversion.h" />
+    <ClInclude Include="src\Utils\DimensionBounds.h" />
     <ClInclude Include="src\Utils\InterfaceDefs.h" />
     <ClInclude Include="src\Utils\JSON.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.h" />
