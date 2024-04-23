@@ -42,6 +42,9 @@ void Explorer::PointPicker::Train ( int dimensionIndex, Utils::Axis axis, bool n
 
 	mKDTree = fluid::algorithm::KDTree ( mLiveFluidSet );
 	bTrained = true;
+
+	if ( dimsFilled == 2 ) { b3D = false; }
+	if ( dimsFilled == 3 ) { b3D = true; }
 }
 
 void Explorer::PointPicker::Exit ( )
