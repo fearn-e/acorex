@@ -61,6 +61,7 @@ void Explorer::LiveView::Update ( )
 			Pan3DCam (	( mKeyboardMoveState[1] - mKeyboardMoveState[3] ) * keyboardSpeedDelta,
 						( mKeyboardMoveState[0] - mKeyboardMoveState[2] ) * keyboardSpeedDelta,
 						false );
+			mPointPicker.SetNearestCheckNeeded ( );
 		}
 	}
 	else
@@ -70,6 +71,7 @@ void Explorer::LiveView::Update ( )
 			float adjustedSpeed = mCamMoveSpeedScaleAdjusted * keyboardSpeedDelta;
 			mCamera.boom ( (mKeyboardMoveState[0] - mKeyboardMoveState[2]) * adjustedSpeed );
 			mCamera.truck ( (mKeyboardMoveState[3] - mKeyboardMoveState[1]) * adjustedSpeed );
+			mPointPicker.SetNearestCheckNeeded ( );
 		}
 	}
 }
@@ -433,14 +435,17 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 		if ( args.type == 4 ) // scroll - zoom
 		{
 			Zoom3DCam ( args.scrollY );
+			mPointPicker.SetNearestCheckNeeded ( );
 		}
 		else if ( args.type == 3 && args.button == 0 ) // left click drag - rotate
 		{
 			Rotate3DCam ( args.x, args.y );
+			mPointPicker.SetNearestCheckNeeded ( );
 		}
 		else if ( args.type == 3 && args.button == 1 ) // middle click drag - pan
 		{
 			Pan3DCam ( args.x, args.y, true );
+			mPointPicker.SetNearestCheckNeeded ( );
 		}
 	}
 	else // 2D
@@ -451,11 +456,13 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 			if ( mCamera.getScale ( ).x < mZoomMin2D ) { mCamera.setScale ( 0.1 ); }
 			else if ( mCamera.getScale ( ).x > mZoomMax2D ) { mCamera.setScale ( 20.0 ); }
 			mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera.getScale ( ).x;
+			mPointPicker.SetNearestCheckNeeded ( );
 		}
 		else if ( (args.type == 3 && args.button == 0) || (args.type == 3 && args.button == 1) ) // left/middle button drag - pan
 		{
 			mCamera.boom ( (args.y - mLastMouseY) * mCamMoveSpeedScaleAdjusted );
 			mCamera.truck ( (args.x - mLastMouseX) * mCamMoveSpeedScaleAdjusted * -1 );
+			mPointPicker.SetNearestCheckNeeded ( );
 		}
 	}
 
