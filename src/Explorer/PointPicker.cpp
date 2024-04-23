@@ -2,12 +2,15 @@
 
 using namespace Acorex;
 
-void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset )
+void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Utils::DimensionBounds& dimensionBounds )
 {
 	mFullFluidSet.resize ( dataset.analysisSettings.currentDimensionCount );
 	mLiveFluidSet.resize ( 3 );
 
 	mDatasetConversion.CorpusToFluid ( mFullFluidSet, dataset, std::vector<int> ( ) );
+}
+void Explorer::PointPicker::ScaleDataset ( Utils::DataSet& scaledDataset, const Utils::DimensionBounds& dimensionBounds )
+{
 }
 
 void Explorer::PointPicker::Train ( int dimensionIndex, Utils::Axis axis, bool none )
