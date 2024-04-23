@@ -15,19 +15,9 @@ public:
 	{
 		minBounds.clear ( );
 		maxBounds.clear ( );
-		maxTime = 0;
 
 		minBounds.resize ( dataset.dimensionNames.size ( ) );
 		maxBounds.resize ( dataset.dimensionNames.size ( ) );
-
-		if ( dataset.analysisSettings.bTime )
-		{
-			for ( int file = 0; file < dataset.time.raw.size ( ); file++ )
-			{
-				double temp = dataset.time.raw[file].size ( ) * dataset.time.hopSize / dataset.time.sampleRates[file];
-				if ( temp > maxTime ) { maxTime = temp; }
-			}
-		}
 
 #pragma omp parallel for
 		for ( int dimension = 0; dimension < dataset.dimensionNames.size ( ); dimension++ )
@@ -63,12 +53,10 @@ public:
 
 	double GetMinBound ( int dimension ) const { return minBounds[dimension]; }
 	double GetMaxBound ( int dimension ) const { return maxBounds[dimension]; }
-	double GetMaxTime ( ) const { return maxTime; }
 
 private:
 	std::vector<double> minBounds;
 	std::vector<double> maxBounds;
-	double maxTime = 0;
 };
 
 } // namespace Utils

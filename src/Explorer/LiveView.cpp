@@ -176,23 +176,21 @@ void Explorer::LiveView::CreatePoints ( )
 
 void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axis )
 {
-	std::string dimensionName = dimensionIndex == -1 ? "Time" : mRawView->GetDimensions ( )[dimensionIndex];
+	std::string dimensionName = mRawView->GetDimensions ( )[dimensionIndex];
 	if ( axis == Utils::Axis::X ) { xLabel = dimensionName; }
 	else if ( axis == Utils::Axis::Y ) { yLabel = dimensionName; }
 	else if ( axis == Utils::Axis::Z ) { zLabel = dimensionName; }
 
 	Utils::TimeData* time = mRawView->GetTimeData ( );
 
-	double min = dimensionIndex == -1 ? 0 : mDimensionBounds.GetMinBound ( dimensionIndex );
-	double max = dimensionIndex == -1 ? mDimensionBounds.GetMaxTime ( ) : mDimensionBounds.GetMaxBound ( dimensionIndex );
+	double min = mDimensionBounds.GetMinBound ( dimensionIndex );
+	double max = mDimensionBounds.GetMaxBound ( dimensionIndex );
 
 	for ( int file = 0; file < time->raw.size ( ); file++ )
 	{
 		for ( int timepoint = 0; timepoint < time->raw[file].size ( ); timepoint++ )
 		{
-			double value = 0.0;
-			if ( dimensionIndex == -1 ) { value = ( timepoint * time->hopSize ) / time->sampleRates[file]; }
-			else { value = time->raw[file][timepoint][dimensionIndex]; }
+			double value = time->raw[file][timepoint][dimensionIndex];
 
 			if ( axis == Utils::Axis::COLOR )
 			{

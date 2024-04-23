@@ -22,6 +22,10 @@ public:
     bool Fit ( Utils::DataSet& dataset, const Utils::ReductionSettings& settings );
 
 private:
+
+    void ExtractTimeDimension ( Utils::DataSet& dataset, std::vector<double>& timeDimension );
+    void InsertTimeDimension ( Utils::DataSet& dataset, const std::vector<double>& timeDimension );
+
     Utils::DatasetConversion mConversion;
 };
 

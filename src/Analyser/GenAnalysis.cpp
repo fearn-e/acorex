@@ -2,7 +2,7 @@
 #include <ofLog.h>
 #include <omp.h>
 
-#ifndef DATA_CHANGE_CHECK_9
+#ifndef DATA_CHANGE_CHECK_1
 #error "Check if dataset is still used correctly"
 #endif
 
@@ -12,7 +12,6 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 {  
     if ( dataset.analysisSettings.bTime )
     {
-        dataset.time.sampleRates.clear ( );
         dataset.time.raw.clear ( );
     }
 	else
@@ -23,12 +22,13 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
     int analysedFileIndex = 0;
     std::vector<std::string> analysedFiles;
 
+    fluid::index numTimeDimensions = dataset.analysisSettings.bTime         ? 1 : 0;
     fluid::index numPitchDimensions = dataset.analysisSettings.bPitch       ? 2 : 0;
     fluid::index numLoudnessDimensions = dataset.analysisSettings.bLoudness ? 2 : 0;
     fluid::index numShapeDimensions = dataset.analysisSettings.bShape       ? 7 : 0;
     fluid::index numMFCCDimensions = dataset.analysisSettings.bMFCC         ? dataset.analysisSettings.nCoefs : 0;
 
-    fluid::index numDimensions = numPitchDimensions + numLoudnessDimensions + numShapeDimensions + numMFCCDimensions;
+    fluid::index numDimensions = numTimeDimensions + numPitchDimensions + numLoudnessDimensions + numShapeDimensions + numMFCCDimensions;
 
     if ( dataset.analysisSettings.currentDimensionCount > 0 )
     {
@@ -41,7 +41,6 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 
     fluid::index nBins = dataset.analysisSettings.windowFFTSize / 2 + 1;
     fluid::index hopSize = dataset.analysisSettings.windowFFTSize / dataset.analysisSettings.hopFraction;
-    if ( dataset.analysisSettings.bTime ) { dataset.time.hopSize = hopSize; }
     fluid::index halfWindow = dataset.analysisSettings.windowFFTSize / 2;
     
     //if ( dataset.analysisSettings.bTime )
@@ -136,9 +135,12 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 
         if ( dataset.analysisSettings.bTime )
         {
-            dataset.time.sampleRates.push_back ( samplingRate );
-
             std::vector<std::vector<double>> allVectors ( nFrames );
+
+            for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+            {
+                allVectors[frameIndex].push_back ( frameIndex * hopSize / samplingRate );
+            }
 
 			if ( dataset.analysisSettings.bPitch )
 			{
