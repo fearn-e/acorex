@@ -6,6 +6,7 @@ void Utils::DatasetConversion::CorpusToFluid ( fluid::FluidDataSet<std::string, 
 {
 	if ( dataset.analysisSettings.bTime )
 	{
+		filePointLength.resize ( dataset.time.raw.size ( ) );
 		int fileMarker = 0;
 
 		for ( int file = 0; file < dataset.time.raw.size ( ); file++ )
