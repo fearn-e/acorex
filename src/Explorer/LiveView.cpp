@@ -131,7 +131,7 @@ void Explorer::LiveView::CreatePoints ( )
 			for ( int timepoint = 0; timepoint < time->raw[file].size ( ); timepoint++ )
 			{
 				mesh.addVertex ( { 0, 0, 0 } );
-				ofColor color = ofColor::fromHsb ( 255, 255, 255 );
+				ofColor color = ofColor::fromHsb ( 35, 255, 255 );
 				mesh.addColor ( color );
 			}
 			mTimeCorpus.push_back ( mesh );
@@ -151,7 +151,7 @@ void Explorer::LiveView::CreatePoints ( )
 			for ( int point = 0; point < stats->raw[file].size ( ); point++ )
 			{
 				mStatsCorpus.addVertex ( { 0, 0, 0 } );
-				ofColor color = ofColor::fromHsb ( 255, 255, 255 );
+				ofColor color = ofColor::fromHsb ( 35, 255, 255 );
 				mStatsCorpus.addColor ( color );
 			}
 		}
@@ -167,7 +167,8 @@ void Explorer::LiveView::CreatePoints ( )
 			for ( int point = 0; point < stats->reduced[file].size ( ); point++ )
 			{
 				mStatsCorpus.addVertex ( { 0, 0, 0 } );
-				mStatsCorpus.addColor ( { 255, 255, 255 } );
+				ofColor color = ofColor::fromHsb ( 35, 255, 255 );
+				mStatsCorpus.addColor ( color );
 			}
 		}
 
@@ -303,8 +304,7 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 			{
 				if ( axis == Utils::Axis::COLOR )
 				{
-					ofColor currentColor = mTimeCorpus[file].getColor ( timepoint );
-					currentColor.set ( 255, 255, 255 );
+					ofColor currentColor = ofColor::fromHsb ( 35, 255, 255 );
 					mTimeCorpus[file].setColor ( timepoint, currentColor );
 				}
 				else
@@ -322,8 +322,7 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 		{
 			if ( axis == Utils::Axis::COLOR )
 			{
-				ofColor currentColor = mStatsCorpus.getColor ( file );
-				currentColor.set ( 255, 255, 255 );
+				ofColor currentColor = ofColor::fromHsb ( 35, 255, 255 );
 				mStatsCorpus.setColor ( file, currentColor );
 			}
 			else
