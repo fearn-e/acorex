@@ -12,10 +12,12 @@ void Explorer::LiveView::Initialise ( )
 	mTimeCorpus.clear ( );
 
 	b3D = true;
+	mCamera = std::make_shared<ofCamera> ( );
 	Init3DCam ( );
 
 	mDimensionBounds.CalculateBounds ( *mRawView->GetDataset ( ) );
 
+	mPointPicker.SetCamera ( mCamera );
 	mPointPicker.Initialise ( *mRawView->GetDataset ( ), mDimensionBounds );
 
 	ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
@@ -69,8 +71,8 @@ void Explorer::LiveView::Update ( )
 		if ( mKeyboardMoveState[0] || mKeyboardMoveState[1] || mKeyboardMoveState[2] || mKeyboardMoveState[3] )
 		{
 			float adjustedSpeed = mCamMoveSpeedScaleAdjusted * keyboardSpeedDelta;
-			mCamera.boom ( (mKeyboardMoveState[0] - mKeyboardMoveState[2]) * adjustedSpeed );
-			mCamera.truck ( (mKeyboardMoveState[3] - mKeyboardMoveState[1]) * adjustedSpeed );
+			mCamera->boom ( (mKeyboardMoveState[0] - mKeyboardMoveState[2]) * adjustedSpeed );
+			mCamera->truck ( (mKeyboardMoveState[3] - mKeyboardMoveState[1]) * adjustedSpeed );
 			mPointPicker.SetNearestCheckNeeded ( );
 		}
 	}
@@ -86,7 +88,7 @@ void Explorer::LiveView::Draw ( )
 	if ( !bDraw ) { return; }
 
 	ofEnableDepthTest ( );
-	mCamera.begin ( );
+	mCamera->begin ( );
 
 	// Draw Axis ------------------------------
 	ofSetColor ( 255, 255, 255 );
@@ -116,7 +118,7 @@ void Explorer::LiveView::Draw ( )
 		mStatsCorpus.draw ( );
 	}
 
-	mCamera.end ( );
+	mCamera->end ( );
 	ofDisableDepthTest ( );
 }
 
@@ -346,42 +348,42 @@ void Explorer::LiveView::Init3DCam ( )
 { 
 	double outsidePoint = mSpaceMax * 1.5;
 	double midSpacePoint = ( mSpaceMax + mSpaceMin ) / 2;
-	mCamera.setPosition ( outsidePoint, outsidePoint, outsidePoint );
+	mCamera->setPosition ( outsidePoint, outsidePoint, outsidePoint );
 	mCamPivot = ofPoint ( midSpacePoint, midSpacePoint, midSpacePoint );
-	mCamera.lookAt ( mCamPivot ); 
-	mCamera.setNearClip ( 0.01 ); 
-	mCamera.setFarClip ( 99999 ); 
-	mCamera.disableOrtho ( );
-	mCamera.setScale ( 1 );
+	mCamera->lookAt ( mCamPivot ); 
+	mCamera->setNearClip ( 0.01 ); 
+	mCamera->setFarClip ( 99999 ); 
+	mCamera->disableOrtho ( );
+	mCamera->setScale ( 1 );
 }
 
 void Explorer::LiveView::Init2DCam ( Utils::Axis disabledAxis )
 { 
 	double midSpacePoint = ( mSpaceMax + mSpaceMin ) / 2;
-	mCamera.setPosition ( midSpacePoint, midSpacePoint, midSpacePoint );
-	if ( disabledAxis == Utils::Axis::X ) { mCamera.lookAt ( { 0, midSpacePoint, midSpacePoint } ); }
-	else if ( disabledAxis == Utils::Axis::Y ) { mCamera.lookAt ( { midSpacePoint, 0, midSpacePoint } ); }
-	else { mCamera.lookAt ( { midSpacePoint, midSpacePoint, 0 } ); }
-	mCamera.setNearClip ( 0.01 ); 
-	mCamera.setFarClip ( 99999 );
-	mCamera.enableOrtho ( );
-	mCamera.setScale ( 1 );
-	mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera.getScale ( ).x;
+	mCamera->setPosition ( midSpacePoint, midSpacePoint, midSpacePoint );
+	if ( disabledAxis == Utils::Axis::X ) { mCamera->lookAt ( { 0, midSpacePoint, midSpacePoint } ); }
+	else if ( disabledAxis == Utils::Axis::Y ) { mCamera->lookAt ( { midSpacePoint, 0, midSpacePoint } ); }
+	else { mCamera->lookAt ( { midSpacePoint, midSpacePoint, 0 } ); }
+	mCamera->setNearClip ( 0.01 ); 
+	mCamera->setFarClip ( 99999 );
+	mCamera->enableOrtho ( );
+	mCamera->setScale ( 1 );
+	mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera->getScale ( ).x;
 }
 
 void Explorer::LiveView::Zoom3DCam ( int y )
 {
 	float scrollDist = y * mCamZoomSpeed3D;
-	if ( mCamPivot.distance ( mCamera.getPosition ( ) ) > mZoomMin3D && scrollDist < 0 ) { mCamera.dolly ( scrollDist ); }
-	else if ( mCamPivot.distance ( mCamera.getPosition ( ) ) < mZoomMax3D && scrollDist > 0 ) { mCamera.dolly ( scrollDist ); }
+	if ( mCamPivot.distance ( mCamera->getPosition ( ) ) > mZoomMin3D && scrollDist < 0 ) { mCamera->dolly ( scrollDist ); }
+	else if ( mCamPivot.distance ( mCamera->getPosition ( ) ) < mZoomMax3D && scrollDist > 0 ) { mCamera->dolly ( scrollDist ); }
 }
 
 void Explorer::LiveView::Rotate3DCam ( int x, int y )
 {
 	// get vectors
-	glm::vec3 upNormalized = glm::normalize ( mCamera.getUpDir ( ) );
-	glm::vec3 rightNormalized = glm::normalize ( mCamera.getSideDir ( ) );
-	glm::vec3 focus = mCamera.getGlobalPosition ( ) - mCamPivot;
+	glm::vec3 upNormalized = glm::normalize ( mCamera->getUpDir ( ) );
+	glm::vec3 rightNormalized = glm::normalize ( mCamera->getSideDir ( ) );
+	glm::vec3 focus = mCamera->getGlobalPosition ( ) - mCamPivot;
 	glm::vec3 focusNormalized = glm::normalize ( focus );
 
 	// calculate rotation angles
@@ -400,22 +402,22 @@ void Explorer::LiveView::Rotate3DCam ( int x, int y )
 	focus = glm::cross ( focus, yaw );
 
 	// set new camera position and look at pivot point
-	mCamera.setPosition ( mCamPivot + focus );
-	mCamera.lookAt ( mCamPivot );
+	mCamera->setPosition ( mCamPivot + focus );
+	mCamera->lookAt ( mCamPivot );
 }
 
 void Explorer::LiveView::Pan3DCam ( int x, int y, bool mouse )
 {
-	glm::vec3 upNormalized = glm::normalize ( mCamera.getUpDir ( ) );
-	glm::vec3 rightNormalized = glm::normalize ( mCamera.getSideDir ( ) );
+	glm::vec3 upNormalized = glm::normalize ( mCamera->getUpDir ( ) );
+	glm::vec3 rightNormalized = glm::normalize ( mCamera->getSideDir ( ) );
 
 	if ( mouse ) { x -= mLastMouseX; y -= mLastMouseY; }
 
 	float moveX = x * mCamMoveSpeedScaleAdjusted * -1;
 	float moveY = y * mCamMoveSpeedScaleAdjusted;
 
-	mCamera.move ( rightNormalized * moveX );
-	mCamera.move ( upNormalized * moveY );
+	mCamera->move ( rightNormalized * moveX );
+	mCamera->move ( upNormalized * moveY );
 	mCamPivot += rightNormalized * moveX;
 	mCamPivot += upNormalized * moveY;
 }
@@ -452,16 +454,16 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 	{
 		if ( args.type == 4 ) // scroll - zoom
 		{
-			mCamera.setScale ( mCamera.getScale ( ) + args.scrollY * mCamZoomSpeed2D );
-			if ( mCamera.getScale ( ).x < mZoomMin2D ) { mCamera.setScale ( 0.1 ); }
-			else if ( mCamera.getScale ( ).x > mZoomMax2D ) { mCamera.setScale ( 20.0 ); }
-			mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera.getScale ( ).x;
+			mCamera->setScale ( mCamera->getScale ( ) + args.scrollY * mCamZoomSpeed2D );
+			if ( mCamera->getScale ( ).x < mZoomMin2D ) { mCamera->setScale ( 0.1 ); }
+			else if ( mCamera->getScale ( ).x > mZoomMax2D ) { mCamera->setScale ( 20.0 ); }
+			mCamMoveSpeedScaleAdjusted = mCamMoveSpeed * mCamera->getScale ( ).x;
 			mPointPicker.SetNearestCheckNeeded ( );
 		}
 		else if ( (args.type == 3 && args.button == 0) || (args.type == 3 && args.button == 1) ) // left/middle button drag - pan
 		{
-			mCamera.boom ( (args.y - mLastMouseY) * mCamMoveSpeedScaleAdjusted );
-			mCamera.truck ( (args.x - mLastMouseX) * mCamMoveSpeedScaleAdjusted * -1 );
+			mCamera->boom ( (args.y - mLastMouseY) * mCamMoveSpeedScaleAdjusted );
+			mCamera->truck ( (args.x - mLastMouseX) * mCamMoveSpeedScaleAdjusted * -1 );
 			mPointPicker.SetNearestCheckNeeded ( );
 		}
 	}
