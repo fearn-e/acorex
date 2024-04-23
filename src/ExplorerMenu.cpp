@@ -68,14 +68,6 @@ void ExplorerMenu::Initialise ( )
 			mDimensionDropdownZ->add ( "None" );
 			mDimensionDropdownColor->add ( "None" );
 
-			if ( mRawView->IsTimeAnalysis ( ) )
-			{
-				mDimensionDropdownX->add ( "Time" );
-				mDimensionDropdownY->add ( "Time" );
-				mDimensionDropdownZ->add ( "Time" );
-				mDimensionDropdownColor->add ( "Time" );
-			}
-
 			for ( auto& dimension : mRawView->GetDimensions ( ) )
 			{
 				mDimensionDropdownX->add ( dimension );
@@ -215,17 +207,10 @@ void ExplorerMenu::OpenCorpus ( )
 	mLiveView.CreatePoints ( );
 
 	// set default dropdown values
-	std::string xDimension = "Time", yDimension = "None", zDimension = "None", colorDimension = "None";
+	std::string xDimension = "None", yDimension = "None", zDimension = "None", colorDimension = "None";
 	{
 		int dimensionCount = mRawView->GetDimensions ( ).size ( );
-		if ( mRawView->IsTimeAnalysis ( ) )
-		{
-			xDimension = "Time";
-			yDimension = mRawView->GetDimensions ( ).size ( ) > 0 ? mRawView->GetDimensions ( )[0] : "None";
-			zDimension = mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : "None";
-			colorDimension = mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : "None";
-		}
-		else if ( mRawView->IsReduction ( ) )
+		if ( mRawView->IsTimeAnalysis ( ) || mRawView->IsReduction ( ) )
 		{
 			xDimension = mRawView->GetDimensions ( ).size ( ) > 0 ? mRawView->GetDimensions ( )[0] : "None";
 			yDimension = mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : "None";
@@ -263,7 +248,6 @@ void ExplorerMenu::SwapDimension ( string dimension, Utils::Axis axis )
 	if ( bBlockDimensionFilling ) { return; }
 
 	if ( dimension == "None" )					{ mLiveView.FillDimensionNone ( axis ); }
-	else if ( dimension == "Time" )				{ mLiveView.FillDimensionTime ( -1, axis ); }
 	else
 	{
 		int dimensionIndex = GetDimensionIndex ( dimension );
@@ -277,7 +261,7 @@ void ExplorerMenu::SwapDimension ( string dimension, Utils::Axis axis )
 	if ( bIsCorpusOpen )
 	{
 		CameraSwitcher ( );
-		// TODO - if axis != COLOR, retrain point picker
+		// TODO - if axis != COLOR, retrain point picker // is this still needed here? already retraining in liveview
 	}
 }
 

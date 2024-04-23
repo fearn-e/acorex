@@ -66,7 +66,7 @@ bool Utils::JSON::Read ( const std::string& inputFile, AnalysisSettings& setting
 }
 
 
-#ifndef DATA_CHANGE_CHECK_9
+#ifndef DATA_CHANGE_CHECK_1
 #error "data structure changed, please update json serialization"
 #endif
 
@@ -76,8 +76,6 @@ void Utils::to_json ( nlohmann::json& j, const DataSet& a )
 		TO_J ( currentPointCount),
 		TO_J ( dimensionNames ),
 		TO_J ( fileList ),
-		TO_J ( time.hopSize ),
-		TO_J ( time.sampleRates ),
 		TO_J ( time.raw ),
 		TO_J ( stats.raw ),
 		TO_J ( stats.reduced ),
@@ -101,8 +99,6 @@ void Utils::from_json ( const nlohmann::json& j, DataSet& a )
 	TO_A ( currentPointCount );
 	TO_A ( dimensionNames );
 	TO_A ( fileList );
-	TO_A ( time.hopSize );
-	TO_A ( time.sampleRates );
 	TO_A ( time.raw );
 	TO_A ( stats.raw );
 	TO_A ( stats.reduced );
