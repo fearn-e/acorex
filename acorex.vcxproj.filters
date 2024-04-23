@@ -221,6 +221,9 @@
     <ClInclude Include="src\Explorer\PointPicker.h">
       <Filter>src\Explorer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Utils\DimensionBounds.h">
+      <Filter>src\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

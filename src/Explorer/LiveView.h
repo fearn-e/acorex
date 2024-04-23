@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Utils/DimensionBounds.h"
 #include "./PointPicker.h"
 #include "./RawView.h"
 #include "Utils/Data.h"
@@ -32,8 +33,6 @@ public:
 	void FillDimensionStats ( int dimensionIndex, Utils::Axis axis );
 	void FillDimensionStatsReduced ( int dimensionIndex, Utils::Axis axis );
 	void FillDimensionNone ( Utils::Axis axis );
-
-	void FindScaling ( int dimensionIndex, int statisticIndex, double& min, double& max );
 
 	// Camera Functions ----------------------------
 
@@ -92,6 +91,7 @@ private:
 
 	// Acorex Objects ------------------------------
 
+	Utils::DimensionBounds mDimensionBounds;
 	PointPicker mPointPicker;
 };
 
