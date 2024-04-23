@@ -90,7 +90,7 @@ void Explorer::LiveView::Draw ( )
 	if ( mDisabledAxis != Utils::Axis::X ) { ofDrawBitmapString ( xLabel , { mSpaceMax, 0, 0 } ); }
 	if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawBitmapString ( yLabel , { 0, mSpaceMax, 0 } ); }
 	if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawBitmapString ( zLabel , { 0, 0, mSpaceMax } ); }
-	
+
 	// Draw points ------------------------------
 	if ( mRawView->IsTimeAnalysis ( ) ) // Time
 	{
@@ -337,8 +337,9 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 void Explorer::LiveView::Init3DCam ( )
 { 
 	double outsidePoint = mSpaceMax * 1.5;
+	double midSpacePoint = ( mSpaceMax + mSpaceMin ) / 2;
 	mCamera.setPosition ( outsidePoint, outsidePoint, outsidePoint );
-	mCamPivot = ofPoint ( mSpaceMin, mSpaceMin, mSpaceMin );
+	mCamPivot = ofPoint ( midSpacePoint, midSpacePoint, midSpacePoint );
 	mCamera.lookAt ( mCamPivot ); 
 	mCamera.setNearClip ( 0.01 ); 
 	mCamera.setFarClip ( 99999 ); 
