@@ -120,6 +120,9 @@ void Explorer::LiveView::Draw ( )
 
 	mCamera->end ( );
 	ofDisableDepthTest ( );
+
+	// Draw Nearest Point -----------------------
+	mPointPicker.Draw ( );
 }
 
 // Filler Functions ----------------------------
