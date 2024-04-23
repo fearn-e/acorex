@@ -2,6 +2,7 @@
 #include "./SpaceDefs.h"
 
 #include <ofGraphics.h>
+#include <of3DGraphics.h>
 
 using namespace Acorex;
 
@@ -12,6 +13,22 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
 
 	Utils::DataSet scaledDataset = dataset;
 	ScaleDataset ( scaledDataset, dimensionBounds );
+
+	for ( int file = 0; file < dataset.fileList.size ( ); file++ )
+	{
+		if ( dataset.analysisSettings.bTime )
+		{
+			for ( int timepoint = 0; timepoint < dataset.time.raw[file].size ( ); timepoint++ )
+			{
+				mCorpusFileLookUp.push_back ( file );
+				mCorpusTimeLookUp.push_back ( timepoint );
+			}
+		}
+		else
+		{
+			mCorpusFileLookUp.push_back ( file );
+		}
+	}
 
 	mDatasetConversion.CorpusToFluid ( mFullFluidSet, scaledDataset, std::vector<int> ( ) );
 
@@ -124,31 +141,76 @@ void Explorer::PointPicker::Draw ( )
 {
 	ofDrawBitmapStringHighlight ( "Nearest Point: " + std::to_string ( mNearestPoint ), 50, 50 );
 	ofDrawBitmapStringHighlight ( "Nearest Distance: " + std::to_string ( mNearestDistance ), 50, 70 );
+
+	ofEnableDepthTest ( );
+	mCamera->begin ( );
+
+	for ( auto& each : testDrawPoints )
+	{
+		ofSetColor ( 255, 0, 0 );
+		ofDrawSphere ( each, 3.0f );
+	}
+
+	mCamera->end ( );
+	ofDisableDepthTest ( );
 }
 
 void Explorer::PointPicker::FindNearest ( )
 {
+	testDrawPoints.clear ( );
+
 	if ( !bTrained ) { return; }
 	if ( !bNearestCheckNeeded ) { return; }
 
-	if ( !b3D )
-	{
-		// 2D nearest
-		return;
-	}
-
-	// 3D nearest
-	mNearestPoint = -1;
+	mNearestPoint = -1; mNearestPointFile = -1; mNearestPointTime = -1;
 	mNearestDistance = std::numeric_limits<double>::max ( );
 
 	int mouseX = ofGetMouseX ( );
 	int mouseY = ofGetMouseY ( );
 
-	for ( int rayPoint = 0; rayPoint < 10; rayPoint++ )
+	if ( !b3D )
+	{
+		// 2D nearest
+
+		glm::vec3 rayPosition = mCamera->screenToWorld ( glm::vec3 ( mouseX, mouseY, 0 ) );
+		
+		if ( !bDimensionsFilled[0] ) { rayPosition.x = 0; }
+		if ( !bDimensionsFilled[1] ) { rayPosition.y = 0; }
+		if ( !bDimensionsFilled[2] ) { rayPosition.z = 0; }
+
+		fluid::RealVector query ( 2 );
+
+		query[0] = ofMap ( rayPosition.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+		query[1] = ofMap ( rayPosition.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+
+		auto [dist, id] = mKDTree.kNearest ( query, 1, maxAllowedDistance );
+
+		if ( dist.size ( ) == 0 ) { return; }
+
+		if ( dist[0] < mNearestDistance )
+		{
+			mNearestDistance = dist[0];
+			mNearestPoint = std::stoi ( *id[0] );
+			mNearestPointFile = mCorpusFileLookUp[mNearestPoint];
+			if ( mCorpusTimeLookUp.size ( ) > 0 ) { mNearestPointTime = mCorpusTimeLookUp[mNearestPoint]; }
+		}
+
+		testDrawPoints.push_back ( rayPosition );
+
+		return;
+	}
+
+	// 3D nearest
+
+	double desiredRayLenght = 1000.0f;
+	double rayPointSpacing = 2 * ofMap ( maxAllowedDistance, 0.0, 1.0, 0.0, SpaceDefs::mSpaceMax - SpaceDefs::mSpaceMin, false );
+	int rayPointAmount = desiredRayLenght / rayPointSpacing;
+
+	for ( int rayPoint = 0; rayPoint < rayPointAmount; rayPoint++ )
 	{
 		glm::vec3 rayDirection = mCamera->screenToWorld ( glm::vec3 ( mouseX, mouseY, 0 ) );
 		rayDirection = glm::normalize ( rayDirection - mCamera->getPosition ( ) );
-		double depth = rayPoint * 100.0f;
+		double depth = rayPoint * rayPointSpacing;
 		glm::vec3 rayPointPosition = mCamera->getPosition ( ) + glm::vec3 ( rayDirection.x * depth, 
 																			rayDirection.y * depth, 
 																			rayDirection.z * depth );
@@ -167,6 +229,10 @@ void Explorer::PointPicker::FindNearest ( )
 		{
 			mNearestDistance = dist[0];
 			mNearestPoint = std::stoi ( *id[0] );
+			mNearestPointFile = mCorpusFileLookUp[mNearestPoint];
+			if ( mCorpusTimeLookUp.size ( ) > 0 ) { mNearestPointTime = mCorpusTimeLookUp[mNearestPoint]; }
 		}
+
+		testDrawPoints.push_back ( rayPointPosition );
 	}
 }

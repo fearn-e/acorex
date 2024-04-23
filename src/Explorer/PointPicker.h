@@ -34,7 +34,8 @@ public:
 	void SetCamera ( std::shared_ptr<ofCamera> camera ) { mCamera = camera; }
 	void SetNearestCheckNeeded ( ) { bNearestCheckNeeded = true; }
 
-	int GetNearestPoint ( ) const { return mNearestPoint; }
+	int GetNearestPointFile ( ) const { return mNearestPointFile; }
+	int GetNearestPointTime ( ) const { return mNearestPointTime; }
 	double GetNearestDistance ( ) const { return mNearestDistance; }
 	bool IsTrained ( ) const { return bTrained; }
 
@@ -71,10 +72,13 @@ private:
 	fluid::FluidDataSet<std::string, double, 1> mFullFluidSet;
 	fluid::FluidDataSet<std::string, double, 1> mLiveFluidSet;
 	fluid::algorithm::DataSetQuery mFluidSetQuery;
-	std::vector<int> mCorpusFileLookUp;
-	std::vector<int> mCorpusTimepointLookUp;
+	std::vector<int> mCorpusFileLookUp; int mNearestPointFile = -1;
+	std::vector<int> mCorpusTimeLookUp; int mNearestPointTime = -1;
 	
 	Utils::DatasetConversion mDatasetConversion;
+
+	// temp test
+	std::vector<glm::vec3> testDrawPoints;
 };
 
 } // namespace Explorer
