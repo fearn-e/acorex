@@ -50,8 +50,8 @@ bool Analyser::Controller::ReduceCorpus ( const std::string& inputPath, const st
 	success = mUMAP.Fit ( dataset, settings );
 	if ( !success ) { return false; }
 
-	dataset.analysisSettings.currentDimensionCount = settings.dimensionReductionTarget;
-	GenerateDimensionNames ( dataset.dimensionNames, settings );
+	dataset.analysisSettings.currentDimensionCount = settings.dimensionReductionTarget + 1;
+	GenerateDimensionNames ( dataset.dimensionNames, settings, dataset.analysisSettings.bTime );
 
 	success = mJSON.Write ( outputPath, dataset );
 	if ( !success ) { return false; }
@@ -330,9 +330,11 @@ void Analyser::Controller::GenerateDimensionNames ( std::vector<std::string>& di
 	}
 }
 
-void Analyser::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::ReductionSettings& settings )
+void Analyser::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::ReductionSettings& settings, bool time )
 {
 	dimensionNames.clear ( );
+
+	if ( time ) { dimensionNames.push_back ( "Time" ); }
 
 	for ( int i = 0; i < settings.dimensionReductionTarget; i++ )
 	{
