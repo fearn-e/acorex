@@ -30,6 +30,7 @@ void Explorer::LiveView::Initialise ( )
 void Explorer::LiveView::Exit ( )
 {
 	RemoveListeners ( );
+	mPointPicker.Exit ( );
 }
 
 void Explorer::LiveView::RemoveListeners ( )

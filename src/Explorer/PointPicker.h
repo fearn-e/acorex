@@ -19,14 +19,19 @@ public:
 
 	void Initialise ( const Utils::DataSet& dataset, const Utils::DimensionBounds& dimensionBounds );
 
-	void FindNearest ( );
 	void Train ( int dimensionIndex, Utils::Axis axis, bool none );
 
+	void Exit ( );
+	void RemoveListeners ( );
+
 	void SlowUpdate ( );
+	void Draw ( );
+
+	void FindNearest ( );
 
 	// Setters & Getters ----------------------------
 
-	void SetCamera ( std::shared_ptr<ofCamera> camera ) { mCamera = camera; }
+	void SetNearestCheckNeeded ( ) { bNearestCheckNeeded = true; }
 
 	int GetNearestPoint ( ) const { return mNearestPoint; }
 	double GetNearestDistance ( ) const { return mNearestDistance; }
@@ -35,12 +40,24 @@ public:
 private:
 	void ScaleDataset ( Utils::DataSet& scaledDataset, const Utils::DimensionBounds& dimensionBounds );
 
+	// Listeners ------------------------------------
+
+	void MouseMoved ( ofMouseEventArgs& args ) { bNearestCheckNeeded = true; }
+
+	// States ---------------------------------------
+
+	bool bDraw = false;
+	bool b3D = true;
 	bool bTrained = false;
 	bool bSkipTraining = true;
-	
-	bool mDimensionsFilled[3] = { false, false, false };
+	bool bListenersAdded = false;
+	bool bNearestCheckNeeded = false;
+	bool bDimensionsFilled[3] = { false, false, false };
+
+	// Variables ------------------------------------
+
 	int mDimensionsIndices[3] = { -1, -1, -1 };
-	
+
 	int mNearestPoint = -1;
 	double mNearestDistance = -1;
 
@@ -51,9 +68,9 @@ private:
 	fluid::FluidDataSet<std::string, double, 1> mFullFluidSet;
 	fluid::FluidDataSet<std::string, double, 1> mLiveFluidSet;
 	fluid::algorithm::DataSetQuery mFluidSetQuery;
+	std::vector<int> mCorpusFileLookUp;
+	std::vector<int> mCorpusTimepointLookUp;
 	
-	std::shared_ptr<ofCamera> mCamera;
-
 	Utils::DatasetConversion mDatasetConversion;
 };
 
