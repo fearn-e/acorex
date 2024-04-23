@@ -11,6 +11,15 @@
 namespace Acorex {
 namespace Utils {
 
+enum class Axis : int {
+	X = 0,
+	Y = 1,
+	Z = 2,
+	COLOR = 3,
+	NONE = 4,
+	MULTIPLE = 5
+};
+
 struct TimeData {
 	int hopSize = 0;
 	std::vector<double> sampleRates; // [file]
