@@ -125,6 +125,9 @@ void Explorer::LiveView::Draw ( )
 
 	// Draw Nearest Point -----------------------
 	mPointPicker.Draw ( );
+
+	ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )], 50, 90 );
+	ofDrawBitmapStringHighlight ( "Nearest Timepoint: " + std::to_string ( mPointPicker.GetNearestPointTime ( ) ), 50, 110 );
 }
 
 // Filler Functions ----------------------------
