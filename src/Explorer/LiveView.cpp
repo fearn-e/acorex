@@ -4,8 +4,6 @@
 #include <of3dUtils.h>
 #include <ofEvents.h>
 
-#include <of3dGraphics.h>
-
 using namespace Acorex;
 
 void Explorer::LiveView::Initialise ( )
@@ -82,9 +80,7 @@ void Explorer::LiveView::Draw ( )
 	ofEnableDepthTest ( );
 	mCamera.begin ( );
 
-	ofSetColor ( 255, 0, 0 );
-	ofDrawSphere ( mCamPivot, 10 );
-
+	// Draw Axis ------------------------------
 	ofSetColor ( 255, 255, 255 );
 
 	if ( mDisabledAxis != Utils::Axis::X ) { ofDrawLine ( { mSpaceMin, 0, 0 }, { mSpaceMax, 0, 0 } ); }
@@ -95,7 +91,6 @@ void Explorer::LiveView::Draw ( )
 	if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawBitmapString ( yLabel , { 0, mSpaceMax, 0 } ); }
 	if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawBitmapString ( zLabel , { 0, 0, mSpaceMax } ); }
 	
-
 	// Draw points ------------------------------
 	if ( mRawView->IsTimeAnalysis ( ) ) // Time
 	{
