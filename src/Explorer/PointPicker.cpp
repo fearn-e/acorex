@@ -188,6 +188,7 @@ void Explorer::PointPicker::Draw ( )
 
 void Explorer::PointPicker::FindNearest ( )
 {
+	if ( !ofGetMousePressed ( 2 ) && !ofGetKeyPressed ( 'c' ) ) { return; }
 	if ( !bTrained ) { return; }
 	if ( !bNearestCheckNeeded ) { return; }
 	bNearestCheckNeeded = false;
