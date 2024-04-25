@@ -1,19 +1,17 @@
-#pragma once
-
 #include "./GenAnalysis.h"
 #include <ofLog.h>
 #include <omp.h>
 
-#ifndef DATA_CHANGE_CHECK_8
+#ifndef DATA_CHANGE_CHECK_1
 #error "Check if dataset is still used correctly"
 #endif
 
-int AcorexAnalyse::GenAnalysis::ProcessFiles ( AcorexUtils::DataSet& dataset )
+using namespace Acorex;
+
+int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 {  
     if ( dataset.analysisSettings.bTime )
     {
-        dataset.time.samples.clear ( );
-        dataset.time.seconds.clear ( );
         dataset.time.raw.clear ( );
     }
 	else
@@ -24,12 +22,13 @@ int AcorexAnalyse::GenAnalysis::ProcessFiles ( AcorexUtils::DataSet& dataset )
     int analysedFileIndex = 0;
     std::vector<std::string> analysedFiles;
 
+    fluid::index numTimeDimensions = dataset.analysisSettings.bTime         ? 1 : 0;
     fluid::index numPitchDimensions = dataset.analysisSettings.bPitch       ? 2 : 0;
     fluid::index numLoudnessDimensions = dataset.analysisSettings.bLoudness ? 2 : 0;
     fluid::index numShapeDimensions = dataset.analysisSettings.bShape       ? 7 : 0;
     fluid::index numMFCCDimensions = dataset.analysisSettings.bMFCC         ? dataset.analysisSettings.nCoefs : 0;
 
-    fluid::index numDimensions = numPitchDimensions + numLoudnessDimensions + numShapeDimensions + numMFCCDimensions;
+    fluid::index numDimensions = numTimeDimensions + numPitchDimensions + numLoudnessDimensions + numShapeDimensions + numMFCCDimensions;
 
     if ( dataset.analysisSettings.currentDimensionCount > 0 )
     {
@@ -63,24 +62,10 @@ int AcorexAnalyse::GenAnalysis::ProcessFiles ( AcorexUtils::DataSet& dataset )
 
     for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
     {
-        const char* inputFileName = dataset.fileList[fileIndex].c_str ( );
-        htl::in_audio_file file ( inputFileName );
-
-        if ( !file.is_open ( ) )
-        {
-            ofLogError ( "GenAnalysis" ) << "input file " << inputFileName << " could not be opened";
-            continue;
-        }
-
-        if ( file.is_error ( ) )
-        {
-            ofLogError ( "GenAnalysis" ) << "input file " << inputFileName << " is not supported";
-            continue;
-        }
-
-        auto samplingRate = file.sampling_rate ( );
-        fluid::RealVector in ( file.frames ( ) );
-        ReadMono ( in, file );
+        double samplingRate = 0;
+        fluid::RealVector in ( 0 );
+        bool success = ReadFile ( dataset.fileList[fileIndex], in, samplingRate );
+        if ( !success ) { continue; }
 
         fluid::algorithm::STFT stft { dataset.analysisSettings.windowFFTSize, dataset.analysisSettings.windowFFTSize, hopSize };
         fluid::algorithm::MelBands bands { dataset.analysisSettings.nBands, dataset.analysisSettings.windowFFTSize };
@@ -150,15 +135,12 @@ int AcorexAnalyse::GenAnalysis::ProcessFiles ( AcorexUtils::DataSet& dataset )
 
         if ( dataset.analysisSettings.bTime )
         {
-            dataset.time.samples.push_back ( std::vector<double> ( ) );
-            dataset.time.seconds.push_back ( std::vector<double> ( ) );
+            std::vector<std::vector<double>> allVectors ( nFrames );
+
             for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
             {
-                dataset.time.samples[analysedFileIndex].push_back ( frameIndex * hopSize );
-                dataset.time.seconds[analysedFileIndex].push_back ( (frameIndex * hopSize) / samplingRate );
+                allVectors[frameIndex].push_back ( frameIndex * hopSize / samplingRate );
             }
-
-            std::vector<std::vector<double>> allVectors ( nFrames );
 
 			if ( dataset.analysisSettings.bPitch )
 			{
@@ -228,7 +210,8 @@ int AcorexAnalyse::GenAnalysis::ProcessFiles ( AcorexUtils::DataSet& dataset )
         }
 
         analysedFileIndex++;
-        analysedFiles.push_back ( inputFileName );
+        analysedFiles.push_back ( dataset.fileList[fileIndex] );
+        ofLogNotice ( "GenAnalysis" ) << analysedFileIndex / (float)dataset.fileList.size ( ) * 100 << "% | Analysed " << dataset.fileList[fileIndex];
     }
 
     dataset.fileList.clear ( );
@@ -237,7 +220,59 @@ int AcorexAnalyse::GenAnalysis::ProcessFiles ( AcorexUtils::DataSet& dataset )
     return analysedFileIndex;
 }
 
-void AcorexAnalyse::GenAnalysis::ReadMono ( fluid::RealVector& output, htl::in_audio_file& file )
+bool Analyser::GenAnalysis::ReadFile ( std::string filename, fluid::RealVector& output, double& sampleRate )
+{
+    //if file ends in .wav, .aiff, .flac - use htl::in_audio_file
+    //if file ends in .mp3, .ogg - use ofxAudioFile
+
+    if ( !ofFile::doesFileExist ( filename ) )
+    {
+		ofLogError ( "GenAnalysis" ) << "input file " << filename << " does not exist";
+		return false;
+	}
+
+    if ( filename.find ( ".wav" ) != std::string::npos || filename.find ( ".aiff" ) != std::string::npos || filename.find ( ".flac" ) != std::string::npos )
+    {
+        htl::in_audio_file file ( filename.c_str ( ) );
+
+        if ( !file.is_open ( ) )
+        {
+            ofLogError ( "GenAnalysis" ) << "input file " << filename << " could not be opened";
+            return false;
+        }
+
+        if ( file.is_error ( ) )
+        {
+            ofLogError ( "GenAnalysis" ) << "input file " << filename << " is not supported";
+            return false;
+        }
+
+        output.resize ( file.frames ( ) );
+        sampleRate = file.sampling_rate ( );
+
+        ReadToMono ( output, file );
+    }
+    else if ( filename.find ( ".mp3" ) != std::string::npos || filename.find ( ".ogg" ) != std::string::npos )
+    {
+		ofxAudioFile file;
+		file.load ( filename );
+
+        if ( !file.loaded ( ) )
+        {
+			ofLogError ( "GenAnalysis" ) << "input file " << filename << " could not be opened";
+			return false;
+		}
+
+		output.resize ( file.length ( ) );
+		sampleRate = file.samplerate ( );
+
+		ReadToMono ( output, file );
+	}
+
+    return true;
+}
+
+void Analyser::GenAnalysis::ReadToMono ( fluid::RealVector& output, htl::in_audio_file& file )
 {
     int numChannels = file.channels ( );
     int numSamples = file.frames ( );
@@ -269,7 +304,34 @@ void AcorexAnalyse::GenAnalysis::ReadMono ( fluid::RealVector& output, htl::in_a
 
 }
 
-fluid::RealVector AcorexAnalyse::GenAnalysis::ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats )
+void Analyser::GenAnalysis::ReadToMono ( fluid::RealVector& output, ofxAudioFile& file )
+{
+    int numChannels = file.channels ( );
+    int numSamples = file.length ( );
+
+    if ( numChannels == 1 )
+    {
+        for ( int sample = 0; sample < numSamples; sample++ )
+        {
+			output[sample] = file.sample ( sample, 0 );
+		}
+        return;
+    }
+
+    std::fill ( output.begin ( ), output.end ( ), 0 );
+
+#pragma omp parallel for
+    for ( int sample = 0; sample < numSamples; sample++ )
+    {
+        for ( int channel = 0; channel < numChannels; channel++ )
+        {
+			output[sample] += file.sample ( sample, channel );
+		}
+		output[sample] /= numChannels;
+	}
+}
+
+fluid::RealVector Analyser::GenAnalysis::ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats )
 {
     fluid::index      dim = matrix.cols ( );
     fluid::RealMatrix tmp ( dim, 7 );
@@ -282,7 +344,7 @@ fluid::RealVector AcorexAnalyse::GenAnalysis::ComputeStats ( fluid::RealMatrixVi
     return result;
 }
 
-void AcorexAnalyse::GenAnalysis::Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions )
+void Analyser::GenAnalysis::Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>>& fileData, int numDimensions )
 {
     for ( fluid::index dimension = 0; dimension < numDimensions; dimension++ )
     {

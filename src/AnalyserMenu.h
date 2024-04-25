@@ -2,25 +2,25 @@
 
 #include "Utils/Data.h"
 #include "Utils/JSON.h"
-#include "Analyse/Controller.h"
+#include "Analyser/Controller.h"
 #include "Utils/InterfaceDefs.h"
 #include <ofxGui.h>
 #include <ofSystemUtils.h>
 
-namespace AcorexAnalyse {
+namespace Acorex {
 
-class ControllerMenu {
+class AnalyserMenu {
 public:
-	ControllerMenu ( ) { };
-	~ControllerMenu ( ) { };
+	AnalyserMenu ( );
+	~AnalyserMenu ( ) { };
 
-	void Setup ( );
+	void Initialise ( );
+	void Show ( );
+	void Hide ( );
 	void Draw ( );
 	void Exit ( );
 
 private:
-	// Setup --------------------------------------
-	void Reset ( );
 	void RemoveListeners ( );
 
 	// Analyse and Reduce --------------------------
@@ -37,9 +37,9 @@ private:
 
 	// Load and Save Settings ----------------------
 
-	void UnpackSettingsFromFile ( const AcorexUtils::AnalysisSettings& settings );
-	void PackSettingsFromUser ( AcorexUtils::AnalysisSettings& settings);
-	void PackSettingsFromUser ( AcorexUtils::ReductionSettings& settings );
+	void UnpackSettingsFromFile ( const Utils::AnalysisSettings& settings );
+	void PackSettingsFromUser ( Utils::AnalysisSettings& settings);
+	void PackSettingsFromUser ( Utils::ReductionSettings& settings );
 
 	// UI Value Management -------------------------
 
@@ -57,6 +57,9 @@ private:
 	void ShowReductionPanel ( );
 
 	// State --------------------------------------
+
+	bool bDraw;
+	bool bProcessing;
 
 	bool bDrawMainPanel;
 	bool bDrawAnalysisPanel;
@@ -133,13 +136,12 @@ private:
 	ofxButton mConfirmReductionButton;
 	ofxButton mCancelReductionButton;
 
+	// Acorex Objects ------------------------------
 
-
-
-	AcorexAnalyse::Controller mController;
-	AcorexUtils::JSON mJSON;
-	AcorexUtils::Colors mColors;
-	AcorexUtils::ControllerUILayout mLayout;
+	Analyser::Controller mController;
+	Utils::JSON mJSON;
+	Utils::Colors mColors;
+	Utils::MenuLayout mLayout;
 };
 
-} // namespace AcorexAnalyse
+} // namespace Acorex

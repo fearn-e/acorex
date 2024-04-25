@@ -5,19 +5,75 @@ void ofApp::setup ( )
 	ofSetVerticalSync ( true );
 	ofBackground ( 30 );
 
-	mControllerMenu.Setup ( );
+	mAnalyserMenu.Initialise ( );
+	mExplorerMenu.Initialise ( );
+
+	mAnalyseToggle.setup ( "Analyse", false, 100, mLayout.topBarHeight / 2 );
+	mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout.topBarHeight / 4 );
+	mAnalyseToggle.setBackgroundColor ( mColors.transparent );
+
+	mExploreToggle.setup ( "Explore", false, 100, mLayout.topBarHeight / 2 );
+	mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout.topBarHeight / 4 );
+	mExploreToggle.setBackgroundColor ( mColors.transparent );
+	
+	mAnalyseToggle.addListener ( this, &ofApp::AnalyseToggled );
+	mExploreToggle.addListener ( this, &ofApp::ExploreToggled );
 }
 
 void ofApp::update ( )
 {
+	mExplorerMenu.Update ( );
 }
 
 void ofApp::draw ( )
 {
-	mControllerMenu.Draw ( );
+	mExplorerMenu.Draw ( );
+	mAnalyserMenu.Draw ( );
+
+	{
+		ofSetColor ( mColors.interfaceBackgroundColor );
+		ofDrawRectangle ( 0, 0, ofGetWidth ( ), mLayout.topBarHeight );
+
+		mAnalyseToggle.draw ( );
+		mExploreToggle.draw ( );
+	}
+
+	ofDrawBitmapStringHighlight ( "fps: " + ofToString ( ofGetFrameRate ( ) ), 20, ofGetHeight ( ) - 20 );
 }
 
 void ofApp::exit ( )
 {
-	mControllerMenu.Exit ( );
+	mAnalyserMenu.Exit ( );
+}
+
+void ofApp::windowResized ( int w, int h )
+{
+	mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout.topBarHeight / 4 );
+	mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout.topBarHeight / 4 );
+
+	mExplorerMenu.WindowResized ( );
+}
+
+void ofApp::AnalyseToggled ( bool& value )
+{
+	if ( value )
+	{
+		mAnalyserMenu.Show ( );
+	}
+	else
+	{
+		mAnalyserMenu.Hide ( );
+	}
+}
+
+void ofApp::ExploreToggled ( bool& value )
+{
+	if ( value )
+	{
+		mExplorerMenu.Show ( );
+	}
+	else
+	{
+		mExplorerMenu.Hide ( );
+	}
 }

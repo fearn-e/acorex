@@ -1,1 +1,3 @@
+ofxAudioFile
+ofxDropdown
 ofxGui

@@ -15,24 +15,30 @@
 #include <data/FluidJSON.hpp>
 #include <data/FluidMemory.hpp>
 #include <data/TensorTypes.hpp>
+#include <ofxAudioFile.h>
 #include <vector>
 #include <string>
 
-namespace AcorexAnalyse {
+namespace Acorex {
+namespace Analyser {
 
 class GenAnalysis {
 public:
 	GenAnalysis ( ) { };
 	~GenAnalysis ( ) { };
 
-	int ProcessFiles ( AcorexUtils::DataSet& dataset );
+	int ProcessFiles ( Utils::DataSet& dataset );
 
 private:
-	void ReadMono ( fluid::RealVector& output, htl::in_audio_file& file );
+	bool ReadFile ( std::string filename, fluid::RealVector& output, double& sampleRate );
+
+	void ReadToMono ( fluid::RealVector& output, htl::in_audio_file& file );
+	void ReadToMono ( fluid::RealVector& output, ofxAudioFile& file );
 
 	fluid::RealVector ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats );
 
-	void Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>> fileData, int numDimensions );
+	void Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>>& fileData, int numDimensions );
 };
 
-} // namespace AcorexAnalyse
+} // namespace Analyser
+} // namespace Acorex

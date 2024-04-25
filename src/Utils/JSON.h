@@ -3,7 +3,8 @@
 #include "Utils/Data.h"
 #include <nlohmann/json.hpp>
 
-namespace AcorexUtils {
+namespace Acorex {
+namespace Utils {
 
 class JSON {
 
@@ -29,4 +30,5 @@ void from_json ( const nlohmann::json& j, DataSet& a );
 void to_json ( nlohmann::json& j, const AnalysisSettings& a );
 void from_json ( const nlohmann::json& j, AnalysisSettings& a );
 
-} // namespace AcorexUtils
+} // namespace Utils
+} // namespace Acorex

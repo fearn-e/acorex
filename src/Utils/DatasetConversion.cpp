@@ -1,39 +1,12 @@
-#pragma once
+#include "./DatasetConversion.h"
 
-#include "./UMAP.h"
-#include "ofLog.h"
+using namespace Acorex;
 
-bool AcorexAnalyse::UMAP::Fit ( AcorexUtils::DataSet& dataset, const AcorexUtils::ReductionSettings& settings )
-{
-    fluid::algorithm::UMAP algorithm;
-
-	fluid::FluidDataSet<std::string, double, 1> fluidsetIN ( dataset.analysisSettings.currentDimensionCount );
-	fluid::FluidDataSet<std::string, double, 1> fluidsetOUT ( settings.dimensionReductionTarget );
-
-	std::vector<int> filePointLength ( dataset.analysisSettings.bTime ? dataset.fileList.size ( ) : 0, 0 );
-
-	CorpusToFluid ( fluidsetIN, dataset, filePointLength );
-
-	fluid::index k = 15;
-
-	if ( dataset.currentPointCount < 15 ) // TODO - double check exactly how k in UMAP works
-	{
-		k = dataset.currentPointCount;
-	}
-
-	fluidsetOUT = algorithm.train ( fluidsetIN, k, settings.dimensionReductionTarget, 0.1, settings.maxIterations, 0.1 );
-
-	FluidToCorpus ( dataset, fluidsetOUT, filePointLength, settings.dimensionReductionTarget );
-
-	dataset.analysisSettings.hasBeenReduced = true;
-
-    return true;
-}
-
-void AcorexAnalyse::UMAP::CorpusToFluid ( fluid::FluidDataSet<std::string, double, 1>& fluidset, const AcorexUtils::DataSet& dataset, std::vector<int>& filePointLength )
+void Utils::DatasetConversion::CorpusToFluid ( fluid::FluidDataSet<std::string, double, 1>& fluidset, const Utils::DataSet& dataset, std::vector<int>& filePointLength )
 {
 	if ( dataset.analysisSettings.bTime )
-	{	
+	{
+		filePointLength.resize ( dataset.time.raw.size ( ) );
 		int fileMarker = 0;
 
 		for ( int file = 0; file < dataset.time.raw.size ( ); file++ )
@@ -53,19 +26,37 @@ void AcorexAnalyse::UMAP::CorpusToFluid ( fluid::FluidDataSet<std::string, doubl
 			filePointLength[file] = dataset.time.raw[file].size ( );
 			fileMarker += dataset.time.raw[file].size ( );
 		}
+
+		return;
 	}
-	else
+	
+	if ( !dataset.analysisSettings.hasBeenReduced )
 	{
 		for ( int file = 0; file < dataset.stats.raw.size ( ); file++ )
 		{
-			fluid::RealVector point ( dataset.analysisSettings.currentDimensionCount );
-			
+			fluid::RealVector point ( dataset.dimensionNames.size ( ) );
+
 			for ( int dimension = 0; dimension < dataset.stats.raw[file].size ( ); dimension++ )
 			{
 				for ( int statistic = 0; statistic < dataset.stats.raw[file][dimension].size ( ); statistic++ )
 				{
-					point[( dimension * DATA_NUM_STATS ) + statistic] = dataset.stats.raw[file][dimension][statistic];
+					point[(dimension * DATA_NUM_STATS) + statistic] = dataset.stats.raw[file][dimension][statistic];
 				}
+			}
+
+			fluidset.add ( std::to_string ( file ), point );
+		}
+		return;
+	}
+
+	{
+		for ( int file = 0; file < dataset.stats.reduced.size ( ); file++ )
+		{
+			fluid::RealVector point ( dataset.stats.reduced[file].size ( ) );
+
+			for ( int dimension = 0; dimension < dataset.stats.reduced[file].size ( ); dimension++ )
+			{
+				point[dimension] = dataset.stats.reduced[file][dimension];
 			}
 
 			fluidset.add ( std::to_string ( file ), point );
@@ -73,7 +64,7 @@ void AcorexAnalyse::UMAP::CorpusToFluid ( fluid::FluidDataSet<std::string, doubl
 	}
 }
 
-void AcorexAnalyse::UMAP::FluidToCorpus ( AcorexUtils::DataSet& dataset, const fluid::FluidDataSet<std::string, double, 1>& fluidset, const std::vector<int>& filePointLength, const int reducedDimensionCount )
+void Utils::DatasetConversion::FluidToCorpus ( Utils::DataSet& dataset, const fluid::FluidDataSet<std::string, double, 1>& fluidset, const std::vector<int>& filePointLength, const int reducedDimensionCount )
 {
 	if ( dataset.analysisSettings.bTime )
 	{

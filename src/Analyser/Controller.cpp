@@ -1,16 +1,16 @@
-#pragma once
-
 #include "./Controller.h"
 #include <ofLog.h>
 #include <filesystem>
 
+using namespace Acorex;
+
 // Public --------------------------------------------------------------------
 
-bool AcorexAnalyse::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexUtils::AnalysisSettings& settings )
+bool Analyser::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const Utils::AnalysisSettings& settings )
 {
 	bool success;
 
-	AcorexUtils::DataSet dataset;
+	Utils::DataSet dataset;
 
 	dataset.analysisSettings = settings;
 
@@ -38,11 +38,11 @@ bool AcorexAnalyse::Controller::CreateCorpus ( const std::string& inputPath, con
 	return true;
 }
 
-bool AcorexAnalyse::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const AcorexUtils::ReductionSettings& settings )
+bool Analyser::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const Utils::ReductionSettings& settings )
 {
 	bool success;
 
-	AcorexUtils::DataSet dataset;
+	Utils::DataSet dataset;
 
 	success = mJSON.Read ( inputPath, dataset );
 	if ( !success ) { return false; }
@@ -50,8 +50,8 @@ bool AcorexAnalyse::Controller::ReduceCorpus ( const std::string& inputPath, con
 	success = mUMAP.Fit ( dataset, settings );
 	if ( !success ) { return false; }
 
-	dataset.analysisSettings.currentDimensionCount = settings.dimensionReductionTarget;
-	GenerateDimensionNames ( dataset.dimensionNames, settings );
+	dataset.analysisSettings.currentDimensionCount = settings.dimensionReductionTarget + 1;
+	GenerateDimensionNames ( dataset.dimensionNames, settings, dataset.analysisSettings.bTime );
 
 	success = mJSON.Write ( outputPath, dataset );
 	if ( !success ) { return false; }
@@ -59,11 +59,11 @@ bool AcorexAnalyse::Controller::ReduceCorpus ( const std::string& inputPath, con
 	return true;
 }
 
-bool AcorexAnalyse::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const bool newReplacesExisting )
+bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const bool newReplacesExisting )
 {
 	bool success;
 
-	AcorexUtils::DataSet existingDataset;
+	Utils::DataSet existingDataset;
 	success = mJSON.Read ( outputPath, existingDataset );
 	if ( !success ) { return false; }
 
@@ -107,10 +107,10 @@ bool AcorexAnalyse::Controller::InsertIntoCorpus ( const std::string& inputPath,
 		ofLogNotice ( "Controller" ) << newFiles.size ( ) << " new files left to process, with " << preTreated - newFiles.size ( ) << " duplicates removed.";
 	}
 
-	AcorexUtils::DataSet newDataset;
+	Utils::DataSet newDataset;
 	newDataset.fileList = newFiles;
 	newDataset.analysisSettings = existingDataset.analysisSettings;
-#ifndef DATA_CHANGE_CHECK_8
+#ifndef DATA_CHANGE_CHECK_1
 #error "check if this is still valid with dataset structure"
 #endif
 
@@ -146,7 +146,7 @@ bool AcorexAnalyse::Controller::InsertIntoCorpus ( const std::string& inputPath,
 
 // Private -------------------------------------------------------------------
 
-std::vector<int> AcorexAnalyse::Controller::MergeDatasets ( AcorexUtils::DataSet& primaryDataset, const AcorexUtils::DataSet& additionalDataset, const bool additionalReplacesPrimary )
+std::vector<int> Analyser::Controller::MergeDatasets ( Utils::DataSet& primaryDataset, const Utils::DataSet& additionalDataset, const bool additionalReplacesPrimary )
 {
 	int filesSkipped = 0;
 	int filesAdded = 0;
@@ -183,8 +183,6 @@ std::vector<int> AcorexAnalyse::Controller::MergeDatasets ( AcorexUtils::DataSet
 			if ( primaryDataset.analysisSettings.bTime )
 			{ // Time
 				pointCountDiff = additionalDataset.time.raw[i].size ( ) - primaryDataset.time.raw[existingIndex].size ( ); // TODO - DOUBLE CHECK THIS
-				primaryDataset.time.samples[existingIndex] = additionalDataset.time.samples[i];
-				primaryDataset.time.seconds[existingIndex] = additionalDataset.time.seconds[i];
 				primaryDataset.time.raw[existingIndex] = additionalDataset.time.raw[i];
 			}
 			else
@@ -208,8 +206,6 @@ std::vector<int> AcorexAnalyse::Controller::MergeDatasets ( AcorexUtils::DataSet
 			if ( primaryDataset.analysisSettings.bTime )
 			{ // Time
 				pointCountDiff = additionalDataset.time.raw[i].size ( ); // TODO - DOUBLE CHECK THIS
-				primaryDataset.time.samples.push_back ( additionalDataset.time.samples[i] );
-				primaryDataset.time.seconds.push_back ( additionalDataset.time.seconds[i] );
 				primaryDataset.time.raw.push_back ( additionalDataset.time.raw[i] );
 			}
 			else
@@ -227,7 +223,7 @@ std::vector<int> AcorexAnalyse::Controller::MergeDatasets ( AcorexUtils::DataSet
 	return std::vector<int> { filesSkipped, filesAdded, filesOverwritten };
 }
 
-bool AcorexAnalyse::Controller::SearchDirectory ( const std::string& directory, std::vector<std::string>& files )
+bool Analyser::Controller::SearchDirectory ( const std::string& directory, std::vector<std::string>& files )
 {
 	files.clear ( );
 
@@ -241,7 +237,9 @@ bool AcorexAnalyse::Controller::SearchDirectory ( const std::string& directory, 
 		// TODO - add mp3 and ogg support
 		if ( entry.path ( ).extension ( ) != ".wav" &&
 			entry.path ( ).extension ( ) != ".aiff" &&
-			entry.path ( ).extension ( ) != ".flac" )
+			entry.path ( ).extension ( ) != ".flac" &&
+			entry.path ( ).extension ( ) != ".mp3" &&
+			entry.path ( ).extension ( ) != ".ogg" )
 		{
 			continue;
 		}
@@ -258,12 +256,14 @@ bool AcorexAnalyse::Controller::SearchDirectory ( const std::string& directory, 
 	return true;
 }
 
-void AcorexAnalyse::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexUtils::AnalysisSettings& settings )
+void Analyser::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::AnalysisSettings& settings )
 {
 	dimensionNames.clear ( );
 
 	if ( settings.bTime )
 	{ // Time
+		dimensionNames.push_back ( "Time" );
+
 		if ( settings.bPitch )
 		{
 			dimensionNames.push_back ( "Pitch" );
@@ -330,9 +330,11 @@ void AcorexAnalyse::Controller::GenerateDimensionNames ( std::vector<std::string
 	}
 }
 
-void AcorexAnalyse::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const AcorexUtils::ReductionSettings& settings )
+void Analyser::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::ReductionSettings& settings, bool time )
 {
 	dimensionNames.clear ( );
+
+	if ( time ) { dimensionNames.push_back ( "Time" ); }
 
 	for ( int i = 0; i < settings.dimensionReductionTarget; i++ )
 	{
@@ -340,13 +342,11 @@ void AcorexAnalyse::Controller::GenerateDimensionNames ( std::vector<std::string
 	}
 }
 
-void AcorexAnalyse::Controller::Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames )
+void Analyser::Controller::Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames )
 {
-	dimensionNames.push_back ( masterDimension + " (Mean)" );
-	dimensionNames.push_back ( masterDimension + " (Standard Deviation)" );
-	dimensionNames.push_back ( masterDimension + " (Skewness)" );
-	dimensionNames.push_back ( masterDimension + " (Kurtosis)" );
-	dimensionNames.push_back ( masterDimension + " (Low %)" );
-	dimensionNames.push_back ( masterDimension + " (Middle %)" );
-	dimensionNames.push_back ( masterDimension + " (High %)" );
+	Utils::DataSet temp;
+	for ( int i = 0; i < temp.statisticNames.size ( ); i++ )
+	{
+		dimensionNames.push_back ( masterDimension + " (" + temp.statisticNames[i] + ")" );
+	}
 }
