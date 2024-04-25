@@ -428,7 +428,9 @@ void Explorer::LiveView::Init3DCam ( )
 void Explorer::LiveView::Init2DCam ( Utils::Axis disabledAxis )
 { 
 	double midSpacePoint = (SpaceDefs::mSpaceMax + SpaceDefs::mSpaceMin ) / 2;
-	mCamera->setPosition ( midSpacePoint, midSpacePoint, midSpacePoint );
+	if ( disabledAxis == Utils::Axis::X ) { mCamera->setPosition ( -midSpacePoint, midSpacePoint, midSpacePoint ); }
+	else if ( disabledAxis == Utils::Axis::Y ) { mCamera->setPosition ( midSpacePoint, -midSpacePoint, midSpacePoint ); }
+	else { mCamera->setPosition ( midSpacePoint, midSpacePoint, midSpacePoint ); }
 	if ( disabledAxis == Utils::Axis::X ) { mCamera->lookAt ( { 0, midSpacePoint, midSpacePoint } ); }
 	else if ( disabledAxis == Utils::Axis::Y ) { mCamera->lookAt ( { midSpacePoint, 0, midSpacePoint } ); }
 	else { mCamera->lookAt ( { midSpacePoint, midSpacePoint, 0 } ); }
