@@ -20,6 +20,7 @@ namespace SpaceDefs {
 
 	static double mSpaceMin = 0; static double mSpaceMax = 5000;
 	static double mColorMin = 0; static double mColorMax = 215;
+	static double mColorBlue = 170; static double mColorRed = 255;
 
 } // namespace SpaceDefs
 

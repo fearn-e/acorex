@@ -39,6 +39,7 @@ private:
 	void SwapDimensionY ( string& dimension );
 	void SwapDimensionZ ( string& dimension );
 	void SwapDimensionColor ( string& dimension );
+	void SwitchColorSpectrum ( bool& fullSpectrum );
 
 	// States --------------------------------------
 
@@ -70,6 +71,7 @@ private:
 	unique_ptr<ofxDropdown> mDimensionDropdownY;
 	unique_ptr<ofxDropdown> mDimensionDropdownZ;
 	unique_ptr<ofxDropdown> mDimensionDropdownColor;
+	ofxToggle mColorSpectrumSwitcher;
 
 	// Acorex Objects ------------------------------
 

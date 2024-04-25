@@ -300,7 +300,8 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axi
 
 			if ( axis == Utils::Axis::COLOR )
 			{
-				value = ofMap ( value, min, max, SpaceDefs::mColorMin, SpaceDefs::mColorMax );
+				if ( bColorFullSpectrum ) { value = ofMap ( value, min, max, SpaceDefs::mColorMin, SpaceDefs::mColorMax ); }
+				else { value = ofMap ( value, min, max, SpaceDefs::mColorBlue, SpaceDefs::mColorRed ); }
 				ofColor currentColor = mTimeCorpus[file].getColor ( timepoint );
 				currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
 				mTimeCorpus[file].setColor ( timepoint, currentColor );
@@ -330,24 +331,24 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis ax
 
 	Utils::StatsData* stats = mRawView->GetStatsData ( );
 
+	double min = mDimensionBounds.GetMinBound ( dimensionIndex );
+	double max = mDimensionBounds.GetMaxBound ( dimensionIndex );
+
 	for ( int file = 0; file < stats->raw.size ( ); file++ )
 	{
+		double value = stats->raw[file][dividedDimensionIndex][statisticIndex];
+		
 		if ( axis == Utils::Axis::COLOR )
 		{
-			double value = ofMap (	stats->raw[file][dividedDimensionIndex][statisticIndex], 
-									mDimensionBounds.GetMinBound ( dimensionIndex ), 
-									mDimensionBounds.GetMaxBound ( dimensionIndex ), 
-									SpaceDefs::mColorMin, SpaceDefs::mColorMax );
+			if ( bColorFullSpectrum ) { value = ofMap ( value, min, max, SpaceDefs::mColorMin, SpaceDefs::mColorMax ); }
+			else { value = ofMap ( value, min, max, SpaceDefs::mColorBlue, SpaceDefs::mColorRed ); }
 			ofColor currentColor = mStatsCorpus.getColor ( file );
 			currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
 			mStatsCorpus.setColor ( file, currentColor );
 		}
 		else
 		{
-			double value = ofMap (	stats->raw[file][dividedDimensionIndex][statisticIndex], 
-									mDimensionBounds.GetMinBound ( dimensionIndex ), 
-									mDimensionBounds.GetMaxBound ( dimensionIndex ), 
-									SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
+			value = ofMap (  value, min, max, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
 			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
 			currentPoint[(int)axis] = value;
 			mStatsCorpus.setVertex ( file, currentPoint );
@@ -366,24 +367,24 @@ void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::
 
 	Utils::StatsData* stats = mRawView->GetStatsData ( );
 
+	double min = mDimensionBounds.GetMinBound ( dimensionIndex );
+	double max = mDimensionBounds.GetMaxBound ( dimensionIndex );
+
 	for ( int file = 0; file < stats->reduced.size ( ); file++ )
 	{
+		double value = stats->reduced[file][dimensionIndex];
+
 		if ( axis == Utils::Axis::COLOR )
 		{
-			double value = ofMap (	stats->reduced[file][dimensionIndex], 
-									mDimensionBounds.GetMinBound ( dimensionIndex ), 
-									mDimensionBounds.GetMaxBound ( dimensionIndex ), 
-									SpaceDefs::mColorMin, SpaceDefs::mColorMax );
+			if ( bColorFullSpectrum ) { value = ofMap ( value, min, max, SpaceDefs::mColorMin, SpaceDefs::mColorMax ); }
+			else { value = ofMap ( value, min, max, SpaceDefs::mColorBlue, SpaceDefs::mColorRed ); }
 			ofColor currentColor = mStatsCorpus.getColor ( file );
 			currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
 			mStatsCorpus.setColor ( file, currentColor );
 		}
 		else
 		{
-			double value = ofMap (	stats->reduced[file][dimensionIndex], 
-									mDimensionBounds.GetMinBound ( dimensionIndex ), 
-									mDimensionBounds.GetMaxBound ( dimensionIndex ),
-									SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
+			double value = ofMap ( value, min, max, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
 			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
 			currentPoint[(int)axis] = value;
 			mStatsCorpus.setVertex ( file, currentPoint );

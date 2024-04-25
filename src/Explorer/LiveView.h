@@ -52,6 +52,7 @@ public:
 
 	void SetRawView ( std::shared_ptr<RawView>& rawPointer ) { mRawView = rawPointer; }
 	void Set3D ( bool is3D ) { b3D = is3D; }
+	void SetColorFullSpectrum ( bool fullSpectrum ) { bColorFullSpectrum = fullSpectrum; }
 
 	bool Is3D ( ) const { return b3D; }
 
@@ -63,6 +64,7 @@ public:
 private:
 	bool bDraw = false;
 	bool b3D = true;
+	bool bColorFullSpectrum = false;
 
 	bool mKeyboardMoveState[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // W, A, S, D, R, F, Q, E, Z, X
 	float mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed;
