@@ -1,6 +1,7 @@
 #include "./LiveView.h"
 #include <ofLog.h>
-#include "ofGraphics.h"
+#include <of3dGraphics.h>
+#include <ofGraphics.h>
 #include <of3dUtils.h>
 #include <ofEvents.h>
 
@@ -168,8 +169,24 @@ void Explorer::LiveView::Draw ( )
 	}
 	else // Stats
 	{
-		mStatsCorpus.setMode ( OF_PRIMITIVE_POINTS );
-		mStatsCorpus.draw ( );
+		if ( mPointPicker.GetNearestPointFile ( ) == -1 )
+		{
+			mStatsCorpus.enableColors ( );
+			mStatsCorpus.setMode ( OF_PRIMITIVE_POINTS );
+			mStatsCorpus.draw ( );
+		}
+		else
+		{
+			mStatsCorpus.disableColors ( );
+			ofSetColor ( 255, 255, 255, 25 );
+			mStatsCorpus.setMode ( OF_PRIMITIVE_POINTS );
+			mStatsCorpus.draw ( );
+
+			ofDisableDepthTest ( );
+			ofSetColor ( mStatsCorpus.getColor ( mPointPicker.GetNearestPointFile ( ) ) );
+			ofDrawSphere ( mStatsCorpus.getVertex ( mPointPicker.GetNearestPointFile ( ) ), 25 );
+			ofEnableDepthTest ( );
+		}
 	}
 
 	mCamera->end ( );
