@@ -166,6 +166,7 @@ void Explorer::PointPicker::FindNearest ( )
 
 	if ( !bTrained ) { return; }
 	if ( !bNearestCheckNeeded ) { return; }
+	bNearestCheckNeeded = false;
 
 	mNearestPoint = -1; mNearestPointFile = -1; mNearestPointTime = -1;
 	mNearestDistance = std::numeric_limits<double>::max ( );
