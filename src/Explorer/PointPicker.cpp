@@ -41,9 +41,9 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
 
 void Explorer::PointPicker::Train ( int dimensionIndex, Utils::Axis axis, bool none )
 {
-	if ( axis == Utils::Axis::X ) { bDimensionsFilled[0] = none ? false : true; mDimensionsIndices[0] = dimensionIndex; }
-	else if ( axis == Utils::Axis::Y ) { bDimensionsFilled[1] = none ? false : true; mDimensionsIndices[1] = dimensionIndex; }
-	else if ( axis == Utils::Axis::Z ) { bDimensionsFilled[2] = none ? false : true; mDimensionsIndices[2] = dimensionIndex; }
+	if ( axis == Utils::Axis::X ) { bDimensionsFilled[0] = !none; mDimensionsIndices[0] = dimensionIndex; }
+	else if ( axis == Utils::Axis::Y ) { bDimensionsFilled[1] = !none; mDimensionsIndices[1] = dimensionIndex; }
+	else if ( axis == Utils::Axis::Z ) { bDimensionsFilled[2] = !none; mDimensionsIndices[2] = dimensionIndex; }
 	else { return; }
 
 	int dimsFilled = bDimensionsFilled[0] + bDimensionsFilled[1] + bDimensionsFilled[2];
