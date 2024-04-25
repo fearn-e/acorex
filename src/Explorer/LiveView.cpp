@@ -125,9 +125,16 @@ void Explorer::LiveView::Draw ( )
 
 	// Draw Nearest Point -----------------------
 	mPointPicker.Draw ( );
-
-	ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )], 50, 90 );
-	ofDrawBitmapStringHighlight ( "Nearest Timepoint: " + std::to_string ( mPointPicker.GetNearestPointTime ( ) ), 50, 110 );
+	if ( mPointPicker.GetNearestPointFile ( ) != -1 )
+	{
+		ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )], 20, ofGetHeight ( ) - 60 );
+		if ( mRawView->IsTimeAnalysis ( ) )
+		{
+			std::string hopInfoSamps = std::to_string ( mPointPicker.GetNearestPointTime ( ) * mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction );
+			std::string hopInfoSecs = std::to_string ( mRawView->GetTimeData ( )->raw[mPointPicker.GetNearestPointFile ( )][mPointPicker.GetNearestPointTime ( )][0] );
+			ofDrawBitmapStringHighlight ( "Nearest Timepoint: " + hopInfoSamps + " samples, " + hopInfoSecs + "s", 20, ofGetHeight ( ) - 40 );
+		}
+	}
 }
 
 // Filler Functions ----------------------------
