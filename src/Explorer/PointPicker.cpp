@@ -162,18 +162,6 @@ void Explorer::PointPicker::Draw ( )
 		ofDrawBitmapStringHighlight ( "Nearest Point: " + std::to_string ( mNearestPoint ), 20, ofGetHeight ( ) - 100 );
 		ofDrawBitmapStringHighlight ( "Nearest Distance: " + std::to_string ( mNearestDistance ), 20, ofGetHeight ( ) - 80 );
 	}
-
-	ofEnableDepthTest ( );
-	mCamera->begin ( );
-
-	for ( auto& each : testDrawPoints )
-	{
-		ofSetColor ( 255, 0, 0 );
-		ofDrawSphere ( each, 3.0f );
-	}
-
-	mCamera->end ( );
-	ofDisableDepthTest ( );
 }
 
 void Explorer::PointPicker::FindNearest ( )
@@ -181,8 +169,6 @@ void Explorer::PointPicker::FindNearest ( )
 	if ( !bTrained ) { return; }
 	if ( !bNearestCheckNeeded ) { return; }
 	bNearestCheckNeeded = false;
-
-	if ( testDrawPoints.size ( ) > 0 ) { testDrawPoints.clear ( ); }
 
 	mNearestPoint = -1; mNearestPointFile = -1; mNearestPointTime = -1;
 	mNearestDistance = std::numeric_limits<double>::max ( );
@@ -200,8 +186,6 @@ void Explorer::PointPicker::FindNearest ( )
 		if ( !bDimensionsFilled[0] ) { rayPosition2D.x = rayPosition.y; rayPosition2D.y = rayPosition.z; rayPosition.x = 0; }
 		if ( !bDimensionsFilled[1] ) { rayPosition2D.x = rayPosition.x; rayPosition2D.y = rayPosition.z; rayPosition.y = 0; }
 		if ( !bDimensionsFilled[2] ) { rayPosition2D.x = rayPosition.x; rayPosition2D.y = rayPosition.y; rayPosition.z = 0; }
-
-		testDrawPoints.push_back ( rayPosition );
 
 		fluid::RealVector query ( 2 );
 

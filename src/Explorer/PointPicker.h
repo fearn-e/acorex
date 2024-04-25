@@ -75,9 +75,6 @@ private:
 	std::vector<int> mCorpusTimeLookUp; int mNearestPointTime = -1;
 	
 	Utils::DatasetConversion mDatasetConversion;
-
-	// temp test
-	std::vector<glm::vec3> testDrawPoints;
 };
 
 } // namespace Explorer
