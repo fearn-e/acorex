@@ -232,14 +232,14 @@ void Explorer::PointPicker::FindNearest ( )
 	}
 
 	// 3D nearest
-
-	double desiredRayLength = 7500.0f;
+	
+	double desiredRayLength = 10000.0f;
 	double rayLength = 0.0f;
 	std::vector<double> rayPointSpacing;
 	
 	do
 	{
-		double maxAllowedDistance = ofMap ( rayLength, 0.0f, desiredRayLength, 0.02, 0.25, false );
+		double maxAllowedDistance = ofMap ( rayLength, 0.0f, desiredRayLength, 0.02, 0.3, false );
 		rayPointSpacing.push_back ( maxAllowedDistance );
 		rayLength += maxAllowedDistance * 1000.0f;
 	} while ( rayLength < desiredRayLength );
