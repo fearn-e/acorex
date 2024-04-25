@@ -490,8 +490,8 @@ void Explorer::LiveView::Zoom2DCam ( float y, bool mouse )
 void Explorer::LiveView::Zoom3DCam ( float y, bool mouse )
 {
 	float scrollDist = y * SpaceDefs::mCamZoomSpeed3D;
-	if ( mCamPivot.distance ( mCamera->getPosition ( ) ) > SpaceDefs::mZoomMin3D && scrollDist < 0 ) { mCamera->dolly ( scrollDist ); }
-	else if ( mCamPivot.distance ( mCamera->getPosition ( ) ) < SpaceDefs::mZoomMax3D && scrollDist > 0 ) { mCamera->dolly ( scrollDist ); }
+	if ( mCamPivot.distance ( mCamera->getPosition ( ) ) > SpaceDefs::mZoomMin3D && scrollDist < 0.0f && scrollDist < mCamPivot.distance ( mCamera->getPosition ( ) ) ) { mCamera->dolly ( scrollDist ); }
+	else if ( mCamPivot.distance ( mCamera->getPosition ( ) ) < SpaceDefs::mZoomMax3D && scrollDist > 0.0f ) { mCamera->dolly ( scrollDist ); }
 }
 
 void Explorer::LiveView::Rotate3DCam ( float x, float y, bool mouse )
