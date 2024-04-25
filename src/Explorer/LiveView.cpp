@@ -153,6 +153,7 @@ void Explorer::LiveView::Draw ( )
 		{
 			for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
 			{
+				mTimeCorpus[file].enableColors ( );
 				mTimeCorpus[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
 				mTimeCorpus[file].draw ( );
 				mTimeCorpus[file].setMode ( OF_PRIMITIVE_POINTS );
@@ -161,10 +162,26 @@ void Explorer::LiveView::Draw ( )
 		}
 		else
 		{
+			for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
+			{
+				if ( file != mPointPicker.GetNearestPointFile ( ) )
+				{
+					mTimeCorpus[file].disableColors ( );
+					ofSetColor ( 255, 255, 255, 25 );
+					mTimeCorpus[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
+					mTimeCorpus[file].draw ( );
+					mTimeCorpus[file].setMode ( OF_PRIMITIVE_POINTS );
+					mTimeCorpus[file].draw ( );
+				}
+			}
+
+			ofDisableDepthTest ( );
+			mTimeCorpus[mLastNearestPointFile].enableColors ( );
 			mTimeCorpus[mLastNearestPointFile].setMode ( OF_PRIMITIVE_LINE_STRIP );
 			mTimeCorpus[mLastNearestPointFile].draw ( );
 			mTimeCorpus[mLastNearestPointFile].setMode ( OF_PRIMITIVE_POINTS );
 			mTimeCorpus[mLastNearestPointFile].draw ( );
+			ofEnableDepthTest ( );
 		}
 	}
 	else // Stats
