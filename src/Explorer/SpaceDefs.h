@@ -7,7 +7,7 @@ namespace SpaceDefs {
 
 	// Camera Adjustments --------------------
 
-	static float mCamZoomSpeed3D = 24.0;	static float mCamZoomSpeed2D = 0.1;
+	static float mCamZoomSpeed3D = 200;		static float mCamZoomSpeed2D = 0.1;
 	static float mZoomMin3D = 50.0;			static float mZoomMax3D = 5000.0;
 	static float mZoomMin2D = 0.1;			static float mZoomMax2D = 10.0;
 	static float mCamMoveSpeed = 1.0;
@@ -16,7 +16,7 @@ namespace SpaceDefs {
 
 	// Space and Color Limits --------------------
 
-	static double mSpaceMin = 0; static double mSpaceMax = 1000;
+	static double mSpaceMin = 0; static double mSpaceMax = 5000;
 	static double mColorMin = 0; static double mColorMax = 215;
 
 } // namespace SpaceDefs
