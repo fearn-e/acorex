@@ -104,6 +104,12 @@ void ExplorerMenu::Initialise ( )
 		mDimensionDropdownZ->setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mDimensionDropdownColor->setBackgroundColor ( mColors.interfaceBackgroundColor );
 
+		if ( bInitialiseShouldLoad )
+		{
+			mMainPanel.add ( mColorSpectrumSwitcher.setup ( "Color Spectrum: Red<->Blue", false ) );
+			mColorSpectrumSwitcher.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		}
+
 		mMainPanel.setPosition ( ofGetWidth ( ) - mLayout.explorePanelWidth, mLayout.explorePanelOriginY );
 		mMainPanel.setWidthElements ( mLayout.explorePanelWidth );
 		mMainPanel.disableHeader ( );
@@ -116,6 +122,7 @@ void ExplorerMenu::Initialise ( )
 		mDimensionDropdownY->addListener ( this, &ExplorerMenu::SwapDimensionY );
 		mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SwapDimensionZ );
 		mDimensionDropdownColor->addListener ( this, &ExplorerMenu::SwapDimensionColor );
+		mColorSpectrumSwitcher.addListener ( this, &ExplorerMenu::SwitchColorSpectrum );
 		bListenersAdded = true;
 	}
 
@@ -180,6 +187,7 @@ void ExplorerMenu::RemoveListeners ( )
 	mDimensionDropdownY->removeListener ( this, &ExplorerMenu::SwapDimensionY );
 	mDimensionDropdownZ->removeListener ( this, &ExplorerMenu::SwapDimensionZ );
 	mDimensionDropdownColor->removeListener ( this, &ExplorerMenu::SwapDimensionColor );
+	mColorSpectrumSwitcher.removeListener ( this, &ExplorerMenu::SwitchColorSpectrum );
 	bListenersAdded = false;
 }
 
@@ -339,4 +347,12 @@ void ExplorerMenu::SwapDimensionZ ( string& dimension )
 void ExplorerMenu::SwapDimensionColor ( string& dimension )
 {
 	SwapDimension ( dimension, Utils::Axis::COLOR );
+}
+
+void ExplorerMenu::SwitchColorSpectrum ( bool& fullSpectrum )
+{
+	if ( fullSpectrum ) { mColorSpectrumSwitcher.setName ( "Color Spectrum: Full" ); }
+	else { mColorSpectrumSwitcher.setName ( "Color Spectrum: Red<->Blue" ); }
+	mLiveView.SetColorFullSpectrum ( fullSpectrum );
+	SwapDimension ( mDimensionDropdownColor->getAllSelected ( )[0], Utils::Axis::COLOR );
 }
