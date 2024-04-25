@@ -80,9 +80,6 @@ private:
 	std::vector<ofMesh> mTimeCorpus;
 	ofMesh mStatsCorpus;
 
-	int mLastNearestPointFile = -1;
-	int mLastNearestPointTime = -1;
-
 	// Camera ----------------------------------------
 
 	std::shared_ptr<ofCamera> mCamera;
