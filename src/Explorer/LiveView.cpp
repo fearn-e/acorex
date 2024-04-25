@@ -90,7 +90,12 @@ void Explorer::LiveView::Update ( )
 			mCamera->truck ( (mKeyboardMoveState[3] - mKeyboardMoveState[1]) * adjustedSpeed );
 			mPointPicker.SetNearestCheckNeeded ( );
 		}
+		else if ( mKeyboardMoveState[8] || mKeyboardMoveState[9] )
+		{
+			Zoom2DCam ( ( mKeyboardMoveState[8] - mKeyboardMoveState[9] ) * keyboardZoomDelta, false );
+			mPointPicker.SetNearestCheckNeeded ( );
 	}
+}
 }
 
 void Explorer::LiveView::SlowUpdate ( )
@@ -472,6 +477,16 @@ void Explorer::LiveView::Init2DCam ( Utils::Axis disabledAxis )
 	mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed * mCamera->getScale ( ).x;
 }
 
+void Explorer::LiveView::Zoom2DCam ( float y, bool mouse )
+{
+	mCamera->setScale ( mCamera->getScale ( ) + y * SpaceDefs::mCamZoomSpeed2D );
+	float zoom = mCamera->getScale ( ).x + y * SpaceDefs::mCamZoomSpeed2D;
+	if ( mCamera->getScale ( ).x > SpaceDefs::mZoomMin2D && y < 0.0f ) { mCamera->setScale ( zoom ); }
+	else if ( mCamera->getScale ( ).x < SpaceDefs::mZoomMax2D && y > 0.0f ) { mCamera->setScale ( zoom ); }
+	mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed * mCamera->getScale ( ).x;
+	mPointPicker.SetNearestCheckNeeded ( );
+}
+
 void Explorer::LiveView::Zoom3DCam ( float y, bool mouse )
 {
 	float scrollDist = y * SpaceDefs::mCamZoomSpeed3D;
@@ -570,10 +585,7 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 	{
 		if ( args.type == 4 ) // scroll - zoom
 		{
-			mCamera->setScale ( mCamera->getScale ( ) + args.scrollY * SpaceDefs::mCamZoomSpeed2D );
-			if ( mCamera->getScale ( ).x < SpaceDefs::mZoomMin2D ) { mCamera->setScale ( 0.1 ); }
-			else if ( mCamera->getScale ( ).x > SpaceDefs::mZoomMax2D ) { mCamera->setScale ( 20.0 ); }
-			mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed * mCamera->getScale ( ).x;
+			Zoom2DCam ( args.scrollY, true );
 			mPointPicker.SetNearestCheckNeeded ( );
 		}
 		else if ( (args.type == 3 && args.button == 0) || (args.type == 3 && args.button == 1) ) // left/middle button drag - pan
