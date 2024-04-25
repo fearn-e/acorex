@@ -44,9 +44,11 @@ private:
 	// Listeners ------------------------------------
 
 	void MouseMoved ( ofMouseEventArgs& args ) { bNearestCheckNeeded = true; }
+	void KeyPressed ( ofKeyEventArgs& args ) { if ( args.key == OF_KEY_F3 ) bDebug = !bDebug; }
 
 	// States ---------------------------------------
 
+	bool bDebug = false;
 	bool bDraw = false;
 	bool b3D = true;
 	bool bTrained = false;
@@ -75,6 +77,11 @@ private:
 	std::vector<int> mCorpusTimeLookUp; int mNearestPointTime = -1;
 	
 	Utils::DatasetConversion mDatasetConversion;
+
+	std::vector<glm::vec3> testPoints;
+	std::vector<float> testRadii;
+	std::vector<glm::vec3> testPointsOutOfRange;
+	std::vector<float> testRadiiOutOfRange;
 };
 
 } // namespace Explorer

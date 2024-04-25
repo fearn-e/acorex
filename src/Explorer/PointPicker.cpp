@@ -35,6 +35,7 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
 	if ( !bListenersAdded )
 	{
 		ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
+		ofAddListener ( ofEvents ( ).keyPressed, this, &Explorer::PointPicker::KeyPressed );
 		bListenersAdded = true;
 	}
 }
@@ -157,10 +158,31 @@ void Explorer::PointPicker::SlowUpdate ( )
 
 void Explorer::PointPicker::Draw ( )
 {
-	if ( mNearestPoint != -1 )
+	if ( bDebug )
 	{
-		ofDrawBitmapStringHighlight ( "Nearest Point: " + std::to_string ( mNearestPoint ), 20, ofGetHeight ( ) - 100 );
-		ofDrawBitmapStringHighlight ( "Nearest Distance: " + std::to_string ( mNearestDistance ), 20, ofGetHeight ( ) - 80 );
+		if ( mNearestPoint != -1 )
+		{
+			ofDrawBitmapStringHighlight ( "Nearest Point: " + std::to_string ( mNearestPoint ), 20, ofGetHeight ( ) - 100 );
+			ofDrawBitmapStringHighlight ( "Nearest Distance: " + std::to_string ( mNearestDistance ), 20, ofGetHeight ( ) - 80 );
+		}
+
+		ofEnableDepthTest ( );
+		mCamera->begin ( );
+
+		ofSetColor ( 150, 150, 255, 125 );
+		for ( int i = 0; i < testPoints.size ( ); i++ )
+		{
+			ofDrawSphere ( testPoints[i], testRadii[i] );
+		}
+
+		ofSetColor ( 255, 255, 255, 25 );
+		for ( int i = 0; i < testPointsOutOfRange.size ( ); i++ )
+		{
+			ofDrawSphere ( testPointsOutOfRange[i], testRadiiOutOfRange[i] );
+		}
+
+		mCamera->end ( );
+		ofDisableDepthTest ( );
 	}
 }
 
@@ -222,6 +244,15 @@ void Explorer::PointPicker::FindNearest ( )
 	} while ( rayLength < desiredRayLength );
 
 	double depth = 0.0f;
+
+	if ( bDebug )
+	{
+		if ( testPoints.size ( ) > 0 ) { testPoints.clear ( ); }
+		if ( testRadii.size ( ) > 0 ) { testRadii.clear ( ); }
+		if ( testPointsOutOfRange.size ( ) > 0 ) { testPointsOutOfRange.clear ( ); }
+		if ( testRadiiOutOfRange.size ( ) > 0 ) { testRadiiOutOfRange.clear ( ); }
+	}
+
 	for ( int rayPoint = 1; rayPoint < rayPointSpacing.size ( ); rayPoint++ )
 	{
 		depth += rayPointSpacing[rayPoint] * 1000.0f;
