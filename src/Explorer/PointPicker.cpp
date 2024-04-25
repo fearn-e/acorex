@@ -161,11 +161,11 @@ void Explorer::PointPicker::Draw ( )
 
 void Explorer::PointPicker::FindNearest ( )
 {
-	testDrawPoints.clear ( );
-
 	if ( !bTrained ) { return; }
 	if ( !bNearestCheckNeeded ) { return; }
 	bNearestCheckNeeded = false;
+
+	if ( testDrawPoints.size ( ) > 0 ) { testDrawPoints.clear ( ); }
 
 	mNearestPoint = -1; mNearestPointFile = -1; mNearestPointTime = -1;
 	mNearestDistance = std::numeric_limits<double>::max ( );
@@ -182,6 +182,8 @@ void Explorer::PointPicker::FindNearest ( )
 		if ( !bDimensionsFilled[0] ) { rayPosition.x = 0; }
 		if ( !bDimensionsFilled[1] ) { rayPosition.y = 0; }
 		if ( !bDimensionsFilled[2] ) { rayPosition.z = 0; }
+
+		testDrawPoints.push_back ( rayPosition );
 
 		fluid::RealVector query ( 2 );
 
@@ -200,18 +202,16 @@ void Explorer::PointPicker::FindNearest ( )
 			if ( mCorpusTimeLookUp.size ( ) > 0 ) { mNearestPointTime = mCorpusTimeLookUp[mNearestPoint]; }
 		}
 
-		testDrawPoints.push_back ( rayPosition );
-
 		return;
 	}
 
 	// 3D nearest
 
-	double desiredRayLenght = 1000.0f;
+	double desiredRayLenght = 3000.0f;
 	double rayPointSpacing = ofMap ( maxAllowedDistance, 0.0, 1.0, 0.0, SpaceDefs::mSpaceMax - SpaceDefs::mSpaceMin, false );
 	int rayPointAmount = desiredRayLenght / rayPointSpacing;
 
-	for ( int rayPoint = 0; rayPoint < rayPointAmount; rayPoint++ )
+	for ( int rayPoint = 1; rayPoint < rayPointAmount; rayPoint++ )
 	{
 		glm::vec3 rayDirection = mCamera->screenToWorld ( glm::vec3 ( mouseX, mouseY, 0 ) );
 		rayDirection = glm::normalize ( rayDirection - mCamera->getPosition ( ) );
@@ -219,6 +219,8 @@ void Explorer::PointPicker::FindNearest ( )
 		glm::vec3 rayPointPosition = mCamera->getPosition ( ) + glm::vec3 ( rayDirection.x * depth, 
 																			rayDirection.y * depth, 
 																			rayDirection.z * depth );
+
+		testDrawPoints.push_back ( rayPointPosition );
 
 		fluid::RealVector query ( 3 );
 
@@ -237,7 +239,5 @@ void Explorer::PointPicker::FindNearest ( )
 			mNearestPointFile = mCorpusFileLookUp[mNearestPoint];
 			if ( mCorpusTimeLookUp.size ( ) > 0 ) { mNearestPointTime = mCorpusTimeLookUp[mNearestPoint]; }
 		}
-
-		testDrawPoints.push_back ( rayPointPosition );
 	}
 }
