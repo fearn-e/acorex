@@ -208,7 +208,7 @@ void Explorer::PointPicker::FindNearest ( )
 	// 3D nearest
 
 	double desiredRayLenght = 1000.0f;
-	double rayPointSpacing = 2 * ofMap ( maxAllowedDistance, 0.0, 1.0, 0.0, SpaceDefs::mSpaceMax - SpaceDefs::mSpaceMin, false );
+	double rayPointSpacing = ofMap ( maxAllowedDistance, 0.0, 1.0, 0.0, SpaceDefs::mSpaceMax - SpaceDefs::mSpaceMin, false );
 	int rayPointAmount = desiredRayLenght / rayPointSpacing;
 
 	for ( int rayPoint = 0; rayPoint < rayPointAmount; rayPoint++ )
