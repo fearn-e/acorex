@@ -1,18 +1,17 @@
-#pragma once
-
 #include "./JSON.h"
 #include <ofLog.h>
 #include <fstream>
 
+using namespace Acorex;
 
-bool AcorexUtils::JSON::Write ( const std::string& outputFile, const DataSet& dataset )
+bool Utils::JSON::Write ( const std::string& outputFile, const DataSet& dataset )
 {
 	try
 	{
 		std::ofstream file ( outputFile );
 		nlohmann::json j = dataset;
 
-		file << j.dump ( 4 ) << std::endl;
+		file << j.dump ( 0 ) << std::endl;
 		file.close ( );
 	}
 	catch ( std::exception& e )
@@ -24,7 +23,7 @@ bool AcorexUtils::JSON::Write ( const std::string& outputFile, const DataSet& da
 	return true;
 }
 
-bool AcorexUtils::JSON::Read ( const std::string& inputFile, DataSet& dataset )
+bool Utils::JSON::Read ( const std::string& inputFile, DataSet& dataset )
 {
 	try
 	{
@@ -45,7 +44,7 @@ bool AcorexUtils::JSON::Read ( const std::string& inputFile, DataSet& dataset )
 	return true;
 }
 
-bool AcorexUtils::JSON::Read ( const std::string& inputFile, AnalysisSettings& settings )
+bool Utils::JSON::Read ( const std::string& inputFile, AnalysisSettings& settings )
 {
 	try
 	{
@@ -67,18 +66,16 @@ bool AcorexUtils::JSON::Read ( const std::string& inputFile, AnalysisSettings& s
 }
 
 
-#ifndef DATA_CHANGE_CHECK_8
+#ifndef DATA_CHANGE_CHECK_1
 #error "data structure changed, please update json serialization"
 #endif
 
-void AcorexUtils::to_json ( nlohmann::json& j, const DataSet& a )
+void Utils::to_json ( nlohmann::json& j, const DataSet& a )
 {
 	j = nlohmann::json {	
 		TO_J ( currentPointCount),
 		TO_J ( dimensionNames ),
 		TO_J ( fileList ),
-		TO_J ( time.samples ),
-		TO_J ( time.seconds ),
 		TO_J ( time.raw ),
 		TO_J ( stats.raw ),
 		TO_J ( stats.reduced ),
@@ -97,13 +94,11 @@ void AcorexUtils::to_json ( nlohmann::json& j, const DataSet& a )
 		TO_J_SETTINGS ( maxFreq ) };
 }
 
-void AcorexUtils::from_json ( const nlohmann::json& j, DataSet& a )
+void Utils::from_json ( const nlohmann::json& j, DataSet& a )
 {
 	TO_A ( currentPointCount );
 	TO_A ( dimensionNames );
 	TO_A ( fileList );
-	TO_A ( time.samples );
-	TO_A ( time.seconds );
 	TO_A ( time.raw );
 	TO_A ( stats.raw );
 	TO_A ( stats.reduced );
@@ -122,7 +117,7 @@ void AcorexUtils::from_json ( const nlohmann::json& j, DataSet& a )
 	TO_A_SETTINGS ( maxFreq );
 }
 
-void AcorexUtils::to_json ( nlohmann::json& j, const AnalysisSettings& a )
+void Utils::to_json ( nlohmann::json& j, const AnalysisSettings& a )
 {
 	j = nlohmann::json { 
 		TO_J ( currentDimensionCount ),
@@ -140,7 +135,7 @@ void AcorexUtils::to_json ( nlohmann::json& j, const AnalysisSettings& a )
 		TO_J ( maxFreq ) };
 }
 
-void AcorexUtils::from_json ( const nlohmann::json& j, AnalysisSettings& a )
+void Utils::from_json ( const nlohmann::json& j, AnalysisSettings& a )
 { 
 	TO_A ( currentDimensionCount );
 	TO_A ( hasBeenReduced );
