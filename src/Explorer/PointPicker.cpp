@@ -178,17 +178,18 @@ void Explorer::PointPicker::FindNearest ( )
 		// 2D nearest
 
 		glm::vec3 rayPosition = mCamera->screenToWorld ( glm::vec3 ( mouseX, mouseY, 0 ) );
+		glm::vec2 rayPosition2D;
 		
-		if ( !bDimensionsFilled[0] ) { rayPosition.x = 0; }
-		if ( !bDimensionsFilled[1] ) { rayPosition.y = 0; }
-		if ( !bDimensionsFilled[2] ) { rayPosition.z = 0; }
+		if ( !bDimensionsFilled[0] ) { rayPosition2D.x = rayPosition.y; rayPosition2D.y = rayPosition.z; rayPosition.x = 0; }
+		if ( !bDimensionsFilled[1] ) { rayPosition2D.x = rayPosition.x; rayPosition2D.y = rayPosition.z; rayPosition.y = 0; }
+		if ( !bDimensionsFilled[2] ) { rayPosition2D.x = rayPosition.x; rayPosition2D.y = rayPosition.y; rayPosition.z = 0; }
 
 		testDrawPoints.push_back ( rayPosition );
 
 		fluid::RealVector query ( 2 );
 
-		query[0] = ofMap ( rayPosition.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
-		query[1] = ofMap ( rayPosition.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+		query[0] = ofMap ( rayPosition2D.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+		query[1] = ofMap ( rayPosition2D.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
 
 		auto [dist, id] = mKDTree.kNearest ( query, 1, maxAllowedDistance );
 
