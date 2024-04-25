@@ -8,8 +8,8 @@ using namespace Acorex;
 
 void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Utils::DimensionBounds& dimensionBounds )
 {
-	mFullFluidSet.resize ( dataset.analysisSettings.currentDimensionCount );
-	mLiveFluidSet.resize ( 3 );
+	mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dataset.analysisSettings.currentDimensionCount );
+	mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 3 );
 
 	Utils::DataSet scaledDataset = dataset;
 	ScaleDataset ( scaledDataset, dimensionBounds );
