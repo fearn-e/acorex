@@ -108,49 +108,6 @@ void Explorer::LiveView::Update ( )
 void Explorer::LiveView::SlowUpdate ( )
 {
 	mPointPicker.SlowUpdate ( );
-
-	UpdateAlphas ( );
-}
-
-void Explorer::LiveView::UpdateAlphas ( )
-{
-	if ( mRawView->IsTimeAnalysis ( ) )
-	{
-		mLastNearestPointFile = mPointPicker.GetNearestPointFile ( );
-		mLastNearestPointTime = mPointPicker.GetNearestPointTime ( );
-		return;
-	}
-	
-	// only for stat points, not for trails - trail lines obscure hovered trail too much
-	if ( mPointPicker.GetNearestPointFile ( ) != mLastNearestPointFile || mPointPicker.GetNearestPointTime ( ) != mLastNearestPointTime )
-	{
-		// Set all points to full alpha or 20% alpha depending on if a nearest point is found
-		if ( (mLastNearestPointFile == -1 && mPointPicker.GetNearestPointFile ( ) >= 0) ||
-			(mLastNearestPointFile >= 0 && mPointPicker.GetNearestPointFile ( ) == -1) )
-		{
-			for ( int point = 0; point < mStatsCorpus.getNumColors ( ); point++ )
-			{
-				ofColor currentColor = mStatsCorpus.getColor ( point );
-				currentColor.a = mPointPicker.GetNearestPointFile ( ) == -1 ? 255 : 50;
-				mStatsCorpus.setColor ( point, currentColor );
-			}
-		}
-		else if ( mLastNearestPointFile != mPointPicker.GetNearestPointFile ( ) )
-		{
-			ofColor currentColor = mStatsCorpus.getColor ( mLastNearestPointFile );
-			currentColor.a = 50;
-			mStatsCorpus.setColor ( mLastNearestPointFile, currentColor );
-		}
-
-		if ( mPointPicker.GetNearestPointFile ( ) >= 0 )
-		{
-			ofColor currentColor = mStatsCorpus.getColor ( mPointPicker.GetNearestPointFile ( ) );
-			currentColor.a = 255;
-			mStatsCorpus.setColor ( mPointPicker.GetNearestPointFile ( ), currentColor );
-		}
-
-		mLastNearestPointFile = mPointPicker.GetNearestPointFile ( );
-	}
 }
 
 void Explorer::LiveView::Draw ( )
@@ -201,11 +158,11 @@ void Explorer::LiveView::Draw ( )
 			}
 
 			ofDisableDepthTest ( );
-			mTimeCorpus[mLastNearestPointFile].enableColors ( );
-			mTimeCorpus[mLastNearestPointFile].setMode ( OF_PRIMITIVE_LINE_STRIP );
-			mTimeCorpus[mLastNearestPointFile].draw ( );
-			mTimeCorpus[mLastNearestPointFile].setMode ( OF_PRIMITIVE_POINTS );
-			mTimeCorpus[mLastNearestPointFile].draw ( );
+			mTimeCorpus[mPointPicker.GetNearestPointFile ( )].enableColors ( );
+			mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setMode ( OF_PRIMITIVE_LINE_STRIP );
+			mTimeCorpus[mPointPicker.GetNearestPointFile ( )].draw ( );
+			mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setMode ( OF_PRIMITIVE_POINTS );
+			mTimeCorpus[mPointPicker.GetNearestPointFile ( )].draw ( );
 			ofEnableDepthTest ( );
 		}
 	}
