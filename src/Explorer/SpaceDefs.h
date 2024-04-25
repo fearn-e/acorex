@@ -12,7 +12,9 @@ namespace SpaceDefs {
 	static float mZoomMin2D = 0.1;			static float mZoomMax2D = 10.0;
 	static float mCamMoveSpeed = 1.0;
 	static float mCamRotateSpeed = 0.006;
-	static float mKeyboardSpeedMulti = 800.0;
+	static float mKeyboardMoveSpeed = 3000.0;
+	static float mKeyboardRotateSpeed = 1500.0;
+	static float mKeyboardZoomSpeed = 750.0;
 
 	// Space and Color Limits --------------------
 
