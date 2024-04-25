@@ -236,6 +236,7 @@ void Explorer::PointPicker::FindNearest ( )
 	double desiredRayLength = 3000.0f;
 	double rayLength = 0.0f;
 	std::vector<double> rayPointSpacing;
+	
 	do
 	{
 		double maxAllowedDistance = ofMap ( rayLength, 0.0f, desiredRayLength, 0.02, 0.10, false );
@@ -243,6 +244,8 @@ void Explorer::PointPicker::FindNearest ( )
 		rayLength += maxAllowedDistance * 1000.0f;
 	} while ( rayLength < desiredRayLength );
 
+	glm::vec3 rayDirection = mCamera->screenToWorld ( glm::vec3 ( mouseX, mouseY, 0 ) );
+	rayDirection = glm::normalize ( rayDirection - mCamera->getPosition ( ) );
 	double depth = 0.0f;
 
 	if ( bDebug )
@@ -257,11 +260,27 @@ void Explorer::PointPicker::FindNearest ( )
 	{
 		depth += rayPointSpacing[rayPoint] * 1000.0f;
 
-		glm::vec3 rayDirection = mCamera->screenToWorld ( glm::vec3 ( mouseX, mouseY, 0 ) );
-		rayDirection = glm::normalize ( rayDirection - mCamera->getPosition ( ) );
 		glm::vec3 rayPointPosition = mCamera->getPosition ( ) + glm::vec3 ( rayDirection.x * depth,
 																			rayDirection.y * depth, 
 																			rayDirection.z * depth );
+
+		if ( rayPointPosition.x < ( SpaceDefs::mSpaceMin - 100 ) || rayPointPosition.x > ( SpaceDefs::mSpaceMax + 100 ) ||
+			rayPointPosition.y < ( SpaceDefs::mSpaceMin - 100 ) || rayPointPosition.y > ( SpaceDefs::mSpaceMax + 100 ) ||
+			rayPointPosition.z < ( SpaceDefs::mSpaceMin - 100 ) || rayPointPosition.z > ( SpaceDefs::mSpaceMax + 100 ) )
+		{
+			if ( bDebug )
+			{
+				testPointsOutOfRange.push_back ( rayPointPosition );
+				testRadiiOutOfRange.push_back ( rayPointSpacing[rayPoint] * 1000.0f );
+			}
+			continue; 
+		}
+
+		if ( bDebug )
+		{
+			testPoints.push_back ( rayPointPosition );
+			testRadii.push_back ( rayPointSpacing[rayPoint] * 1000.0f );
+		}
 
 		fluid::RealVector query ( 3 );
 
