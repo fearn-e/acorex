@@ -139,8 +139,11 @@ void Explorer::PointPicker::SlowUpdate ( )
 
 void Explorer::PointPicker::Draw ( )
 {
-	ofDrawBitmapStringHighlight ( "Nearest Point: " + std::to_string ( mNearestPoint ), 50, 50 );
-	ofDrawBitmapStringHighlight ( "Nearest Distance: " + std::to_string ( mNearestDistance ), 50, 70 );
+	if ( mNearestPoint != -1 )
+	{
+		ofDrawBitmapStringHighlight ( "Nearest Point: " + std::to_string ( mNearestPoint ), 20, ofGetHeight ( ) - 100 );
+		ofDrawBitmapStringHighlight ( "Nearest Distance: " + std::to_string ( mNearestDistance ), 20, ofGetHeight ( ) - 80 );
+	}
 
 	ofEnableDepthTest ( );
 	mCamera->begin ( );
