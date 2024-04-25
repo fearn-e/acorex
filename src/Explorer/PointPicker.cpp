@@ -208,6 +208,8 @@ void Explorer::PointPicker::FindNearest ( )
 		query[0] = ofMap ( rayPosition2D.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
 		query[1] = ofMap ( rayPosition2D.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
 
+		double maxAllowedDistance = ofMap ( mCamera->getScale ( ).x, SpaceDefs::mZoomMin2D, SpaceDefs::mZoomMax2D, maxAllowedDistanceNear * 1.5, maxAllowedDistanceFar * 1.5 );
+
 		auto [dist, id] = mKDTree.kNearest ( query, 1, maxAllowedDistance );
 
 		if ( dist.size ( ) == 0 ) { return; }
@@ -225,20 +227,26 @@ void Explorer::PointPicker::FindNearest ( )
 
 	// 3D nearest
 
-	double desiredRayLenght = 3000.0f;
-	double rayPointSpacing = ofMap ( maxAllowedDistance, 0.0, 1.0, 0.0, SpaceDefs::mSpaceMax - SpaceDefs::mSpaceMin, false );
-	int rayPointAmount = desiredRayLenght / rayPointSpacing;
-
-	for ( int rayPoint = 1; rayPoint < rayPointAmount; rayPoint++ )
+	double desiredRayLength = 3000.0f;
+	double rayLength = 0.0f;
+	std::vector<double> rayPointSpacing;
+	do
 	{
+		double maxAllowedDistance = ofMap ( rayLength, 0.0f, desiredRayLength, 0.02, 0.10, false );
+		rayPointSpacing.push_back ( maxAllowedDistance );
+		rayLength += maxAllowedDistance * 1000.0f;
+	} while ( rayLength < desiredRayLength );
+
+	double depth = 0.0f;
+	for ( int rayPoint = 1; rayPoint < rayPointSpacing.size ( ); rayPoint++ )
+	{
+		depth += rayPointSpacing[rayPoint] * 1000.0f;
+
 		glm::vec3 rayDirection = mCamera->screenToWorld ( glm::vec3 ( mouseX, mouseY, 0 ) );
 		rayDirection = glm::normalize ( rayDirection - mCamera->getPosition ( ) );
-		double depth = rayPoint * rayPointSpacing;
-		glm::vec3 rayPointPosition = mCamera->getPosition ( ) + glm::vec3 ( rayDirection.x * depth, 
+		glm::vec3 rayPointPosition = mCamera->getPosition ( ) + glm::vec3 ( rayDirection.x * depth,
 																			rayDirection.y * depth, 
 																			rayDirection.z * depth );
-
-		testDrawPoints.push_back ( rayPointPosition );
 
 		fluid::RealVector query ( 3 );
 
@@ -246,7 +254,7 @@ void Explorer::PointPicker::FindNearest ( )
 		query[1] = ofMap ( rayPointPosition.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
 		query[2] = ofMap ( rayPointPosition.z, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
 
-		auto [dist, id] = mKDTree.kNearest ( query, 1, maxAllowedDistance );
+		auto [dist, id] = mKDTree.kNearest ( query, 1, rayPointSpacing[rayPoint] );
 
 		if ( dist.size ( ) == 0 ) { continue; }
 
