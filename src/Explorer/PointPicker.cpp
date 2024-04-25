@@ -58,6 +58,8 @@ void Explorer::PointPicker::Train ( int dimensionIndex, Utils::Axis axis, bool n
 	if ( bDimensionsFilled[1] ) { mFluidSetQuery.addRange ( mDimensionsIndices[1], 1 ); }
 	if ( bDimensionsFilled[2] ) { mFluidSetQuery.addRange ( mDimensionsIndices[2], 1 ); }
 
+	mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 3 );
+
 	mFluidSetQuery.process ( mFullFluidSet, fluid::FluidDataSet<std::string, double, 1> ( ), mLiveFluidSet );
 
 	mKDTree = fluid::algorithm::KDTree ( mLiveFluidSet );
