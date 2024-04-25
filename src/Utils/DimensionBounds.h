@@ -23,7 +23,7 @@ public:
 		for ( int dimension = 0; dimension < dataset.dimensionNames.size ( ); dimension++ )
 		{
 			minBounds[dimension] = std::numeric_limits<double>::max ( );
-			maxBounds[dimension] = std::numeric_limits<double>::min ( );
+			maxBounds[dimension] = std::numeric_limits<double>::max ( ) * -1;
 
 			for ( int file = 0; file < dataset.fileList.size ( ); file++ )
 			{
