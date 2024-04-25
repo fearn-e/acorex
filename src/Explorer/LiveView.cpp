@@ -56,15 +56,28 @@ void Explorer::LiveView::Update ( )
 	lastUpdateTime = ofGetElapsedTimef ( );
 	if ( !bDraw ) { return; }
 
-	float keyboardSpeedDelta = SpaceDefs::mKeyboardSpeedMulti * deltaTime;
+	float keyboardMoveDelta = SpaceDefs::mKeyboardMoveSpeed * deltaTime;
+	float keyboardRotateDelta = SpaceDefs::mKeyboardRotateSpeed * deltaTime;
+	float keyboardZoomDelta = SpaceDefs::mKeyboardZoomSpeed * deltaTime;
 
 	if ( b3D )
 	{
-		if ( mKeyboardMoveState[0] || mKeyboardMoveState[1] || mKeyboardMoveState[2] || mKeyboardMoveState[3] )
+		if ( mKeyboardMoveState[0] || mKeyboardMoveState[1] || mKeyboardMoveState[2] || mKeyboardMoveState[3] || mKeyboardMoveState[4] || mKeyboardMoveState[5] )
 		{
-			Pan3DCam (	( mKeyboardMoveState[1] - mKeyboardMoveState[3] ) * keyboardSpeedDelta,
-						( mKeyboardMoveState[0] - mKeyboardMoveState[2] ) * keyboardSpeedDelta,
+			Pan3DCam (	( mKeyboardMoveState[1] - mKeyboardMoveState[3] ) * keyboardMoveDelta,
+						( mKeyboardMoveState[4] - mKeyboardMoveState[5] ) * keyboardMoveDelta,
+						( mKeyboardMoveState[2] - mKeyboardMoveState[0] ) * keyboardMoveDelta,
 						false );
+			mPointPicker.SetNearestCheckNeeded ( );
+		}
+		else if ( mKeyboardMoveState[6] || mKeyboardMoveState[7] )
+		{
+			Rotate3DCam ( ( mKeyboardMoveState[6] - mKeyboardMoveState[7] ) * keyboardRotateDelta, 0, false );
+			mPointPicker.SetNearestCheckNeeded ( );
+		}
+		else if ( mKeyboardMoveState[8] || mKeyboardMoveState[9] )
+		{
+			Zoom3DCam ( ( mKeyboardMoveState[8] - mKeyboardMoveState[9] ) * keyboardZoomDelta, false );
 			mPointPicker.SetNearestCheckNeeded ( );
 		}
 	}
@@ -72,7 +85,7 @@ void Explorer::LiveView::Update ( )
 	{
 		if ( mKeyboardMoveState[0] || mKeyboardMoveState[1] || mKeyboardMoveState[2] || mKeyboardMoveState[3] )
 		{
-			float adjustedSpeed = mCamMoveSpeedScaleAdjusted * keyboardSpeedDelta;
+			float adjustedSpeed = mCamMoveSpeedScaleAdjusted * keyboardMoveDelta;
 			mCamera->boom ( (mKeyboardMoveState[0] - mKeyboardMoveState[2]) * adjustedSpeed );
 			mCamera->truck ( (mKeyboardMoveState[3] - mKeyboardMoveState[1]) * adjustedSpeed );
 			mPointPicker.SetNearestCheckNeeded ( );
@@ -458,14 +471,14 @@ void Explorer::LiveView::Init2DCam ( Utils::Axis disabledAxis )
 	mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed * mCamera->getScale ( ).x;
 }
 
-void Explorer::LiveView::Zoom3DCam ( int y )
+void Explorer::LiveView::Zoom3DCam ( float y, bool mouse )
 {
 	float scrollDist = y * SpaceDefs::mCamZoomSpeed3D;
 	if ( mCamPivot.distance ( mCamera->getPosition ( ) ) > SpaceDefs::mZoomMin3D && scrollDist < 0 ) { mCamera->dolly ( scrollDist ); }
 	else if ( mCamPivot.distance ( mCamera->getPosition ( ) ) < SpaceDefs::mZoomMax3D && scrollDist > 0 ) { mCamera->dolly ( scrollDist ); }
 }
 
-void Explorer::LiveView::Rotate3DCam ( int x, int y )
+void Explorer::LiveView::Rotate3DCam ( float x, float y, bool mouse )
 {
 	// get vectors
 	glm::vec3 upNormalized = glm::normalize ( mCamera->getUpDir ( ) );
@@ -474,8 +487,10 @@ void Explorer::LiveView::Rotate3DCam ( int x, int y )
 	glm::vec3 focusNormalized = glm::normalize ( focus );
 
 	// calculate rotation angles
-	float yawAngle = (x - mLastMouseX) * SpaceDefs::mCamRotateSpeed;
-	float pitchAngle = (y - mLastMouseY) * SpaceDefs::mCamRotateSpeed;
+	if ( mouse ) { x -= mLastMouseX; y -= mLastMouseY; }
+
+	float yawAngle = x * SpaceDefs::mCamRotateSpeed;
+	float pitchAngle = y * SpaceDefs::mCamRotateSpeed;
 
 	// calculate quaternions
 	glm::quat yaw = glm::angleAxis ( yawAngle, upNormalized );
@@ -493,20 +508,33 @@ void Explorer::LiveView::Rotate3DCam ( int x, int y )
 	mCamera->lookAt ( mCamPivot );
 }
 
-void Explorer::LiveView::Pan3DCam ( int x, int y, bool mouse )
+void Explorer::LiveView::Pan3DCam ( float x, float y, float z, bool mouse )
 {
-	glm::vec3 upNormalized = glm::normalize ( mCamera->getUpDir ( ) );
-	glm::vec3 rightNormalized = glm::normalize ( mCamera->getSideDir ( ) );
+	glm::vec3 upNormalized = mCamera->getUpDir ( );
+	glm::vec3 rightNormalized = mCamera->getSideDir ( );
+	glm::vec3 focusNormalized = mCamera->getGlobalPosition ( ) - mCamPivot;
+
+	upNormalized.x = 0;
+	upNormalized.z = 0;
+	rightNormalized.y = 0;
+	focusNormalized.y = 0;
+
+	upNormalized = glm::normalize ( upNormalized );
+	rightNormalized = glm::normalize ( rightNormalized );
+	focusNormalized = glm::normalize ( focusNormalized );
 
 	if ( mouse ) { x -= mLastMouseX; y -= mLastMouseY; }
 
 	float moveX = x * mCamMoveSpeedScaleAdjusted * -1;
 	float moveY = y * mCamMoveSpeedScaleAdjusted;
+	float moveZ = z * mCamMoveSpeedScaleAdjusted;
 
 	mCamera->move ( rightNormalized * moveX );
 	mCamera->move ( upNormalized * moveY );
+	mCamera->move ( focusNormalized * moveZ );
 	mCamPivot += rightNormalized * moveX;
 	mCamPivot += upNormalized * moveY;
+	mCamPivot += focusNormalized * moveZ;
 }
 
 // Listener Functions --------------------------
@@ -523,17 +551,17 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 	{
 		if ( args.type == 4 ) // scroll - zoom
 		{
-			Zoom3DCam ( args.scrollY );
+			Zoom3DCam ( args.scrollY, true);
 			mPointPicker.SetNearestCheckNeeded ( );
 		}
 		else if ( args.type == 3 && args.button == 0 ) // left click drag - rotate
 		{
-			Rotate3DCam ( args.x, args.y );
+			Rotate3DCam ( args.x, args.y, true );
 			mPointPicker.SetNearestCheckNeeded ( );
 		}
 		else if ( args.type == 3 && args.button == 1 ) // middle click drag - pan
 		{
-			Pan3DCam ( args.x, args.y, true );
+			Pan3DCam ( args.x, args.y, 0, true );
 			mPointPicker.SetNearestCheckNeeded ( );
 		}
 	}
@@ -571,6 +599,12 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 		else if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = true; }
 		else if ( args.key == 's' || args.key == OF_KEY_DOWN ) { mKeyboardMoveState[2] = true; }
 		else if ( args.key == 'd' || args.key == OF_KEY_RIGHT ) { mKeyboardMoveState[3] = true; }
+		else if ( args.key == 'r' ) { mKeyboardMoveState[4] = true; }
+		else if ( args.key == 'f' ) { mKeyboardMoveState[5] = true; }
+		else if ( args.key == 'q' ) { mKeyboardMoveState[6] = true; }
+		else if ( args.key == 'e' ) { mKeyboardMoveState[7] = true; }
+		else if ( args.key == 'z' ) { mKeyboardMoveState[8] = true; }
+		else if ( args.key == 'x' ) { mKeyboardMoveState[9] = true; }
 	}
 	else if ( args.type == 1 )
 	{
@@ -578,5 +612,11 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 		else if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = false; }
 		else if ( args.key == 's' || args.key == OF_KEY_DOWN ) { mKeyboardMoveState[2] = false; }
 		else if ( args.key == 'd' || args.key == OF_KEY_RIGHT ) { mKeyboardMoveState[3] = false; }
+		else if ( args.key == 'r' ) { mKeyboardMoveState[4] = false; }
+		else if ( args.key == 'f' ) { mKeyboardMoveState[5] = false; }
+		else if ( args.key == 'q' ) { mKeyboardMoveState[6] = false; }
+		else if ( args.key == 'e' ) { mKeyboardMoveState[7] = false; }
+		else if ( args.key == 'z' ) { mKeyboardMoveState[8] = false; }
+		else if ( args.key == 'x' ) { mKeyboardMoveState[9] = false; }
 	}
 }

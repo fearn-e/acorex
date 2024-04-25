@@ -44,9 +44,9 @@ public:
 	void Init3DCam ( );
 	void Init2DCam ( Utils::Axis disabledAxis );
 
-	void Zoom3DCam ( int y );
-	void Rotate3DCam ( int x, int y );
-	void Pan3DCam ( int x, int y, bool mouse );
+	void Zoom3DCam ( float y, bool mouse );
+	void Rotate3DCam ( float x, float y, bool mouse );
+	void Pan3DCam ( float x, float y, float z, bool mouse );
 
 	// Setters & Getters ----------------------------
 
@@ -64,7 +64,7 @@ private:
 	bool bDraw = false;
 	bool b3D = true;
 
-	bool mKeyboardMoveState[4] = { 0, 0, 0, 0 };
+	bool mKeyboardMoveState[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // W, A, S, D, R, F, Q, E, Z, X
 	float mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed;
 
 	float deltaTime = 0.1;
