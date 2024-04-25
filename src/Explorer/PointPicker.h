@@ -5,7 +5,6 @@
 #include "Utils/DatasetConversion.h"
 #include <algorithms/public/KDTree.hpp>
 #include <data/FluidDataSet.hpp>
-#include <algorithms/public/DataSetQuery.hpp>
 #include <ofCamera.h>
 #include <ofEvents.h>
 
@@ -71,7 +70,6 @@ private:
 
 	fluid::FluidDataSet<std::string, double, 1> mFullFluidSet;
 	fluid::FluidDataSet<std::string, double, 1> mLiveFluidSet;
-	fluid::algorithm::DataSetQuery mFluidSetQuery;
 	std::vector<int> mCorpusFileLookUp; int mNearestPointFile = -1;
 	std::vector<int> mCorpusTimeLookUp; int mNearestPointTime = -1;
 	
