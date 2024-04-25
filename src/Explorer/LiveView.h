@@ -44,6 +44,7 @@ public:
 	void Init3DCam ( );
 	void Init2DCam ( Utils::Axis disabledAxis );
 
+	void Zoom2DCam ( float y, bool mouse );
 	void Zoom3DCam ( float y, bool mouse );
 	void Rotate3DCam ( float x, float y, bool mouse );
 	void Pan3DCam ( float x, float y, float z, bool mouse );
