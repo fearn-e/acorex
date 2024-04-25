@@ -104,7 +104,7 @@ void ExplorerMenu::Initialise ( )
 		mDimensionDropdownZ->setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mDimensionDropdownColor->setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-		mMainPanel.setPosition ( mLayout.explorePanelOriginX, mLayout.explorePanelOriginY );
+		mMainPanel.setPosition ( ofGetWidth ( ) - mLayout.explorePanelWidth, mLayout.explorePanelOriginY );
 		mMainPanel.setWidthElements ( mLayout.explorePanelWidth );
 		mMainPanel.disableHeader ( );
 	}
@@ -315,6 +315,11 @@ void ExplorerMenu::CameraSwitcher ( )
 }
 
 // Listener Functions --------------------------
+
+void ExplorerMenu::WindowResized ( )
+{
+	mMainPanel.setPosition ( ofGetWidth ( ) - mLayout.explorePanelWidth, mLayout.explorePanelOriginY );
+}
 
 void ExplorerMenu::SwapDimensionX ( string& dimension )
 {

@@ -19,7 +19,7 @@ public:
 	//void audioIn ( float* input, int bufferSize, int nChannels );
 	//void audioOut ( float* buffer, int bufferSize, int nChannels );
 	
-	//void windowResized ( int w, int h );
+	void windowResized ( int w, int h );
 	//void dragEvent ( ofDragInfo dragInfo );
 	//void gotMessage ( ofMessage msg );
 
