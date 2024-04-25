@@ -52,14 +52,31 @@ void Explorer::PointPicker::Train ( int dimensionIndex, Utils::Axis axis, bool n
 	if ( axis == Utils::Axis::Z ) { bSkipTraining = false; }
 	if ( bSkipTraining ) { return; }
 
-	mFluidSetQuery.clear ( );
-	mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 3 );
+	mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dimsFilled );
 
-	if ( bDimensionsFilled[0] ) { mFluidSetQuery.addRange ( mDimensionsIndices[0], 1 ); }
-	if ( bDimensionsFilled[1] ) { mFluidSetQuery.addRange ( mDimensionsIndices[1], 1 ); }
-	if ( bDimensionsFilled[2] ) { mFluidSetQuery.addRange ( mDimensionsIndices[2], 1 ); }
+	for ( int point = 0; point < mFullFluidSet.size ( ); point++ )
+	{
+		fluid::RealVector pointData ( dimsFilled );
+		if ( dimsFilled == 3 || bDimensionsFilled[2] == false )
+		{
+			for ( int dim = 0; dim < dimsFilled; dim++ )
+			{
+				pointData[dim] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[dim]];
+			}
+		}
+		else if ( bDimensionsFilled[1] == false )
+		{
+			pointData[0] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[0]];
+			pointData[1] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[2]];
+		}
+		else if ( bDimensionsFilled[0] == false )
+		{
+			pointData[0] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[1]];
+			pointData[1] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[2]];
+		}
 
-	mFluidSetQuery.process ( mFullFluidSet, fluid::FluidDataSet < std::string, double, 1> ( ), mLiveFluidSet );
+		mLiveFluidSet.add ( mFullFluidSet.getIds ( )[point], pointData );
+	}
 
 	mKDTree = fluid::algorithm::KDTree ( mLiveFluidSet );
 	bTrained = true;
