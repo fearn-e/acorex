@@ -20,6 +20,8 @@ public:
 	void Update ( );
 	void Exit ( );
 
+	void WindowResized ( );
+
 private:
 	void SlowUpdate ( );
 	void RemoveListeners ( );

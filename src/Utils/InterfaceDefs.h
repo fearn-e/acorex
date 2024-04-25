@@ -28,7 +28,7 @@ namespace Utils {
 		int panelBackgroundMargin = 5;
 
 		int analysePanelOriginX = 0; int analysePanelOriginY = topBarHeight + interPanelSpacing;
-		int explorePanelOriginX = ofGetWidth ( ) - explorePanelWidth; int explorePanelOriginY = topBarHeight + interPanelSpacing;
+		int explorePanelOriginY = topBarHeight + interPanelSpacing;
 		glm::vec3 hiddenPanelPosition = { -1000, -1000, 0 };
 	};
 } // namespace Utils

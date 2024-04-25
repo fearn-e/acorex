@@ -46,6 +46,14 @@ void ofApp::exit ( )
 	mAnalyserMenu.Exit ( );
 }
 
+void ofApp::windowResized ( int w, int h )
+{
+	mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout.topBarHeight / 4 );
+	mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout.topBarHeight / 4 );
+
+	mExplorerMenu.WindowResized ( );
+}
+
 void ofApp::AnalyseToggled ( bool& value )
 {
 	if ( value )
