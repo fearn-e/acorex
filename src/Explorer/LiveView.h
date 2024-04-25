@@ -25,6 +25,9 @@ public:
 
 	void Update ( );
 	void SlowUpdate ( );
+
+	void UpdateAlphas ( );
+
 	void Draw ( );
 
 	// Filler Functions ----------------------------
@@ -73,6 +76,9 @@ private:
 	std::shared_ptr<RawView> mRawView; // might need to be weak_ptr?
 	std::vector<ofMesh> mTimeCorpus;
 	ofMesh mStatsCorpus;
+
+	int mLastNearestPointFile = -1;
+	int mLastNearestPointTime = -1;
 
 	// Camera ----------------------------------------
 
