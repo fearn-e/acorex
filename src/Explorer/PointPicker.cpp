@@ -8,8 +8,18 @@ using namespace Acorex;
 
 void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Utils::DimensionBounds& dimensionBounds )
 {
-	mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dataset.analysisSettings.currentDimensionCount );
+	mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dataset.dimensionNames.size ( ) );
 	mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 3 );
+
+	bool b3D = true; bSkipTraining = true; bNearestCheckNeeded = false;
+
+	bDimensionsFilled[0] = false; bDimensionsFilled[1] = false; bDimensionsFilled[2] = false;
+	mDimensionsIndices[0] = -1; mDimensionsIndices[1] = -1; mDimensionsIndices[2] = -1;
+
+	mNearestPoint = -1; mNearestDistance = -1; mNearestPointFile = -1; mNearestPointTime = -1;
+
+	if ( mCorpusFileLookUp.size ( ) > 0 ) { mCorpusFileLookUp.clear ( ); }
+	if ( mCorpusTimeLookUp.size ( ) > 0 ) { mCorpusTimeLookUp.clear ( ); }
 
 	Utils::DataSet scaledDataset = dataset;
 	ScaleDataset ( scaledDataset, dimensionBounds );

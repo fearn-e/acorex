@@ -14,6 +14,13 @@ void Explorer::LiveView::Initialise ( )
 	mTimeCorpus.clear ( );
 
 	b3D = true;
+	bColorFullSpectrum = false;
+
+	for ( auto& each : mKeyboardMoveState ) { each = false; }
+
+	mDisabledAxis = Utils::Axis::NONE;
+	xLabel = "X"; yLabel = "Y"; zLabel = "Z";
+
 	mCamera = std::make_shared<ofCamera> ( );
 	Init3DCam ( );
 
