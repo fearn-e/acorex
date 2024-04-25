@@ -37,6 +37,8 @@ void ofApp::draw ( )
 		mAnalyseToggle.draw ( );
 		mExploreToggle.draw ( );
 	}
+
+	ofDrawBitmapStringHighlight ( "fps: " + ofToString ( ofGetFrameRate ( ) ), 20, ofGetHeight ( ) - 20 );
 }
 
 void ofApp::exit ( )
