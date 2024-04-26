@@ -67,6 +67,7 @@ public:
 	void MouseEvent ( ofMouseEventArgs& args );
 
 private:
+	bool bDebug = false;
 	bool bDraw = false;
 	bool b3D = true;
 	bool bColorFullSpectrum = false;

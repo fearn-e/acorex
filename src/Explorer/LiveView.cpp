@@ -299,6 +299,11 @@ void Explorer::LiveView::Draw ( )
 			ofDrawBitmapStringHighlight ( "Nearest Timepoint: " + hopInfoSamps + " samples, " + hopInfoSecs + "s", 20, ofGetHeight ( ) - 40 );
 		}
 	}
+
+	if ( bDebug )
+	{
+		ofDrawBitmapStringHighlight ( "UPS: " + std::to_string ( 1 / deltaTime ), 20, ofGetHeight ( ) - 220 );
+	}
 }
 
 // Sound Functions ------------------------------
@@ -559,6 +564,8 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 
 void Explorer::LiveView::RefreshFileColors ( int fileIndex )
 {
+	if ( bDebug ) { ofLogNotice ( "Explorer" ) << "Refreshing file colors for file: " << mRawView->GetDataset ( )->fileList[fileIndex]; }
+
 	double min = mDimensionBounds.GetMinBound ( colorDimension );
 	double max = mDimensionBounds.GetMaxBound ( colorDimension );
 	double outputMin = bColorFullSpectrum ? SpaceDefs::mColorMin : SpaceDefs::mColorBlue;
@@ -786,6 +793,7 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 		else if ( args.key == 'e' ) { mKeyboardMoveState[7] = false; }
 		else if ( args.key == 'z' ) { mKeyboardMoveState[8] = false; }
 		else if ( args.key == 'x' ) { mKeyboardMoveState[9] = false; }
+		else if ( args.key == OF_KEY_F3 ) { bDebug = !bDebug; }
 		else if ( args.key == 'l' )
 		{
 			bLoopAudio = !bLoopAudio;
