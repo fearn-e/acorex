@@ -46,7 +46,7 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
 	if ( !bListenersAdded )
 	{
 		ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
-		ofAddListener ( ofEvents ( ).keyPressed, this, &Explorer::PointPicker::KeyPressed );
+		ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
 		bListenersAdded = true;
 	}
 }
@@ -260,10 +260,10 @@ void Explorer::PointPicker::FindNearest ( )
 	rayDirection = glm::normalize ( rayDirection - mCamera->getPosition ( ) );
 	double depth = 0.0f;
 
-		if ( testPoints.size ( ) > 0 ) { testPoints.clear ( ); }
-		if ( testRadii.size ( ) > 0 ) { testRadii.clear ( ); }
-		if ( testPointsOutOfRange.size ( ) > 0 ) { testPointsOutOfRange.clear ( ); }
-		if ( testRadiiOutOfRange.size ( ) > 0 ) { testRadiiOutOfRange.clear ( ); }
+	if ( testPoints.size ( ) > 0 ) { testPoints.clear ( ); }
+	if ( testRadii.size ( ) > 0 ) { testRadii.clear ( ); }
+	if ( testPointsOutOfRange.size ( ) > 0 ) { testPointsOutOfRange.clear ( ); }
+	if ( testRadiiOutOfRange.size ( ) > 0 ) { testRadiiOutOfRange.clear ( ); }
 
 	for ( int rayPoint = 1; rayPoint < rayPointSpacing.size ( ); rayPoint++ )
 	{
@@ -311,7 +311,7 @@ void Explorer::PointPicker::FindNearest ( )
 	}
 }
 
-void Explorer::PointPicker::KeyPressed ( ofKeyEventArgs& args )
+void Explorer::PointPicker::KeyEvent ( ofKeyEventArgs& args )
 {
 	if ( args.type == ofKeyEventArgs::Type::Released )
 	{

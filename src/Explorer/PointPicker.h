@@ -46,7 +46,7 @@ private:
 	// Listeners ------------------------------------
 
 	void MouseMoved ( ofMouseEventArgs& args ) { bNearestCheckNeeded = true; }
-	void KeyPressed ( ofKeyEventArgs& args );
+	void KeyEvent ( ofKeyEventArgs& args );
 
 	// States ---------------------------------------
 
