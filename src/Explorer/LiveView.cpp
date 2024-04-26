@@ -37,7 +37,6 @@ void Explorer::LiveView::Initialise ( )
 	if ( mSoundPlayers.size ( ) > 0 ) { mSoundPlayers.clear ( ); }
 	if ( mPlayingFiles.size ( ) > 0 ) { mPlayingFiles.clear ( ); }
 	if ( mPlayingTimeHeads.size ( ) > 0 ) { mPlayingTimeHeads.clear ( ); }
-	if ( mPlayingExistingColors.size ( ) > 0 ) { mPlayingExistingColors.clear ( ); }
 
 	ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
 	ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
