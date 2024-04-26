@@ -11,7 +11,8 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
 	mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dataset.dimensionNames.size ( ) );
 	mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 3 );
 
-	bool b3D = true; bSkipTraining = true; bNearestCheckNeeded = false;
+
+	bPicker = false; b3D = true; bSkipTraining = true; bNearestCheckNeeded = false;
 
 	bDimensionsFilled[0] = false; bDimensionsFilled[1] = false; bDimensionsFilled[2] = false;
 	mDimensionsIndices[0] = -1; mDimensionsIndices[1] = -1; mDimensionsIndices[2] = -1;
@@ -198,7 +199,7 @@ void Explorer::PointPicker::Draw ( )
 
 void Explorer::PointPicker::FindNearest ( )
 {
-	if ( !ofGetMousePressed ( 2 ) && !ofGetKeyPressed ( 'c' ) ) { return; }
+	if ( !ofGetMousePressed ( 2 ) && !bPicker ) { return; }
 	if ( !bTrained ) { return; }
 	if ( !bNearestCheckNeeded ) { return; }
 	bNearestCheckNeeded = false;
@@ -311,4 +312,10 @@ void Explorer::PointPicker::FindNearest ( )
 			if ( mCorpusTimeLookUp.size ( ) > 0 ) { mNearestPointTime = mCorpusTimeLookUp[mNearestPoint]; }
 		}
 	}
+}
+
+void Explorer::PointPicker::KeyPressed ( ofKeyEventArgs& args )
+{
+	if ( args.key == OF_KEY_F3 ) { bDebug = !bDebug; }
+	else if ( args.key == OF_KEY_TAB ) { bPicker = !bPicker; }
 }
