@@ -4,9 +4,9 @@
 # Build
 ### Requirements
 
-* CMake (version?)
+* CMake
 
-* Git Bash (version?)
+* Something to run shell scripts in (e.g. Git Bash)
 
 * IDE (VS for Windows, Xcode for Mac, Linux T.B.D.)
 
@@ -14,10 +14,12 @@
 
 * Clone the repo
 
-* Run ./build-deps.sh
+* Run ./build-deps.sh - this will download all dependencies and OpenFrameworks
 
   * Optional arguments:
 
     * -c | force recompile
 
     * -d | force re-download (also forces recompile)
+
+* Once the script is done, navigate to openframeworks/apps/myApps/acorex, run the VS or XCode solutions and build from there
