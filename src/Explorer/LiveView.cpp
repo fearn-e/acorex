@@ -16,6 +16,7 @@ void Explorer::LiveView::Initialise ( )
 
 	b3D = true;
 	bColorFullSpectrum = false;
+	bLoopAudio = false;
 
 	for ( auto& each : mKeyboardMoveState ) { each = false; }
 
@@ -132,7 +133,7 @@ void Explorer::LiveView::UpdateAudioPlayers ( )
 			{
 				mPlayingTimeHeads[i]++;
 
-				if ( mPlayingTimeHeads[i] >= time->raw[mPlayingFiles[i]].size ( ) )
+				if ( !bLoopAudio && mPlayingTimeHeads[i] >= time->raw[mPlayingFiles[i]].size ( ) )
 				{
 					RefreshFileColors ( mPlayingFiles[i] );
 					mPlayingFiles.erase ( mPlayingFiles.begin ( ) + i );
@@ -141,9 +142,15 @@ void Explorer::LiveView::UpdateAudioPlayers ( )
 					mSoundPlayers.erase ( mSoundPlayers.begin ( ) + i );
 					i--;
 				}
+				else if ( bLoopAudio && mPlayingTimeHeads[i] >= time->raw[mPlayingFiles[i]].size ( ) )
+				{
+					RefreshFileColors ( mPlayingFiles[i] );
+					mPlayingTimeHeads[i] = 0;
+					mSoundPlayers[i].setPositionMS ( 0 );
+				}
 				else
 				{
-					mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], ofColor { 255, 255, 255, 255 } );
+					mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], ofColor { 255, 255, 255, 150 } );
 				}
 			}
 		}
@@ -263,7 +270,7 @@ void Explorer::LiveView::Draw ( )
 
 			for ( int i = 0; i < mPlayingFiles.size ( ); i++ )
 			{
-				ofSetColor ( 255, 255, 255, 255 );
+				ofSetColor ( 255, 255, 255, 150 );
 				ofDrawSphere ( mStatsCorpus.getVertex ( mPlayingFiles[i] ), 25 );
 			}
 
@@ -320,7 +327,7 @@ void Explorer::LiveView::PlaySound ( )
 	}
 
 	mSoundPlayers.push_back ( soundPlayer );
-	mSoundPlayers.back ( ).setLoop ( false );
+	mSoundPlayers.back ( ).setLoop ( bLoopAudio );
 	mSoundPlayers.back ( ).setVolume ( 0.6 );
 	mSoundPlayers.back ( ).play ( );
 }
@@ -779,6 +786,11 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 		else if ( args.key == 'e' ) { mKeyboardMoveState[7] = false; }
 		else if ( args.key == 'z' ) { mKeyboardMoveState[8] = false; }
 		else if ( args.key == 'x' ) { mKeyboardMoveState[9] = false; }
+		else if ( args.key == 'l' )
+		{
+			bLoopAudio = !bLoopAudio;
+			for ( auto& each : mSoundPlayers ) { each.setLoop ( bLoopAudio ); }
+		}
 		else if ( args.key == 'c' )
 		{ 
 			if ( mPointPicker.GetNearestPointFile ( ) != -1 )
