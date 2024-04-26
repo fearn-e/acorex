@@ -316,6 +316,9 @@ void Explorer::PointPicker::FindNearest ( )
 
 void Explorer::PointPicker::KeyPressed ( ofKeyEventArgs& args )
 {
-	if ( args.key == OF_KEY_F3 ) { bDebug = !bDebug; }
-	else if ( args.key == OF_KEY_TAB ) { bPicker = !bPicker; }
+	if ( args.type == ofKeyEventArgs::Type::Released )
+	{
+		if ( args.key == OF_KEY_F3 ) { bDebug = !bDebug; }
+		else if ( args.key == OF_KEY_TAB ) { bPicker = !bPicker; }
+	}
 }

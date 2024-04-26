@@ -713,7 +713,7 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 	//key: no modifiers, just the raw key
 	//scancode: includes all modifiers
 
-	if ( args.type == 0 )
+	if ( args.type == ofKeyEventArgs::Type::Pressed )
 	{
 		if ( args.key == 'w' || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = true; }
 		else if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = true; }
@@ -727,7 +727,7 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 		else if ( args.key == 'x' ) { mKeyboardMoveState[9] = true; }
 		else if ( args.key == ' ' ) { PlaySound ( ); }
 	}
-	else if ( args.type == 1 )
+	else if ( args.type == ofKeyEventArgs::Type::Released )
 	{
 		if ( args.key == 'w' || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = false; }
 		else if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = false; }
