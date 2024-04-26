@@ -260,13 +260,10 @@ void Explorer::PointPicker::FindNearest ( )
 	rayDirection = glm::normalize ( rayDirection - mCamera->getPosition ( ) );
 	double depth = 0.0f;
 
-	if ( bDebug )
-	{
 		if ( testPoints.size ( ) > 0 ) { testPoints.clear ( ); }
 		if ( testRadii.size ( ) > 0 ) { testRadii.clear ( ); }
 		if ( testPointsOutOfRange.size ( ) > 0 ) { testPointsOutOfRange.clear ( ); }
 		if ( testRadiiOutOfRange.size ( ) > 0 ) { testRadiiOutOfRange.clear ( ); }
-	}
 
 	for ( int rayPoint = 1; rayPoint < rayPointSpacing.size ( ); rayPoint++ )
 	{
