@@ -90,6 +90,8 @@ private:
 	std::vector<ofSoundPlayer> mSoundPlayers;
 	std::vector<int> mPlayingFiles;
 	std::vector<int> mPlayingTimeHeads;
+	std::vector<float> mPlayingLastPositionMS;
+	std::vector<ofColor> mPlayingLastColor;
 
 	// Camera ----------------------------------------
 

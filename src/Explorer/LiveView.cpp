@@ -128,31 +128,46 @@ void Explorer::LiveView::UpdateAudioPlayers ( )
 		for ( int i = 0; i < mPlayingFiles.size ( ); i++ )
 		{
 			float timePlayed = mSoundPlayers[i].getPositionMS ( ) / 1000.0;
-			float nextTimeStep = time->raw[mPlayingFiles[i]][mPlayingTimeHeads[i]][0];
-			if ( timePlayed >= nextTimeStep )
+			if ( !mSoundPlayers[i].getIsPlaying ( ) || timePlayed < mPlayingLastPositionMS[i] || ( mPlayingTimeHeads[i] + 1 ) >= time->raw[mPlayingFiles[i]].size ( ) )
 			{
-				mPlayingTimeHeads[i]++;
-
-				if ( !bLoopAudio && mPlayingTimeHeads[i] >= time->raw[mPlayingFiles[i]].size ( ) )
+				if ( !bLoopAudio )
 				{
 					RefreshFileColors ( mPlayingFiles[i] );
 					mPlayingFiles.erase ( mPlayingFiles.begin ( ) + i );
 					mPlayingTimeHeads.erase ( mPlayingTimeHeads.begin ( ) + i );
+					mPlayingLastPositionMS.erase ( mPlayingLastPositionMS.begin ( ) + i );
+					mPlayingLastColor.erase ( mPlayingLastColor.begin ( ) + i );
 					mSoundPlayers[i].stop ( );
 					mSoundPlayers.erase ( mSoundPlayers.begin ( ) + i );
 					i--;
-				}
-				else if ( bLoopAudio && mPlayingTimeHeads[i] >= time->raw[mPlayingFiles[i]].size ( ) )
-				{
-					RefreshFileColors ( mPlayingFiles[i] );
-					mPlayingTimeHeads[i] = 0;
-					mSoundPlayers[i].setPositionMS ( 0 );
+					continue;
 				}
 				else
 				{
-					mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], ofColor { 255, 255, 255, 150 } );
+					mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], mPlayingLastColor[i] );
+
+					mPlayingTimeHeads[i] = 0;
+
+					mPlayingLastColor[i] = mTimeCorpus[mPlayingFiles[i]].getColor ( mPlayingTimeHeads[i] );
+					mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], ofColor { 255, 255, 255, 255 } );
 				}
 			}
+			else
+			{
+				float nextTimeStep = time->raw[mPlayingFiles[i]][mPlayingTimeHeads[i]][0];
+
+				if ( timePlayed >= nextTimeStep )
+				{
+					mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], mPlayingLastColor[i] );
+
+					mPlayingTimeHeads[i]++;
+
+					mPlayingLastColor[i] = mTimeCorpus[mPlayingFiles[i]].getColor ( mPlayingTimeHeads[i] );
+					mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], ofColor { 255, 255, 255, 255 } );
+				}
+			}
+
+			mPlayingLastPositionMS[i] = timePlayed;
 		}
 	}
 	else // stats
@@ -312,7 +327,29 @@ void Explorer::LiveView::PlaySound ( )
 {
 	if ( mPointPicker.GetNearestPointFile ( ) == -1 ) { return; }
 
-	if ( std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker.GetNearestPointFile ( ) ) != mPlayingFiles.end ( ) ) { return; }
+	if ( std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker.GetNearestPointFile ( ) ) != mPlayingFiles.end ( ) )
+	{
+		std::vector<int>::iterator it = std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker.GetNearestPointFile ( ) );
+		int index = std::distance ( mPlayingFiles.begin ( ), it );
+		mSoundPlayers[index].setPositionMS ( 0 );
+		mSoundPlayers[index].play ( );
+
+		if ( mRawView->IsTimeAnalysis ( ) )
+		{
+			ofColor color = mTimeCorpus[mPlayingFiles[index]].getColor ( mPlayingTimeHeads[index] );
+			color.setBrightness ( 100 );  color.setSaturation ( 100 );
+			mTimeCorpus[mPlayingFiles[index]].setColor ( mPlayingTimeHeads[index], color );
+
+			mPlayingTimeHeads[index] = 0;
+
+			color = mTimeCorpus[mPlayingFiles[index]].getColor ( mPlayingTimeHeads[index] );
+			color.setBrightness ( 255 );  color.setSaturation ( 0 );
+			mTimeCorpus[mPlayingFiles[index]].setColor ( mPlayingTimeHeads[index], color );
+
+			mPlayingLastPositionMS[index] = 0.0f;
+		}
+		return;
+	}
 
 	std::string filePath = mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )];
 
@@ -324,12 +361,12 @@ void Explorer::LiveView::PlaySound ( )
 	if ( mRawView->IsTimeAnalysis ( ) )
 	{
 		mPlayingTimeHeads.push_back ( 0 );
+		mPlayingLastPositionMS.push_back ( 0.0f );
+		mPlayingLastColor.push_back ( mTimeCorpus[mPointPicker.GetNearestPointFile ( )].getColor ( 0 ) );
 		mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setColor ( 0, ofColor { 255, 255, 255, 255 } );
 	}
 	else
-	{
-		mStatsCorpus.setColor ( mPointPicker.GetNearestPointFile ( ), ofColor { 255, 255, 255, 255 } );
-	}
+	{ }
 
 	mSoundPlayers.push_back ( soundPlayer );
 	mSoundPlayers.back ( ).setLoop ( bLoopAudio );
@@ -577,9 +614,8 @@ void Explorer::LiveView::RefreshFileColors ( int fileIndex )
 
 		for ( int timepoint = 0; timepoint < time->raw[fileIndex].size ( ); timepoint++ )
 		{
-			ofColor color = ofColor::fromHsb ( ofMap ( time->raw[fileIndex][timepoint][colorDimension], min, max, outputMin, outputMax ), 255, 255 );
-			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointTime ( ) != -1 ) { color.a = 25; }
-			else { color.a = 255; }
+			ofColor color = ofColor::fromHsb ( ofMap ( time->raw[fileIndex][timepoint][colorDimension], min, max, outputMin, outputMax ), 255, 255, 255 );
+			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointFile ( ) != -1 ) { color.a = 125; }
 			mTimeCorpus[fileIndex].setColor ( timepoint, color );
 		}
 	}
@@ -592,16 +628,14 @@ void Explorer::LiveView::RefreshFileColors ( int fileIndex )
 			int statisticIndex = colorDimension % DATA_NUM_STATS;
 			int dimensionIndex = colorDimension / DATA_NUM_STATS;
 
-			ofColor color = ofColor::fromHsb ( ofMap ( stats->raw[fileIndex][dimensionIndex][statisticIndex], min, max, outputMin, outputMax ), 255, 255 );
-			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointTime ( ) != -1 ) { color.a = 25; }
-			else { color.a = 255; }
+			ofColor color = ofColor::fromHsb ( ofMap ( stats->raw[fileIndex][dimensionIndex][statisticIndex], min, max, outputMin, outputMax ), 255, 255, 255 );
+			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointFile ( ) != -1 ) { color.a = 125; }
 			mStatsCorpus.setColor ( fileIndex, color );
 		}
 		else
 		{
-			ofColor color = ofColor::fromHsb ( ofMap ( stats->reduced[fileIndex][colorDimension], min, max, outputMin, outputMax ), 255, 255 );
-			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointTime ( ) != -1 ) { color.a = 25; }
-			else { color.a = 255; }
+			ofColor color = ofColor::fromHsb ( ofMap ( stats->reduced[fileIndex][colorDimension], min, max, outputMin, outputMax ), 255, 255, 255 );
+			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointFile ( ) != -1 ) { color.a = 125; }
 			mStatsCorpus.setColor ( fileIndex, color );
 		}
 	}
