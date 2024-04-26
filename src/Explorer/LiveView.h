@@ -41,6 +41,7 @@ public:
 	void FillDimensionStats ( int dimensionIndex, Utils::Axis axis );
 	void FillDimensionStatsReduced ( int dimensionIndex, Utils::Axis axis );
 	void FillDimensionNone ( Utils::Axis axis );
+	void RefreshFileColors ( int fileIndex );
 
 	// Camera Functions ----------------------------
 
@@ -78,6 +79,7 @@ private:
 
 	Utils::Axis mDisabledAxis = Utils::Axis::NONE;
 	std::string xLabel = "X", yLabel = "Y", zLabel = "Z";
+	int colorDimension = -1;
 
 	std::shared_ptr<RawView> mRawView; // might need to be weak_ptr?
 	std::vector<ofMesh> mTimeCorpus;
@@ -86,7 +88,6 @@ private:
 	std::vector<ofSoundPlayer> mSoundPlayers;
 	std::vector<int> mPlayingFiles;
 	std::vector<int> mPlayingTimeHeads;
-	std::vector<ofColor> mPlayingExistingColors;
 
 	// Camera ----------------------------------------
 

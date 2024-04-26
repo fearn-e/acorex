@@ -21,6 +21,7 @@ void Explorer::LiveView::Initialise ( )
 
 	mDisabledAxis = Utils::Axis::NONE;
 	xLabel = "X"; yLabel = "Y"; zLabel = "Z";
+	colorDimension = -1;
 
 	if ( mPlayingFiles.size ( ) > 0 ) { mPlayingFiles.clear ( ); }
 	if ( mPlayingTimeHeads.size ( ) > 0 ) { mPlayingTimeHeads.clear ( ); }
@@ -130,22 +131,19 @@ void Explorer::LiveView::UpdateAudioPlayers ( )
 			float nextTimeStep = time->raw[mPlayingFiles[i]][mPlayingTimeHeads[i]][0];
 			if ( timePlayed >= nextTimeStep )
 			{
-				mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], mPlayingExistingColors[i] );
-
 				mPlayingTimeHeads[i]++;
 
 				if ( mPlayingTimeHeads[i] >= time->raw[mPlayingFiles[i]].size ( ) )
 				{
+					RefreshFileColors ( mPlayingFiles[i] );
 					mPlayingFiles.erase ( mPlayingFiles.begin ( ) + i );
 					mPlayingTimeHeads.erase ( mPlayingTimeHeads.begin ( ) + i );
-					mPlayingExistingColors.erase ( mPlayingExistingColors.begin ( ) + i );
 					mSoundPlayers[i].stop ( );
 					mSoundPlayers.erase ( mSoundPlayers.begin ( ) + i );
 					i--;
 				}
 				else
 				{
-					mPlayingExistingColors[i] = mTimeCorpus[mPlayingFiles[i]].getColor ( mPlayingTimeHeads[i] );
 					mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], ofColor { 255, 255, 255, 255 } );
 				}
 			}
@@ -159,10 +157,8 @@ void Explorer::LiveView::UpdateAudioPlayers ( )
 		{
 			if ( mSoundPlayers[i].getIsPlaying ( ) ) { continue; }
 
-			mStatsCorpus.setColor ( mPlayingFiles[i], mPlayingExistingColors[i] );
-
+			RefreshFileColors ( mPlayingFiles[i] );
 			mPlayingFiles.erase ( mPlayingFiles.begin ( ) + i );
-			mPlayingExistingColors.erase ( mPlayingExistingColors.begin ( ) + i );
 			mSoundPlayers[i].stop ( );
 			mSoundPlayers.erase ( mSoundPlayers.begin ( ) + i );
 			i--;
@@ -317,12 +313,10 @@ void Explorer::LiveView::PlaySound ( )
 	if ( mRawView->IsTimeAnalysis ( ) )
 	{
 		mPlayingTimeHeads.push_back ( 0 );
-		mPlayingExistingColors.push_back ( mTimeCorpus[mPointPicker.GetNearestPointFile ( )].getColor ( 0 ) );
 		mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setColor ( 0, ofColor { 255, 255, 255, 255 } );
 	}
 	else
 	{
-		mPlayingExistingColors.push_back ( mStatsCorpus.getColor ( mPointPicker.GetNearestPointFile ( ) ) );
 		mStatsCorpus.setColor ( mPointPicker.GetNearestPointFile ( ), ofColor { 255, 255, 255, 255 } );
 	}
 
@@ -398,6 +392,7 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axi
 	if ( axis == Utils::Axis::X ) { xLabel = dimensionName; }
 	else if ( axis == Utils::Axis::Y ) { yLabel = dimensionName; }
 	else if ( axis == Utils::Axis::Z ) { zLabel = dimensionName; }
+	else if ( axis == Utils::Axis::COLOR ) { colorDimension = dimensionIndex; }
 
 	Utils::TimeData* time = mRawView->GetTimeData ( );
 
@@ -437,6 +432,7 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis ax
 	if ( axis == Utils::Axis::X ) { xLabel = dimensionName; }
 	else if ( axis == Utils::Axis::Y ) { yLabel = dimensionName; }
 	else if ( axis == Utils::Axis::Z ) { zLabel = dimensionName; }
+	else if ( axis == Utils::Axis::COLOR ) { colorDimension = dimensionIndex; }
 
 	int statisticIndex = dimensionIndex % mRawView->GetStatistics ( ).size ( );
 	int dividedDimensionIndex = dimensionIndex / mRawView->GetStatistics ( ).size ( );
@@ -476,6 +472,7 @@ void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::
 	if ( axis == Utils::Axis::X ) { xLabel = dimensioName; }
 	else if ( axis == Utils::Axis::Y ) { yLabel = dimensioName; }
 	else if ( axis == Utils::Axis::Z ) { zLabel = dimensioName; }
+	else if ( axis == Utils::Axis::COLOR ) { colorDimension = dimensionIndex; }
 
 	Utils::StatsData* stats = mRawView->GetStatsData ( );
 
@@ -511,6 +508,7 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 	if ( axis == Utils::Axis::X ) { xLabel = ""; }
 	else if ( axis == Utils::Axis::Y ) { yLabel = ""; }
 	else if ( axis == Utils::Axis::Z ) { zLabel = ""; }
+	else if ( axis == Utils::Axis::COLOR ) { colorDimension = -1; }
 
 	if ( mRawView->IsTimeAnalysis ( ) )
 	{
@@ -551,6 +549,49 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 	}
 
 	mPointPicker.Train ( -1, axis, true );
+}
+
+void Explorer::LiveView::RefreshFileColors ( int fileIndex )
+{
+	double min = mDimensionBounds.GetMinBound ( colorDimension );
+	double max = mDimensionBounds.GetMaxBound ( colorDimension );
+	double outputMin = bColorFullSpectrum ? SpaceDefs::mColorMin : SpaceDefs::mColorBlue;
+	double outputMax = bColorFullSpectrum ? SpaceDefs::mColorMax : SpaceDefs::mColorRed;
+
+	if ( mRawView->IsTimeAnalysis ( ) )
+	{
+		Utils::TimeData* time = mRawView->GetTimeData ( );
+
+		for ( int timepoint = 0; timepoint < time->raw[fileIndex].size ( ); timepoint++ )
+		{
+			ofColor color = ofColor::fromHsb ( ofMap ( time->raw[fileIndex][timepoint][colorDimension], min, max, outputMin, outputMax ), 255, 255 );
+			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointTime ( ) != -1 ) { color.a = 25; }
+			else { color.a = 255; }
+			mTimeCorpus[fileIndex].setColor ( timepoint, color );
+		}
+	}
+	else
+	{
+		Utils::StatsData* stats = mRawView->GetStatsData ( );
+
+		if ( !mRawView->IsReduction ( ) )
+		{
+			int statisticIndex = colorDimension % DATA_NUM_STATS;
+			int dimensionIndex = colorDimension / DATA_NUM_STATS;
+
+			ofColor color = ofColor::fromHsb ( ofMap ( stats->raw[fileIndex][dimensionIndex][statisticIndex], min, max, outputMin, outputMax ), 255, 255 );
+			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointTime ( ) != -1 ) { color.a = 25; }
+			else { color.a = 255; }
+			mStatsCorpus.setColor ( fileIndex, color );
+		}
+		else
+		{
+			ofColor color = ofColor::fromHsb ( ofMap ( stats->reduced[fileIndex][colorDimension], min, max, outputMin, outputMax ), 255, 255 );
+			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointTime ( ) != -1 ) { color.a = 25; }
+			else { color.a = 255; }
+			mStatsCorpus.setColor ( fileIndex, color );
+		}
+	}
 }
 
 // Camera Functions ----------------------------
