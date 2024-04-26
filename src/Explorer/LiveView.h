@@ -70,6 +70,7 @@ private:
 	bool bDraw = false;
 	bool b3D = true;
 	bool bColorFullSpectrum = false;
+	bool bLoopAudio = false;
 
 	bool mKeyboardMoveState[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // W, A, S, D, R, F, Q, E, Z, X
 	float mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed;
