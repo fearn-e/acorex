@@ -46,10 +46,11 @@ private:
 	// Listeners ------------------------------------
 
 	void MouseMoved ( ofMouseEventArgs& args ) { bNearestCheckNeeded = true; }
-	void KeyPressed ( ofKeyEventArgs& args ) { if ( args.key == OF_KEY_F3 ) bDebug = !bDebug; }
+	void KeyPressed ( ofKeyEventArgs& args );
 
 	// States ---------------------------------------
 
+	bool bPicker = false;
 	bool bDebug = false;
 	bool bDraw = false;
 	bool b3D = true;
