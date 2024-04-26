@@ -1,6 +1,7 @@
 #include "./LiveView.h"
 #include <ofLog.h>
-#include "ofGraphics.h"
+#include <of3dGraphics.h>
+#include <ofGraphics.h>
 #include <of3dUtils.h>
 #include <ofEvents.h>
 
@@ -14,6 +15,18 @@ void Explorer::LiveView::Initialise ( )
 	mTimeCorpus.clear ( );
 
 	b3D = true;
+	bColorFullSpectrum = false;
+	bLoopAudio = false;
+
+	for ( auto& each : mKeyboardMoveState ) { each = false; }
+
+	mDisabledAxis = Utils::Axis::NONE;
+	xLabel = "X"; yLabel = "Y"; zLabel = "Z";
+	colorDimension = -1;
+
+	if ( mPlayingFiles.size ( ) > 0 ) { mPlayingFiles.clear ( ); }
+	if ( mPlayingTimeHeads.size ( ) > 0 ) { mPlayingTimeHeads.clear ( ); }
+
 	mCamera = std::make_shared<ofCamera> ( );
 	Init3DCam ( );
 
@@ -21,6 +34,10 @@ void Explorer::LiveView::Initialise ( )
 
 	mPointPicker.SetCamera ( mCamera );
 	mPointPicker.Initialise ( *mRawView->GetDataset ( ), mDimensionBounds );
+
+	if ( mSoundPlayers.size ( ) > 0 ) { mSoundPlayers.clear ( ); }
+	if ( mPlayingFiles.size ( ) > 0 ) { mPlayingFiles.clear ( ); }
+	if ( mPlayingTimeHeads.size ( ) > 0 ) { mPlayingTimeHeads.clear ( ); }
 
 	ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
 	ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
@@ -94,56 +111,85 @@ void Explorer::LiveView::Update ( )
 		{
 			Zoom2DCam ( ( mKeyboardMoveState[8] - mKeyboardMoveState[9] ) * keyboardZoomDelta, false );
 			mPointPicker.SetNearestCheckNeeded ( );
+		}
 	}
+
+	UpdateAudioPlayers ( );
 }
+
+void Explorer::LiveView::UpdateAudioPlayers ( )
+{
+	if ( mPlayingFiles.size ( ) == 0 ) { return; }
+
+	if ( mRawView->IsTimeAnalysis ( )  )
+	{
+		Utils::TimeData* time = mRawView->GetTimeData ( );
+
+		for ( int i = 0; i < mPlayingFiles.size ( ); i++ )
+		{
+			float timePlayed = mSoundPlayers[i].getPositionMS ( ) / 1000.0;
+			if ( !mSoundPlayers[i].getIsPlaying ( ) || timePlayed < mPlayingLastPositionMS[i] || ( mPlayingTimeHeads[i] + 1 ) >= time->raw[mPlayingFiles[i]].size ( ) )
+			{
+				if ( !bLoopAudio )
+				{
+					RefreshFileColors ( mPlayingFiles[i] );
+					mPlayingFiles.erase ( mPlayingFiles.begin ( ) + i );
+					mPlayingTimeHeads.erase ( mPlayingTimeHeads.begin ( ) + i );
+					mPlayingLastPositionMS.erase ( mPlayingLastPositionMS.begin ( ) + i );
+					mPlayingLastColor.erase ( mPlayingLastColor.begin ( ) + i );
+					mSoundPlayers[i].stop ( );
+					mSoundPlayers.erase ( mSoundPlayers.begin ( ) + i );
+					i--;
+					continue;
+				}
+				else
+				{
+					mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], mPlayingLastColor[i] );
+
+					mPlayingTimeHeads[i] = 0;
+
+					mPlayingLastColor[i] = mTimeCorpus[mPlayingFiles[i]].getColor ( mPlayingTimeHeads[i] );
+					mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], ofColor { 255, 255, 255, 255 } );
+				}
+			}
+			else
+			{
+				float nextTimeStep = time->raw[mPlayingFiles[i]][mPlayingTimeHeads[i]][0];
+
+				if ( timePlayed >= nextTimeStep )
+				{
+					mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], mPlayingLastColor[i] );
+
+					mPlayingTimeHeads[i]++;
+
+					mPlayingLastColor[i] = mTimeCorpus[mPlayingFiles[i]].getColor ( mPlayingTimeHeads[i] );
+					mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], ofColor { 255, 255, 255, 255 } );
+				}
+			}
+
+			mPlayingLastPositionMS[i] = timePlayed;
+		}
+	}
+	else // stats
+	{
+		Utils::StatsData* stats = mRawView->GetStatsData ( );
+
+		for ( int i = 0; i < mPlayingFiles.size ( ); i++ )
+		{
+			if ( mSoundPlayers[i].getIsPlaying ( ) ) { continue; }
+
+			RefreshFileColors ( mPlayingFiles[i] );
+			mPlayingFiles.erase ( mPlayingFiles.begin ( ) + i );
+			mSoundPlayers[i].stop ( );
+			mSoundPlayers.erase ( mSoundPlayers.begin ( ) + i );
+			i--;
+		}
+	}
 }
 
 void Explorer::LiveView::SlowUpdate ( )
 {
 	mPointPicker.SlowUpdate ( );
-
-	UpdateAlphas ( );
-}
-
-void Explorer::LiveView::UpdateAlphas ( )
-{
-	if ( mRawView->IsTimeAnalysis ( ) )
-	{
-		mLastNearestPointFile = mPointPicker.GetNearestPointFile ( );
-		mLastNearestPointTime = mPointPicker.GetNearestPointTime ( );
-		return;
-	}
-	
-	// only for stat points, not for trails - trail lines obscure hovered trail too much
-	if ( mPointPicker.GetNearestPointFile ( ) != mLastNearestPointFile || mPointPicker.GetNearestPointTime ( ) != mLastNearestPointTime )
-	{
-		// Set all points to full alpha or 20% alpha depending on if a nearest point is found
-		if ( (mLastNearestPointFile == -1 && mPointPicker.GetNearestPointFile ( ) >= 0) ||
-			(mLastNearestPointFile >= 0 && mPointPicker.GetNearestPointFile ( ) == -1) )
-		{
-			for ( int point = 0; point < mStatsCorpus.getNumColors ( ); point++ )
-			{
-				ofColor currentColor = mStatsCorpus.getColor ( point );
-				currentColor.a = mPointPicker.GetNearestPointFile ( ) == -1 ? 255 : 50;
-				mStatsCorpus.setColor ( point, currentColor );
-			}
-		}
-		else if ( mLastNearestPointFile != mPointPicker.GetNearestPointFile ( ) )
-		{
-			ofColor currentColor = mStatsCorpus.getColor ( mLastNearestPointFile );
-			currentColor.a = 50;
-			mStatsCorpus.setColor ( mLastNearestPointFile, currentColor );
-		}
-
-		if ( mPointPicker.GetNearestPointFile ( ) >= 0 )
-		{
-			ofColor currentColor = mStatsCorpus.getColor ( mPointPicker.GetNearestPointFile ( ) );
-			currentColor.a = 255;
-			mStatsCorpus.setColor ( mPointPicker.GetNearestPointFile ( ), currentColor );
-		}
-
-		mLastNearestPointFile = mPointPicker.GetNearestPointFile ( );
-	}
 }
 
 void Explorer::LiveView::Draw ( )
@@ -167,7 +213,7 @@ void Explorer::LiveView::Draw ( )
 	// Draw points ------------------------------
 	if ( mRawView->IsTimeAnalysis ( ) ) // Time
 	{
-		if ( mPointPicker.GetNearestPointFile ( ) == -1 )
+		if ( mPointPicker.GetNearestPointFile ( ) == -1 && mPlayingFiles.size ( ) == 0 )
 		{
 			for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
 			{
@@ -184,6 +230,10 @@ void Explorer::LiveView::Draw ( )
 			{
 				if ( file != mPointPicker.GetNearestPointFile ( ) )
 				{
+					bool skip = false;
+					for ( auto& each : mPlayingFiles ) { if ( file == each ) { skip = true; } }
+					if ( skip ) { continue; }
+
 					mTimeCorpus[file].disableColors ( );
 					ofSetColor ( 255, 255, 255, 25 );
 					mTimeCorpus[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
@@ -194,18 +244,59 @@ void Explorer::LiveView::Draw ( )
 			}
 
 			ofDisableDepthTest ( );
-			mTimeCorpus[mLastNearestPointFile].enableColors ( );
-			mTimeCorpus[mLastNearestPointFile].setMode ( OF_PRIMITIVE_LINE_STRIP );
-			mTimeCorpus[mLastNearestPointFile].draw ( );
-			mTimeCorpus[mLastNearestPointFile].setMode ( OF_PRIMITIVE_POINTS );
-			mTimeCorpus[mLastNearestPointFile].draw ( );
+
+			for ( int i = 0; i < mPlayingFiles.size ( ); i++ )
+			{
+				mTimeCorpus[mPlayingFiles[i]].enableColors ( );
+				mTimeCorpus[mPlayingFiles[i]].setMode ( OF_PRIMITIVE_LINE_STRIP );
+				mTimeCorpus[mPlayingFiles[i]].draw ( );
+				mTimeCorpus[mPlayingFiles[i]].setMode ( OF_PRIMITIVE_POINTS );
+				mTimeCorpus[mPlayingFiles[i]].draw ( );
+			}
+
+			if ( mPointPicker.GetNearestPointFile ( ) >= 0 )
+			{
+				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].enableColors ( );
+				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setMode ( OF_PRIMITIVE_LINE_STRIP );
+				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].draw ( );
+				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setMode ( OF_PRIMITIVE_POINTS );
+				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].draw ( );
+			}
+
 			ofEnableDepthTest ( );
 		}
 	}
 	else // Stats
 	{
-		mStatsCorpus.setMode ( OF_PRIMITIVE_POINTS );
-		mStatsCorpus.draw ( );
+		if ( mPointPicker.GetNearestPointFile ( ) == -1 && mPlayingFiles.size ( ) == 0 )
+		{
+			mStatsCorpus.enableColors ( );
+			mStatsCorpus.setMode ( OF_PRIMITIVE_POINTS );
+			mStatsCorpus.draw ( );
+		}
+		else
+		{
+			mStatsCorpus.disableColors ( );
+			ofSetColor ( 255, 255, 255, 25 );
+			mStatsCorpus.setMode ( OF_PRIMITIVE_POINTS );
+			mStatsCorpus.draw ( );
+
+			ofDisableDepthTest ( );
+
+			for ( int i = 0; i < mPlayingFiles.size ( ); i++ )
+			{
+				ofSetColor ( 255, 255, 255, 150 );
+				ofDrawSphere ( mStatsCorpus.getVertex ( mPlayingFiles[i] ), 25 );
+			}
+
+			if ( mPointPicker.GetNearestPointFile ( ) >= 0 )
+			{
+				ofSetColor ( mStatsCorpus.getColor ( mPointPicker.GetNearestPointFile ( ) ) );
+				ofDrawSphere ( mStatsCorpus.getVertex ( mPointPicker.GetNearestPointFile ( ) ), 25 );
+			}
+
+			ofEnableDepthTest ( );
+		}
 	}
 
 	mCamera->end ( );
@@ -223,6 +314,64 @@ void Explorer::LiveView::Draw ( )
 			ofDrawBitmapStringHighlight ( "Nearest Timepoint: " + hopInfoSamps + " samples, " + hopInfoSecs + "s", 20, ofGetHeight ( ) - 40 );
 		}
 	}
+
+	if ( bDebug )
+	{
+		ofDrawBitmapStringHighlight ( "UPS: " + std::to_string ( 1 / deltaTime ), 20, ofGetHeight ( ) - 220 );
+	}
+}
+
+// Sound Functions ------------------------------
+
+void Explorer::LiveView::PlaySound ( )
+{
+	if ( mPointPicker.GetNearestPointFile ( ) == -1 ) { return; }
+
+	if ( std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker.GetNearestPointFile ( ) ) != mPlayingFiles.end ( ) )
+	{
+		std::vector<int>::iterator it = std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker.GetNearestPointFile ( ) );
+		int index = std::distance ( mPlayingFiles.begin ( ), it );
+		mSoundPlayers[index].setPositionMS ( 0 );
+		mSoundPlayers[index].play ( );
+
+		if ( mRawView->IsTimeAnalysis ( ) )
+		{
+			ofColor color = mTimeCorpus[mPlayingFiles[index]].getColor ( mPlayingTimeHeads[index] );
+			color.setBrightness ( 100 );  color.setSaturation ( 100 );
+			mTimeCorpus[mPlayingFiles[index]].setColor ( mPlayingTimeHeads[index], color );
+
+			mPlayingTimeHeads[index] = 0;
+
+			color = mTimeCorpus[mPlayingFiles[index]].getColor ( mPlayingTimeHeads[index] );
+			color.setBrightness ( 255 );  color.setSaturation ( 0 );
+			mTimeCorpus[mPlayingFiles[index]].setColor ( mPlayingTimeHeads[index], color );
+
+			mPlayingLastPositionMS[index] = 0.0f;
+		}
+		return;
+	}
+
+	std::string filePath = mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )];
+
+	ofSoundPlayer soundPlayer;
+	bool success = soundPlayer.load ( filePath );
+	if ( !success ) { ofLogError ( "Explorer" ) << "Failed to load sound file: " << filePath; return; }
+
+	mPlayingFiles.push_back ( mPointPicker.GetNearestPointFile ( ) );
+	if ( mRawView->IsTimeAnalysis ( ) )
+	{
+		mPlayingTimeHeads.push_back ( 0 );
+		mPlayingLastPositionMS.push_back ( 0.0f );
+		mPlayingLastColor.push_back ( mTimeCorpus[mPointPicker.GetNearestPointFile ( )].getColor ( 0 ) );
+		mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setColor ( 0, ofColor { 255, 255, 255, 255 } );
+	}
+	else
+	{ }
+
+	mSoundPlayers.push_back ( soundPlayer );
+	mSoundPlayers.back ( ).setLoop ( bLoopAudio );
+	mSoundPlayers.back ( ).setVolume ( 0.6 );
+	mSoundPlayers.back ( ).play ( );
 }
 
 // Filler Functions ----------------------------
@@ -291,6 +440,7 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axi
 	if ( axis == Utils::Axis::X ) { xLabel = dimensionName; }
 	else if ( axis == Utils::Axis::Y ) { yLabel = dimensionName; }
 	else if ( axis == Utils::Axis::Z ) { zLabel = dimensionName; }
+	else if ( axis == Utils::Axis::COLOR ) { colorDimension = dimensionIndex; }
 
 	Utils::TimeData* time = mRawView->GetTimeData ( );
 
@@ -330,6 +480,7 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis ax
 	if ( axis == Utils::Axis::X ) { xLabel = dimensionName; }
 	else if ( axis == Utils::Axis::Y ) { yLabel = dimensionName; }
 	else if ( axis == Utils::Axis::Z ) { zLabel = dimensionName; }
+	else if ( axis == Utils::Axis::COLOR ) { colorDimension = dimensionIndex; }
 
 	int statisticIndex = dimensionIndex % mRawView->GetStatistics ( ).size ( );
 	int dividedDimensionIndex = dimensionIndex / mRawView->GetStatistics ( ).size ( );
@@ -369,6 +520,7 @@ void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::
 	if ( axis == Utils::Axis::X ) { xLabel = dimensioName; }
 	else if ( axis == Utils::Axis::Y ) { yLabel = dimensioName; }
 	else if ( axis == Utils::Axis::Z ) { zLabel = dimensioName; }
+	else if ( axis == Utils::Axis::COLOR ) { colorDimension = dimensionIndex; }
 
 	Utils::StatsData* stats = mRawView->GetStatsData ( );
 
@@ -404,6 +556,7 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 	if ( axis == Utils::Axis::X ) { xLabel = ""; }
 	else if ( axis == Utils::Axis::Y ) { yLabel = ""; }
 	else if ( axis == Utils::Axis::Z ) { zLabel = ""; }
+	else if ( axis == Utils::Axis::COLOR ) { colorDimension = -1; }
 
 	if ( mRawView->IsTimeAnalysis ( ) )
 	{
@@ -444,6 +597,48 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 	}
 
 	mPointPicker.Train ( -1, axis, true );
+}
+
+void Explorer::LiveView::RefreshFileColors ( int fileIndex )
+{
+	if ( bDebug ) { ofLogNotice ( "Explorer" ) << "Refreshing file colors for file: " << mRawView->GetDataset ( )->fileList[fileIndex]; }
+
+	double min = mDimensionBounds.GetMinBound ( colorDimension );
+	double max = mDimensionBounds.GetMaxBound ( colorDimension );
+	double outputMin = bColorFullSpectrum ? SpaceDefs::mColorMin : SpaceDefs::mColorBlue;
+	double outputMax = bColorFullSpectrum ? SpaceDefs::mColorMax : SpaceDefs::mColorRed;
+
+	if ( mRawView->IsTimeAnalysis ( ) )
+	{
+		Utils::TimeData* time = mRawView->GetTimeData ( );
+
+		for ( int timepoint = 0; timepoint < time->raw[fileIndex].size ( ); timepoint++ )
+		{
+			ofColor color = ofColor::fromHsb ( ofMap ( time->raw[fileIndex][timepoint][colorDimension], min, max, outputMin, outputMax ), 255, 255, 255 );
+			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointFile ( ) != -1 ) { color.a = 125; }
+			mTimeCorpus[fileIndex].setColor ( timepoint, color );
+		}
+	}
+	else
+	{
+		Utils::StatsData* stats = mRawView->GetStatsData ( );
+
+		if ( !mRawView->IsReduction ( ) )
+		{
+			int statisticIndex = colorDimension % DATA_NUM_STATS;
+			int dimensionIndex = colorDimension / DATA_NUM_STATS;
+
+			ofColor color = ofColor::fromHsb ( ofMap ( stats->raw[fileIndex][dimensionIndex][statisticIndex], min, max, outputMin, outputMax ), 255, 255, 255 );
+			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointFile ( ) != -1 ) { color.a = 125; }
+			mStatsCorpus.setColor ( fileIndex, color );
+		}
+		else
+		{
+			ofColor color = ofColor::fromHsb ( ofMap ( stats->reduced[fileIndex][colorDimension], min, max, outputMin, outputMax ), 255, 255, 255 );
+			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointFile ( ) != -1 ) { color.a = 125; }
+			mStatsCorpus.setColor ( fileIndex, color );
+		}
+	}
 }
 
 // Camera Functions ----------------------------
@@ -606,7 +801,7 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 	//key: no modifiers, just the raw key
 	//scancode: includes all modifiers
 
-	if ( args.type == 0 )
+	if ( args.type == ofKeyEventArgs::Type::Pressed )
 	{
 		if ( args.key == 'w' || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = true; }
 		else if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = true; }
@@ -618,8 +813,9 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 		else if ( args.key == 'e' ) { mKeyboardMoveState[7] = true; }
 		else if ( args.key == 'z' ) { mKeyboardMoveState[8] = true; }
 		else if ( args.key == 'x' ) { mKeyboardMoveState[9] = true; }
+		else if ( args.key == ' ' ) { PlaySound ( ); }
 	}
-	else if ( args.type == 1 )
+	else if ( args.type == ofKeyEventArgs::Type::Released )
 	{
 		if ( args.key == 'w' || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = false; }
 		else if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = false; }
@@ -631,5 +827,31 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 		else if ( args.key == 'e' ) { mKeyboardMoveState[7] = false; }
 		else if ( args.key == 'z' ) { mKeyboardMoveState[8] = false; }
 		else if ( args.key == 'x' ) { mKeyboardMoveState[9] = false; }
+		else if ( args.key == OF_KEY_F3 ) { bDebug = !bDebug; }
+		else if ( args.key == 'l' )
+		{
+			bLoopAudio = !bLoopAudio;
+			for ( auto& each : mSoundPlayers ) { each.setLoop ( bLoopAudio ); }
+		}
+		else if ( args.key == 'c' )
+		{ 
+			if ( mPointPicker.GetNearestPointFile ( ) != -1 )
+			{
+				ofSetClipboardString ( mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
+			}
+		}
+		else if ( args.key == OF_KEY_RETURN )
+		{
+			if ( mPointPicker.GetNearestPointFile ( ) != -1 )
+			{
+#ifdef _WIN32 || _WIN64
+				ofSystem ( "explorer /select," + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
+#elif __APPLE__ && __MACH__
+				ofSystem ( "open -R " + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
+#elif __linux__
+				ofSystem ( "xdg-open " + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
+#endif
+			}
+		}
 	}
 }

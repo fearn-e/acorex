@@ -22,7 +22,7 @@ namespace Utils {
 		int analyseAnalysisPanelWidth = 315;
 		int analyseReductionPanelWidth = 300;
 
-		int explorePanelWidth = 200;
+		int explorePanelWidth = 315;
 
 		int interPanelSpacing = 5;
 		int panelBackgroundMargin = 5;

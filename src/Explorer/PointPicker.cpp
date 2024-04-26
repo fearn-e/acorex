@@ -8,8 +8,19 @@ using namespace Acorex;
 
 void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Utils::DimensionBounds& dimensionBounds )
 {
-	mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dataset.analysisSettings.currentDimensionCount );
+	mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dataset.dimensionNames.size ( ) );
 	mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 3 );
+
+
+	bPicker = false; b3D = true; bSkipTraining = true; bNearestCheckNeeded = false;
+
+	bDimensionsFilled[0] = false; bDimensionsFilled[1] = false; bDimensionsFilled[2] = false;
+	mDimensionsIndices[0] = -1; mDimensionsIndices[1] = -1; mDimensionsIndices[2] = -1;
+
+	mNearestPoint = -1; mNearestDistance = -1; mNearestPointFile = -1; mNearestPointTime = -1;
+
+	if ( mCorpusFileLookUp.size ( ) > 0 ) { mCorpusFileLookUp.clear ( ); }
+	if ( mCorpusTimeLookUp.size ( ) > 0 ) { mCorpusTimeLookUp.clear ( ); }
 
 	Utils::DataSet scaledDataset = dataset;
 	ScaleDataset ( scaledDataset, dimensionBounds );
@@ -35,7 +46,7 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
 	if ( !bListenersAdded )
 	{
 		ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
-		ofAddListener ( ofEvents ( ).keyPressed, this, &Explorer::PointPicker::KeyPressed );
+		ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
 		bListenersAdded = true;
 	}
 }
@@ -188,7 +199,7 @@ void Explorer::PointPicker::Draw ( )
 
 void Explorer::PointPicker::FindNearest ( )
 {
-	if ( !ofGetMousePressed ( 2 ) && !ofGetKeyPressed ( 'c' ) ) { return; }
+	if ( !ofGetMousePressed ( 2 ) && !bPicker ) { return; }
 	if ( !bTrained ) { return; }
 	if ( !bNearestCheckNeeded ) { return; }
 	bNearestCheckNeeded = false;
@@ -245,17 +256,14 @@ void Explorer::PointPicker::FindNearest ( )
 		rayLength += maxAllowedDistance * 1000.0f;
 	} while ( rayLength < desiredRayLength );
 
-	glm::vec3 rayDirection = mCamera->screenToWorld ( glm::vec3 ( mouseX, mouseY, 0 ) );
+	glm::vec3 rayDirection = mCamera->screenToWorld ( glm::vec3 ( (float)mouseX, (float)mouseY, 0.0f ) );
 	rayDirection = glm::normalize ( rayDirection - mCamera->getPosition ( ) );
 	double depth = 0.0f;
 
-	if ( bDebug )
-	{
-		if ( testPoints.size ( ) > 0 ) { testPoints.clear ( ); }
-		if ( testRadii.size ( ) > 0 ) { testRadii.clear ( ); }
-		if ( testPointsOutOfRange.size ( ) > 0 ) { testPointsOutOfRange.clear ( ); }
-		if ( testRadiiOutOfRange.size ( ) > 0 ) { testRadiiOutOfRange.clear ( ); }
-	}
+	if ( testPoints.size ( ) > 0 ) { testPoints.clear ( ); }
+	if ( testRadii.size ( ) > 0 ) { testRadii.clear ( ); }
+	if ( testPointsOutOfRange.size ( ) > 0 ) { testPointsOutOfRange.clear ( ); }
+	if ( testRadiiOutOfRange.size ( ) > 0 ) { testRadiiOutOfRange.clear ( ); }
 
 	for ( int rayPoint = 1; rayPoint < rayPointSpacing.size ( ); rayPoint++ )
 	{
@@ -300,5 +308,14 @@ void Explorer::PointPicker::FindNearest ( )
 			mNearestPointFile = mCorpusFileLookUp[mNearestPoint];
 			if ( mCorpusTimeLookUp.size ( ) > 0 ) { mNearestPointTime = mCorpusTimeLookUp[mNearestPoint]; }
 		}
+	}
+}
+
+void Explorer::PointPicker::KeyEvent ( ofKeyEventArgs& args )
+{
+	if ( args.type == ofKeyEventArgs::Type::Released )
+	{
+		if ( args.key == OF_KEY_F3 ) { bDebug = !bDebug; }
+		else if ( args.key == OF_KEY_TAB ) { bPicker = !bPicker; }
 	}
 }
