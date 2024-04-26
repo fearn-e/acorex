@@ -37,6 +37,8 @@ public:
 	int GetNearestPointTime ( ) const { return mNearestPointTime; }
 	double GetNearestDistance ( ) const { return mNearestDistance; }
 	bool IsTrained ( ) const { return bTrained; }
+	std::vector<int>* GetCorpusFileLookUp ( ) { return &mCorpusFileLookUp; }
+	std::vector<int>* GetCorpusTimeLookUp ( ) { return &mCorpusTimeLookUp; }
 
 private:
 	void ScaleDataset ( Utils::DataSet& scaledDataset, const Utils::DimensionBounds& dimensionBounds );

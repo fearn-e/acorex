@@ -7,6 +7,7 @@
 #include "Utils/Data.h"
 #include <ofMesh.h>
 #include <ofEasyCam.h>
+#include <ofSoundPlayer.h>
 
 namespace Acorex {
 namespace Explorer {
@@ -24,11 +25,13 @@ public:
 	// Process Functions ---------------------------
 
 	void Update ( );
+	void UpdateAudioPlayers ( );
 	void SlowUpdate ( );
-
-	void UpdateAlphas ( );
-
 	void Draw ( );
+
+	// Sound Functions ------------------------------
+
+	void PlaySound ( );
 
 	// Filler Functions ----------------------------
 
@@ -79,6 +82,11 @@ private:
 	std::shared_ptr<RawView> mRawView; // might need to be weak_ptr?
 	std::vector<ofMesh> mTimeCorpus;
 	ofMesh mStatsCorpus;
+
+	std::vector<ofSoundPlayer> mSoundPlayers;
+	std::vector<int> mPlayingFiles;
+	std::vector<int> mPlayingTimeHeads;
+	std::vector<ofColor> mPlayingExistingColors;
 
 	// Camera ----------------------------------------
 
