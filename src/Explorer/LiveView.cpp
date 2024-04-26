@@ -739,5 +739,25 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 		else if ( args.key == 'e' ) { mKeyboardMoveState[7] = false; }
 		else if ( args.key == 'z' ) { mKeyboardMoveState[8] = false; }
 		else if ( args.key == 'x' ) { mKeyboardMoveState[9] = false; }
+		else if ( args.key == 'c' )
+		{ 
+			if ( mPointPicker.GetNearestPointFile ( ) != -1 )
+			{
+				ofSetClipboardString ( mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
+			}
+		}
+		else if ( args.key == OF_KEY_RETURN )
+		{
+			if ( mPointPicker.GetNearestPointFile ( ) != -1 )
+			{
+#ifdef _WIN32 || _WIN64
+				ofSystem ( "explorer /select," + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
+#elif __APPLE__ && __MACH__
+				ofSystem ( "open -R " + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
+#elif __linux__
+				ofSystem ( "xdg-open " + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
+#endif
+			}
+		}
 	}
 }
