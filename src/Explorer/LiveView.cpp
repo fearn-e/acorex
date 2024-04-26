@@ -327,6 +327,8 @@ void Explorer::LiveView::PlaySound ( )
 	}
 
 	mSoundPlayers.push_back ( soundPlayer );
+	mSoundPlayers.back ( ).setLoop ( false );
+	mSoundPlayers.back ( ).setVolume ( 0.6 );
 	mSoundPlayers.back ( ).play ( );
 }
 
