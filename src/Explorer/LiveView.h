@@ -7,6 +7,7 @@
 #include "Utils/Data.h"
 #include <ofMesh.h>
 #include <ofEasyCam.h>
+#include <ofSoundPlayer.h>
 
 namespace Acorex {
 namespace Explorer {
@@ -24,11 +25,13 @@ public:
 	// Process Functions ---------------------------
 
 	void Update ( );
+	void UpdateAudioPlayers ( );
 	void SlowUpdate ( );
-
-	void UpdateAlphas ( );
-
 	void Draw ( );
+
+	// Sound Functions ------------------------------
+
+	void PlaySound ( );
 
 	// Filler Functions ----------------------------
 
@@ -38,6 +41,7 @@ public:
 	void FillDimensionStats ( int dimensionIndex, Utils::Axis axis );
 	void FillDimensionStatsReduced ( int dimensionIndex, Utils::Axis axis );
 	void FillDimensionNone ( Utils::Axis axis );
+	void RefreshFileColors ( int fileIndex );
 
 	// Camera Functions ----------------------------
 
@@ -63,9 +67,11 @@ public:
 	void MouseEvent ( ofMouseEventArgs& args );
 
 private:
+	bool bDebug = false;
 	bool bDraw = false;
 	bool b3D = true;
 	bool bColorFullSpectrum = false;
+	bool bLoopAudio = false;
 
 	bool mKeyboardMoveState[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // W, A, S, D, R, F, Q, E, Z, X
 	float mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed;
@@ -75,13 +81,17 @@ private:
 
 	Utils::Axis mDisabledAxis = Utils::Axis::NONE;
 	std::string xLabel = "X", yLabel = "Y", zLabel = "Z";
+	int colorDimension = -1;
 
 	std::shared_ptr<RawView> mRawView; // might need to be weak_ptr?
 	std::vector<ofMesh> mTimeCorpus;
 	ofMesh mStatsCorpus;
 
-	int mLastNearestPointFile = -1;
-	int mLastNearestPointTime = -1;
+	std::vector<ofSoundPlayer> mSoundPlayers;
+	std::vector<int> mPlayingFiles;
+	std::vector<int> mPlayingTimeHeads;
+	std::vector<float> mPlayingLastPositionMS;
+	std::vector<ofColor> mPlayingLastColor;
 
 	// Camera ----------------------------------------
 

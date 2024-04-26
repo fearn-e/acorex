@@ -37,6 +37,8 @@ public:
 	int GetNearestPointTime ( ) const { return mNearestPointTime; }
 	double GetNearestDistance ( ) const { return mNearestDistance; }
 	bool IsTrained ( ) const { return bTrained; }
+	std::vector<int>* GetCorpusFileLookUp ( ) { return &mCorpusFileLookUp; }
+	std::vector<int>* GetCorpusTimeLookUp ( ) { return &mCorpusTimeLookUp; }
 
 private:
 	void ScaleDataset ( Utils::DataSet& scaledDataset, const Utils::DimensionBounds& dimensionBounds );
@@ -44,10 +46,11 @@ private:
 	// Listeners ------------------------------------
 
 	void MouseMoved ( ofMouseEventArgs& args ) { bNearestCheckNeeded = true; }
-	void KeyPressed ( ofKeyEventArgs& args ) { if ( args.key == OF_KEY_F3 ) bDebug = !bDebug; }
+	void KeyEvent ( ofKeyEventArgs& args );
 
 	// States ---------------------------------------
 
+	bool bPicker = false;
 	bool bDebug = false;
 	bool bDraw = false;
 	bool b3D = true;
