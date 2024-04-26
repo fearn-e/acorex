@@ -256,7 +256,7 @@ void Explorer::PointPicker::FindNearest ( )
 		rayLength += maxAllowedDistance * 1000.0f;
 	} while ( rayLength < desiredRayLength );
 
-	glm::vec3 rayDirection = mCamera->screenToWorld ( glm::vec3 ( mouseX, mouseY, 0 ) );
+	glm::vec3 rayDirection = mCamera->screenToWorld ( glm::vec3 ( (float)mouseX, (float)mouseY, 0.0f ) );
 	rayDirection = glm::normalize ( rayDirection - mCamera->getPosition ( ) );
 	double depth = 0.0f;
 
