@@ -1,6 +1,39 @@
 set -o nounset
 set -o errexit
 
+# Optional args
+    FORCE_DOWNLOAD=false
+    FORCE_COMPILE=false
+
+    ARG1=${1:-"n"}
+    ARG2=${2:-"n"}
+
+    if [ $ARG1 == "-d" ] || [ $ARG2 == "-d" ]; then
+        FORCE_DOWNLOAD=true
+    elif [ $ARG1 == "-c" ] || [ $ARG2 == "-c" ]; then
+        FORCE_COMPILE=true
+    fi
+#
+
+# Get OS type
+    currentOS="win"
+    if [ "$OSTYPE" == "darwin"* ]; then
+        # Mac OSX
+        currentOS="mac"
+    elif [ "$OSTYPE" == "msys" ] || [ "$OSTYPE" == "win32" ]; then
+        # Lightweight shell and GNU utilities compiled for Windows (part of MinGW), not sure if win32 can even happen?
+        currentOS="win"
+    else
+        # Unknown, cygwin, linux-gnu
+        echo "no official support for this OS, script functionality may not be as expected, continue? (y/n)"
+        CONFIRM="n"
+        read -p "" CONFIRM
+        if [ ! "$CONFIRM" == "y" ] && [ ! "$CONFIRM" == "Y" ]; then
+            exit 
+        fi
+    fi
+#
+
 # Check Current Directory & OpenFrameworks Exists
     CURRENT_FOLDER=${PWD##*/}
     if [ "$CURRENT_FOLDER" != "acorex" ]; then
@@ -43,40 +76,18 @@ set -o errexit
 
         cp -rv acorex/ openframeworks/apps/myApps/acorex/
         rm -rfv acorex
-        cd openframeworks/apps/myapps/acorex/
-    fi
-#
 
-# Optional args
-    FORCE_DOWNLOAD=false
-    FORCE_COMPILE=false
+        cd openframeworks/scripts
 
-    ARG1=${1:-"n"}
-    ARG2=${2:-"n"}
-
-    if [ $ARG1 == "-d" ] || [ $ARG2 == "-d" ]; then
-        FORCE_DOWNLOAD=true
-    elif [ $ARG1 == "-c" ] || [ $ARG2 == "-c" ]; then
-        FORCE_COMPILE=true
-    fi
-#
-
-# Get OS type
-    currentOS="win"
-    if [ "$OSTYPE" == "darwin"* ]; then
-        # Mac OSX
-        currentOS="mac"
-    elif [ "$OSTYPE" == "msys" ] || [ "$OSTYPE" == "win32" ]; then
-        # Lightweight shell and GNU utilities compiled for Windows (part of MinGW), not sure if win32 can even happen?
-        currentOS="win"
-    else
-        # Unknown, cygwin, linux-gnu
-        echo "no official support for this OS, script functionality may not be as expected, continue? (y/n)"
-        CONFIRM="n"
-        read -p "" CONFIRM
-        if [ ! "$CONFIRM" == "y" ] && [ ! "$CONFIRM" == "Y" ]; then
-            exit 
+        if [ "$currentOS" == "win" ]; then
+            cd vs
+            source download_libs.sh
+        elif [ "$currentOS" == "mac" ]; then
+            cd osx
+            source download_libs.sh
         fi
+
+        cd ../../apps/myApps/acorex
     fi
 #
 
