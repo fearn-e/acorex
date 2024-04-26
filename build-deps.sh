@@ -1,14 +1,51 @@
 set -o nounset
 set -o errexit
 
-# Check Current Directory
+# Check Current Directory & OpenFrameworks Exists
     CURRENT_FOLDER=${PWD##*/}
     if [ "$CURRENT_FOLDER" != "acorex" ]; then
         echo "Incorrect working directory"
         exit
     fi
-#
 
+    OF_FOUND=false
+
+    cd ..
+    CURRENT_FOLDER=${PWD##*/}
+    if [ "$CURRENT_FOLDER" == "myApps" ]; then
+        cd ..
+        CURRENT_FOLDER=${PWD##*/}
+        if [ "$CURRENT_FOLDER" == "apps" ]; then
+            cd ..
+            CURRENT_FOLDER=${PWD##*/}
+            if [ "$CURRENT_FOLDER" == "openframeworks" ]; then
+                cd apps/myApps/acorex
+                echo "openframeworks found"
+                OF_FOUND=true
+            else
+                cd apps
+            fi
+        else
+            cd myApps
+        fi
+    else
+        cd acorex
+    fi
+
+    if [ $OF_FOUND == false ]; then
+        echo "openframeworks not found, downloading..."
+        cd ..
+        git -c advice.detachedHead=false clone --depth 1 -b "0.12.0" https://github.com/openframeworks/openframeworks
+        
+        cd openframeworks/apps
+        mkdir myApps
+        cd ../..
+
+        cp -rv acorex/ openframeworks/apps/myApps/acorex/
+        rm -rfv acorex
+        cd openframeworks/apps/myapps/acorex/
+    fi
+#
 
 # Optional args
     FORCE_DOWNLOAD=false
@@ -45,7 +82,25 @@ set -o errexit
 
 echo "OS discovered as $currentOS"
 
-# Download repos
+# Download repos & OF addons
+    echo "--------------------------------------------------"
+    echo "downloading openframeworks addons"
+    echo ""
+
+    cd ../../../addons
+
+    if [ ! -d "ofxDropdown" ]; then
+        git clone --depth 1 -b master https://github.com/fearn-e/ofxDropdown
+        echo ""
+    fi
+
+    if [ ! -d "ofxAudioFile" ]; then
+        git clone --depth 1 -b master https://github.com/fearn-e/ofxAudioFile
+        echo ""
+    fi
+
+    cd ../apps/myApps/acorex
+
     echo "--------------------------------------------------"
     echo "downloading repos to deps-pre-build"
     echo ""
