@@ -253,7 +253,7 @@ void Explorer::PointPicker::FindNearest ( )
 	{
 		double maxAllowedDistance = ofMap ( rayLength, 0.0f, desiredRayLength, 0.02, 0.3, false );
 		rayPointSpacing.push_back ( maxAllowedDistance );
-		rayLength += maxAllowedDistance * 1000.0f;
+		rayLength += maxAllowedDistance * ( SpaceDefs::mSpaceMax - SpaceDefs::mSpaceMin );
 	} while ( rayLength < desiredRayLength );
 
 	glm::vec3 rayDirection = mCamera->screenToWorld ( glm::vec3 ( (float)mouseX, (float)mouseY, 0.0f ) );
@@ -267,20 +267,20 @@ void Explorer::PointPicker::FindNearest ( )
 
 	for ( int rayPoint = 1; rayPoint < rayPointSpacing.size ( ); rayPoint++ )
 	{
-		depth += rayPointSpacing[rayPoint] * 1000.0f;
+		depth += rayPointSpacing[rayPoint] * ( SpaceDefs::mSpaceMax - SpaceDefs::mSpaceMin );
 
 		glm::vec3 rayPointPosition = mCamera->getPosition ( ) + glm::vec3 ( rayDirection.x * depth,
 																			rayDirection.y * depth, 
 																			rayDirection.z * depth );
 
-		if ( rayPointPosition.x < ( SpaceDefs::mSpaceMin - 100 ) || rayPointPosition.x > ( SpaceDefs::mSpaceMax + 100 ) ||
-			rayPointPosition.y < ( SpaceDefs::mSpaceMin - 100 ) || rayPointPosition.y > ( SpaceDefs::mSpaceMax + 100 ) ||
-			rayPointPosition.z < ( SpaceDefs::mSpaceMin - 100 ) || rayPointPosition.z > ( SpaceDefs::mSpaceMax + 100 ) )
+		if ( rayPointPosition.x < ( SpaceDefs::mSpaceMin - 250 ) || rayPointPosition.x > ( SpaceDefs::mSpaceMax + 250 ) ||
+			rayPointPosition.y < ( SpaceDefs::mSpaceMin - 250 ) || rayPointPosition.y > ( SpaceDefs::mSpaceMax + 250 ) ||
+			rayPointPosition.z < ( SpaceDefs::mSpaceMin - 250 ) || rayPointPosition.z > ( SpaceDefs::mSpaceMax + 250 ) )
 		{
 			if ( bDebug )
 			{
 				testPointsOutOfRange.push_back ( rayPointPosition );
-				testRadiiOutOfRange.push_back ( rayPointSpacing[rayPoint] * 1000.0f );
+				testRadiiOutOfRange.push_back ( rayPointSpacing[rayPoint] * ( SpaceDefs::mSpaceMax - SpaceDefs::mSpaceMin ) );
 			}
 			continue; 
 		}
@@ -288,7 +288,7 @@ void Explorer::PointPicker::FindNearest ( )
 		if ( bDebug )
 		{
 			testPoints.push_back ( rayPointPosition );
-			testRadii.push_back ( rayPointSpacing[rayPoint] * 1000.0f );
+			testRadii.push_back ( rayPointSpacing[rayPoint] * (SpaceDefs::mSpaceMax - SpaceDefs::mSpaceMin) );
 		}
 
 		fluid::RealVector query ( 3 );
