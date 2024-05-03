@@ -2,6 +2,18 @@
 
 void ofApp::setup ( )
 {
+	int topBarButtonWidth = 100;
+	if ( GetDpiForSystem ( ) > 119 )
+	{
+		ofxGuiEnableHiResDisplay ( );
+		mLayout.enableHiDpi ( );
+		topBarButtonWidth *= 2;
+	}
+	else
+	{
+		mLayout.disableHiDpi ( );
+	}
+
 	ofSetWindowTitle ( "ACorEx" );
 	
 	ofSetVerticalSync ( true );
@@ -13,11 +25,11 @@ void ofApp::setup ( )
 	mAnalyserMenu.Initialise ( );
 	mExplorerMenu.Initialise ( );
 
-	mAnalyseToggle.setup ( "Analyse", false, 100, mLayout.topBarHeight / 2 );
+	mAnalyseToggle.setup ( "Analyse", false, topBarButtonWidth, mLayout.topBarHeight / 2 );
 	mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout.topBarHeight / 4 );
 	mAnalyseToggle.setBackgroundColor ( mColors.transparent );
 
-	mExploreToggle.setup ( "Explore", false, 100, mLayout.topBarHeight / 2 );
+	mExploreToggle.setup ( "Explore", false, topBarButtonWidth, mLayout.topBarHeight / 2 );
 	mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout.topBarHeight / 4 );
 	mExploreToggle.setBackgroundColor ( mColors.transparent );
 	
