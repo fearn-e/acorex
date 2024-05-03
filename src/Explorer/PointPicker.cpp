@@ -171,6 +171,10 @@ void Explorer::PointPicker::Draw ( )
 {
 	if ( bDebug )
 	{
+		ofDrawBitmapStringHighlight ( "Ray Direction: " + std::to_string ( mRayDirection.x ) + ", " + std::to_string ( mRayDirection.y ) + ", " + std::to_string ( mRayDirection.z ), 20, ofGetHeight ( ) - 260 );
+		ofDrawBitmapStringHighlight ( "Mouse Position: " + std::to_string ( mMousePosition.x ) + ", " + std::to_string ( mMousePosition.y ), 20, ofGetHeight ( ) - 240 );
+		ofDrawBitmapStringHighlight ( "Camera position: " + std::to_string ( mCamPosition.x ) + ", " + std::to_string ( mCamPosition.y ) + ", " + std::to_string ( mCamPosition.z ), 20, ofGetHeight ( ) - 200 );
+
 		if ( mNearestPoint != -1 )
 		{
 			ofDrawBitmapStringHighlight ( "Nearest Point: " + std::to_string ( mNearestPoint ), 20, ofGetHeight ( ) - 100 );
@@ -256,8 +260,20 @@ void Explorer::PointPicker::FindNearest ( )
 		rayLength += maxAllowedDistance * ( SpaceDefs::mSpaceMax - SpaceDefs::mSpaceMin );
 	} while ( rayLength < desiredRayLength );
 
-	glm::vec3 rayDirection = mCamera->screenToWorld ( glm::vec3 ( (float)mouseX, (float)mouseY, 0.0f ) );
-	rayDirection = glm::normalize ( rayDirection - mCamera->getPosition ( ) );
+	glm::vec3 rayDirection;
+	{
+		//glm::vec3 ofCamera::cameraToWorld ( glm::vec3 CameraXYZ, const ofRectangle & viewport ) const
+		
+		auto MVPmatrix = mCamera->getModelViewProjectionMatrix ( );
+		if ( mCamera->isVFlipped ( ) )
+		{
+			MVPmatrix = glm::scale ( glm::mat4 ( 1.0 ), glm::vec3 ( 1.f, -1.f, 1.f ) ) * MVPmatrix;
+		}
+		auto world = glm::inverse ( MVPmatrix ) * glm::vec4 ( (float)mouseX, (float)mouseY, 0.0, 1.0 );
+		rayDirection = glm::vec3 ( world ) / world.w;
+		rayDirection = glm::normalize ( rayDirection - mCamera->getPosition ( ) );
+	}
+
 	double depth = 0.0f;
 
 	if ( testPoints.size ( ) > 0 ) { testPoints.clear ( ); }
