@@ -245,13 +245,13 @@ void Explorer::PointPicker::FindNearest ( )
 
 	// 3D nearest
 	
-	double desiredRayLength = 10000.0f;
+	double desiredRayLength = 15000.0f;
 	double rayLength = 0.0f;
 	std::vector<double> rayPointSpacing;
 	
 	do
 	{
-		double maxAllowedDistance = ofMap ( rayLength, 0.0f, desiredRayLength, 0.02, 0.3, false );
+		double maxAllowedDistance = ofMap ( rayLength, 0.0f, desiredRayLength, 0.01, 0.05, false );
 		rayPointSpacing.push_back ( maxAllowedDistance );
 		rayLength += maxAllowedDistance * ( SpaceDefs::mSpaceMax - SpaceDefs::mSpaceMin );
 	} while ( rayLength < desiredRayLength );
