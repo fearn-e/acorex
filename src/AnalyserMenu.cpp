@@ -9,6 +9,18 @@ AnalyserMenu::AnalyserMenu ( )
 
 void AnalyserMenu::Initialise ( )
 {
+	// DPI ----------------------------------------
+	{
+		if ( GetDpiForSystem ( ) > 119 )
+		{
+			mLayout.enableHiDpi ( );
+		}
+		else
+		{
+			mLayout.disableHiDpi ( );
+		}
+	}
+
 	// Clear --------------------------------------
 	{
 		RemoveListeners ( );
@@ -83,7 +95,7 @@ void AnalyserMenu::Initialise ( )
 		mAnalysisOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
 		mAnalysisPanel.setPosition ( mLayout.hiddenPanelPosition );
-		mAnalysisPanel.setWidthElements ( 315 );
+		mAnalysisPanel.setWidthElements ( mLayout.analyseAnalysisPanelWidth );
 		mAnalysisPanel.disableHeader ( );
 
 

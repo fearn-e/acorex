@@ -30,6 +30,32 @@ namespace Utils {
 		int analysePanelOriginX = 0; int analysePanelOriginY = topBarHeight + interPanelSpacing;
 		int explorePanelOriginY = topBarHeight + interPanelSpacing;
 		glm::vec3 hiddenPanelPosition = { -1000, -1000, 0 };
+
+		void disableHiDpi ( )
+		{
+			topBarHeight = 40;
+			analyseMainPanelWidth = 200;
+			analyseAnalysisPanelWidth = 315;
+			analyseReductionPanelWidth = 300;
+			explorePanelWidth = 315;
+			interPanelSpacing = 5;
+			panelBackgroundMargin = 5;
+			analysePanelOriginX = 0; analysePanelOriginY = topBarHeight + interPanelSpacing;
+			explorePanelOriginY = topBarHeight + interPanelSpacing;
+		}
+
+		void enableHiDpi ( )
+		{
+			topBarHeight = 40 * 2;
+			analyseMainPanelWidth = 200 * 2;
+			analyseAnalysisPanelWidth = 315 * 2;
+			analyseReductionPanelWidth = 300 * 2;
+			explorePanelWidth = 315 * 2;
+			interPanelSpacing = 5 * 2;
+			panelBackgroundMargin = 5 * 2;
+			analysePanelOriginX = 0; analysePanelOriginY = topBarHeight + interPanelSpacing;
+			explorePanelOriginY = topBarHeight + interPanelSpacing;
+		}
 	};
 } // namespace Utils
 } // namespace Acorex

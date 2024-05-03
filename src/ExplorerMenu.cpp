@@ -5,6 +5,18 @@ using namespace Acorex;
 
 void ExplorerMenu::Initialise ( )
 {
+	// DPI -----------------------------------------
+	{
+	 	if ( GetDpiForSystem ( ) > 119 )
+	 	{
+	 		mLayout.enableHiDpi ( );
+	 	}
+		else
+		{
+			mLayout.disableHiDpi ( );
+		}
+	}
+	
 	// Pointer Sharing -----------------------------
 	{
 		if ( !bViewPointerShared )
