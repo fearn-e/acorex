@@ -2,8 +2,13 @@
 
 void ofApp::setup ( )
 {
+	ofSetWindowTitle ( "ACorEx" );
+	
 	ofSetVerticalSync ( true );
 	ofBackground ( 30 );
+
+	ofSetWindowShape ( ofGetScreenWidth ( ) * 0.75, ofGetScreenHeight ( ) * 0.75 );
+	ofSetWindowPosition ( ofGetScreenWidth ( ) / 2 - ofGetWidth ( ) / 2, ofGetScreenHeight ( ) / 2 - ofGetHeight ( ) / 2 );
 
 	mAnalyserMenu.Initialise ( );
 	mExplorerMenu.Initialise ( );
