@@ -7,6 +7,7 @@
 #include <data/FluidDataSet.hpp>
 #include <ofCamera.h>
 #include <ofEvents.h>
+#include <ofMesh.h>
 
 namespace Acorex {
 namespace Explorer {
@@ -81,10 +82,16 @@ private:
 	
 	Utils::DatasetConversion mDatasetConversion;
 
+	// Debug ----------------------------------------
+
 	std::vector<glm::vec3> testPoints;
 	std::vector<float> testRadii;
 	std::vector<glm::vec3> testPointsOutOfRange;
 	std::vector<float> testRadiiOutOfRange;
+
+	glm::vec3 mCamPosition;
+	glm::vec3 mMousePosition;
+	glm::vec3 mRayDirection;
 };
 
 } // namespace Explorer
