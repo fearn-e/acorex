@@ -129,7 +129,7 @@ echo "OS discovered as $currentOS"
     cd deps-pre-build
 
     if [ ! -d "flucoma-core" ]; then
-        git -c advice.detachedHead=false clone --depth 1 -b main https://github.com/flucoma/flucoma-core
+        git -c advice.detachedHead=false clone --depth 1 -b acorex https://github.com/fearn-e/flucoma-core
         echo ""
     else
         FORCE_DOWNLOAD_TIP+=1
