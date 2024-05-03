@@ -16,6 +16,7 @@ bool Analyser::Controller::CreateCorpus ( const std::string& inputPath, const st
 
 	success = SearchDirectory ( inputPath, dataset.fileList );
 	if ( !success ) { return false; }
+	dataset.topFolder = inputPath;
 	
 	int filesIn = dataset.fileList.size ( );
 	int numAnalysed = mGenAnalysis.ProcessFiles ( dataset );
@@ -244,7 +245,8 @@ bool Analyser::Controller::SearchDirectory ( const std::string& directory, std::
 			continue;
 		}
 
-		files.push_back ( entry.path ( ).string ( ) );
+		std::string fileSubPath = entry.path ( ).string ( ).substr ( directory.size ( ) );
+		files.push_back ( fileSubPath );
 	}
 
 	if ( files.empty ( ) )

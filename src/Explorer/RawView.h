@@ -18,6 +18,7 @@ public:
 	bool IsReduction ( ) const; // check if dataset is a reduced corpus
 	std::vector<std::string> GetDimensions ( ) const; // get dimensions from dataset
 	std::vector<std::string> GetStatistics ( ) const; // get statistics from dataset
+	std::string GetFileName ( int index ) const; // get file name from dataset
 	std::string GetCorpusName ( ) const; // get corpus name
 	Utils::TimeData* GetTimeData ( ); // get time data from dataset
 	Utils::StatsData* GetStatsData ( ); // get stats data from dataset
