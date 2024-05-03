@@ -10,6 +10,25 @@ using namespace Acorex;
 
 int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 {  
+    ofLogNotice ( "GenAnalysis" ) << "Calculating file lengths...";
+    double fileLengthSumTracker = 0;
+    double fileLengthSumTotal = 0;
+
+    {
+        unsigned long long int sampleTotal = 0;
+#pragma omp parallel for reduction(+:fileLengthSumTotal)
+        for ( int i = 0; i < dataset.fileList.size ( ); i++ )
+        {
+            double temp;
+            fluid::RealVector in ( 0 );
+            bool success = ReadFile ( dataset.fileList[i], in, temp );
+            if ( success ) { sampleTotal += in.size ( ); }
+        }
+        fileLengthSumTotal = sampleTotal;
+    }
+
+    ofLogNotice ( "GenAnalysis" ) << "Total sample count: " << fileLengthSumTotal;
+
     if ( dataset.analysisSettings.bTime )
     {
         dataset.time.raw.clear ( );
@@ -60,6 +79,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
     //    dataset.stats.raw.reserve ( reserveSize );
     //}
 
+    double startTime = ofGetElapsedTimef ( );
     for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
     {
         double samplingRate = 0;
@@ -211,7 +231,26 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 
         analysedFileIndex++;
         analysedFiles.push_back ( dataset.fileList[fileIndex] );
-        ofLogNotice ( "GenAnalysis" ) << analysedFileIndex / (float)dataset.fileList.size ( ) * 100 << "% | Analysed " << dataset.fileList[fileIndex];
+
+        { // Progress logging
+            fileLengthSumTracker += in.size ( );
+            double elapsedTime = ofGetElapsedTimef ( ) - startTime;
+            double progress = fileLengthSumTracker / fileLengthSumTotal * 100.0f;
+            double eta = (elapsedTime / progress) * (100.0f - progress);
+            int etaHours = eta / 3600; int etaMinutes = (eta - (etaHours * 3600)) / 60; int etaSeconds = eta - (etaHours * 3600) - (etaMinutes * 60);
+            if ( etaHours > 0 )
+            {
+                ofLogNotice ( "GenAnalysis" ) << "Progress: " << progress << "% | ETA: " << etaHours << "h " << etaMinutes << "m " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex];
+            }
+            else if ( etaMinutes > 0 )
+            {
+                ofLogNotice ( "GenAnalysis" ) << "Progress: " << progress << "% | ETA: " << etaMinutes << "m " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex];
+            }
+            else
+            {
+                ofLogNotice ( "GenAnalysis" ) << "Progress: " << progress << "% | ETA: " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex];
+            }
+        }
     }
 
     dataset.fileList.clear ( );
