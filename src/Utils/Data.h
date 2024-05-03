@@ -4,7 +4,7 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 
-#define DATA_CHANGE_CHECK_1
+#define DATA_CHANGE_CHECK_2
 
 #define DATA_NUM_STATS 7
 
@@ -56,6 +56,7 @@ struct DataSet {
 	std::vector<std::string> dimensionNames; // [dimension]
 	std::vector<std::string> statisticNames = { "Mean Average", "Standard Deviation", "Skewness", "Kurtosis", "Low Quartile", "Median", "High Quartile" }; // [statistic]
 	std::vector<std::string> fileList; // [file]
+	std::string topFolder; // top folder of the file list
 
 	TimeData time;
 

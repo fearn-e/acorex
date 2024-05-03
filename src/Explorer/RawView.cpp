@@ -58,6 +58,11 @@ std::vector<std::string> Explorer::RawView::GetStatistics ( ) const
 	return mDataset.statisticNames;
 }
 
+std::string Explorer::RawView::GetFileName ( int index ) const
+{
+	return mDataset.fileList[index];
+}
+
 std::string Explorer::RawView::GetCorpusName ( ) const
 {
 	return mCorpusName;
