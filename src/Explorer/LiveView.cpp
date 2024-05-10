@@ -679,11 +679,13 @@ void Explorer::LiveView::Zoom2DCam ( float y, bool mouse )
 	if ( mCamera->getScale ( ).x > SpaceDefs::mZoomMin2D && y < 0.0f ) { mCamera->setScale ( zoom ); }
 	else if ( mCamera->getScale ( ).x < SpaceDefs::mZoomMax2D && y > 0.0f ) { mCamera->setScale ( zoom ); }
 	mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed * mCamera->getScale ( ).x;
+	if ( mCamera->getScale ( ).x < SpaceDefs::mZoomMin2D ) { mCamera->setScale ( SpaceDefs::mZoomMin2D ); }
 	mPointPicker.SetNearestCheckNeeded ( );
 }
 
 void Explorer::LiveView::Zoom3DCam ( float y, bool mouse )
 {
+	// TODO - get cam direction to pivot point, check after zoom that direction is still the same, if negative, revert zoom
 	float scrollDist = y * SpaceDefs::mCamZoomSpeed3D;
 	if ( mCamPivot.distance ( mCamera->getPosition ( ) ) > SpaceDefs::mZoomMin3D && scrollDist < 0.0f && scrollDist < mCamPivot.distance ( mCamera->getPosition ( ) ) ) { mCamera->dolly ( scrollDist ); }
 	else if ( mCamPivot.distance ( mCamera->getPosition ( ) ) < SpaceDefs::mZoomMax3D && scrollDist > 0.0f ) { mCamera->dolly ( scrollDist ); }
