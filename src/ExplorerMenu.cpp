@@ -7,7 +7,7 @@ void ExplorerMenu::Initialise ( )
 {
 	// DPI -----------------------------------------
 	{
-	 	if ( GetDpiForSystem ( ) > 119 )
+	 	if ( GetDpiForSystem ( ) > 149 )
 	 	{
 	 		mLayout.enableHiDpi ( );
 	 	}

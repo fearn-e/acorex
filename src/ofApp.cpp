@@ -3,7 +3,8 @@
 void ofApp::setup ( )
 {
 	int topBarButtonWidth = 100;
-	if ( GetDpiForSystem ( ) > 119 )
+	ofLogNotice ( "DPI", "DPI: " + ofToString ( GetDpiForSystem ( ) ) );
+	if ( GetDpiForSystem ( ) > 149 )
 	{
 		ofxGuiEnableHiResDisplay ( );
 		mLayout.enableHiDpi ( );
