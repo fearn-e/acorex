@@ -260,7 +260,7 @@ echo "OS discovered as $currentOS"
         cp  deps-pre-build/compiled-memory/src/Debug/*                          libs/
         cp  deps-pre-build/compiled-memory/src/Release/*                        libs/
     elif [ "$currentOS" == "mac" ]; then
-        cp -v  deps-pre-build/compiled-memory/src/foonathan_memory-*.a             libs/
+        cp  deps-pre-build/compiled-memory/src/libfoonathan_memory-*.a             libs/
     fi
     
     #copy extra compiled foonathan_memory headers
