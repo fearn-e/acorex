@@ -17,7 +17,7 @@ set -o errexit
 
 # Get OS type
     currentOS="win"
-    if [ "$OSTYPE" == "darwin"* ]; then
+    if echo "$OSTYPE" | grep -q "darwin.*"; then
         # Mac OSX
         currentOS="mac"
     elif [ "$OSTYPE" == "msys" ] || [ "$OSTYPE" == "win32" ]; then
