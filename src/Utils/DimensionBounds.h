@@ -2,7 +2,10 @@
 
 #include "./Data.h"
 #include <vector>
+
+#if __has_include(<omp.h>)
 #include <omp.h>
+#endif
 
 namespace Acorex {
 namespace Utils {
