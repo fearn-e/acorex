@@ -49,17 +49,11 @@ set -o errexit
         cd ..
         CURRENT_FOLDER=${PWD##*/}
         if [ "$CURRENT_FOLDER" == "apps" ]; then
-            cd ..
-            CURRENT_FOLDER=${PWD##*/}
-            if [ "$CURRENT_FOLDER" == "openframeworks" ]; then
-                cd apps/myApps/acorex
-                echo "openframeworks found"
-                OF_FOUND=true
-            else
-                cd apps
-            fi
+            cd myApps/acorex
+            echo "openframeworks found"
+            OF_FOUND=true
         else
-            cd myApps
+            cd myApps/acorex
         fi
     else
         cd acorex
