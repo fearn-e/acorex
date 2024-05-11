@@ -235,35 +235,37 @@ echo "OS discovered as $currentOS"
     echo "installing dependencies and libraries"
     echo ""
     if [ -d "deps" ]; then
-        rm -rfv deps
+        rm -rf deps
     fi
     mkdir -v deps
 
     if [ -d "libs" ]; then
-        rm -rfv libs
+        rm -rf libs
     fi
     mkdir -v libs
 
+    echo "copying headers..."
     #copy dependency headerfiles
-    cp -rv   deps-pre-build/eigen/Eigen/                                         deps/Eigen/
-    cp -rv   deps-pre-build/eigen/unsupported/                                   deps/unsupported/
-    cp -rv   deps-pre-build/flucoma-core/include/                                deps/flucoma-core/
-    cp -rv   deps-pre-build/memory/include/foonathan/memory/                     deps/memory/
-    cp -rv   deps-pre-build/hisstools_library/include/                           deps/hisstools_library/
-    cp -rv   deps-pre-build/spectra/include/Spectra/                             deps/Spectra/
-    cp -rv   deps-pre-build/json/include/nlohmann/                               deps/nlohmann/
+    cp -r   deps-pre-build/eigen/Eigen/                                         deps/Eigen/
+    cp -r   deps-pre-build/eigen/unsupported/                                   deps/unsupported/
+    cp -r   deps-pre-build/flucoma-core/include/                                deps/flucoma-core/
+    cp -r   deps-pre-build/memory/include/foonathan/memory/                     deps/memory/
+    cp -r   deps-pre-build/hisstools_library/include/                           deps/hisstools_library/
+    cp -r   deps-pre-build/spectra/include/Spectra/                             deps/Spectra/
+    cp -r   deps-pre-build/json/include/nlohmann/                               deps/nlohmann/
 
+    echo "copying libs..."
     #copy foonathan_memory compiled lib files
     if [ "$currentOS" == "win" ]; then
-        cp -v  deps-pre-build/compiled-memory/src/Debug/*                          libs/
-        cp -v  deps-pre-build/compiled-memory/src/Release/*                        libs/
+        cp  deps-pre-build/compiled-memory/src/Debug/*                          libs/
+        cp  deps-pre-build/compiled-memory/src/Release/*                        libs/
     elif [ "$currentOS" == "mac" ]; then
         cp -v  deps-pre-build/compiled-memory/src/foonathan_memory-*.a             libs/
     fi
     
     #copy extra compiled foonathan_memory headers
-    cp -v      deps-pre-build/compiled-memory/src/config_impl.hpp                  deps/memory/
-    cp -v      deps-pre-build/compiled-memory/src/container_node_sizes_impl.hpp    deps/memory/
+    cp      deps-pre-build/compiled-memory/src/config_impl.hpp                  deps/memory/
+    cp      deps-pre-build/compiled-memory/src/container_node_sizes_impl.hpp    deps/memory/
 #
 
 echo "--------------------------------------------------"
