@@ -19,7 +19,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 
     {
         unsigned long long int sampleTotal = 0;
-#pragma omp parallel for reduction(+:fileLengthSumTotal)
+#pragma omp parallel for reduction(+:sampleTotal)
         for ( int i = 0; i < dataset.fileList.size ( ); i++ )
         {
             double temp;
