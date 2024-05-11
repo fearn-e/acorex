@@ -1,6 +1,9 @@
 #include "./GenAnalysis.h"
 #include <ofLog.h>
+
+#if __has_include(<omp.h>)
 #include <omp.h>
+#endif
 
 #ifndef DATA_CHANGE_CHECK_1
 #error "Check if dataset is still used correctly"
