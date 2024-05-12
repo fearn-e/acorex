@@ -241,6 +241,7 @@ echo "OS discovered as $currentOS"
     echo "copying headers..."
     #copy dependency headerfiles
     cp -r   deps-pre-build/eigen/Eigen/                                         deps/Eigen/
+    cp -r   deps-pre-build/eigen/test/                                          deps/test/
     cp -r   deps-pre-build/eigen/unsupported/                                   deps/unsupported/
     cp -r   deps-pre-build/flucoma-core/include/                                deps/flucoma-core/
     cp -r   deps-pre-build/memory/include/foonathan/memory/                     deps/memory/
