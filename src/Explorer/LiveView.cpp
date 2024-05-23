@@ -846,7 +846,7 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 		{
 			if ( mPointPicker.GetNearestPointFile ( ) != -1 )
 			{
-#ifdef _WIN32 || _WIN64
+#ifdef _WIN32
 				ofSystem ( "explorer /select," + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
 #elif __APPLE__ && __MACH__
 				ofSystem ( "open -R " + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
