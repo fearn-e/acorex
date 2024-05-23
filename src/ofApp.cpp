@@ -3,6 +3,7 @@
 void ofApp::setup ( )
 {
 	int topBarButtonWidth = 100;
+#ifdef _WIN32
 	ofLogNotice ( "DPI", "DPI: " + ofToString ( GetDpiForSystem ( ) ) );
 	if ( GetDpiForSystem ( ) > 149 )
 	{
@@ -14,7 +15,13 @@ void ofApp::setup ( )
 	{
 		mLayout.disableHiDpi ( );
 	}
-
+#elif __APPLE__ && __MACH__
+    ofxGuiEnableHiResDisplay ( );
+    mLayout.enableHiDpi ( );
+    topBarButtonWidth *= 2;
+#endif
+    //TODO - ADD LINUX + SORT THIS OUT PROPERLY
+    
 	ofSetWindowTitle ( "ACorEx" );
 	
 	ofSetVerticalSync ( true );

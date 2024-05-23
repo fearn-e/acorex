@@ -6,7 +6,8 @@ using namespace Acorex;
 void ExplorerMenu::Initialise ( )
 {
 	// DPI -----------------------------------------
-	{
+    {
+#ifdef _WIN32
 	 	if ( GetDpiForSystem ( ) > 149 )
 	 	{
 	 		mLayout.enableHiDpi ( );
@@ -15,6 +16,10 @@ void ExplorerMenu::Initialise ( )
 		{
 			mLayout.disableHiDpi ( );
 		}
+#elif __APPLE__ && __MACH__
+        mLayout.enableHiDpi ( );
+#endif
+        //TODO - PROPOGATE THIS FROM ofApp INSTEAD
 	}
 	
 	// Pointer Sharing -----------------------------
