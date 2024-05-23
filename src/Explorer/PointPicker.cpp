@@ -41,7 +41,9 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
 		}
 	}
 
-	mDatasetConversion.CorpusToFluid ( mFullFluidSet, scaledDataset, std::vector<int> ( ) );
+    std::vector<int> tempVector;
+    
+	mDatasetConversion.CorpusToFluid ( mFullFluidSet, scaledDataset, tempVector );
 
 	if ( !bListenersAdded )
 	{

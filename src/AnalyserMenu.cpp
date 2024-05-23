@@ -11,14 +11,19 @@ void AnalyserMenu::Initialise ( )
 {
 	// DPI ----------------------------------------
 	{
-		if ( GetDpiForSystem ( ) > 149 )
-		{
-			mLayout.enableHiDpi ( );
-		}
-		else
-		{
-			mLayout.disableHiDpi ( );
-		}
+#ifdef _WIN32
+         if ( GetDpiForSystem ( ) > 149 )
+         {
+             mLayout.enableHiDpi ( );
+         }
+        else
+        {
+            mLayout.disableHiDpi ( );
+        }
+#elif __APPLE__ && __MACH__
+        mLayout.enableHiDpi ( );
+#endif
+        //TODO - PROPOGATE THIS FROM ofApp INSTEAD
 	}
 
 	// Clear --------------------------------------
