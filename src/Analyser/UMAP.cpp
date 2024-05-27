@@ -43,7 +43,8 @@ void Analyser::UMAP::ExtractTimeDimension ( Utils::DataSet& dataset, std::vector
 	if ( !dataset.analysisSettings.bTime ) { return; }
 
 	dataset.dimensionNames.erase ( dataset.dimensionNames.begin ( ) );
-
+    dataset.analysisSettings.currentDimensionCount -= 1;
+    
 	for ( int file = 0; file < dataset.fileList.size ( ); file++ )
 	{
 		for ( int timepoint = 0; timepoint < dataset.time.raw[file].size ( ); timepoint++ )
@@ -59,7 +60,8 @@ void Analyser::UMAP::InsertTimeDimension ( Utils::DataSet& dataset, const std::v
 	if ( !dataset.analysisSettings.bTime ) { return; }
 
 	dataset.dimensionNames.insert ( dataset.dimensionNames.begin ( ), "Time" );
-
+    dataset.analysisSettings.currentDimensionCount += 1;
+    
 	unsigned long long int insertIndex = 0;
 
 	for ( int file = 0; file < dataset.fileList.size ( ); file++ )
