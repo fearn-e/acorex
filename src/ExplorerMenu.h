@@ -13,7 +13,7 @@ public:
 	ExplorerMenu ( ) { }
 	~ExplorerMenu ( ) { }
 
-	void Initialise ( );
+	void Initialise ( bool HiDpi );
 	void Show ( );
 	void Hide ( );
 	void Draw ( );

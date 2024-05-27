@@ -3,23 +3,12 @@
 
 using namespace Acorex;
 
-void ExplorerMenu::Initialise ( )
+void ExplorerMenu::Initialise ( bool HiDpi )
 {
 	// DPI -----------------------------------------
     {
-#ifdef _WIN32
-	 	if ( GetDpiForSystem ( ) > 149 )
-	 	{
-	 		mLayout.enableHiDpi ( );
-	 	}
-		else
-		{
-			mLayout.disableHiDpi ( );
-		}
-#elif __APPLE__ && __MACH__
-        mLayout.enableHiDpi ( );
-#endif
-        //TODO - PROPOGATE THIS FROM ofApp INSTEAD
+		if ( HiDpi ) { mLayout.enableHiDpi ( ); }
+		else { mLayout.disableHiDpi ( ); }
 	}
 	
 	// Pointer Sharing -----------------------------
@@ -229,7 +218,7 @@ void ExplorerMenu::OpenCorpus ( )
 	if ( !success ) { return; }
 	
 	bInitialiseShouldLoad = true;
-	Initialise ( );
+	Initialise ( mLayout.HiDpi );
 
 	mLiveView.CreatePoints ( );
 
