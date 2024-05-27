@@ -90,7 +90,7 @@ void AnalyserMenu::Initialise ( )
 		mAnalysisPanel.setup ( "Analysis" );
 
 		mAnalysisPanel.add ( mAnalysisPickDirectoryButton.setup ( "Pick Audio Directory" ) );
-		mAnalysisPanel.add ( mAnalysisDirectoryLabel.setup ( "", "?" ) );
+		mAnalysisPanel.add ( mAnalysisDirectoryLabel.setup ( " ", "?" ) );
 		mAnalysisPanel.add ( mAnalysisPickOutputFileButton.setup ( "Pick Output File" ) );
 		mAnalysisPanel.add ( mAnalysisOutputLabel.setup ( "", "?" ) );
 
@@ -170,7 +170,7 @@ void AnalyserMenu::Initialise ( )
 		mReductionPanel.setup ( "Reduction" );
 
 		mReductionPanel.add ( mReductionPickInputFileButton.setup ( "Pick Input File" ) );
-		mReductionPanel.add ( mReductionInputLabel.setup ( "", "?" ) );
+		mReductionPanel.add ( mReductionInputLabel.setup ( " ", "?" ) );
 		mReductionPanel.add ( mReductionPickOutputFileButton.setup ( "Pick Output File" ) );
 		mReductionPanel.add ( mReductionOutputLabel.setup ( "", "?" ) );
 

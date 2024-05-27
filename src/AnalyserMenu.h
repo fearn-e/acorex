@@ -112,14 +112,13 @@ private:
 	ofxButton mCreateCorpusButton;
 	ofxButton mReduceCorpusButton;
 
-
 	ofxPanel mAnalysisPanel;
 	ofxPanel mAnalysisMetadataPanel;
 	ofxPanel mAnalysisConfirmPanel;
 	ofxButton mAnalysisPickDirectoryButton;
-	ofxLabel mAnalysisDirectoryLabel;
+	ofxTextField mAnalysisDirectoryLabel;
 	ofxButton mAnalysisPickOutputFileButton;
-	ofxLabel mAnalysisOutputLabel;
+	ofxTextField mAnalysisOutputLabel;
 	ofxButton mConfirmAnalysisButton;
 	ofxButton mCancelAnalysisButton;
 
@@ -130,9 +129,9 @@ private:
 
 	ofxPanel mReductionPanel;
 	ofxButton mReductionPickInputFileButton;
-	ofxLabel mReductionInputLabel;
+	ofxTextField mReductionInputLabel;
 	ofxButton mReductionPickOutputFileButton;
-	ofxLabel mReductionOutputLabel;
+	ofxTextField mReductionOutputLabel;
 	ofxButton mConfirmReductionButton;
 	ofxButton mCancelReductionButton;
 
