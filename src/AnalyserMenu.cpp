@@ -4,26 +4,15 @@ using namespace Acorex;
 
 AnalyserMenu::AnalyserMenu ( )
 {
-	Initialise ( );
+	Initialise ( false );
 }
 
-void AnalyserMenu::Initialise ( )
+void AnalyserMenu::Initialise ( bool HiDpi )
 {
 	// DPI ----------------------------------------
 	{
-#ifdef _WIN32
-         if ( GetDpiForSystem ( ) > 149 )
-         {
-             mLayout.enableHiDpi ( );
-         }
-        else
-        {
-            mLayout.disableHiDpi ( );
-        }
-#elif __APPLE__ && __MACH__
-        mLayout.enableHiDpi ( );
-#endif
-        //TODO - PROPOGATE THIS FROM ofApp INSTEAD
+		if ( HiDpi ) { mLayout.enableHiDpi ( ); }
+		else { mLayout.disableHiDpi ( ); }
 	}
 
 	// Clear --------------------------------------
@@ -222,7 +211,7 @@ void AnalyserMenu::Show ( )
 // fully resets all values and hides the menu
 void AnalyserMenu::Hide ( )
 {
-	Initialise ( );
+	Initialise ( mLayout.HiDpi );
 }
 
 void AnalyserMenu::Draw ( )
@@ -718,7 +707,7 @@ void AnalyserMenu::ToggleAnalysisUILockout ( bool lock )
 
 void AnalyserMenu::ShowMainPanel ( )
 {
-	Initialise ( );
+	Initialise ( mLayout.HiDpi );
 	bDraw = true;
 	bDrawMainPanel = true;
 	mMainPanel.setPosition ( mLayout.analysePanelOriginX, mLayout.analysePanelOriginY );
@@ -726,7 +715,7 @@ void AnalyserMenu::ShowMainPanel ( )
 
 void AnalyserMenu::ShowAnalysisPanel ( )
 {
-	Initialise ( );
+	Initialise ( mLayout.HiDpi );
 	bDraw = true;
 	bDrawAnalysisPanel = true;
 	mAnalysisPanel.setPosition ( mLayout.analysePanelOriginX, mLayout.analysePanelOriginY );
@@ -748,7 +737,7 @@ void AnalyserMenu::HideAnalysisInsertionPanel ( )
 
 void AnalyserMenu::ShowReductionPanel ( )
 {
-	Initialise ( );
+	Initialise ( mLayout.HiDpi );
 	bDraw = true;
 	bDrawReductionPanel = true;
 	mReductionPanel.setPosition ( mLayout.analysePanelOriginX, mLayout.analysePanelOriginY );

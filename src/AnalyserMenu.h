@@ -14,7 +14,7 @@ public:
 	AnalyserMenu ( );
 	~AnalyserMenu ( ) { };
 
-	void Initialise ( );
+	void Initialise ( bool HiDpi );
 	void Show ( );
 	void Hide ( );
 	void Draw ( );

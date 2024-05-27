@@ -24,8 +24,11 @@ public:
 	//void gotMessage ( ofMessage msg );
 
 private:
+	void RemoveListeners ( );
+	void SetupUI ( bool keepValues );
 	void AnalyseToggled ( bool& value );
 	void ExploreToggled ( bool& value );
+	void DPIToggled ( bool& value );
 
 	Acorex::AnalyserMenu mAnalyserMenu;
 	Acorex::ExplorerMenu mExplorerMenu;
@@ -34,4 +37,7 @@ private:
 
 	ofxToggle mAnalyseToggle;
 	ofxToggle mExploreToggle;
+	ofxToggle mDPIToggle;
+
+	bool bListenersAdded = false;
 };

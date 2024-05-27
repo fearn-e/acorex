@@ -1,27 +1,7 @@
 #include "ofApp.h"
 
 void ofApp::setup ( )
-{
-	int topBarButtonWidth = 100;
-#ifdef _WIN32
-	ofLogNotice ( "DPI", "DPI: " + ofToString ( GetDpiForSystem ( ) ) );
-	if ( GetDpiForSystem ( ) > 149 )
-	{
-		ofxGuiEnableHiResDisplay ( );
-		mLayout.enableHiDpi ( );
-		topBarButtonWidth *= 2;
-	}
-	else
-	{
-		mLayout.disableHiDpi ( );
-	}
-#elif __APPLE__ && __MACH__
-    ofxGuiEnableHiResDisplay ( );
-    mLayout.enableHiDpi ( );
-    topBarButtonWidth *= 2;
-#endif
-    //TODO - ADD LINUX + SORT THIS OUT PROPERLY
-    
+{    
 	ofSetWindowTitle ( "ACorEx" );
 	
 	ofSetVerticalSync ( true );
@@ -30,19 +10,13 @@ void ofApp::setup ( )
 	ofSetWindowShape ( ofGetScreenWidth ( ) * 0.75, ofGetScreenHeight ( ) * 0.75 );
 	ofSetWindowPosition ( ofGetScreenWidth ( ) / 2 - ofGetWidth ( ) / 2, ofGetScreenHeight ( ) / 2 - ofGetHeight ( ) / 2 );
 
-	mAnalyserMenu.Initialise ( );
-	mExplorerMenu.Initialise ( );
+	ofxGuiDisableHiResDisplay ( );
+	mLayout.disableHiDpi ( );
 
-	mAnalyseToggle.setup ( "Analyse", false, topBarButtonWidth, mLayout.topBarHeight / 2 );
-	mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout.topBarHeight / 4 );
-	mAnalyseToggle.setBackgroundColor ( mColors.transparent );
+	SetupUI ( false );
 
-	mExploreToggle.setup ( "Explore", false, topBarButtonWidth, mLayout.topBarHeight / 2 );
-	mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout.topBarHeight / 4 );
-	mExploreToggle.setBackgroundColor ( mColors.transparent );
-	
-	mAnalyseToggle.addListener ( this, &ofApp::AnalyseToggled );
-	mExploreToggle.addListener ( this, &ofApp::ExploreToggled );
+	mAnalyserMenu.Initialise ( false );
+	mExplorerMenu.Initialise ( false );
 }
 
 void ofApp::update ( )
@@ -61,6 +35,7 @@ void ofApp::draw ( )
 
 		mAnalyseToggle.draw ( );
 		mExploreToggle.draw ( );
+		mDPIToggle.draw ( );
 	}
 
 	ofDrawBitmapStringHighlight ( "fps: " + ofToString ( ofGetFrameRate ( ) ), 20, ofGetHeight ( ) - 20 );
@@ -69,6 +44,7 @@ void ofApp::draw ( )
 void ofApp::exit ( )
 {
 	mAnalyserMenu.Exit ( );
+	mExplorerMenu.Exit ( );
 }
 
 void ofApp::windowResized ( int w, int h )
@@ -77,6 +53,42 @@ void ofApp::windowResized ( int w, int h )
 	mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout.topBarHeight / 4 );
 
 	mExplorerMenu.WindowResized ( );
+}
+
+void ofApp::RemoveListeners ( )
+{
+	if ( bListenersAdded )
+	{
+		mAnalyseToggle.removeListener ( this, &ofApp::AnalyseToggled );
+		mExploreToggle.removeListener ( this, &ofApp::ExploreToggled );
+		mDPIToggle.removeListener ( this, &ofApp::DPIToggled );
+		bListenersAdded = false;
+	}
+}
+
+void ofApp::SetupUI ( bool keepValues )
+{
+	RemoveListeners ( );
+
+	bool tmpAnalyse = keepValues ? mAnalyseToggle : false;
+	mAnalyseToggle.setup ( "Analyse", tmpAnalyse, mLayout.topBarButtonWidth, mLayout.topBarHeight / 2 );
+	mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout.topBarHeight / 4 );
+	mAnalyseToggle.setBackgroundColor ( mColors.transparent );
+
+	bool tmpExplore = keepValues ? mExploreToggle : false;
+	mExploreToggle.setup ( "Explore", tmpExplore, mLayout.topBarButtonWidth, mLayout.topBarHeight / 2 );
+	mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout.topBarHeight / 4 );
+	mExploreToggle.setBackgroundColor ( mColors.transparent );
+
+	bool tmpDPI = keepValues ? mDPIToggle : false;
+	mDPIToggle.setup ( "Bigger UI", tmpDPI, mLayout.topBarButtonWidth, mLayout.topBarHeight / 2 );
+	mDPIToggle.setPosition ( ofGetWidth ( ) - mLayout.topBarButtonWidth - 5, mLayout.topBarHeight / 4 );
+	mDPIToggle.setBackgroundColor ( mColors.transparent );
+
+	mAnalyseToggle.addListener ( this, &ofApp::AnalyseToggled );
+	mExploreToggle.addListener ( this, &ofApp::ExploreToggled );
+	mDPIToggle.addListener ( this, &ofApp::DPIToggled );
+	bListenersAdded = true;
 }
 
 void ofApp::AnalyseToggled ( bool& value )
@@ -101,4 +113,24 @@ void ofApp::ExploreToggled ( bool& value )
 	{
 		mExplorerMenu.Hide ( );
 	}
+}
+
+void ofApp::DPIToggled ( bool& value )
+{
+	if ( value )
+	{
+		ofxGuiEnableHiResDisplay ( );
+		mLayout.enableHiDpi ( );
+	}
+	else
+	{
+		ofxGuiDisableHiResDisplay ( );
+		mLayout.disableHiDpi ( );
+	}
+
+	SetupUI ( true );
+
+	mExplorerMenu.Initialise ( value );
+	mAnalyserMenu.Initialise ( value );
+	if ( mAnalyseToggle ) { mAnalyserMenu.Show ( ); }
 }
