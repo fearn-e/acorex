@@ -21,6 +21,23 @@ body, html {
   background-image: url("acorex_examples.jpg");
   min-height: 75%;
 }
+
+ a:link {
+  color: green;
+}
+
+a:visited {
+  color: red;
+}
+
+a:hover {
+  color: hotpink;
+}
+
+a:active {
+  color: blue;
+} 
+
 </style>
 </head>
 <body>
@@ -28,32 +45,49 @@ body, html {
 <!-- Links (sit on top) -->
 <div class="w3-top">
   <div class="w3-row w3-padding w3-black">
-    <div class="w3-col s6">
+    <div class="w3-col s3">
       <a href="#" class="w3-button w3-block w3-black">HOME</a>
     </div>
-    <div class="w3-col s6">
+    <div class="w3-col s3">
+      <a href="#about" class="w3-button w3-block w3-black">ABOUT</a>
+    </div>
+    <div class="w3-col s3">
       <a href="#download" class="w3-button w3-block w3-black">DOWNLOAD</a>
+    </div>
+    <div class="w3-col s3">
+      <a href="#contact" class="w3-button w3-block w3-black">CONTACT</a>
     </div>
   </div>
 </div>
 
 <!-- Header with image -->
 <header class="bgimg w3-display-container w3-grayscale-min" id="home">
-  <div class="w3-display-middle w3-center">
-    <span class="w3-text-sand" style="font-size:90px">Audio Corpus Explorer</span>
+  <div class="w3-display-middle w3-center w3-wide">
+    <span class="w3-text-sand" style="font-size:3.5vw;background-color:rgba(0, 0, 0, 0.5);border-radius:15px;">A<sup style="color:gray">udio </sup>Cor<sup style="color:gray">pus </sup>Ex<sup style="color:gray">plorer</sup></span>
   </div>
 </header>
 
 <!-- Add a background color and large text to the whole page -->
 <div class="w3-sand w3-grayscale w3-large">
 
+<!-- About Container -->
+<div class="w3-container" id="about">
+  <div class="w3-content" style="max-width:700px;">
+  <h5 class="w3-center w3-padding-64"><span class="w3-tag w3-wide">ABOUT</span></h5>
+    <p style="margin-top:-10px;">ACorEx is a tool for exploring audio corpora, similar to existing software like AudioStellar and CataRT. It was created to investigate ideas of 3D navigation and time series analysis in this space, and to help researchers and musicians to navigate through large collections of audio files. The tool provides an interface for analysing, browsing, and listening to audio files.</p>
+    <p>ACorEx is developed by <a href="https://github.com/fearn-e">Elowyn Fearne</a> at the <a href="https://www.hud.ac.uk/">University of Huddersfield</a> in England. The tool is open-source and free to use. It is available for Windows and MacOS.</p>
+    <p>ACorEx is still in development. If you have any feedback or suggestions, please feel free to fill out the <a href="https://forms.office.com/e/2RWL8WSvmf"><strong>feedback form</strong></a>. </p>
+  </div>
+</div>
 
+<br>
+<hr style="border-color:black;margin-left:30vw;margin-right:30vw">
 
 <!-- Download Container -->
 <div class="w3-container" id="download">
   <div class="w3-content" style="max-width:700px">
     <h5 class="w3-center w3-padding-64"><span class="w3-tag w3-wide">DOWNLOAD LINKS</span></h5>
-    <p style="text-align: center; font-size: larger;">Latest version:</p>
+    <p style="text-align: center; font-size: larger;margin-top:-20px;">Latest version:</p>
     <div style="border:3px solid black; margin-left:15%; margin-right:15%; margin-top: -20px;">
         <div style="display: flex; justify-content: center;">
             <!-- replace these with new version -->
@@ -85,6 +119,19 @@ body, html {
         </a>
     </div>
     </div>
+  </div>
+</div>
+
+<br>
+<br>
+<hr style="border-color:black;margin-left:30vw;margin-right:30vw">
+
+<!-- Contact Container -->
+<div class="w3-container" id="contact">
+  <div class="w3-content" style="max-width:700px">
+    <h5 class="w3-center w3-padding-48"><span class="w3-tag w3-wide">CONTACT</span></h5>
+    <p style="text-align:center;margin-top:-20px;">For any questions, feedback, or suggestions, <br> please contact Elowyn Fearne at <a href="mailto:gitfearne@proton.me">gitfearne@proton.me</a>,<br> or fill out the <a href="https://forms.office.com/e/2RWL8WSvmf"><strong>feedback form</strong></a>
+    </p>
   </div>
 </div>
 
