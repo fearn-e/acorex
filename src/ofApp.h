@@ -15,10 +15,9 @@ public:
 	void update ( );
 	void draw ( );
 	void exit ( );
-
-	//void audioIn ( float* input, int bufferSize, int nChannels );
-	//void audioOut ( float* buffer, int bufferSize, int nChannels );
 	
+	void audioOut ( ofSoundBuffer &outBuffer );
+
 	void windowResized ( int w, int h );
 	//void dragEvent ( ofDragInfo dragInfo );
 	//void gotMessage ( ofMessage msg );
@@ -40,4 +39,7 @@ private:
 	ofxToggle mDPIToggle;
 
 	bool bListenersAdded = false;
+
+	ofSoundStream mSoundStream;
+	float phase = 0;
 };
