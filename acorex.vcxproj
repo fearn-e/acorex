@@ -116,6 +116,7 @@
     <ClCompile Include="src\ExplorerMenu.cpp" />
     <ClCompile Include="src\Explorer\LiveView.cpp" />
     <ClCompile Include="src\Explorer\RawView.cpp" />
+    <ClCompile Include="src\Utils\AudioFileLoader.cpp" />
     <ClCompile Include="src\Utils\DatasetConversion.cpp" />
     <ClCompile Include="src\Utils\JSON.cpp" />
     <ClCompile Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.cpp" />
@@ -143,6 +144,7 @@
     <ClInclude Include="src\ExplorerMenu.h" />
     <ClInclude Include="src\Explorer\LiveView.h" />
     <ClInclude Include="src\Explorer\RawView.h" />
+    <ClInclude Include="src\Utils\AudioFileLoader.h" />
     <ClInclude Include="src\Utils\Data.h" />
     <ClInclude Include="src\Utils\DatasetConversion.h" />
     <ClInclude Include="src\Utils\DimensionBounds.h" />
