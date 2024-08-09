@@ -16,8 +16,6 @@ public:
 	void draw ( );
 	void exit ( );
 	
-	void audioOut ( ofSoundBuffer &outBuffer );
-
 	void windowResized ( int w, int h );
 	//void dragEvent ( ofDragInfo dragInfo );
 	//void gotMessage ( ofMessage msg );
@@ -39,7 +37,4 @@ private:
 	ofxToggle mDPIToggle;
 
 	bool bListenersAdded = false;
-
-	ofSoundStream mSoundStream;
-	float phase = 0;
 };
