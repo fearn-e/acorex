@@ -4,6 +4,7 @@
 #include "./SpaceDefs.h"
 #include "./PointPicker.h"
 #include "./RawView.h"
+#include "./AudioPlayback.h"
 #include "Utils/Data.h"
 #include <ofMesh.h>
 #include <ofEasyCam.h>
@@ -103,6 +104,7 @@ private:
 
 	Utils::DimensionBounds mDimensionBounds;
 	PointPicker mPointPicker;
+	AudioPlayback mAudioPlayback;
 };
 
 } // namespace Explorer

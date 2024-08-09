@@ -17,22 +17,6 @@ void ofApp::setup ( )
 
 	mAnalyserMenu.Initialise ( false );
 	mExplorerMenu.Initialise ( false );
-
-	// audio setup
-
-	ofSoundStreamSettings settings;
-	settings.numInputChannels = 0;
-	settings.numOutputChannels = 2;
-	settings.sampleRate = 44100;
-	settings.bufferSize = 512;
-	settings.numBuffers = 4;
-	//settings.setOutListener ( mExplorerMenu.GetLiveView ( ) ); // TODO - figure out why the buffer doesn't work when the listener is set here
-	settings.setOutListener ( this );
-
-	auto devices = mSoundStream.getDeviceList ( ofSoundDevice::Api::MS_DS ); // TODO - set devices properly with UI
-	settings.setOutDevice ( devices[0] );
-
-	mSoundStream.setup ( settings );
 }
 
 void ofApp::update ( )
@@ -61,25 +45,6 @@ void ofApp::exit ( )
 {
 	mAnalyserMenu.Exit ( );
 	mExplorerMenu.Exit ( );
-}
-
-void ofApp::audioOut ( ofSoundBuffer& outBuffer )
-{
-	float freq = 440.0f;
-	float phaseStep = TWO_PI * freq / ( float ) mSoundStream.getSampleRate ( );
-
-	while ( phase > TWO_PI )
-	{
-		phase -= TWO_PI;
-	}
-
-	for ( size_t i = 0; i < outBuffer.getNumFrames ( ); i++ )
-	{
-		float sample = sin ( phase );
-		outBuffer.getSample ( i, 0 ) = sample;
-		outBuffer.getSample ( i, 1 ) = sample;
-		phase += phaseStep;
-	}
 }
 
 void ofApp::windowResized ( int w, int h )
