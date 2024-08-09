@@ -20,6 +20,11 @@ enum class Axis : int {
 	MULTIPLE = 5
 };
 
+struct AudioData {
+	std::vector<std::vector<double>> raw; // [file][sample]
+	std::vector<double> originalSampleRates; // [file]
+};
+
 struct TimeData {
 	std::vector<std::vector<std::vector<double>>> raw; // [file][timepoint][dimension] (first dimension is always time)
 };
@@ -56,6 +61,8 @@ struct DataSet {
 	std::vector<std::string> dimensionNames; // [dimension]
 	std::vector<std::string> statisticNames = { "Mean Average", "Standard Deviation", "Skewness", "Kurtosis", "Low Quartile", "Median", "High Quartile" }; // [statistic]
 	std::vector<std::string> fileList; // [file]
+
+	AudioData audio;
 
 	TimeData time;
 
