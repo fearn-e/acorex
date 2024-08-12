@@ -23,11 +23,15 @@ public:
 	Utils::StatsData* GetStatsData ( ); // get stats data from dataset
 	Utils::DataSet* GetDataset ( ); // get dataset
 
+	void SetSampleRate ( double sampleRate ) { globalSampleRate = sampleRate; }
+
 private:
 	std::string mCorpusName;
 	Utils::DataSet mDataset;
 
 	Utils::JSON mJSON;
+
+	double globalSampleRate;
 };
 
 } // namespace Explorer

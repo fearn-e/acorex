@@ -39,7 +39,8 @@ void Explorer::LiveView::Initialise ( )
 	if ( mPlayingFiles.size ( ) > 0 ) { mPlayingFiles.clear ( ); }
 	if ( mPlayingTimeHeads.size ( ) > 0 ) { mPlayingTimeHeads.clear ( ); }
 
-	mAudioPlayback.Initialise ( );
+	mRawView->SetSampleRate ( 44100 );
+	mAudioPlayback.Initialise ( 44100 );
 
 	ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
 	ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
