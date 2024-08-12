@@ -123,6 +123,11 @@ std::string Explorer::RawView::GetCorpusName ( ) const
 	return mCorpusName;
 }
 
+Utils::AudioData* Explorer::RawView::GetAudioData ( )
+{
+	return &mDataset.audio;
+}
+
 Utils::TimeData* Explorer::RawView::GetTimeData ( )
 {
 	return &mDataset.time;

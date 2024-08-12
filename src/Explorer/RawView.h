@@ -20,6 +20,7 @@ public:
 	std::vector<std::string> GetDimensions ( ) const; // get dimensions from dataset
 	std::vector<std::string> GetStatistics ( ) const; // get statistics from dataset
 	std::string GetCorpusName ( ) const; // get corpus name
+	Utils::AudioData* GetAudioData ( ); // get audio data from dataset
 	Utils::TimeData* GetTimeData ( ); // get time data from dataset
 	Utils::StatsData* GetStatsData ( ); // get stats data from dataset
 	Utils::DataSet* GetDataset ( ); // get dataset
