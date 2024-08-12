@@ -2,6 +2,7 @@
 
 #include "Utils/Data.h"
 #include "Utils/JSON.h"
+#include "utils/AudioFileLoader.h"
 
 namespace Acorex {
 namespace Explorer {
@@ -26,10 +27,13 @@ public:
 	void SetSampleRate ( double sampleRate ) { globalSampleRate = sampleRate; }
 
 private:
+	bool LoadAudioSet ( Utils::DataSet& dataset ); // load all audio files in dataset into memory
+
 	std::string mCorpusName;
 	Utils::DataSet mDataset;
 
 	Utils::JSON mJSON;
+	Utils::AudioFileLoader mAudioLoader;
 
 	double globalSampleRate;
 };
