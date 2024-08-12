@@ -11,7 +11,7 @@ public:
 	AudioPlayback ( ) { }
 	~AudioPlayback ( ) { }
 
-	void Initialise ( );
+	void Initialise ( double sampleRate );
 
 	void audioOut ( ofSoundBuffer& outBuffer );
 

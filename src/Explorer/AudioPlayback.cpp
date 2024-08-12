@@ -3,12 +3,12 @@
 
 using namespace Acorex;
 
-void Explorer::AudioPlayback::Initialise ( )
+void Explorer::AudioPlayback::Initialise ( double sampleRate )
 {
 	ofSoundStreamSettings settings;
 	settings.numInputChannels = 0;
 	settings.numOutputChannels = 2;
-	settings.sampleRate = 44100;
+	settings.sampleRate = sampleRate;
 	settings.bufferSize = 512;
 	settings.numBuffers = 4;
 	settings.setOutListener ( this );
