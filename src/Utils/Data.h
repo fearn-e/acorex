@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ofSoundBuffer.h>
 #include <string>
 #include <vector>
 #include <nlohmann/json.hpp>
@@ -21,7 +22,8 @@ enum class Axis : int {
 };
 
 struct AudioData {
-	std::vector<std::vector<double>> raw; // [file][sample]
+	std::vector<bool> loaded; // [file]
+	std::vector<ofSoundBuffer> raw; // [file]
 	std::vector<double> originalSampleRates; // [file]
 };
 

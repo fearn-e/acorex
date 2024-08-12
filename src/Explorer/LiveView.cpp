@@ -41,6 +41,7 @@ void Explorer::LiveView::Initialise ( )
 
 	mRawView->SetSampleRate ( 44100 );
 	mAudioPlayback.Initialise ( 44100 );
+	mAudioPlayback.SetRawView ( mRawView );
 
 	ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
 	ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
