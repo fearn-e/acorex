@@ -48,7 +48,6 @@ bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
 {
 	dataset.audio.loaded.clear ( );
 	dataset.audio.raw.clear ( );
-	dataset.audio.originalSampleRates.clear ( );
 
 	for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
 	{
@@ -59,21 +58,12 @@ bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
 		{
 			ofLogError ( "RawView" ) << "Failed to load audio file: " << dataset.fileList[fileIndex];
 			dataset.audio.loaded.push_back ( false );
-			dataset.audio.originalSampleRates.push_back ( 0 );
 			dataset.audio.raw.push_back ( ofSoundBuffer ( ) );
 			continue;
 		}
 
-		dataset.audio.originalSampleRates.push_back ( sampleRate );
-
 		ofSoundBuffer audioData;
 		audioData.copyFrom ( std::vector<float> ( fileData.begin ( ), fileData.end ( ) ), 1, sampleRate );
-
-		if ( sampleRate != globalSampleRate )
-		{
-			audioData.resample ( ( sampleRate / globalSampleRate ), ofSoundBuffer::Hermite );
-			audioData.setSampleRate ( globalSampleRate );
-		}
 
 		dataset.audio.raw.push_back ( audioData );
 		dataset.audio.loaded.push_back ( true );

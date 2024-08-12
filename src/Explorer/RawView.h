@@ -25,8 +25,6 @@ public:
 	Utils::StatsData* GetStatsData ( ); // get stats data from dataset
 	Utils::DataSet* GetDataset ( ); // get dataset
 
-	void SetSampleRate ( double sampleRate ) { globalSampleRate = sampleRate; }
-
 private:
 	bool LoadAudioSet ( Utils::DataSet& dataset ); // load all audio files in dataset into memory
 

@@ -24,7 +24,6 @@ enum class Axis : int {
 struct AudioData {
 	std::vector<bool> loaded; // [file]
 	std::vector<ofSoundBuffer> raw; // [file]
-	std::vector<double> originalSampleRates; // [file]
 };
 
 struct TimeData {
