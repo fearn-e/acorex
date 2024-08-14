@@ -330,6 +330,10 @@ void Explorer::LiveView::PlaySound ( )
 {
 	if ( mPointPicker.GetNearestPointFile ( ) == -1 ) { return; }
 
+	mAudioPlayback.CreatePlayhead ( mPointPicker.GetNearestPointFile ( ), mPointPicker.GetNearestPointTime ( ) );
+
+	return; // CUTTING OFF OLD PLAYER CODE FOR NOW
+
 	if ( std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker.GetNearestPointFile ( ) ) != mPlayingFiles.end ( ) )
 	{
 		std::vector<int>::iterator it = std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker.GetNearestPointFile ( ) );

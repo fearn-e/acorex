@@ -3,6 +3,7 @@
 #include <ofSoundBuffer.h>
 #include <string>
 #include <vector>
+#include <queue>
 #include <nlohmann/json.hpp>
 
 #define DATA_CHANGE_CHECK_1
@@ -70,6 +71,16 @@ struct DataSet {
 	StatsData stats;
 
 	AnalysisSettings analysisSettings;
+
+};
+
+struct Playhead {
+	Playhead ( size_t file, size_t sample ) : fileIndex ( file ), sampleIndex ( sample ) { }
+
+	size_t fileIndex = -1;
+	size_t sampleIndex = -1;
+	
+	std::queue<size_t> triggerSamplePoints;
 };
 
 } // namespace Utils
