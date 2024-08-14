@@ -77,8 +77,8 @@ struct DataSet {
 struct Playhead {
 	Playhead ( size_t file, size_t sample ) : fileIndex ( file ), sampleIndex ( sample ) { }
 
-	size_t fileIndex = -1;
-	size_t sampleIndex = -1;
+	size_t fileIndex = 0;
+	size_t sampleIndex = 0;
 	
 	std::queue<size_t> triggerSamplePoints;
 };
