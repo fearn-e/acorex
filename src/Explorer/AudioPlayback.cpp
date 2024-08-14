@@ -30,7 +30,9 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 		outBuffer.getSample ( sampleIndex, 1 ) = 0.0;
 	}
 
-	// get new playheads from the main thread
+	std::vector<size_t> playheadsToKillThisBuffer;
+
+	// get new playheads and playheads to kill from main thread
 	if ( mNewPlayheadMutex.try_lock ( ) )
 	{
 		std::lock_guard<std::mutex> lock ( mNewPlayheadMutex, std::adopt_lock );
@@ -40,13 +42,19 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			mPlayheads.push_back ( mNewPlayheads.front ( ) );
 			mNewPlayheads.pop ( );
 		}
+
+		while ( !mPlayheadsToKill.empty ( ) )
+		{
+			playheadsToKillThisBuffer.push_back ( mPlayheadsToKill.front ( ) );
+			mPlayheadsToKill.pop ( );
+		}
 	}
 
 	double crossoverJumpChance = (double)crossoverJumpsInAHundred / 100.0;
 
 	for ( size_t playheadIndex = 0; playheadIndex < mPlayheads.size ( ); playheadIndex++ )
 	{
-		Utils::Playhead* currentPlayhead = &mPlayheads[playheadIndex];
+		Utils::AudioPlayhead* currentPlayhead = &mPlayheads[playheadIndex];
 
 		ofSoundBuffer playheadBuffer;
 		playheadBuffer.setSampleRate ( mSoundStream.getSampleRate ( ) );
@@ -70,7 +78,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 				}
 				else
 				{
-					// mark for killing
+					playheadsToKillThisBuffer.push_back ( mPlayheads[playheadIndex].playheadID );
 				}
 			}
 
@@ -130,11 +138,42 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			}
 		}
 		
+		// if playhead is marked for death, apply a fade out and remove from playheads
+		{
+			std::vector<size_t>::iterator it = std::find ( playheadsToKillThisBuffer.begin ( ), playheadsToKillThisBuffer.end ( ), mPlayheads[playheadIndex].playheadID );
+			size_t killIndex = std::distance ( playheadsToKillThisBuffer.begin ( ), it );
+			if ( it != playheadsToKillThisBuffer.end ( ) )
+			{
+				for ( size_t i = 0; i < playheadBuffer.size ( ); i++ )
+				{
+					float gain = cos ( (float)i / (float)playheadBuffer.size ( ) * 0.5 * M_PI );
+					playheadBuffer.getSample ( i, 0 ) *= gain;
+				}
+
+				playheadsToKillThisBuffer.erase ( playheadsToKillThisBuffer.begin ( ) + killIndex );
+
+				mPlayheads.erase ( mPlayheads.begin ( ) + playheadIndex );
+				playheadIndex--;
+			}
+		}
+
 		// processing done, add to outBuffer
 		for ( size_t sampleIndex = 0; sampleIndex < outBuffer.getNumFrames ( ); sampleIndex++ )
 		{
 			outBuffer.getSample ( sampleIndex, 0 ) += playheadBuffer.getSample ( sampleIndex, 0 );
 			outBuffer.getSample ( sampleIndex, 1 ) += playheadBuffer.getSample ( sampleIndex, 0 );
+		}
+	}
+
+	if ( mVisualPlayheadUpdateMutex.try_lock ( ) )
+	{
+		std::lock_guard<std::mutex> lock ( mVisualPlayheadUpdateMutex, std::adopt_lock );
+
+		if ( mVisualPlayheads.size ( ) > 0 ) { mVisualPlayheads.clear ( ); }
+
+		for ( size_t i = 0; i < mPlayheads.size ( ); i++ )
+		{
+			mVisualPlayheads.push_back ( Utils::VisualPlayhead ( mPlayheads[i].playheadID, mPlayheads[i].fileIndex, mPlayheads[i].sampleIndex ) );
 		}
 	}
 }
@@ -152,7 +191,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 // need to add above resampling code to the FillAudioSegment and CrossfadeAudioSegment functions
 
 
-void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utils::Playhead* playhead, bool outBufferFull )
+void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utils::AudioPlayhead* playhead, bool outBufferFull )
 {
 	size_t segmentLength = playhead->triggerSamplePoints.front ( ) - playhead->sampleIndex;
 
@@ -170,7 +209,7 @@ void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_
 	*outBufferPosition += segmentLength;
 }
 
-void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, size_t startSample_A, size_t endSample_A, size_t fileIndex_A, Utils::Playhead* playhead_B, size_t lengthSetting, bool outBufferFull )
+void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, size_t startSample_A, size_t endSample_A, size_t fileIndex_A, Utils::AudioPlayhead* playhead_B, size_t lengthSetting, bool outBufferFull )
 {
 	size_t originLength = endSample_A - startSample_A;
 	size_t jumpLength = playhead_B->triggerSamplePoints.front ( ) - playhead_B->sampleIndex;
@@ -227,7 +266,8 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t sampleIn
 
 	if ( mRawView->GetAudioData ( )->loaded[fileIndex] )
 	{
-		Utils::Playhead newPlayhead ( fileIndex, sampleIndex );
+		Utils::AudioPlayhead newPlayhead ( playheadCounter, fileIndex, sampleIndex );
+		playheadCounter++;
 
 		CalculateTriggerPoints ( newPlayhead );
 
@@ -235,6 +275,8 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t sampleIn
 			std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
 			mNewPlayheads.push ( newPlayhead );
 		}
+
+		ofLogNotice ( "AudioPlayback" ) << "New playhead created for " << mRawView->GetDataset ( )->fileList[fileIndex] << " at sample " << sampleIndex;
 
 		return true;
 	}
@@ -245,7 +287,24 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t sampleIn
 	}
 }
 
-void Explorer::AudioPlayback::CalculateTriggerPoints ( Utils::Playhead& playhead )
+bool Explorer::AudioPlayback::KillPlayhead ( size_t playheadID )
+{
+	{
+		std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
+		mPlayheadsToKill.push ( playheadID );
+	}
+
+	return true;
+}
+
+void Explorer::AudioPlayback::GetPlayheadInfo ( std::vector<Utils::VisualPlayhead>& playheadInfo )
+{
+	std::lock_guard<std::mutex> lock ( mVisualPlayheadUpdateMutex );
+
+	playheadInfo = mVisualPlayheads;
+}
+
+void Explorer::AudioPlayback::CalculateTriggerPoints ( Utils::AudioPlayhead& playhead )
 {
 	while ( !playhead.triggerSamplePoints.empty ( ) )
 	{
