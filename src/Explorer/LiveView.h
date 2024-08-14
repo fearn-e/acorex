@@ -68,6 +68,8 @@ public:
 	void MouseEvent ( ofMouseEventArgs& args );
 
 private:
+	bool listenersAdded = false;
+
 	bool bDebug = false;
 	bool bDraw = false;
 	bool b3D = true;

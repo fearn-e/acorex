@@ -42,6 +42,8 @@ void Explorer::LiveView::Initialise ( )
 	mAudioPlayback.Initialise ( 44100 );
 	mAudioPlayback.SetRawView ( mRawView );
 
+	if ( !listenersAdded )
+	{
 	ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
 	ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
 	ofAddListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
@@ -49,6 +51,8 @@ void Explorer::LiveView::Initialise ( )
 	ofAddListener ( ofEvents ( ).mouseScrolled, this, &Explorer::LiveView::MouseEvent );
 	ofAddListener ( ofEvents ( ).keyPressed, this, &Explorer::LiveView::KeyEvent );
 	ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
+		listenersAdded = true;
+}
 }
 
 void Explorer::LiveView::Exit ( )
@@ -59,6 +63,7 @@ void Explorer::LiveView::Exit ( )
 
 void Explorer::LiveView::RemoveListeners ( )
 {
+	if ( !listenersAdded ) { return; }
 	ofRemoveListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
 	ofRemoveListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
 	ofRemoveListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
@@ -66,6 +71,7 @@ void Explorer::LiveView::RemoveListeners ( )
 	ofRemoveListener ( ofEvents ( ).mouseScrolled, this, &Explorer::LiveView::MouseEvent );
 	ofRemoveListener ( ofEvents ( ).keyPressed, this, &Explorer::LiveView::KeyEvent );
 	ofRemoveListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
+	listenersAdded = false;
 }
 
 // Process Functions ---------------------------
