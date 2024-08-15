@@ -507,6 +507,7 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axi
 				else { value = ofMap ( value, min, max, SpaceDefs::mColorBlue, SpaceDefs::mColorRed ); }
 				ofColor currentColor = mTimeCorpus[file].getColor ( timepoint );
 				currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
+				currentColor.a = 150;
 				mTimeCorpus[file].setColor ( timepoint, currentColor );
 			}
 			else
@@ -548,6 +549,7 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis ax
 			else { value = ofMap ( value, min, max, SpaceDefs::mColorBlue, SpaceDefs::mColorRed ); }
 			ofColor currentColor = mStatsCorpus.getColor ( file );
 			currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
+			currentColor.a = 150;
 			mStatsCorpus.setColor ( file, currentColor );
 		}
 		else
@@ -585,6 +587,7 @@ void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::
 			else { value = ofMap ( value, min, max, SpaceDefs::mColorBlue, SpaceDefs::mColorRed ); }
 			ofColor currentColor = mStatsCorpus.getColor ( file );
 			currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
+			currentColor.a = 150;
 			mStatsCorpus.setColor ( file, currentColor );
 		}
 		else
