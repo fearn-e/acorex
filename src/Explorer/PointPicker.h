@@ -26,7 +26,7 @@ public:
 	void SlowUpdate ( );
 	void Draw ( );
 
-	void FindNearest ( );
+	void FindNearestToMouse ( );
 
 	// Setters & Getters ----------------------------
 
@@ -47,9 +47,11 @@ private:
 
 	void MouseMoved ( ofMouseEventArgs& args ) { bNearestCheckNeeded = true; }
 	void KeyEvent ( ofKeyEventArgs& args );
+	void MouseReleased ( ofMouseEventArgs& args );
 
 	// States ---------------------------------------
 
+	bool bClicked = false;
 	bool bPicker = false;
 	bool bDebug = false;
 	bool bDraw = false;
