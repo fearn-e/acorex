@@ -111,6 +111,7 @@ void Explorer::PointPicker::RemoveListeners ( )
 	if ( bListenersAdded )
 	{
 		ofRemoveListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
+		ofRemoveListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
 		bListenersAdded = false;
 	}
 }
