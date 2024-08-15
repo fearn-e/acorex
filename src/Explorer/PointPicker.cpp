@@ -49,6 +49,7 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
 	{
 		ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
 		ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
+		ofAddListener ( ofEvents ( ).mouseReleased, this, &Explorer::PointPicker::MouseReleased );
 		bListenersAdded = true;
 	}
 }
@@ -112,6 +113,7 @@ void Explorer::PointPicker::RemoveListeners ( )
 	{
 		ofRemoveListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
 		ofRemoveListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
+		ofRemoveListener ( ofEvents ( ).mouseReleased, this, &Explorer::PointPicker::MouseReleased );
 		bListenersAdded = false;
 	}
 }
@@ -169,7 +171,7 @@ void Explorer::PointPicker::ScaleDataset ( Utils::DataSet& scaledDataset, const 
 
 void Explorer::PointPicker::SlowUpdate ( )
 {
-	FindNearest ( );
+	FindNearestToMouse ( );
 }
 
 void Explorer::PointPicker::Draw ( )
@@ -202,11 +204,12 @@ void Explorer::PointPicker::Draw ( )
 	}
 }
 
-void Explorer::PointPicker::FindNearest ( )
+void Explorer::PointPicker::FindNearestToMouse ( )
 {
-	if ( !ofGetMousePressed ( 2 ) && !bPicker ) { return; }
-	if ( !bTrained ) { return; }
-	if ( !bNearestCheckNeeded ) { return; }
+	if ( !bClicked ) { return; }
+	bClicked = false;
+
+	if ( !bPicker && !bTrained && !bNearestCheckNeeded ) { return; }
 	bNearestCheckNeeded = false;
 
 	mNearestPoint = -1; mNearestPointFile = -1; mNearestPointTime = -1;
@@ -323,4 +326,9 @@ void Explorer::PointPicker::KeyEvent ( ofKeyEventArgs& args )
 		if ( args.key == OF_KEY_F3 ) { bDebug = !bDebug; }
 		else if ( args.key == OF_KEY_TAB ) { bPicker = !bPicker; }
 	}
+}
+
+void Explorer::PointPicker::MouseReleased ( ofMouseEventArgs& args )
+{
+	if ( args.button == 2 ) { bClicked = true; }
 }
