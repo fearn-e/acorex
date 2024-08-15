@@ -24,6 +24,17 @@ void Explorer::AudioPlayback::Initialise ( size_t sampleRate )
 
 void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 {
+	if ( bResetFlag )
+	{
+		for ( size_t i = 0; i < mPlayheads.size ( ); i++ )
+		{
+			mPlayheads.erase ( mPlayheads.begin ( ) + i );
+			i--;
+		}
+
+		bResetFlag = false;
+	}
+
 	for ( size_t sampleIndex = 0; sampleIndex < outBuffer.getNumFrames ( ); sampleIndex++ )
 	{
 		outBuffer.getSample ( sampleIndex, 0 ) = 0.0;
@@ -297,11 +308,24 @@ bool Explorer::AudioPlayback::KillPlayhead ( size_t playheadID )
 	return true;
 }
 
-void Explorer::AudioPlayback::GetPlayheadInfo ( std::vector<Utils::VisualPlayhead>& playheadInfo )
+std::vector<Utils::VisualPlayhead> Explorer::AudioPlayback::GetPlayheadInfo ( )
 {
 	std::lock_guard<std::mutex> lock ( mVisualPlayheadUpdateMutex );
 
-	playheadInfo = mVisualPlayheads;
+	return mVisualPlayheads;
+}
+
+void Explorer::AudioPlayback::SetFlagReset ( )
+{
+	bResetFlag = true;
+}
+
+void Explorer::AudioPlayback::WaitForResetConfirm ( )
+{
+	while ( bResetFlag )
+	{
+		// wait for reset to be confirmed
+	}
 }
 
 void Explorer::AudioPlayback::CalculateTriggerPoints ( Utils::AudioPlayhead& playhead )

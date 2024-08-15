@@ -20,19 +20,22 @@ public:
 	~LiveView ( ) { }
 
 	void Initialise ( );
+	void KillAudio ( );
 	void Exit ( );
 	void RemoveListeners ( );
 
 	// Process Functions ---------------------------
 
 	void Update ( );
-	void UpdateAudioPlayers ( );
+	void UpdatePlayheads ( );
+	void OLD_UpdateAudioPlayers ( );
 	void SlowUpdate ( );
 	void Draw ( );
 
 	// Sound Functions ------------------------------
 
-	void PlaySound ( );
+	void CreatePlayhead ( );
+	void OLD_PlaySound ( );
 
 	// Filler Functions ----------------------------
 
@@ -95,6 +98,10 @@ private:
 	std::vector<int> mPlayingTimeHeads;
 	std::vector<float> mPlayingLastPositionMS;
 	std::vector<ofColor> mPlayingLastColor;
+
+	// Playheads -------------------------------------
+
+	std::vector<Utils::VisualPlayhead> mPlayheads;
 
 	// Camera ----------------------------------------
 
