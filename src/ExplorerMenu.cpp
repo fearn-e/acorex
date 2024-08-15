@@ -214,6 +214,8 @@ void ExplorerMenu::OpenCorpus ( )
 	bOpenCorpusDrawWarning = false;
 	mOpenCorpusButton.setName ( "Open Corpus" );
 
+	mLiveView.KillAudio ( ); // waits for confirmation
+
 	bool success = mRawView->LoadCorpus ( );
 	if ( !success ) { return; }
 	

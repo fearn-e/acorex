@@ -6,6 +6,7 @@
 #include <ofSoundStream.h>
 #include <vector>
 #include <mutex>
+#include <atomic>
 
 namespace Acorex {
 namespace Explorer {
@@ -24,7 +25,9 @@ public:
 
 	bool CreatePlayhead ( size_t fileIndex, size_t sampleIndex );
 	bool KillPlayhead ( size_t playheadID );
-	void GetPlayheadInfo ( std::vector<Utils::VisualPlayhead>& playheadInfo );
+	std::vector<Utils::VisualPlayhead> GetPlayheadInfo ( );
+	void SetFlagReset ( );
+	void WaitForResetConfirm ( );
 
 private:
 
@@ -54,6 +57,8 @@ private:
 
 	std::mutex mVisualPlayheadUpdateMutex;
 	std::vector<Utils::VisualPlayhead> mVisualPlayheads;
+
+	std::atomic<bool> bResetFlag = false;
 };
 
 } // namespace Explorer

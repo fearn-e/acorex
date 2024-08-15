@@ -44,15 +44,21 @@ void Explorer::LiveView::Initialise ( )
 
 	if ( !listenersAdded )
 	{
-	ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
-	ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
-	ofAddListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
-	ofAddListener ( ofEvents ( ).mouseReleased, this, &Explorer::LiveView::MouseEvent );
-	ofAddListener ( ofEvents ( ).mouseScrolled, this, &Explorer::LiveView::MouseEvent );
-	ofAddListener ( ofEvents ( ).keyPressed, this, &Explorer::LiveView::KeyEvent );
-	ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
+		ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
+		ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
+		ofAddListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
+		ofAddListener ( ofEvents ( ).mouseReleased, this, &Explorer::LiveView::MouseEvent );
+		ofAddListener ( ofEvents ( ).mouseScrolled, this, &Explorer::LiveView::MouseEvent );
+		ofAddListener ( ofEvents ( ).keyPressed, this, &Explorer::LiveView::KeyEvent );
+		ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
 		listenersAdded = true;
+	}
 }
+
+void Explorer::LiveView::KillAudio ( )
+{
+	mAudioPlayback.SetFlagReset ( );
+	mAudioPlayback.WaitForResetConfirm ( );
 }
 
 void Explorer::LiveView::Exit ( )
@@ -123,10 +129,49 @@ void Explorer::LiveView::Update ( )
 		}
 	}
 
-	UpdateAudioPlayers ( );
+	UpdatePlayheads ( );
 }
 
-void Explorer::LiveView::UpdateAudioPlayers ( )
+void Explorer::LiveView::UpdatePlayheads ( )
+{
+	std::vector<Utils::VisualPlayhead> playheadUpdates = mAudioPlayback.GetPlayheadInfo ( );
+
+	// remove playheads that aren't in the update list
+	for ( int i = 0; i < mPlayheads.size ( ); i++ )
+	{
+		if ( std::find_if ( playheadUpdates.begin ( ), playheadUpdates.end ( ), [this, i]( Utils::VisualPlayhead& playhead ) { return playhead.playheadID == mPlayheads[i].playheadID; } ) == playheadUpdates.end ( ) )
+		{
+			mPlayheads.erase ( mPlayheads.begin ( ) + i );
+			i--;
+		}
+	}
+
+	// go through playheadUpdates and update the respective playheads or add new ones if the ID isn't found
+	for ( int i = 0; i < playheadUpdates.size ( ); i++ )
+	{
+		auto it = std::find_if ( mPlayheads.begin ( ), mPlayheads.end ( ), [this, i, &playheadUpdates] ( Utils::VisualPlayhead& playhead ) { return playhead.playheadID == playheadUpdates[i].playheadID; } );
+		if ( it != mPlayheads.end ( ) )
+		{
+			*it = playheadUpdates[i];
+		}
+		else
+		{
+			mPlayheads.push_back ( playheadUpdates[i] );
+		}
+	}
+
+	// calculate the 3D positions of the playheads
+	for ( auto& playhead : mPlayheads )
+	{
+		glm::vec3 position = { 0, 0, 0 };
+		size_t timeIndex = playhead.sampleIndex / ( mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction );
+		playhead.position[0] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).x;
+		playhead.position[1] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).y;
+		playhead.position[2] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).z;
+	}
+}
+
+void Explorer::LiveView::OLD_UpdateAudioPlayers ( )
 {
 	if ( mPlayingFiles.size ( ) == 0 ) { return; }
 
@@ -206,6 +251,7 @@ void Explorer::LiveView::Draw ( )
 	if ( !bDraw ) { return; }
 
 	ofEnableDepthTest ( );
+	ofEnableAlphaBlending ( );
 	mCamera->begin ( );
 
 	// Draw Axis ------------------------------
@@ -222,7 +268,7 @@ void Explorer::LiveView::Draw ( )
 	// Draw points ------------------------------
 	if ( mRawView->IsTimeAnalysis ( ) ) // Time
 	{
-		if ( mPointPicker.GetNearestPointFile ( ) == -1 && mPlayingFiles.size ( ) == 0 )
+		if ( mPointPicker.GetNearestPointFile ( ) == -1 )
 		{
 			for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
 			{
@@ -237,42 +283,27 @@ void Explorer::LiveView::Draw ( )
 		{
 			for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
 			{
-				if ( file != mPointPicker.GetNearestPointFile ( ) )
-				{
-					bool skip = false;
-					for ( auto& each : mPlayingFiles ) { if ( file == each ) { skip = true; } }
-					if ( skip ) { continue; }
-
-					mTimeCorpus[file].disableColors ( );
-					ofSetColor ( 255, 255, 255, 25 );
-					mTimeCorpus[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
-					mTimeCorpus[file].draw ( );
-					mTimeCorpus[file].setMode ( OF_PRIMITIVE_POINTS );
-					mTimeCorpus[file].draw ( );
-				}
+				if ( file == mPointPicker.GetNearestPointFile ( ) ) { continue; }
+				mTimeCorpus[file].disableColors ( );
+				ofSetColor ( 255, 255, 255, 25 );
+				mTimeCorpus[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
+				mTimeCorpus[file].draw ( );
+				mTimeCorpus[file].setMode ( OF_PRIMITIVE_POINTS );
+				mTimeCorpus[file].draw ( );
 			}
 
-			ofDisableDepthTest ( );
+			mTimeCorpus[mPointPicker.GetNearestPointFile ( )].enableColors ( );
+			mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setMode ( OF_PRIMITIVE_LINE_STRIP );
+			mTimeCorpus[mPointPicker.GetNearestPointFile ( )].draw ( );
+			mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setMode ( OF_PRIMITIVE_POINTS );
+			mTimeCorpus[mPointPicker.GetNearestPointFile ( )].draw ( );
+		}
 
-			for ( int i = 0; i < mPlayingFiles.size ( ); i++ )
-			{
-				mTimeCorpus[mPlayingFiles[i]].enableColors ( );
-				mTimeCorpus[mPlayingFiles[i]].setMode ( OF_PRIMITIVE_LINE_STRIP );
-				mTimeCorpus[mPlayingFiles[i]].draw ( );
-				mTimeCorpus[mPlayingFiles[i]].setMode ( OF_PRIMITIVE_POINTS );
-				mTimeCorpus[mPlayingFiles[i]].draw ( );
-			}
-
-			if ( mPointPicker.GetNearestPointFile ( ) >= 0 )
-			{
-				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].enableColors ( );
-				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setMode ( OF_PRIMITIVE_LINE_STRIP );
-				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].draw ( );
-				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setMode ( OF_PRIMITIVE_POINTS );
-				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].draw ( );
-			}
-
-			ofEnableDepthTest ( );
+		for ( int i = 0; i < mPlayheads.size ( ); i++ )
+		{
+			ofSetColor ( 255, 255, 255, 255 );
+			glm::vec3 position = { mPlayheads[i].position[0], mPlayheads[i].position[1], mPlayheads[i].position[2] };
+			ofDrawSphere ( position, 50 );
 		}
 	}
 	else // Stats
@@ -309,6 +340,7 @@ void Explorer::LiveView::Draw ( )
 	}
 
 	mCamera->end ( );
+	ofDisableAlphaBlending ( );
 	ofDisableDepthTest ( );
 
 	// Draw Nearest Point -----------------------
@@ -332,14 +364,17 @@ void Explorer::LiveView::Draw ( )
 
 // Sound Functions ------------------------------
 
-void Explorer::LiveView::PlaySound ( )
+void Explorer::LiveView::CreatePlayhead ( )
 {
 	if ( mPointPicker.GetNearestPointFile ( ) == -1 ) { return; }
 
 	mAudioPlayback.CreatePlayhead ( mPointPicker.GetNearestPointFile ( ), mPointPicker.GetNearestPointTime ( ) );
 
-	return; // CUTTING OFF OLD PLAYER CODE FOR NOW
+	return;
+}
 
+void Explorer::LiveView::OLD_PlaySound ( )
+{
 	if ( std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker.GetNearestPointFile ( ) ) != mPlayingFiles.end ( ) )
 	{
 		std::vector<int>::iterator it = std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker.GetNearestPointFile ( ) );
@@ -828,7 +863,7 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 		else if ( args.key == 'e' ) { mKeyboardMoveState[7] = true; }
 		else if ( args.key == 'z' ) { mKeyboardMoveState[8] = true; }
 		else if ( args.key == 'x' ) { mKeyboardMoveState[9] = true; }
-		else if ( args.key == ' ' ) { PlaySound ( ); }
+		else if ( args.key == ' ' ) { CreatePlayhead ( ); }
 	}
 	else if ( args.type == ofKeyEventArgs::Type::Released )
 	{

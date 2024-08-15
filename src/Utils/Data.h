@@ -74,13 +74,26 @@ struct DataSet {
 
 };
 
-struct Playhead {
-	Playhead ( size_t file, size_t sample ) : fileIndex ( file ), sampleIndex ( sample ) { }
+struct AudioPlayhead {
+	AudioPlayhead ( size_t ID, size_t file, size_t sample ) : playheadID ( ID ), fileIndex ( file ), sampleIndex ( sample ) { }
+
+	size_t playheadID = 0;
 
 	size_t fileIndex = 0;
 	size_t sampleIndex = 0;
 	
 	std::queue<size_t> triggerSamplePoints;
+};
+
+struct VisualPlayhead {
+	VisualPlayhead ( size_t ID, size_t file, size_t sample ) : playheadID ( ID ), fileIndex ( file ), sampleIndex ( sample ) { }
+
+	size_t playheadID = 0;
+
+	size_t fileIndex = 0;
+	size_t sampleIndex = 0;
+
+	float position[3] = { 0.0, 0.0, 0.0 };
 };
 
 } // namespace Utils
