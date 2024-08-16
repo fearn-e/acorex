@@ -1,9 +1,11 @@
 #pragma once
 
 #include "./RawView.h"
+#include "./PointPicker.h"
 #include "Utils/Data.h"
 #include <ofSoundBuffer.h>
 #include <ofSoundStream.h>
+#include <ofMesh.h>
 #include <vector>
 #include <mutex>
 #include <atomic>
@@ -29,6 +31,10 @@ public:
 	void SetFlagReset ( );
 	void WaitForResetConfirm ( );
 
+	void SetTimeCorpus ( const std::vector<ofMesh>& timeCorpus );
+
+	void SetPointPicker ( std::shared_ptr<PointPicker>& pointPicker ) { mPointPicker = pointPicker; }
+
 private:
 
 	void FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utils::AudioPlayhead* playhead, bool outBufferFull );
@@ -45,6 +51,7 @@ private:
 	std::vector<Utils::AudioPlayhead> mPlayheads;
 
 	std::shared_ptr<RawView> mRawView;
+	std::shared_ptr<PointPicker> mPointPicker;
 
 	ofSoundStream mSoundStream;
 
@@ -57,6 +64,9 @@ private:
 
 	std::mutex mVisualPlayheadUpdateMutex;
 	std::vector<Utils::VisualPlayhead> mVisualPlayheads;
+
+	std::mutex mTimeCorpusMutex;
+	std::vector<ofMesh> mTimeCorpus;
 
 	std::atomic<bool> bResetFlag = false;
 };

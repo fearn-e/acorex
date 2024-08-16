@@ -80,6 +80,12 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 		bool jumpNext = false; size_t jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile;
 		while ( true )
 		{
+			// remove trigger points that have been hit
+			while ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) > 0 && mPlayheads[playheadIndex].sampleIndex >= mPlayheads[playheadIndex].triggerSamplePoints.front ( ) )
+			{
+				mPlayheads[playheadIndex].triggerSamplePoints.pop ( );
+			}
+
 			// if EOF: loop/kill
 			if ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) == 0 )
 			{
@@ -128,24 +134,26 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			// after this point it is assumed that a new trigger has been reached
 
 			// if current trigger point is not the final one and causes a jump
-			if ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) > 1 &&
-				((double)rand ( ) / RAND_MAX) < crossoverJumpChance &&
-				((double)rand ( ) / RAND_MAX) < 0.2 ) //REPLACE SECOND RAND WITH IF KDTREE SEARCH RETURNS A POINT - TEMPORARY CODE
+			if ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) > 1 && ((double)rand ( ) / RAND_MAX) < crossoverJumpChance && mTimeCorpusMutex.try_lock ( ) )
 			{
-				jumpNext = true;
-				jumpOriginFile = mPlayheads[playheadIndex].fileIndex;
-				jumpOriginStartSample = mPlayheads[playheadIndex].sampleIndex;
-				jumpOriginEndSample = mPlayheads[playheadIndex].triggerSamplePoints.front ( );
+				std::lock_guard<std::mutex> lock ( mTimeCorpusMutex, std::adopt_lock );
 
-				size_t jumpFileIndex = rand ( ) % mRawView->GetDataset ( )->fileList.size ( ); // REPLACE RAND WITH KDTREE NEAREST FILE
-				size_t jumpSampleIndex = rand ( ) % mRawView->GetAudioData ( )->raw[jumpFileIndex].size ( ); // REPLACE RAND WITH KDTREE NEAREST TIME
-				JumpPlayhead ( jumpFileIndex, jumpSampleIndex, playheadIndex );
+				size_t timePointIndex = mPlayheads[playheadIndex].sampleIndex / (mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction);
+				glm::vec3 playheadPosition = mTimeCorpus[mPlayheads[playheadIndex].fileIndex].getVertex ( timePointIndex );
+				Utils::PointFT nearestPoint;
+				Utils::PointFT currentPoint; currentPoint.file = mPlayheads[playheadIndex].fileIndex; currentPoint.time = timePointIndex;
 
-				continue;
-			}
-			else // if current trigger point is the final one
-			{
-				mPlayheads[playheadIndex].triggerSamplePoints.pop ( );
+				if ( mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, 0.05 ) ) // TODO - replace 0.05 with a global variable
+				{
+					jumpNext = true;
+					jumpOriginFile = mPlayheads[playheadIndex].fileIndex;
+					jumpOriginStartSample = mPlayheads[playheadIndex].sampleIndex;
+					jumpOriginEndSample = mPlayheads[playheadIndex].triggerSamplePoints.front ( );
+
+					size_t jumpFileIndex = nearestPoint.file;
+					size_t jumpSampleIndex = nearestPoint.time * (mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction);
+					JumpPlayhead ( jumpFileIndex, jumpSampleIndex, playheadIndex );
+				}
 			}
 		}
 		
@@ -326,6 +334,13 @@ void Explorer::AudioPlayback::WaitForResetConfirm ( )
 	{
 		// wait for reset to be confirmed
 	}
+}
+
+void Explorer::AudioPlayback::SetTimeCorpus ( const std::vector<ofMesh>& timeCorpus )
+{
+	std::lock_guard<std::mutex> lock ( mTimeCorpusMutex );
+
+	mTimeCorpus = timeCorpus;
 }
 
 void Explorer::AudioPlayback::CalculateTriggerPoints ( Utils::AudioPlayhead& playhead )
