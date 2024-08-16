@@ -8,11 +8,12 @@ using namespace Acorex;
 
 void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Utils::DimensionBounds& dimensionBounds )
 {
+	std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+
 	mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dataset.dimensionNames.size ( ) );
 	mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 3 );
 
-
-	bPicker = false; b3D = true; bSkipTraining = true; bNearestCheckNeeded = false;
+	bPicker = false; b3D = true; bSkipTraining = true; bNearestMouseCheckNeeded = false;
 
 	bDimensionsFilled[0] = false; bDimensionsFilled[1] = false; bDimensionsFilled[2] = false;
 	mDimensionsIndices[0] = -1; mDimensionsIndices[1] = -1; mDimensionsIndices[2] = -1;
@@ -56,6 +57,8 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
 
 void Explorer::PointPicker::Train ( int dimensionIndex, Utils::Axis axis, bool none )
 {
+	std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+
 	if ( axis == Utils::Axis::X ) { bDimensionsFilled[0] = !none; mDimensionsIndices[0] = dimensionIndex; }
 	else if ( axis == Utils::Axis::Y ) { bDimensionsFilled[1] = !none; mDimensionsIndices[1] = dimensionIndex; }
 	else if ( axis == Utils::Axis::Z ) { bDimensionsFilled[2] = !none; mDimensionsIndices[2] = dimensionIndex; }
@@ -169,11 +172,6 @@ void Explorer::PointPicker::ScaleDataset ( Utils::DataSet& scaledDataset, const 
 	}
 }
 
-void Explorer::PointPicker::SlowUpdate ( )
-{
-	FindNearestToMouse ( );
-}
-
 void Explorer::PointPicker::Draw ( )
 {
 	if ( bDebug )
@@ -209,8 +207,10 @@ void Explorer::PointPicker::FindNearestToMouse ( )
 	if ( !bClicked ) { return; }
 	bClicked = false;
 
-	if ( !bPicker && !bTrained && !bNearestCheckNeeded ) { return; }
-	bNearestCheckNeeded = false;
+	if ( !bPicker && !bTrained && !bNearestMouseCheckNeeded ) { return; }
+	bNearestMouseCheckNeeded = false;
+
+	std::lock_guard<std::mutex> lock ( mPointPickerMutex );
 
 	mNearestPoint = -1; mNearestPointFile = -1; mNearestPointTime = -1;
 	mNearestDistance = std::numeric_limits<double>::max ( );
@@ -316,6 +316,57 @@ void Explorer::PointPicker::FindNearestToMouse ( )
 			mNearestPointFile = mCorpusFileLookUp[mNearestPoint];
 			if ( mCorpusTimeLookUp.size ( ) > 0 ) { mNearestPointTime = mCorpusTimeLookUp[mNearestPoint]; }
 		}
+	}
+}
+
+bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, double maxAllowedDistanceSpace )
+{
+	if ( mPointPickerMutex.try_lock ( ) )
+	{
+		std::lock_guard<std::mutex> lock ( mPointPickerMutex, std::adopt_lock );
+
+		if ( !b3D )
+		{
+			// 2D nearest
+
+			glm::vec2 position2D;
+
+			if ( !bDimensionsFilled[0] ) { position2D.x = position.y; position2D.y = position.z; }
+			if ( !bDimensionsFilled[1] ) { position2D.x = position.x; position2D.y = position.z; }
+			if ( !bDimensionsFilled[2] ) { position2D.x = position.x; position2D.y = position.y; }
+
+			fluid::RealVector query ( 2 );
+
+			query[0] = ofMap ( position2D.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+			query[1] = ofMap ( position2D.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+
+			auto [dist, id] = mKDTree.kNearest ( query, 5, maxAllowedDistanceSpace );
+
+			if ( dist.size ( ) == 0 ) { return false; }
+
+			double nearestDistance = std::numeric_limits<double>::max ( );
+
+			bool jumpFound = false;
+			for ( int i = 0; i < dist.size ( ); i++ )
+			{
+				if ( dist[i] < nearestDistance )
+				{
+					int point = std::stoi ( *id[i] );
+					if ( mCorpusFileLookUp[point] == currentPoint.file ) { continue; } // skip if jumping would jump to the same file (experiment later)
+
+					nearestDistance = dist[i];
+					nearestPoint.file = mCorpusFileLookUp[point];
+					nearestPoint.time = mCorpusTimeLookUp[point];
+					jumpFound = true;
+				}
+			}
+
+			return jumpFound;
+		}
+	}
+	else
+	{
+		return false;
 	}
 }
 

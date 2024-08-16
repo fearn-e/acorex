@@ -71,6 +71,8 @@ public:
 	void MouseEvent ( ofMouseEventArgs& args );
 
 private:
+	bool bPointersShared = false;
+
 	bool listenersAdded = false;
 
 	bool bDebug = false;
@@ -112,7 +114,7 @@ private:
 	// Acorex Objects ------------------------------
 
 	Utils::DimensionBounds mDimensionBounds;
-	PointPicker mPointPicker;
+	std::shared_ptr<PointPicker> mPointPicker;
 	AudioPlayback mAudioPlayback;
 };
 

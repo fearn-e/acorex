@@ -74,6 +74,11 @@ struct DataSet {
 
 };
 
+struct PointFT {
+	size_t file = 0;
+	size_t time = 0;
+};
+
 struct AudioPlayhead {
 	AudioPlayhead ( size_t ID, size_t file, size_t sample ) : playheadID ( ID ), fileIndex ( file ), sampleIndex ( sample ) { }
 
