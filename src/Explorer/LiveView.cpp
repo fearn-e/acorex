@@ -172,7 +172,6 @@ void Explorer::LiveView::UpdatePlayheads ( )
 	// calculate the 3D positions of the playheads
 	for ( auto& playhead : mPlayheads )
 	{
-		glm::vec3 position = { 0, 0, 0 };
 		size_t timeIndex = playhead.sampleIndex / ( mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction );
 		playhead.position[0] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).x;
 		playhead.position[1] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).y;
