@@ -28,7 +28,7 @@ public:
 	void Draw ( );
 
 	void FindNearestToMouse ( );
-	bool FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, double maxAllowedDistanceSpace );
+	bool FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, double maxAllowedDistanceSpace, int maxAllowedTargets );
 
 	// Setters & Getters ----------------------------
 

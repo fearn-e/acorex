@@ -319,7 +319,7 @@ void Explorer::PointPicker::FindNearestToMouse ( )
 	}
 }
 
-bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, double maxAllowedDistanceSpace )
+bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, double maxAllowedDistanceSpace, int maxAllowedTargets )
 {
 	if ( mPointPickerMutex.try_lock ( ) )
 	{
@@ -340,7 +340,7 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 			query[0] = ofMap ( position2D.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
 			query[1] = ofMap ( position2D.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
 
-			auto [dist, id] = mKDTree.kNearest ( query, 5, maxAllowedDistanceSpace );
+			auto [dist, id] = mKDTree.kNearest ( query, maxAllowedTargets, maxAllowedDistanceSpace );
 
 			if ( dist.size ( ) == 0 ) { return false; }
 

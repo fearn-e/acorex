@@ -114,6 +114,21 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 		{
 			mMainPanel.add ( mColorSpectrumSwitcher.setup ( "Color Spectrum: Red<->Blue", false ) );
 			mColorSpectrumSwitcher.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+			mMainPanel.add ( mLoopPlayheadsToggle.setup ( "Loop when reaching end of a file", false ) );
+			mLoopPlayheadsToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+			mMainPanel.add ( mCrossoverJumpChanceSlider.setup ( "Crossover Jump Chance", 0.05, 0.0, 1.0 ) );
+			mCrossoverJumpChanceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+			mMainPanel.add ( mCrossfadeMaxSampleLengthSlider.setup ( "Crossfade Max Sample Length", 256, 1, 2000 ) );
+			mCrossfadeMaxSampleLengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+			mMainPanel.add ( mMaxJumpDistanceSpaceSlider.setup ( "Max Jump Distance Space", 0.05, 0.0, 1.0 ) );
+			mMaxJumpDistanceSpaceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+			mMainPanel.add ( mMaxJumpTargetsSlider.setup ( "Max Jump Targets", 5, 1, 10 ) );
+			mMaxJumpTargetsSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		}
 
 		mMainPanel.setPosition ( ofGetWidth ( ) - mLayout.explorePanelWidth, mLayout.explorePanelOriginY );
@@ -129,6 +144,11 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 		mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SwapDimensionZ );
 		mDimensionDropdownColor->addListener ( this, &ExplorerMenu::SwapDimensionColor );
 		mColorSpectrumSwitcher.addListener ( this, &ExplorerMenu::SwitchColorSpectrum );
+		mLoopPlayheadsToggle.addListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
+		mCrossoverJumpChanceSlider.addListener ( this, &ExplorerMenu::SetCrossoverJumpChance );
+		mCrossfadeMaxSampleLengthSlider.addListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
+		mMaxJumpDistanceSpaceSlider.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
+		mMaxJumpTargetsSlider.addListener ( this, &ExplorerMenu::SetMaxJumpTargets );
 		bListenersAdded = true;
 	}
 
@@ -194,6 +214,11 @@ void ExplorerMenu::RemoveListeners ( )
 	mDimensionDropdownZ->removeListener ( this, &ExplorerMenu::SwapDimensionZ );
 	mDimensionDropdownColor->removeListener ( this, &ExplorerMenu::SwapDimensionColor );
 	mColorSpectrumSwitcher.removeListener ( this, &ExplorerMenu::SwitchColorSpectrum );
+	mLoopPlayheadsToggle.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
+	mCrossoverJumpChanceSlider.removeListener ( this, &ExplorerMenu::SetCrossoverJumpChance );
+	mCrossfadeMaxSampleLengthSlider.removeListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
+	mMaxJumpDistanceSpaceSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
+	mMaxJumpTargetsSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpTargets );
 	bListenersAdded = false;
 }
 
@@ -363,4 +388,29 @@ void ExplorerMenu::SwitchColorSpectrum ( bool& fullSpectrum )
 	else { mColorSpectrumSwitcher.setName ( "Color Spectrum: Red<->Blue" ); }
 	mLiveView.SetColorFullSpectrum ( fullSpectrum );
 	SwapDimension ( mDimensionDropdownColor->getAllSelected ( )[0], Utils::Axis::COLOR );
+}
+
+void ExplorerMenu::ToggleLoopPlayheads ( bool& loop )
+{
+	mLiveView.GetAudioPlayback ( )->SetLoopPlayheads ( loop );
+}
+
+void ExplorerMenu::SetCrossoverJumpChance ( float& jumpChance )
+{
+	mLiveView.GetAudioPlayback ( )->SetCrossoverJumpChance ( (int)(jumpChance * 100) );
+}
+
+void ExplorerMenu::SetCrossfadeMaxSampleLength ( int& length )
+{
+	mLiveView.GetAudioPlayback ( )->SetCrossfadeSampleLength ( length );
+}
+
+void ExplorerMenu::SetMaxJumpDistanceSpace ( float& distance )
+{
+	mLiveView.GetAudioPlayback ( )->SetMaxJumpDistanceSpace ( (int)(distance * 100) );
+}
+
+void ExplorerMenu::SetMaxJumpTargets ( int& targets )
+{
+	mLiveView.GetAudioPlayback ( )->SetMaxJumpTargets ( targets );
 }
