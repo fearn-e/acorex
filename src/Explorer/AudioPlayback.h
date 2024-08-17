@@ -58,7 +58,7 @@ private:
 
 	// settings -----------------------------------
 	
-	std::atomic<bool> mLoopPlayheads = true;
+	std::atomic<bool> mLoopPlayheads = false;
 	std::atomic<int> mCrossoverJumpChanceX100 = 0;
 	std::atomic<int> mCrossfadeSampleLength = 256;
 	std::atomic<int> mMaxJumpDistanceSpaceX100 = 5;
