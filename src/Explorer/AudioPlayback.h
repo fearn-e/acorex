@@ -23,7 +23,6 @@ public:
 	void audioOut ( ofSoundBuffer& outBuffer );
 
 	void SetRawView ( std::shared_ptr<RawView>& rawPointer ) { mRawView = rawPointer; }
-	void SetCrossoverJumpChance ( int jumpsInAHundred ) { crossoverJumpsInAHundred = jumpsInAHundred; }
 
 	bool CreatePlayhead ( size_t fileIndex, size_t sampleIndex );
 	bool KillPlayhead ( size_t playheadID );
@@ -35,6 +34,12 @@ public:
 
 	void SetPointPicker ( std::shared_ptr<PointPicker>& pointPicker ) { mPointPicker = pointPicker; }
 
+	void SetLoopPlayheads ( bool loop ) { mLoopPlayheads = loop; }
+	void SetCrossoverJumpChance ( int jumpsInAHundred ) { mCrossoverJumpChanceX100 = jumpsInAHundred; }
+	void SetCrossfadeSampleLength ( int length ) { mCrossfadeSampleLength = length; }
+	void SetMaxJumpDistanceSpace ( int distanceX100 ) { mMaxJumpDistanceSpaceX100 = distanceX100; }
+	void SetMaxJumpTargets ( int targets ) { mMaxJumpTargets = targets; }
+
 private:
 
 	void FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utils::AudioPlayhead* playhead, bool outBufferFull );
@@ -44,16 +49,20 @@ private:
 
 	void CalculateTriggerPoints ( Utils::AudioPlayhead& playhead );
 
-	int crossoverJumpsInAHundred = 80;
-	int crossfadeSampleLength = 256;
-	bool loopPlayheads = true;
-
 	std::vector<Utils::AudioPlayhead> mPlayheads;
 
 	std::shared_ptr<RawView> mRawView;
 	std::shared_ptr<PointPicker> mPointPicker;
 
 	ofSoundStream mSoundStream;
+
+	// settings -----------------------------------
+	
+	std::atomic<bool> mLoopPlayheads = true;
+	std::atomic<int> mCrossoverJumpChanceX100 = 0;
+	std::atomic<int> mCrossfadeSampleLength = 256;
+	std::atomic<int> mMaxJumpDistanceSpaceX100 = 5;
+	std::atomic<int> mMaxJumpTargets = 5;
 
 	// thread safety ------------------------------
 

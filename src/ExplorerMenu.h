@@ -40,6 +40,11 @@ private:
 	void SwapDimensionZ ( string& dimension );
 	void SwapDimensionColor ( string& dimension );
 	void SwitchColorSpectrum ( bool& fullSpectrum );
+	void ToggleLoopPlayheads ( bool& loop );
+	void SetCrossoverJumpChance ( float& jumpChance );
+	void SetCrossfadeMaxSampleLength ( int& length );
+	void SetMaxJumpDistanceSpace ( float& distance );
+	void SetMaxJumpTargets ( int& targets );
 
 	// States --------------------------------------
 
@@ -72,6 +77,12 @@ private:
 	unique_ptr<ofxDropdown> mDimensionDropdownZ;
 	unique_ptr<ofxDropdown> mDimensionDropdownColor;
 	ofxToggle mColorSpectrumSwitcher;
+
+	ofxToggle mLoopPlayheadsToggle;					
+	ofxFloatSlider mCrossoverJumpChanceSlider;		
+	ofxIntSlider mCrossfadeMaxSampleLengthSlider;	
+	ofxFloatSlider mMaxJumpDistanceSpaceSlider;		
+	ofxIntSlider mMaxJumpTargetsSlider;				
 
 	// Acorex Objects ------------------------------
 

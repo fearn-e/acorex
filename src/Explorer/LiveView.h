@@ -65,6 +65,8 @@ public:
 
 	bool Is3D ( ) const { return b3D; }
 
+	AudioPlayback* GetAudioPlayback ( ) { return &mAudioPlayback; }
+
 	// Listener Functions --------------------------
 
 	void KeyEvent ( ofKeyEventArgs& args );

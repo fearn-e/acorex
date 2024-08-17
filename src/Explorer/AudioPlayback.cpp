@@ -61,7 +61,8 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 		}
 	}
 
-	double crossoverJumpChance = (double)crossoverJumpsInAHundred / 100.0;
+	double crossoverJumpChance = (double)mCrossoverJumpChanceX100 / 100.0;
+	double maxJumpDistanceSpace = (double)mMaxJumpDistanceSpaceX100 / 100.0;
 
 	std::chrono::high_resolution_clock::time_point timeStart = std::chrono::high_resolution_clock::now ( );
 	std::chrono::microseconds preLoopDuration = std::chrono::microseconds ( 0 );
@@ -100,7 +101,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			// if EOF: loop/kill
 			if ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) == 0 )
 			{
-				if ( loopPlayheads )
+				if ( mLoopPlayheads )
 				{
 					JumpPlayhead ( mPlayheads[playheadIndex].fileIndex, 0, playheadIndex );
 				}
@@ -115,7 +116,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			{
 				if ( jumpNext ) //jump
 				{
-					CrossfadeAudioSegment ( &playheadBuffer, &playheadBufferPosition, jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile, &mPlayheads[playheadIndex], crossfadeSampleLength, true );
+					CrossfadeAudioSegment ( &playheadBuffer, &playheadBufferPosition, jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile, &mPlayheads[playheadIndex], mCrossfadeSampleLength, true );
 
 					jumpNext = false;
 				}
@@ -134,7 +135,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			}
 			else //jump
 			{
-				CrossfadeAudioSegment ( &playheadBuffer, &playheadBufferPosition, jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile, &mPlayheads[playheadIndex], crossfadeSampleLength, false );
+				CrossfadeAudioSegment ( &playheadBuffer, &playheadBufferPosition, jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile, &mPlayheads[playheadIndex], mCrossfadeSampleLength, false );
 
 				FillAudioSegment ( &playheadBuffer, &playheadBufferPosition, &mPlayheads[playheadIndex], false );
 
@@ -156,7 +157,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 				Utils::PointFT nearestPoint;
 				Utils::PointFT currentPoint; currentPoint.file = mPlayheads[playheadIndex].fileIndex; currentPoint.time = timePointIndex;
 
-				if ( mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, 0.05 ) ) // TODO - replace 0.05 with a global variable
+				if ( mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, maxJumpDistanceSpace, mMaxJumpTargets ) )
 				{
 					jumpNext = true;
 					jumpOriginFile = mPlayheads[playheadIndex].fileIndex;
