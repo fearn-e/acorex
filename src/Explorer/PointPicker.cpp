@@ -363,6 +363,37 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 
 			return jumpFound;
 		}
+
+		// 3D nearest
+
+		fluid::RealVector query ( 3 );
+
+		query[0] = ofMap ( position.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+		query[1] = ofMap ( position.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+		query[2] = ofMap ( position.z, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+
+		auto [dist, id] = mKDTree.kNearest ( query, maxAllowedTargets, maxAllowedDistanceSpace );
+
+		if ( dist.size ( ) == 0 ) { return false; }
+
+		double nearestDistance = std::numeric_limits<double>::max ( );
+		bool jumpFound = false;
+
+		for ( int i = 0; i < dist.size ( ); i++ )
+		{
+			if ( dist[i] < nearestDistance )
+			{
+				int point = std::stoi ( *id[i] );
+				if ( mCorpusFileLookUp[point] == currentPoint.file ) { continue; } // skip if jumping would jump to the same file (experiment later)
+
+				nearestDistance = dist[i];
+				nearestPoint.file = mCorpusFileLookUp[point];
+				nearestPoint.time = mCorpusTimeLookUp[point];
+				jumpFound = true;
+			}
+
+			return jumpFound;
+		}
 	}
 	else
 	{
