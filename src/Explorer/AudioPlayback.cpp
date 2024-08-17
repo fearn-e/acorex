@@ -108,6 +108,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 				else
 				{
 					playheadsToKillThisBuffer.push_back ( mPlayheads[playheadIndex].playheadID );
+					break;
 				}
 			}
 
