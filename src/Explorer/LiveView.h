@@ -35,6 +35,7 @@ public:
 	// Sound Functions ------------------------------
 
 	void CreatePlayhead ( );
+	void KillPlayhead ( size_t playheadID );
 	void OLD_PlaySound ( );
 
 	// Filler Functions ----------------------------
@@ -64,6 +65,8 @@ public:
 	void SetColorFullSpectrum ( bool fullSpectrum ) { bColorFullSpectrum = fullSpectrum; }
 
 	bool Is3D ( ) const { return b3D; }
+
+	std::vector<Utils::VisualPlayhead>& GetPlayheads ( ) { return mPlayheads; }
 
 	AudioPlayback* GetAudioPlayback ( ) { return &mAudioPlayback; }
 

@@ -5,6 +5,8 @@
 #include <vector>
 #include <queue>
 #include <nlohmann/json.hpp>
+#include <ofColor.h>
+#include <ofRectangle.h>
 
 #define DATA_CHANGE_CHECK_1
 
@@ -93,12 +95,17 @@ struct AudioPlayhead {
 struct VisualPlayhead {
 	VisualPlayhead ( size_t ID, size_t file, size_t sample ) : playheadID ( ID ), fileIndex ( file ), sampleIndex ( sample ) { }
 
+	bool highlight = false;
+
 	size_t playheadID = 0;
 
 	size_t fileIndex = 0;
 	size_t sampleIndex = 0;
 
 	float position[3] = { 0.0, 0.0, 0.0 };
+
+	ofColor color = ofColor ( 255, 255, 255, 255 );
+	ofRectangle panelRect = ofRectangle ( 0, 0, 0, 0 );
 };
 
 } // namespace Utils
