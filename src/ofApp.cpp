@@ -38,7 +38,10 @@ void ofApp::draw ( )
 		mDPIToggle.draw ( );
 	}
 
-	ofDrawBitmapStringHighlight ( "fps: " + ofToString ( ofGetFrameRate ( ) ), 20, ofGetHeight ( ) - 20 );
+	if ( mExploreToggle )
+		ofDrawBitmapStringHighlight ( "fps: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, mLayout.topBarHeight + 10 );
+	else
+		ofDrawBitmapStringHighlight ( "fps: " + ofToString ( (int)ofGetFrameRate ( ) ), ofGetWidth ( ) - 70, mLayout.topBarHeight + 10 );
 }
 
 void ofApp::exit ( )
