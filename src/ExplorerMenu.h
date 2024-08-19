@@ -46,6 +46,8 @@ private:
 	void SetMaxJumpDistanceSpace ( float& distance );
 	void SetMaxJumpTargets ( int& targets );
 
+	void MouseReleased ( ofMouseEventArgs& args );
+
 	// States --------------------------------------
 
 	bool bDraw = false;
@@ -82,7 +84,7 @@ private:
 	ofxFloatSlider mCrossoverJumpChanceSlider;		
 	ofxIntSlider mCrossfadeMaxSampleLengthSlider;	
 	ofxFloatSlider mMaxJumpDistanceSpaceSlider;		
-	ofxIntSlider mMaxJumpTargetsSlider;				
+	ofxIntSlider mMaxJumpTargetsSlider;
 
 	// Acorex Objects ------------------------------
 

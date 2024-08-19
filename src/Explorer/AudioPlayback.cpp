@@ -325,8 +325,6 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t sampleIn
 			mNewPlayheads.push ( newPlayhead );
 		}
 
-		ofLogNotice ( "AudioPlayback" ) << "New playhead created for " << mRawView->GetDataset ( )->fileList[fileIndex] << " at sample " << sampleIndex;
-
 		return true;
 	}
 	else

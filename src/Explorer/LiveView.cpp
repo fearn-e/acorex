@@ -4,6 +4,7 @@
 #include <ofGraphics.h>
 #include <of3dUtils.h>
 #include <ofEvents.h>
+#include <random>
 
 using namespace Acorex;
 
@@ -150,6 +151,16 @@ void Explorer::LiveView::UpdatePlayheads ( )
 	{
 		if ( std::find_if ( playheadUpdates.begin ( ), playheadUpdates.end ( ), [this, i]( Utils::VisualPlayhead& playhead ) { return playhead.playheadID == mPlayheads[i].playheadID; } ) == playheadUpdates.end ( ) )
 		{
+			ofLogNotice ( "LiveView" ) << "Playhead " << mPlayheads[i].playheadID << " deleted";
+
+			// if not the final one, move all after it back to the left
+			int j = mPlayheads.size ( ) - 1; int end = i;
+			while ( j > end )
+			{
+				mPlayheads[j].panelRect = mPlayheads[j - 1].panelRect;
+				j--;
+			}
+
 			mPlayheads.erase ( mPlayheads.begin ( ) + i );
 			i--;
 		}
@@ -161,11 +172,28 @@ void Explorer::LiveView::UpdatePlayheads ( )
 		auto it = std::find_if ( mPlayheads.begin ( ), mPlayheads.end ( ), [this, i, &playheadUpdates] ( Utils::VisualPlayhead& playhead ) { return playhead.playheadID == playheadUpdates[i].playheadID; } );
 		if ( it != mPlayheads.end ( ) )
 		{
+			ofColor color = it->color;
+			ofRectangle rect = it->panelRect;
+			bool highlight = it->highlight;
 			*it = playheadUpdates[i];
+			it->color = color;
+			it->panelRect = rect;
+			it->highlight = highlight;
 		}
 		else
 		{
+			ofLogNotice ( "LiveView" ) << "Playhead " << playheadUpdates[i].playheadID << " added";
+
 			mPlayheads.push_back ( playheadUpdates[i] );
+			int rectWidth = ofGetWidth ( ) / 10; int rectSpacing = ofGetWidth ( ) / 100; int rectHeight = ofGetHeight ( ) / 10;
+			std::random_device rd;
+			std::mt19937 gen ( rd ( ) );
+			std::uniform_int_distribution<> dis ( 0, 255 );
+			mPlayheads.back ( ).color = ofColor::fromHsb ( dis ( gen ), 255, 255 );
+			mPlayheads.back ( ).panelRect = ofRectangle (	rectSpacing * mPlayheads.size ( ) + rectWidth * ( mPlayheads.size ( ) - 1 ),
+															ofGetHeight ( ) - rectHeight - 5,
+															rectWidth,
+															rectHeight );
 		}
 	}
 
@@ -309,9 +337,18 @@ void Explorer::LiveView::Draw ( )
 
 		for ( int i = 0; i < mPlayheads.size ( ); i++ )
 		{
-			ofSetColor ( 255, 255, 255, 255 );
+			ofDisableDepthTest ( );
+			ofDisableAlphaBlending ( );
+
+			ofColor color = mPlayheads[i].color; float size = 50;
+			if ( mPlayheads[i].highlight ) { color = { 255, 255, 255, 255 }; size = 100; }
+
+			ofSetColor ( color );
 			glm::vec3 position = { mPlayheads[i].position[0], mPlayheads[i].position[1], mPlayheads[i].position[2] };
-			ofDrawSphere ( position, 50 );
+			ofDrawSphere ( position, size );
+
+			ofEnableAlphaBlending ( );
+			ofEnableDepthTest ( );
 		}
 	}
 	else // Stats
@@ -379,6 +416,11 @@ void Explorer::LiveView::CreatePlayhead ( )
 	mAudioPlayback.CreatePlayhead ( mPointPicker->GetNearestMousePointFile ( ), mPointPicker->GetNearestMousePointTime ( ) );
 
 	return;
+}
+
+void Explorer::LiveView::KillPlayhead ( size_t playheadID )
+{
+	mAudioPlayback.KillPlayhead ( playheadID );
 }
 
 void Explorer::LiveView::OLD_PlaySound ( )

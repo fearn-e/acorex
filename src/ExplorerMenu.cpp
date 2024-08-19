@@ -1,5 +1,6 @@
 #include "./ExplorerMenu.h"
 #include <ofUtils.h>
+#include <of3dGraphics.h>
 
 using namespace Acorex;
 
@@ -149,6 +150,8 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 		mCrossfadeMaxSampleLengthSlider.addListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
 		mMaxJumpDistanceSpaceSlider.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
 		mMaxJumpTargetsSlider.addListener ( this, &ExplorerMenu::SetMaxJumpTargets );
+
+		ofAddListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
 		bListenersAdded = true;
 	}
 
@@ -175,6 +178,42 @@ void ExplorerMenu::Draw ( )
 	// call pointpicker draw
 
 	mMainPanel.draw ( );
+
+	// draw playhead panels
+
+	{
+		for ( auto& playhead : mLiveView.GetPlayheads ( ) )
+		{
+			// highlight the playhead position if panel is hovered
+			if ( playhead.panelRect.inside ( ofGetMouseX ( ), ofGetMouseY ( ) ) )
+				playhead.highlight = true;
+			else
+				playhead.highlight = false;
+
+			// draw panel
+			ofSetColor ( playhead.color );
+			ofDrawRectangle ( playhead.panelRect );
+			ofSetColor ( 200, 200, 200, 255 );
+			ofDrawRectangle ( playhead.panelRect.x, playhead.panelRect.y, playhead.panelRect.width, playhead.panelRect.height / 2 );
+			// draw playhead id in the top left
+			ofSetColor ( 0, 0, 0, 255 );
+			ofDrawBitmapString ( "ID:" + ofToString ( playhead.playheadID ), playhead.panelRect.x + 5, playhead.panelRect.y + 15 );
+			// draw file index in the top left
+			ofDrawBitmapString ( "File: " + ofToString ( playhead.fileIndex ), playhead.panelRect.x + 5, playhead.panelRect.y + 30 );
+			// draw sample index in the top left
+			ofDrawBitmapString ( "Samp: " + ofToString ( playhead.sampleIndex ), playhead.panelRect.x + 5, playhead.panelRect.y + 45 );
+
+			// draw another smaller rectangle in the top right corner of the panel
+			int smallRectSize = ( playhead.panelRect.width + playhead.panelRect.height ) / 20;
+			ofSetColor ( mColors.interfaceBackgroundColor );
+			ofDrawRectangle ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, smallRectSize, smallRectSize );
+			// draw an X in the top right corner of the panel
+			ofSetColor ( 255, 0, 0, 255 );
+			ofSetLineWidth ( 2 );
+			ofDrawLine ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, playhead.panelRect.x + playhead.panelRect.width, playhead.panelRect.y + smallRectSize );
+			ofDrawLine ( playhead.panelRect.x + playhead.panelRect.width, playhead.panelRect.y, playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y + smallRectSize );
+		}
+	}
 }
 
 void ExplorerMenu::Update ( )
@@ -219,6 +258,8 @@ void ExplorerMenu::RemoveListeners ( )
 	mCrossfadeMaxSampleLengthSlider.removeListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
 	mMaxJumpDistanceSpaceSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
 	mMaxJumpTargetsSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpTargets );
+
+	ofRemoveListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
 	bListenersAdded = false;
 }
 
@@ -413,4 +454,19 @@ void ExplorerMenu::SetMaxJumpDistanceSpace ( float& distance )
 void ExplorerMenu::SetMaxJumpTargets ( int& targets )
 {
 	mLiveView.GetAudioPlayback ( )->SetMaxJumpTargets ( targets );
+}
+
+void ExplorerMenu::MouseReleased ( ofMouseEventArgs& args )
+{
+	for ( auto& playhead : mLiveView.GetPlayheads ( ) )
+	{
+		int smallRectSize = ( playhead.panelRect.width + playhead.panelRect.height ) / 20;
+		ofRectangle smallRect = ofRectangle ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, smallRectSize, smallRectSize );
+
+		if ( smallRect.inside ( args.x, args.y ) )
+		{
+			mLiveView.GetAudioPlayback ( )->KillPlayhead ( playhead.playheadID );
+			return;
+		}
+	}
 }
