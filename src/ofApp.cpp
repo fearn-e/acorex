@@ -21,13 +21,13 @@ void ofApp::setup ( )
 
 void ofApp::update ( )
 {
-	mExplorerMenu.Update ( );
+	if ( mExploreToggle ) { mExplorerMenu.Update ( ); }
 }
 
 void ofApp::draw ( )
 {
-	mExplorerMenu.Draw ( );
-	mAnalyserMenu.Draw ( );
+	if ( mAnalyseToggle ) { mAnalyserMenu.Draw ( ); }
+	if ( mExploreToggle ) { mExplorerMenu.Draw ( ); }
 
 	{
 		ofSetColor ( mColors.interfaceBackgroundColor );
@@ -96,6 +96,7 @@ void ofApp::AnalyseToggled ( bool& value )
 	if ( value )
 	{
 		mAnalyserMenu.Show ( );
+		if ( mExploreToggle ) { mExplorerMenu.Hide ( ); }
 	}
 	else
 	{
@@ -108,6 +109,7 @@ void ofApp::ExploreToggled ( bool& value )
 	if ( value )
 	{
 		mExplorerMenu.Show ( );
+		if ( mAnalyseToggle ) { mAnalyserMenu.Hide ( ); }
 	}
 	else
 	{
