@@ -249,6 +249,8 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			mVisualPlayheads.push_back ( Utils::VisualPlayhead ( mPlayheads[i].playheadID, mPlayheads[i].fileIndex, mPlayheads[i].sampleIndex ) );
 		}
 	}
+
+	mActivePlayheads = mPlayheads.size ( );
 }
 
 /* if ( mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getSampleRate ( ) != mSoundStream.getSampleRate ( ) )
@@ -382,9 +384,10 @@ void Explorer::AudioPlayback::SetFlagReset ( )
 
 void Explorer::AudioPlayback::WaitForResetConfirm ( )
 {
+	if ( !bStreamStarted ) { return; }
 	while ( bResetFlag )
 	{
-		// wait for reset to be confirmed
+		if ( mActivePlayheads == 0 ) { return; }
 	}
 }
 
