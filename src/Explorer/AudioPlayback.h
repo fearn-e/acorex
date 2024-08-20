@@ -18,7 +18,8 @@ public:
 	AudioPlayback ( ) { }
 	~AudioPlayback ( ) { }
 
-	void Initialise ( size_t sampleRate );
+	void Initialise ( );
+	void RestartAudio ( size_t sampleRate, size_t bufferSize, ofSoundDevice outDevice );
 
 	void audioOut ( ofSoundBuffer& outBuffer );
 
@@ -55,6 +56,8 @@ private:
 	std::shared_ptr<PointPicker> mPointPicker;
 
 	ofSoundStream mSoundStream;
+
+	bool bStreamStarted = false;
 
 	// settings -----------------------------------
 	

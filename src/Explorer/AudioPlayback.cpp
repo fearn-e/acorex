@@ -4,22 +4,46 @@
 
 using namespace Acorex;
 
-void Explorer::AudioPlayback::Initialise ( size_t sampleRate )
+void Explorer::AudioPlayback::Initialise ( )
 {
+	srand ( time ( NULL ) );
+
+	ofSoundDevice outDevice;
+
+	for ( int i = 1; i < ofSoundDevice::Api::NUM_APIS; i++ )
+	{
+		std::vector<ofSoundDevice> devices = mSoundStream.getDeviceList ( (ofSoundDevice::Api)i );
+		for ( auto& device : devices )
+		{
+			if ( device.outputChannels == 0 ) { continue; }
+			outDevice = device;
+		}
+	}
+	RestartAudio ( 44100, 512, outDevice );
+}
+
+void Explorer::AudioPlayback::RestartAudio ( size_t sampleRate, size_t bufferSize, ofSoundDevice outDevice )
+{
+	if ( bStreamStarted )
+	{
+		SetFlagReset ( );
+		WaitForResetConfirm ( );
+	}
+
+	if ( bStreamStarted ) { mSoundStream.close ( ); }
+
 	ofSoundStreamSettings settings;
 	settings.numInputChannels = 0;
 	settings.numOutputChannels = 2;
 	settings.sampleRate = sampleRate;
-	settings.bufferSize = 512;
+	settings.bufferSize = bufferSize;
 	settings.numBuffers = 4;
 	settings.setOutListener ( this );
+	settings.setOutDevice ( outDevice );
 
-	auto devices = mSoundStream.getDeviceList ( ofSoundDevice::Api::MS_DS ); // TODO - set devices properly with UI
-	settings.setOutDevice ( devices[0] );
-	
 	mSoundStream.setup ( settings );
 
-	srand ( time ( NULL ) );
+	bStreamStarted = true;
 }
 
 void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
