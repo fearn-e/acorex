@@ -96,7 +96,7 @@ void ofApp::AnalyseToggled ( bool& value )
 	if ( value )
 	{
 		mAnalyserMenu.Show ( );
-		if ( mExploreToggle ) { mExplorerMenu.Hide ( ); }
+		mExploreToggle = false;
 	}
 	else
 	{
@@ -109,7 +109,7 @@ void ofApp::ExploreToggled ( bool& value )
 	if ( value )
 	{
 		mExplorerMenu.Show ( );
-		if ( mAnalyseToggle ) { mAnalyserMenu.Hide ( ); }
+		mAnalyseToggle = false;
 	}
 	else
 	{
