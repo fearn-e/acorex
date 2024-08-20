@@ -251,7 +251,6 @@ bool Analyser::Controller::SearchDirectory ( const std::string& directory, std::
 		if ( !is_regular_file ( entry.path ( ) ) ) { continue; }
 
 		if ( entry.path ( ).extension ( ) != ".wav" &&
-			entry.path ( ).extension ( ) != ".aif" &&
 			entry.path ( ).extension ( ) != ".flac" &&
 			entry.path ( ).extension ( ) != ".mp3" &&
 			entry.path ( ).extension ( ) != ".ogg" )
