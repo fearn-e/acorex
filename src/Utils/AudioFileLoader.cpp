@@ -42,7 +42,11 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
 
         if ( file.is_error ( ) )
         {
-            ofLogError ( "GenAnalysis" ) << "input file " << filename << " returned error " << file.error_string ( );
+            ofLogError ( "GenAnalysis" ) << "input file " << filename << " returned errors:";
+            for ( auto& error : file.get_errors ( ) )
+            {
+				ofLogError ( "GenAnalysis" ) << file.error_string ( error );
+			}
             return false;
         }
 
