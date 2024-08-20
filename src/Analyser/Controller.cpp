@@ -250,7 +250,6 @@ bool Analyser::Controller::SearchDirectory ( const std::string& directory, std::
 
 		if ( !is_regular_file ( entry.path ( ) ) ) { continue; }
 
-		// TODO - add mp3 and ogg support
 		if ( entry.path ( ).extension ( ) != ".wav" &&
 			entry.path ( ).extension ( ) != ".aif" &&
 			entry.path ( ).extension ( ) != ".flac" &&
