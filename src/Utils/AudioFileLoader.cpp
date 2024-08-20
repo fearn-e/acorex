@@ -30,7 +30,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
         return false;
     }
 
-    if ( filename.find ( ".wav" ) != std::string::npos || filename.find ( ".aiff" ) != std::string::npos || filename.find ( ".flac" ) != std::string::npos )
+    if ( filename.find ( ".wav" ) != std::string::npos || filename.find ( ".aif" ) != std::string::npos || filename.find ( ".flac" ) != std::string::npos )
     {
         htl::in_audio_file file ( filename.c_str ( ) );
 
