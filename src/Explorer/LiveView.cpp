@@ -49,7 +49,7 @@ void Explorer::LiveView::Initialise ( )
 	if ( mPlayingFiles.size ( ) > 0 ) { mPlayingFiles.clear ( ); }
 	if ( mPlayingTimeHeads.size ( ) > 0 ) { mPlayingTimeHeads.clear ( ); }
 
-	mAudioPlayback.Initialise ( 44100 );
+	mAudioPlayback.Initialise ( );
 	mAudioPlayback.SetRawView ( mRawView );
 
 	if ( !listenersAdded )
@@ -63,6 +63,11 @@ void Explorer::LiveView::Initialise ( )
 		ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
 		listenersAdded = true;
 	}
+}
+
+void Explorer::LiveView::ChangeAudioSettings ( size_t sampleRate, size_t bufferSize, ofSoundDevice outDevice )
+{
+	mAudioPlayback.RestartAudio ( sampleRate, bufferSize, outDevice );
 }
 
 void Explorer::LiveView::KillAudio ( )
