@@ -30,7 +30,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
         return false;
     }
 
-    if ( filename.find ( ".wav" ) != std::string::npos || filename.find ( ".aif" ) != std::string::npos || filename.find ( ".flac" ) != std::string::npos )
+    if ( filename.find ( ".wav" ) != std::string::npos || filename.find ( ".flac" ) != std::string::npos )
     {
         htl::in_audio_file file ( filename.c_str ( ) );
 
@@ -42,7 +42,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
 
         if ( file.is_error ( ) )
         {
-            ofLogError ( "GenAnalysis" ) << "input file " << filename << " is not supported";
+            ofLogError ( "GenAnalysis" ) << "input file " << filename << " returned error " << file.error_string ( );
             return false;
         }
 
@@ -66,6 +66,11 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
         sampleRate = file.samplerate ( );
 
         ReadToMono ( output, file );
+    }
+    else
+    {
+        ofLogError ( "GenAnalysis" ) << "input file " << filename << " is not supported";
+		return false;
     }
 
     return true;
