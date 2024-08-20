@@ -69,6 +69,8 @@ private:
 
 	// thread safety ------------------------------
 
+	std::atomic<int> mActivePlayheads = 0;
+
 	std::mutex mNewPlayheadMutex;
 	std::queue<Utils::AudioPlayhead> mNewPlayheads;
 	std::queue<size_t> mPlayheadsToKill;
