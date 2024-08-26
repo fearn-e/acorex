@@ -524,7 +524,7 @@ void ExplorerMenu::ToggleLoopPlayheads ( bool& loop )
 
 void ExplorerMenu::SetCrossoverJumpChance ( float& jumpChance )
 {
-	mLiveView.GetAudioPlayback ( )->SetCrossoverJumpChance ( (int)(jumpChance * 100) );
+	mLiveView.GetAudioPlayback ( )->SetCrossoverJumpChance ( (int)(jumpChance * 1000) );
 }
 
 void ExplorerMenu::SetCrossfadeMaxSampleLength ( int& length )
@@ -534,7 +534,7 @@ void ExplorerMenu::SetCrossfadeMaxSampleLength ( int& length )
 
 void ExplorerMenu::SetMaxJumpDistanceSpace ( float& distance )
 {
-	mLiveView.GetAudioPlayback ( )->SetMaxJumpDistanceSpace ( (int)(distance * 100) );
+	mLiveView.GetAudioPlayback ( )->SetMaxJumpDistanceSpace ( (int)(distance * 1000) );
 }
 
 void ExplorerMenu::SetMaxJumpTargets ( int& targets )
