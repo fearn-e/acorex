@@ -102,7 +102,6 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 	}
 
 	double crossoverJumpChance = (double)mCrossoverJumpChanceX100 / 100.0;
-	double maxJumpDistanceSpace = (double)mMaxJumpDistanceSpaceX100 / 100.0;
 
 	std::chrono::high_resolution_clock::time_point timeStart = std::chrono::high_resolution_clock::now ( );
 	std::chrono::microseconds preLoopDuration = std::chrono::microseconds ( 0 );
@@ -198,7 +197,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 				Utils::PointFT nearestPoint;
 				Utils::PointFT currentPoint; currentPoint.file = mPlayheads[playheadIndex].fileIndex; currentPoint.time = timePointIndex;
 
-				if ( mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, maxJumpDistanceSpace, mMaxJumpTargets ) )
+				if ( mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, mMaxJumpDistanceSpaceX100, mMaxJumpTargets ) )
 				{
 					jumpNext = true;
 					jumpOriginFile = mPlayheads[playheadIndex].fileIndex;
