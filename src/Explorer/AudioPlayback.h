@@ -52,9 +52,9 @@ public:
 	void SetPointPicker ( std::shared_ptr<PointPicker>& pointPicker ) { mPointPicker = pointPicker; }
 
 	void SetLoopPlayheads ( bool loop ) { mLoopPlayheads = loop; }
-	void SetCrossoverJumpChance ( int jumpsInAHundred ) { mCrossoverJumpChanceX100 = jumpsInAHundred; }
+	void SetCrossoverJumpChance ( int jumpsInAThousand ) { mCrossoverJumpChanceX1000 = jumpsInAThousand; }
 	void SetCrossfadeSampleLength ( int length ) { mCrossfadeSampleLength = length; }
-	void SetMaxJumpDistanceSpace ( int distanceX100 ) { mMaxJumpDistanceSpaceX100 = distanceX100; }
+	void SetMaxJumpDistanceSpace ( int distanceX1000 ) { mMaxJumpDistanceSpaceX1000 = distanceX1000; }
 	void SetMaxJumpTargets ( int targets ) { mMaxJumpTargets = targets; }
 
 private:
@@ -78,9 +78,9 @@ private:
 	// settings -----------------------------------
 	
 	std::atomic<bool> mLoopPlayheads = false;
-	std::atomic<int> mCrossoverJumpChanceX100 = 5;
+	std::atomic<int> mCrossoverJumpChanceX1000 = 50;
 	std::atomic<int> mCrossfadeSampleLength = 256;
-	std::atomic<int> mMaxJumpDistanceSpaceX100 = 5;
+	std::atomic<int> mMaxJumpDistanceSpaceX1000 = 50;
 	std::atomic<int> mMaxJumpTargets = 5;
 
 	// thread safety ------------------------------
