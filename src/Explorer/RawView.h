@@ -49,8 +49,6 @@ private:
 
 	Utils::JSON mJSON;
 	Utils::AudioFileLoader mAudioLoader;
-
-	double globalSampleRate;
 };
 
 } // namespace Explorer

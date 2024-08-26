@@ -15,11 +15,12 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 */
 
 #include "./AudioFileLoader.h"
+#include <ofSoundBuffer.h>
 #include "ofLog.h"
 
 using namespace Acorex;
 
-bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVector& output, double& sampleRate )
+bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVector& output, double targetSampleRate )
 {
     //if file ends in .wav, .aiff, .flac - use htl::in_audio_file
     //if file ends in .mp3, .ogg - use ofxAudioFile
@@ -50,10 +51,14 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
             return false;
         }
 
-        output.resize ( file.frames ( ) );
-        sampleRate = file.sampling_rate ( );
+        std::vector<float> temp;
 
-        ReadToMono ( output, file );
+        ReadToMono ( temp, file );
+
+        Resample ( temp, file.sampling_rate ( ), targetSampleRate );
+
+        output.resize ( file.frames ( ) );
+        std::copy ( temp.begin ( ), temp.end ( ), output.data ( ) );
     }
     else if ( filename.find ( ".mp3" ) != std::string::npos || filename.find ( ".ogg" ) != std::string::npos )
     {
@@ -66,10 +71,14 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
             return false;
         }
 
-        output.resize ( file.length ( ) );
-        sampleRate = file.samplerate ( );
+        std::vector<float> temp;
 
-        ReadToMono ( output, file );
+        ReadToMono ( temp, file );
+
+        Resample ( temp, file.samplerate ( ), targetSampleRate );
+
+        output.resize ( file.length ( ) );
+        std::copy ( temp.begin ( ), temp.end ( ), output.data ( ) );
     }
     else
     {
@@ -80,10 +89,11 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
     return true;
 }
 
-void Utils::AudioFileLoader::ReadToMono ( fluid::RealVector& output, htl::in_audio_file& file )
+void Utils::AudioFileLoader::ReadToMono ( std::vector<float>& output, htl::in_audio_file& file )
 {
     int numChannels = file.channels ( );
     int numSamples = file.frames ( );
+    output.resize ( numSamples );
 
     if ( numChannels == 1 )
     {
@@ -112,10 +122,11 @@ void Utils::AudioFileLoader::ReadToMono ( fluid::RealVector& output, htl::in_aud
 
 }
 
-void Utils::AudioFileLoader::ReadToMono ( fluid::RealVector& output, ofxAudioFile& file )
+void Utils::AudioFileLoader::ReadToMono ( std::vector<float>& output, ofxAudioFile& file )
 {
     int numChannels = file.channels ( );
     int numSamples = file.length ( );
+    output.resize ( numSamples );
 
     if ( numChannels == 1 )
     {
@@ -137,4 +148,17 @@ void Utils::AudioFileLoader::ReadToMono ( fluid::RealVector& output, ofxAudioFil
         }
         output[sample] /= numChannels;
     }
+}
+
+void Utils::AudioFileLoader::Resample ( std::vector<float>& audio, double fileRate, double targetRate  )
+{
+    ofSoundBuffer resampleBuffer;
+
+    resampleBuffer.copyFrom ( audio, 1, fileRate );
+    
+    resampleBuffer.resample ( (fileRate / targetRate), ofSoundBuffer::Hermite );
+    resampleBuffer.setSampleRate ( targetRate );
+
+    audio.resize ( resampleBuffer.size ( ) );
+    resampleBuffer.copyTo ( audio.data ( ), resampleBuffer.size ( ), 1, 0, false );
 }

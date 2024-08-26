@@ -269,19 +269,6 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 	mActivePlayheads = mPlayheads.size ( );
 }
 
-/* if ( mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getSampleRate ( ) != mSoundStream.getSampleRate ( ) )
-{
-	// RESAMPLE ALGO
-	if ( sampleRate != globalSampleRate )
-	{
-		audioData.resample ( (sampleRate / globalSampleRate), ofSoundBuffer::Hermite );
-		audioData.setSampleRate ( globalSampleRate );
-	}
-} */
-
-// need to add above resampling code to the FillAudioSegment and CrossfadeAudioSegment functions
-
-
 void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utils::AudioPlayhead* playhead, bool outBufferFull )
 {
 	size_t segmentLength = playhead->triggerSamplePoints.front ( ) - playhead->sampleIndex;

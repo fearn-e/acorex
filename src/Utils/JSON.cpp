@@ -102,6 +102,7 @@ void Utils::to_json ( nlohmann::json& j, const DataSet& a )
 		TO_J_SETTINGS ( bLoudness ),
 		TO_J_SETTINGS ( bShape ),
 		TO_J_SETTINGS ( bMFCC ),
+		TO_J_SETTINGS ( sampleRate ),
 		TO_J_SETTINGS ( windowFFTSize ),
 		TO_J_SETTINGS ( hopFraction ),
 		TO_J_SETTINGS ( nBands ),
@@ -125,6 +126,7 @@ void Utils::from_json ( const nlohmann::json& j, DataSet& a )
 	TO_A_SETTINGS ( bLoudness );
 	TO_A_SETTINGS ( bShape );
 	TO_A_SETTINGS ( bMFCC );
+	TO_A_SETTINGS ( sampleRate );
 	TO_A_SETTINGS ( windowFFTSize );
 	TO_A_SETTINGS ( hopFraction );
 	TO_A_SETTINGS ( nBands );
@@ -143,6 +145,7 @@ void Utils::to_json ( nlohmann::json& j, const AnalysisSettings& a )
 		TO_J ( bLoudness ),
 		TO_J ( bShape ),
 		TO_J ( bMFCC ),
+		TO_J ( sampleRate ),
 		TO_J ( windowFFTSize ),
 		TO_J ( hopFraction ),
 		TO_J ( nBands ),
@@ -160,6 +163,7 @@ void Utils::from_json ( const nlohmann::json& j, AnalysisSettings& a )
 	TO_A ( bLoudness );
 	TO_A ( bShape );
 	TO_A ( bMFCC );
+	TO_A ( sampleRate );
 	TO_A ( windowFFTSize );
 	TO_A ( hopFraction );
 	TO_A ( nBands );

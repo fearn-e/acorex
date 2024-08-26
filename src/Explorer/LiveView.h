@@ -36,7 +36,7 @@ public:
 	~LiveView ( ) { }
 
 	void Initialise ( );
-	void ChangeAudioSettings ( size_t sampleRate, size_t bufferSize, ofSoundDevice outDevice );
+	void ChangeAudioSettings ( size_t bufferSize, ofSoundDevice outDevice );
 	void KillAudio ( );
 	void Exit ( );
 	void RemoveListeners ( );

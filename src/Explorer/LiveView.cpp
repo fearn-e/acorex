@@ -81,9 +81,9 @@ void Explorer::LiveView::Initialise ( )
 	}
 }
 
-void Explorer::LiveView::ChangeAudioSettings ( size_t sampleRate, size_t bufferSize, ofSoundDevice outDevice )
+void Explorer::LiveView::ChangeAudioSettings ( size_t bufferSize, ofSoundDevice outDevice )
 {
-	mAudioPlayback.RestartAudio ( sampleRate, bufferSize, outDevice );
+	mAudioPlayback.RestartAudio ( mRawView->GetDataset ( )->analysisSettings.sampleRate, bufferSize, outDevice );
 }
 
 void Explorer::LiveView::KillAudio ( )
