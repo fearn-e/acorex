@@ -667,7 +667,7 @@ void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::
 		}
 		else
 		{
-			double value = ofMap ( value, min, max, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
+			value = ofMap ( value, min, max, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
 			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
 			currentPoint[(int)axis] = value;
 			mStatsCorpus.setVertex ( file, currentPoint );
