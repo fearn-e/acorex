@@ -105,6 +105,7 @@ private:
 	ofxToggle mAnalysisLoudnessToggle;
 	ofxToggle mAnalysisShapeToggle;
 	ofxToggle mAnalysisMFCCToggle;
+	ofxIntField mSampleRateField;
 	ofxIntField mWindowFFTField;
 	ofxIntField mHopFractionField;
 	ofxIntField mNBandsField;

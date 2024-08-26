@@ -163,11 +163,9 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 			mMaxJumpTargetsSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		}
 
-		mSampleRateDropdown.reset ( );
 		mBufferSizeDropdown.reset ( );
 		mOutDeviceDropdown.reset ( );
 
-		mSampleRateDropdown = make_unique<ofxIntDropdown> ( "Sample Rate", dropdownScrollSpeed );
 		mBufferSizeDropdown = make_unique<ofxIntDropdown> ( "Buffer Size", dropdownScrollSpeed );
 		mOutDeviceDropdown = make_unique<ofxDropdown> ( "Output Device", dropdownScrollSpeed );
 
@@ -175,12 +173,6 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 		{
 			std::string deviceName = (std::to_string ( i + 1 ) + ". " + outDevices[i].name);
 			mOutDeviceDropdown->add ( deviceName );
-		}
-
-		{
-			mSampleRateDropdown->add ( 44100 );
-			mSampleRateDropdown->add ( 48000 );
-			mSampleRateDropdown->add ( 96000 );
 		}
 
 		{
@@ -194,29 +186,21 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 			mBufferSizeDropdown->add ( 8192 );
 		}
 
-		mSampleRateDropdown->disableMultipleSelection ( );
 		mBufferSizeDropdown->disableMultipleSelection ( );
 		mOutDeviceDropdown->disableMultipleSelection ( );
 
-		mSampleRateDropdown->enableCollapseOnSelection ( );
 		mBufferSizeDropdown->enableCollapseOnSelection ( );
 		mOutDeviceDropdown->enableCollapseOnSelection ( );
 
-		mSampleRateDropdown->setDropDownPosition ( ofxIntDropdown::DD_LEFT );
 		mBufferSizeDropdown->setDropDownPosition ( ofxIntDropdown::DD_LEFT );
 		mOutDeviceDropdown->setDropDownPosition ( ofxDropdown::DD_LEFT );
 
-		mSampleRateDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mBufferSizeDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mOutDeviceDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-		currentSampleRate = 44100; currentBufferSize = 512; currentOutDevice = outDevices[0];
-
-		mSampleRateDropdown->setSelectedValueByIndex ( 0, true );
 		mBufferSizeDropdown->setSelectedValueByIndex ( 3, true );
 		mOutDeviceDropdown->setSelectedValueByIndex ( 0, true );
 
-		mMainPanel.add ( mSampleRateDropdown.get ( ) );
 		mMainPanel.add ( mBufferSizeDropdown.get ( ) );
 		mMainPanel.add ( mOutDeviceDropdown.get ( ) );
 
@@ -239,7 +223,6 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 		mMaxJumpDistanceSpaceSlider.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
 		mMaxJumpTargetsSlider.addListener ( this, &ExplorerMenu::SetMaxJumpTargets );
 
-		mSampleRateDropdown->addListener ( this, &ExplorerMenu::SetSampleRate );
 		mBufferSizeDropdown->addListener ( this, &ExplorerMenu::SetBufferSize );
 		mOutDeviceDropdown->addListener ( this, &ExplorerMenu::SetOutDevice );
 
@@ -418,7 +401,7 @@ void ExplorerMenu::OpenCorpus ( )
 
 	SwapDimension ( colorDimension, Utils::Axis::COLOR );
 
-	mLiveView.ChangeAudioSettings ( currentSampleRate, currentBufferSize, currentOutDevice );
+	mLiveView.ChangeAudioSettings ( currentBufferSize, currentOutDevice );
 }
 
 void ExplorerMenu::SwapDimension ( string dimension, Utils::Axis axis )
@@ -574,16 +557,10 @@ void ExplorerMenu::MouseReleased ( ofMouseEventArgs& args )
 	}
 }
 
-void ExplorerMenu::SetSampleRate ( int& sampleRate )
-{
-	currentSampleRate = sampleRate;
-	mLiveView.ChangeAudioSettings ( currentSampleRate, currentBufferSize, currentOutDevice );
-}
-
 void ExplorerMenu::SetBufferSize ( int& bufferSize )
 {
 	currentBufferSize = bufferSize;
-	mLiveView.ChangeAudioSettings ( currentSampleRate, currentBufferSize, currentOutDevice );
+	mLiveView.ChangeAudioSettings ( currentBufferSize, currentOutDevice );
 }
 
 void ExplorerMenu::SetOutDevice ( string& outDevice )
@@ -593,5 +570,5 @@ void ExplorerMenu::SetOutDevice ( string& outDevice )
 
 	currentOutDevice = outDevices[deviceIndex];
 
-	mLiveView.ChangeAudioSettings ( currentSampleRate, currentBufferSize, currentOutDevice );
+	mLiveView.ChangeAudioSettings ( currentBufferSize, currentOutDevice );
 }

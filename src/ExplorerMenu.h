@@ -64,13 +64,11 @@ private:
 
 	void MouseReleased ( ofMouseEventArgs& args );
 
-	void SetSampleRate ( int& sampleRate );
 	void SetBufferSize ( int& bufferSize );
 	void SetOutDevice ( string& outDevice );
 
 	std::vector<ofSoundDevice> outDevices;
 	ofSoundDevice currentOutDevice;
-	int currentSampleRate;
 	int currentBufferSize;
 
 	// States --------------------------------------
@@ -111,7 +109,6 @@ private:
 	ofxFloatSlider mMaxJumpDistanceSpaceSlider;		
 	ofxIntSlider mMaxJumpTargetsSlider;
 
-	unique_ptr<ofxIntDropdown> mSampleRateDropdown;
 	unique_ptr<ofxIntDropdown> mBufferSizeDropdown;
 	unique_ptr<ofxDropdown> mOutDeviceDropdown;
 

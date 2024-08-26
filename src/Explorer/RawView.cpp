@@ -68,9 +68,8 @@ bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
 	for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
 	{
 		fluid::RealVector fileData;
-		double sampleRate;
 
-		if ( !mAudioLoader.ReadAudioFile ( dataset.fileList[fileIndex], fileData, sampleRate ) )
+		if ( !mAudioLoader.ReadAudioFile ( dataset.fileList[fileIndex], fileData, dataset.analysisSettings.sampleRate ) )
 		{
 			ofLogError ( "RawView" ) << "Failed to load audio file: " << dataset.fileList[fileIndex];
 			dataset.audio.loaded.push_back ( false );
@@ -79,7 +78,7 @@ bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
 		}
 
 		ofSoundBuffer audioData;
-		audioData.copyFrom ( std::vector<float> ( fileData.begin ( ), fileData.end ( ) ), 1, sampleRate );
+		audioData.copyFrom ( std::vector<float> ( fileData.begin ( ), fileData.end ( ) ), 1, dataset.analysisSettings.sampleRate );
 
 		dataset.audio.raw.push_back ( audioData );
 		dataset.audio.loaded.push_back ( true );

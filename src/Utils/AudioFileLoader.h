@@ -29,11 +29,13 @@ public:
 	AudioFileLoader ( ) { }
 	~AudioFileLoader ( ) { }
 
-	bool ReadAudioFile ( std::string filename, fluid::RealVector& output, double& sampleRate );
+	bool ReadAudioFile ( std::string filename, fluid::RealVector& output, double targetSampleRate );
 
 private:
-	void ReadToMono ( fluid::RealVector& output, htl::in_audio_file& file );
-	void ReadToMono ( fluid::RealVector& output, ofxAudioFile& file );
+	void ReadToMono ( std::vector<float>& output, htl::in_audio_file& file );
+	void ReadToMono ( std::vector<float>& output, ofxAudioFile& file );
+
+	void Resample ( std::vector<float>& audio, double fileRate, double targetRate );
 };
 
 } // namespace Utils

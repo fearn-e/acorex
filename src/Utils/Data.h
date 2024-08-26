@@ -62,6 +62,7 @@ struct AnalysisSettings {
 	bool bLoudness = false;
 	bool bShape = false;
 	bool bMFCC = false;
+	int sampleRate = 44100;
 	int windowFFTSize = 1024;
 	int hopFraction = 2;
 	int nBands = 40;

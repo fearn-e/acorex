@@ -38,9 +38,8 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 #pragma omp parallel for reduction(+:sampleTotal)
         for ( int i = 0; i < dataset.fileList.size ( ); i++ )
         {
-            double temp;
             fluid::RealVector in ( 0 );
-            bool success = mAudioLoader.ReadAudioFile ( dataset.fileList[i], in, temp );
+            bool success = mAudioLoader.ReadAudioFile ( dataset.fileList[i], in, dataset.analysisSettings.sampleRate );
             if ( success ) { sampleTotal += in.size ( ); }
         }
         fileLengthSumTotal = sampleTotal;
@@ -101,9 +100,8 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
     double startTime = ofGetElapsedTimef ( );
     for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
     {
-        double samplingRate = 0;
         fluid::RealVector in ( 0 );
-        bool success = mAudioLoader.ReadAudioFile ( dataset.fileList[fileIndex], in, samplingRate );
+        bool success = mAudioLoader.ReadAudioFile ( dataset.fileList[fileIndex], in, dataset.analysisSettings.sampleRate );
         if ( !success ) { continue; }
 
         fluid::algorithm::STFT stft { dataset.analysisSettings.windowFFTSize, dataset.analysisSettings.windowFFTSize, hopSize };
@@ -115,10 +113,10 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
         fluid::algorithm::MultiStats stats;
 
         bands.init ( dataset.analysisSettings.minFreq, dataset.analysisSettings.maxFreq, 
-                    dataset.analysisSettings.nBands, nBins, samplingRate, dataset.analysisSettings.windowFFTSize );
+                    dataset.analysisSettings.nBands, nBins, dataset.analysisSettings.sampleRate, dataset.analysisSettings.windowFFTSize );
         dct.init ( dataset.analysisSettings.nBands, dataset.analysisSettings.nCoefs );
         stats.init ( 0, 0, 50, 100 );
-        loudness.init ( dataset.analysisSettings.windowFFTSize, samplingRate );
+        loudness.init ( dataset.analysisSettings.windowFFTSize, dataset.analysisSettings.sampleRate );
 
         fluid::RealVector padded ( in.size ( ) + dataset.analysisSettings.windowFFTSize + hopSize );
         fluid::index      nFrames = floor ( (padded.size ( ) - dataset.analysisSettings.windowFFTSize) / hopSize );
@@ -144,7 +142,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
             if ( dataset.analysisSettings.bPitch )
             {
                 fluid::RealVector     pitch ( 2 );
-                yin.processFrame ( magnitude, pitch, dataset.analysisSettings.minFreq, dataset.analysisSettings.maxFreq, samplingRate );
+                yin.processFrame ( magnitude, pitch, dataset.analysisSettings.minFreq, dataset.analysisSettings.maxFreq, dataset.analysisSettings.sampleRate );
                 pitchMat.row ( frameIndex ) <<= pitch;
             }
 
@@ -158,7 +156,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
             if ( dataset.analysisSettings.bShape )
             {
                 fluid::RealVector     shapeDesc ( 7 );
-                shape.processFrame ( magnitude, shapeDesc, samplingRate, 0, -1, 0.95, false, false, fluid::FluidDefaultAllocator ( ) );
+                shape.processFrame ( magnitude, shapeDesc, dataset.analysisSettings.sampleRate, 0, -1, 0.95, false, false, fluid::FluidDefaultAllocator ( ) );
                 shapeMat.row ( frameIndex ) <<= shapeDesc;
 			}
 
@@ -178,7 +176,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 
             for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
             {
-                allVectors[frameIndex].push_back ( frameIndex * hopSize / samplingRate );
+                allVectors[frameIndex].push_back ( frameIndex * hopSize / dataset.analysisSettings.sampleRate );
             }
 
 			if ( dataset.analysisSettings.bPitch )
