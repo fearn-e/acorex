@@ -343,6 +343,8 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 	{
 		std::lock_guard<std::mutex> lock ( mPointPickerMutex, std::adopt_lock );
 
+		double maxAllowedDistanceSpace = (double)maxAllowedDistanceSpaceX1000 / 1000.0;
+
 		if ( !b3D )
 		{
 			// 2D nearest
@@ -389,8 +391,6 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 		query[0] = ofMap ( position.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
 		query[1] = ofMap ( position.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
 		query[2] = ofMap ( position.z, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
-
-		double maxAllowedDistanceSpace = (double)maxAllowedDistanceSpaceX1000 / 1000.0;
 
 		auto [dist, id] = mKDTree.kNearest ( query, maxAllowedTargets, maxAllowedDistanceSpace );
 
