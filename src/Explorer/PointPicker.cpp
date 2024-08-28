@@ -335,7 +335,7 @@ void Explorer::PointPicker::FindNearestToMouse ( )
 	}
 }
 
-bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, int maxAllowedDistanceSpaceX1000, int maxAllowedTargets )
+bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed, int minTimeDiffSameFile )
 {
 	if ( maxAllowedDistanceSpaceX1000 == 0 ) { return false; }
 
@@ -372,7 +372,9 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 				if ( dist[i] < nearestDistance )
 				{
 					int point = std::stoi ( *id[i] );
-					if ( mCorpusFileLookUp[point] == currentPoint.file ) { continue; } // skip if jumping would jump to the same file (experiment later)
+					if ( !sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file ) { continue; } // skip if jumping would jump to the same file and the option is not allowed
+					size_t timeDiff = mCorpusTimeLookUp[point] > currentPoint.time ? mCorpusTimeLookUp[point] - currentPoint.time : currentPoint.time - mCorpusTimeLookUp[point];
+					if ( sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file && timeDiff < minTimeDiffSameFile ) { continue; } // skip if jumping would jump to the same file and the time difference is too small
 
 					nearestDistance = dist[i];
 					nearestPoint.file = mCorpusFileLookUp[point];
@@ -404,7 +406,9 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 			if ( dist[i] < nearestDistance )
 			{
 				int point = std::stoi ( *id[i] );
-				if ( mCorpusFileLookUp[point] == currentPoint.file ) { continue; } // skip if jumping would jump to the same file (experiment later)
+				if ( !sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file ) { continue; } // skip if jumping would jump to the same file and the option is not allowed
+				size_t timeDiff = mCorpusTimeLookUp[point] > currentPoint.time ? mCorpusTimeLookUp[point] - currentPoint.time : currentPoint.time - mCorpusTimeLookUp[point];
+				if ( sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file && timeDiff < minTimeDiffSameFile ) { continue; } // skip if jumping would jump to the same file and the time difference is too small
 
 				nearestDistance = dist[i];
 				nearestPoint.file = mCorpusFileLookUp[point];
