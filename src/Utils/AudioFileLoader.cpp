@@ -31,7 +31,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
         return false;
     }
 
-    if ( filename.find ( ".wav" ) != std::string::npos || filename.find ( ".flac" ) != std::string::npos )
+    /*if ( filename.find ( ".wav" ) != std::string::npos || filename.find ( ".flac" ) != std::string::npos )
     {
         htl::in_audio_file file ( filename.c_str ( ) );
 
@@ -59,8 +59,9 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
 
         output.resize ( file.frames ( ) );
         std::copy ( temp.begin ( ), temp.end ( ), output.data ( ) );
-    }
-    else if ( filename.find ( ".mp3" ) != std::string::npos || filename.find ( ".ogg" ) != std::string::npos )
+    }*/
+    if ( filename.find ( ".mp3" ) != std::string::npos || filename.find ( ".ogg" ) != std::string::npos ||
+        filename.find ( ".wav" ) != std::string::npos || filename.find ( ".flac" ) != std::string::npos )
     {
         ofxAudioFile file;
         file.load ( filename );
@@ -89,38 +90,38 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
     return true;
 }
 
-void Utils::AudioFileLoader::ReadToMono ( std::vector<float>& output, htl::in_audio_file& file )
-{
-    int numChannels = file.channels ( );
-    int numSamples = file.frames ( );
-    output.resize ( numSamples );
-
-    if ( numChannels == 1 )
-    {
-        file.read_channel ( output.data ( ), numSamples, 0 );
-        return;
-    }
-
-    std::fill ( output.begin ( ), output.end ( ), 0 );
-
-    std::vector<std::vector<double>> allChannels ( numChannels, std::vector<double> ( numSamples ) );
-
-    for ( int channel = 0; channel < numChannels; channel++ )
-    {
-        file.read_channel ( allChannels[channel].data ( ), numSamples, channel );
-    }
-
-#pragma omp parallel for
-    for ( int sample = 0; sample < numSamples; sample++ )
-    {
-        for ( int channel = 0; channel < numChannels; channel++ )
-        {
-            output[sample] += allChannels[channel][sample];
-        }
-        output[sample] /= numChannels;
-    }
-
-}
+//void Utils::AudioFileLoader::ReadToMono ( std::vector<float>& output, htl::in_audio_file& file )
+//{
+//    int numChannels = file.channels ( );
+//    int numSamples = file.frames ( );
+//    output.resize ( numSamples );
+//
+//    if ( numChannels == 1 )
+//    {
+//        file.read_channel ( output.data ( ), numSamples, 0 );
+//        return;
+//    }
+//
+//    std::fill ( output.begin ( ), output.end ( ), 0 );
+//
+//    std::vector<std::vector<double>> allChannels ( numChannels, std::vector<double> ( numSamples ) );
+//
+//    for ( int channel = 0; channel < numChannels; channel++ )
+//    {
+//        file.read_channel ( allChannels[channel].data ( ), numSamples, channel );
+//    }
+//
+//#pragma omp parallel for
+//    for ( int sample = 0; sample < numSamples; sample++ )
+//    {
+//        for ( int channel = 0; channel < numChannels; channel++ )
+//        {
+//            output[sample] += allChannels[channel][sample];
+//        }
+//        output[sample] /= numChannels;
+//    }
+//
+//}
 
 void Utils::AudioFileLoader::ReadToMono ( std::vector<float>& output, ofxAudioFile& file )
 {

@@ -32,7 +32,7 @@ public:
 	bool ReadAudioFile ( std::string filename, fluid::RealVector& output, double targetSampleRate );
 
 private:
-	void ReadToMono ( std::vector<float>& output, htl::in_audio_file& file );
+	//void ReadToMono ( std::vector<float>& output, htl::in_audio_file& file );
 	void ReadToMono ( std::vector<float>& output, ofxAudioFile& file );
 
 	void Resample ( std::vector<float>& audio, double fileRate, double targetRate );
