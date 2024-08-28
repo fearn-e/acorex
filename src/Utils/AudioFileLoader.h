@@ -16,21 +16,27 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "Utils/Data.h"
-#include <data/FluidDataSet.hpp>
+#include <data/TensorTypes.hpp>
+#include <audio_file/in_file.hpp>
+#include <ofxAudioFile.h>
+#include <string>
 
 namespace Acorex {
 namespace Utils {
 
-class DatasetConversion {
+class AudioFileLoader {
 public:
-	DatasetConversion ( ) { }
-	~DatasetConversion ( ) { }
+	AudioFileLoader ( ) { }
+	~AudioFileLoader ( ) { }
 
-	void CorpusToFluid ( fluid::FluidDataSet<std::string, double, 1>& fluidset, const Utils::DataSet& dataset, std::vector<int>& filePointLength );
+	bool ReadAudioFile ( std::string filename, fluid::RealVector& output, double targetSampleRate );
 
-	void FluidToCorpus ( Utils::DataSet& dataset, const fluid::FluidDataSet<std::string, double, 1>& fluidset, const std::vector<int>& filePointLength, const int reducedDimensionCount );
+private:
+	//void ReadToMono ( std::vector<float>& output, htl::in_audio_file& file );
+	void ReadToMono ( std::vector<float>& output, ofxAudioFile& file );
+
+	void Resample ( std::vector<float>& audio, double fileRate, double targetRate );
 };
 
 } // namespace Utils
-} // namespace Acorex;
+} // namespace Acorex

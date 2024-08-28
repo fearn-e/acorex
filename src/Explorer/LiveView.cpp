@@ -1,14 +1,40 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2024 Elowyn Fearne
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 #include "./LiveView.h"
 #include <ofLog.h>
 #include <of3dGraphics.h>
 #include <ofGraphics.h>
 #include <of3dUtils.h>
 #include <ofEvents.h>
+#include <random>
 
 using namespace Acorex;
 
 void Explorer::LiveView::Initialise ( )
 {
+	mAudioPlayback.SetFlagReset ( );
+
+	if ( !bPointersShared )
+	{
+		mPointPicker = std::make_shared<Explorer::PointPicker> ( );
+		mAudioPlayback.SetPointPicker ( mPointPicker );
+		bPointersShared = true;
+	}
+
 	glPointSize ( 3.0f );
 
 	mStatsCorpus.clear ( );
@@ -32,30 +58,49 @@ void Explorer::LiveView::Initialise ( )
 
 	mDimensionBounds.CalculateBounds ( *mRawView->GetDataset ( ) );
 
-	mPointPicker.SetCamera ( mCamera );
-	mPointPicker.Initialise ( *mRawView->GetDataset ( ), mDimensionBounds );
+	mPointPicker->SetCamera ( mCamera );
+	mPointPicker->Initialise ( *mRawView->GetDataset ( ), mDimensionBounds );
 
 	if ( mSoundPlayers.size ( ) > 0 ) { mSoundPlayers.clear ( ); }
 	if ( mPlayingFiles.size ( ) > 0 ) { mPlayingFiles.clear ( ); }
 	if ( mPlayingTimeHeads.size ( ) > 0 ) { mPlayingTimeHeads.clear ( ); }
 
-	ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
-	ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
-	ofAddListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
-	ofAddListener ( ofEvents ( ).mouseReleased, this, &Explorer::LiveView::MouseEvent );
-	ofAddListener ( ofEvents ( ).mouseScrolled, this, &Explorer::LiveView::MouseEvent );
-	ofAddListener ( ofEvents ( ).keyPressed, this, &Explorer::LiveView::KeyEvent );
-	ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
+	mAudioPlayback.Initialise ( );
+	mAudioPlayback.SetRawView ( mRawView );
+
+	if ( !listenersAdded )
+	{
+		ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
+		ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
+		ofAddListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
+		ofAddListener ( ofEvents ( ).mouseReleased, this, &Explorer::LiveView::MouseEvent );
+		ofAddListener ( ofEvents ( ).mouseScrolled, this, &Explorer::LiveView::MouseEvent );
+		ofAddListener ( ofEvents ( ).keyPressed, this, &Explorer::LiveView::KeyEvent );
+		ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
+		listenersAdded = true;
+	}
+}
+
+void Explorer::LiveView::ChangeAudioSettings ( size_t bufferSize, ofSoundDevice outDevice )
+{
+	mAudioPlayback.RestartAudio ( mRawView->GetDataset ( )->analysisSettings.sampleRate, bufferSize, outDevice );
+}
+
+void Explorer::LiveView::KillAudio ( )
+{
+	mAudioPlayback.SetFlagReset ( );
+	mAudioPlayback.WaitForResetConfirm ( );
 }
 
 void Explorer::LiveView::Exit ( )
 {
 	RemoveListeners ( );
-	mPointPicker.Exit ( );
+	mPointPicker->Exit ( );
 }
 
 void Explorer::LiveView::RemoveListeners ( )
 {
+	if ( !listenersAdded ) { return; }
 	ofRemoveListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
 	ofRemoveListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
 	ofRemoveListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
@@ -63,6 +108,7 @@ void Explorer::LiveView::RemoveListeners ( )
 	ofRemoveListener ( ofEvents ( ).mouseScrolled, this, &Explorer::LiveView::MouseEvent );
 	ofRemoveListener ( ofEvents ( ).keyPressed, this, &Explorer::LiveView::KeyEvent );
 	ofRemoveListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
+	listenersAdded = false;
 }
 
 // Process Functions ---------------------------
@@ -85,17 +131,17 @@ void Explorer::LiveView::Update ( )
 						( mKeyboardMoveState[4] - mKeyboardMoveState[5] ) * keyboardMoveDelta,
 						( mKeyboardMoveState[2] - mKeyboardMoveState[0] ) * keyboardMoveDelta,
 						false );
-			mPointPicker.SetNearestCheckNeeded ( );
+			mPointPicker->SetNearestCheckNeeded ( );
 		}
 		else if ( mKeyboardMoveState[6] || mKeyboardMoveState[7] )
 		{
 			Rotate3DCam ( ( mKeyboardMoveState[6] - mKeyboardMoveState[7] ) * keyboardRotateDelta, 0, false );
-			mPointPicker.SetNearestCheckNeeded ( );
+			mPointPicker->SetNearestCheckNeeded ( );
 		}
 		else if ( mKeyboardMoveState[8] || mKeyboardMoveState[9] )
 		{
 			Zoom3DCam ( ( mKeyboardMoveState[8] - mKeyboardMoveState[9] ) * keyboardZoomDelta, false );
-			mPointPicker.SetNearestCheckNeeded ( );
+			mPointPicker->SetNearestCheckNeeded ( );
 		}
 	}
 	else
@@ -105,19 +151,84 @@ void Explorer::LiveView::Update ( )
 			float adjustedSpeed = mCamMoveSpeedScaleAdjusted * keyboardMoveDelta;
 			mCamera->boom ( (mKeyboardMoveState[0] - mKeyboardMoveState[2]) * adjustedSpeed );
 			mCamera->truck ( (mKeyboardMoveState[3] - mKeyboardMoveState[1]) * adjustedSpeed );
-			mPointPicker.SetNearestCheckNeeded ( );
+			mPointPicker->SetNearestCheckNeeded ( );
 		}
 		else if ( mKeyboardMoveState[8] || mKeyboardMoveState[9] )
 		{
 			Zoom2DCam ( ( mKeyboardMoveState[8] - mKeyboardMoveState[9] ) * keyboardZoomDelta, false );
-			mPointPicker.SetNearestCheckNeeded ( );
+			mPointPicker->SetNearestCheckNeeded ( );
 		}
 	}
 
-	UpdateAudioPlayers ( );
+	UpdatePlayheads ( );
 }
 
-void Explorer::LiveView::UpdateAudioPlayers ( )
+void Explorer::LiveView::UpdatePlayheads ( )
+{
+	std::vector<Utils::VisualPlayhead> playheadUpdates = mAudioPlayback.GetPlayheadInfo ( );
+
+	// remove playheads that aren't in the update list
+	for ( int i = 0; i < mPlayheads.size ( ); i++ )
+	{
+		if ( std::find_if ( playheadUpdates.begin ( ), playheadUpdates.end ( ), [this, i]( Utils::VisualPlayhead& playhead ) { return playhead.playheadID == mPlayheads[i].playheadID; } ) == playheadUpdates.end ( ) )
+		{
+			ofLogNotice ( "LiveView" ) << "Playhead " << mPlayheads[i].playheadID << " deleted";
+
+			// if not the final one, move all after it back to the left
+			int j = mPlayheads.size ( ) - 1; int end = i;
+			while ( j > end )
+			{
+				mPlayheads[j].panelRect = mPlayheads[j - 1].panelRect;
+				j--;
+			}
+
+			mPlayheads.erase ( mPlayheads.begin ( ) + i );
+			i--;
+		}
+	}
+
+	// go through playheadUpdates and update the respective playheads or add new ones if the ID isn't found
+	for ( int i = 0; i < playheadUpdates.size ( ); i++ )
+	{
+		auto it = std::find_if ( mPlayheads.begin ( ), mPlayheads.end ( ), [this, i, &playheadUpdates] ( Utils::VisualPlayhead& playhead ) { return playhead.playheadID == playheadUpdates[i].playheadID; } );
+		if ( it != mPlayheads.end ( ) )
+		{
+			ofColor color = it->color;
+			ofRectangle rect = it->panelRect;
+			bool highlight = it->highlight;
+			*it = playheadUpdates[i];
+			it->color = color;
+			it->panelRect = rect;
+			it->highlight = highlight;
+		}
+		else
+		{
+			ofLogNotice ( "LiveView" ) << "Playhead " << playheadUpdates[i].playheadID << " added";
+
+			mPlayheads.push_back ( playheadUpdates[i] );
+			int rectWidth = ofGetWidth ( ) / 10; int rectSpacing = ofGetWidth ( ) / 100; int rectHeight = ofGetHeight ( ) / 10;
+			std::random_device rd;
+			std::mt19937 gen ( rd ( ) );
+			std::uniform_int_distribution<> dis ( 0, 255 );
+			mPlayheads.back ( ).color = ofColor::fromHsb ( dis ( gen ), 255, 255 );
+			mPlayheads.back ( ).panelRect = ofRectangle (	rectSpacing * mPlayheads.size ( ) + rectWidth * ( mPlayheads.size ( ) - 1 ),
+															ofGetHeight ( ) - rectHeight - 5,
+															rectWidth,
+															rectHeight );
+		}
+	}
+
+	// calculate the 3D positions of the playheads
+	for ( auto& playhead : mPlayheads )
+	{
+		size_t timeIndex = playhead.sampleIndex / ( mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction );
+		playhead.position[0] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).x;
+		playhead.position[1] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).y;
+		playhead.position[2] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).z;
+	}
+}
+
+void Explorer::LiveView::OLD_UpdateAudioPlayers ( )
 {
 	if ( mPlayingFiles.size ( ) == 0 ) { return; }
 
@@ -189,7 +300,7 @@ void Explorer::LiveView::UpdateAudioPlayers ( )
 
 void Explorer::LiveView::SlowUpdate ( )
 {
-	mPointPicker.SlowUpdate ( );
+	mPointPicker->FindNearestToMouse ( );
 }
 
 void Explorer::LiveView::Draw ( )
@@ -197,6 +308,7 @@ void Explorer::LiveView::Draw ( )
 	if ( !bDraw ) { return; }
 
 	ofEnableDepthTest ( );
+	ofEnableAlphaBlending ( );
 	mCamera->begin ( );
 
 	// Draw Axis ------------------------------
@@ -213,7 +325,7 @@ void Explorer::LiveView::Draw ( )
 	// Draw points ------------------------------
 	if ( mRawView->IsTimeAnalysis ( ) ) // Time
 	{
-		if ( mPointPicker.GetNearestPointFile ( ) == -1 && mPlayingFiles.size ( ) == 0 )
+		if ( mPointPicker->GetNearestMousePointFile ( ) == -1 )
 		{
 			for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
 			{
@@ -228,47 +340,41 @@ void Explorer::LiveView::Draw ( )
 		{
 			for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
 			{
-				if ( file != mPointPicker.GetNearestPointFile ( ) )
-				{
-					bool skip = false;
-					for ( auto& each : mPlayingFiles ) { if ( file == each ) { skip = true; } }
-					if ( skip ) { continue; }
-
-					mTimeCorpus[file].disableColors ( );
-					ofSetColor ( 255, 255, 255, 25 );
-					mTimeCorpus[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
-					mTimeCorpus[file].draw ( );
-					mTimeCorpus[file].setMode ( OF_PRIMITIVE_POINTS );
-					mTimeCorpus[file].draw ( );
-				}
+				if ( file == mPointPicker->GetNearestMousePointFile ( ) ) { continue; }
+				mTimeCorpus[file].disableColors ( );
+				ofSetColor ( 255, 255, 255, 25 );
+				mTimeCorpus[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
+				mTimeCorpus[file].draw ( );
+				mTimeCorpus[file].setMode ( OF_PRIMITIVE_POINTS );
+				mTimeCorpus[file].draw ( );
 			}
 
+			mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].enableColors ( );
+			mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_LINE_STRIP );
+			mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].draw ( );
+			mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_POINTS );
+			mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].draw ( );
+		}
+
+		for ( int i = 0; i < mPlayheads.size ( ); i++ )
+		{
 			ofDisableDepthTest ( );
+			ofDisableAlphaBlending ( );
 
-			for ( int i = 0; i < mPlayingFiles.size ( ); i++ )
-			{
-				mTimeCorpus[mPlayingFiles[i]].enableColors ( );
-				mTimeCorpus[mPlayingFiles[i]].setMode ( OF_PRIMITIVE_LINE_STRIP );
-				mTimeCorpus[mPlayingFiles[i]].draw ( );
-				mTimeCorpus[mPlayingFiles[i]].setMode ( OF_PRIMITIVE_POINTS );
-				mTimeCorpus[mPlayingFiles[i]].draw ( );
-			}
+			ofColor color = mPlayheads[i].color; float size = 50;
+			if ( mPlayheads[i].highlight ) { color = { 255, 255, 255, 255 }; size = 100; }
 
-			if ( mPointPicker.GetNearestPointFile ( ) >= 0 )
-			{
-				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].enableColors ( );
-				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setMode ( OF_PRIMITIVE_LINE_STRIP );
-				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].draw ( );
-				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setMode ( OF_PRIMITIVE_POINTS );
-				mTimeCorpus[mPointPicker.GetNearestPointFile ( )].draw ( );
-			}
+			ofSetColor ( color );
+			glm::vec3 position = { mPlayheads[i].position[0], mPlayheads[i].position[1], mPlayheads[i].position[2] };
+			ofDrawSphere ( position, size );
 
+			ofEnableAlphaBlending ( );
 			ofEnableDepthTest ( );
 		}
 	}
 	else // Stats
 	{
-		if ( mPointPicker.GetNearestPointFile ( ) == -1 && mPlayingFiles.size ( ) == 0 )
+		if ( mPointPicker->GetNearestMousePointFile ( ) == -1 && mPlayingFiles.size ( ) == 0 )
 		{
 			mStatsCorpus.enableColors ( );
 			mStatsCorpus.setMode ( OF_PRIMITIVE_POINTS );
@@ -289,10 +395,10 @@ void Explorer::LiveView::Draw ( )
 				ofDrawSphere ( mStatsCorpus.getVertex ( mPlayingFiles[i] ), 25 );
 			}
 
-			if ( mPointPicker.GetNearestPointFile ( ) >= 0 )
+			if ( mPointPicker->GetNearestMousePointFile ( ) >= 0 )
 			{
-				ofSetColor ( mStatsCorpus.getColor ( mPointPicker.GetNearestPointFile ( ) ) );
-				ofDrawSphere ( mStatsCorpus.getVertex ( mPointPicker.GetNearestPointFile ( ) ), 25 );
+				ofSetColor ( mStatsCorpus.getColor ( mPointPicker->GetNearestMousePointFile ( ) ) );
+				ofDrawSphere ( mStatsCorpus.getVertex ( mPointPicker->GetNearestMousePointFile ( ) ), 25 );
 			}
 
 			ofEnableDepthTest ( );
@@ -300,17 +406,18 @@ void Explorer::LiveView::Draw ( )
 	}
 
 	mCamera->end ( );
+	ofDisableAlphaBlending ( );
 	ofDisableDepthTest ( );
 
 	// Draw Nearest Point -----------------------
-	mPointPicker.Draw ( );
-	if ( mPointPicker.GetNearestPointFile ( ) != -1 )
+	mPointPicker->Draw ( );
+	if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
 	{
-		ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )], 20, ofGetHeight ( ) - 60 );
+		ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )], 20, ofGetHeight ( ) - 60 );
 		if ( mRawView->IsTimeAnalysis ( ) )
 		{
-			std::string hopInfoSamps = std::to_string ( mPointPicker.GetNearestPointTime ( ) * mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction );
-			std::string hopInfoSecs = std::to_string ( mRawView->GetTimeData ( )->raw[mPointPicker.GetNearestPointFile ( )][mPointPicker.GetNearestPointTime ( )][0] );
+			std::string hopInfoSamps = std::to_string ( mPointPicker->GetNearestMousePointTime ( ) * mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction );
+			std::string hopInfoSecs = std::to_string ( mRawView->GetTimeData ( )->raw[mPointPicker->GetNearestMousePointFile ( )][mPointPicker->GetNearestMousePointTime ( )][0] );
 			ofDrawBitmapStringHighlight ( "Nearest Timepoint: " + hopInfoSamps + " samples, " + hopInfoSecs + "s", 20, ofGetHeight ( ) - 40 );
 		}
 	}
@@ -323,13 +430,25 @@ void Explorer::LiveView::Draw ( )
 
 // Sound Functions ------------------------------
 
-void Explorer::LiveView::PlaySound ( )
+void Explorer::LiveView::CreatePlayhead ( )
 {
-	if ( mPointPicker.GetNearestPointFile ( ) == -1 ) { return; }
+	if ( mPointPicker->GetNearestMousePointFile ( ) == -1 ) { return; }
 
-	if ( std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker.GetNearestPointFile ( ) ) != mPlayingFiles.end ( ) )
+	mAudioPlayback.CreatePlayhead ( mPointPicker->GetNearestMousePointFile ( ), mPointPicker->GetNearestMousePointTime ( ) );
+
+	return;
+}
+
+void Explorer::LiveView::KillPlayhead ( size_t playheadID )
+{
+	mAudioPlayback.KillPlayhead ( playheadID );
+}
+
+void Explorer::LiveView::OLD_PlaySound ( )
+{
+	if ( std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker->GetNearestMousePointFile ( ) ) != mPlayingFiles.end ( ) )
 	{
-		std::vector<int>::iterator it = std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker.GetNearestPointFile ( ) );
+		std::vector<int>::iterator it = std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker->GetNearestMousePointFile ( ) );
 		int index = std::distance ( mPlayingFiles.begin ( ), it );
 		mSoundPlayers[index].setPositionMS ( 0 );
 		mSoundPlayers[index].play ( );
@@ -351,19 +470,19 @@ void Explorer::LiveView::PlaySound ( )
 		return;
 	}
 
-	std::string filePath = mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )];
+	std::string filePath = mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )];
 
 	ofSoundPlayer soundPlayer;
 	bool success = soundPlayer.load ( filePath );
 	if ( !success ) { ofLogError ( "Explorer" ) << "Failed to load sound file: " << filePath; return; }
 
-	mPlayingFiles.push_back ( mPointPicker.GetNearestPointFile ( ) );
+	mPlayingFiles.push_back ( mPointPicker->GetNearestMousePointFile ( ) );
 	if ( mRawView->IsTimeAnalysis ( ) )
 	{
 		mPlayingTimeHeads.push_back ( 0 );
 		mPlayingLastPositionMS.push_back ( 0.0f );
-		mPlayingLastColor.push_back ( mTimeCorpus[mPointPicker.GetNearestPointFile ( )].getColor ( 0 ) );
-		mTimeCorpus[mPointPicker.GetNearestPointFile ( )].setColor ( 0, ofColor { 255, 255, 255, 255 } );
+		mPlayingLastColor.push_back ( mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].getColor ( 0 ) );
+		mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].setColor ( 0, ofColor { 255, 255, 255, 255 } );
 	}
 	else
 	{ }
@@ -393,6 +512,8 @@ void Explorer::LiveView::CreatePoints ( )
 			}
 			mTimeCorpus.push_back ( mesh );
 		}
+
+		mAudioPlayback.SetTimeCorpus ( mTimeCorpus );
 
 		bDraw = true;
 		return;
@@ -459,6 +580,7 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axi
 				else { value = ofMap ( value, min, max, SpaceDefs::mColorBlue, SpaceDefs::mColorRed ); }
 				ofColor currentColor = mTimeCorpus[file].getColor ( timepoint );
 				currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
+				currentColor.a = 150;
 				mTimeCorpus[file].setColor ( timepoint, currentColor );
 			}
 			else
@@ -471,7 +593,9 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axi
 		}
 	}
 
-	mPointPicker.Train ( dimensionIndex, axis, false );
+	mAudioPlayback.SetTimeCorpus ( mTimeCorpus );
+
+	mPointPicker->Train ( dimensionIndex, axis, false );
 }
 
 void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis axis )
@@ -500,6 +624,7 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis ax
 			else { value = ofMap ( value, min, max, SpaceDefs::mColorBlue, SpaceDefs::mColorRed ); }
 			ofColor currentColor = mStatsCorpus.getColor ( file );
 			currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
+			currentColor.a = 150;
 			mStatsCorpus.setColor ( file, currentColor );
 		}
 		else
@@ -511,7 +636,7 @@ void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis ax
 		}
 	}
 
-	mPointPicker.Train ( dimensionIndex, axis, false );
+	mPointPicker->Train ( dimensionIndex, axis, false );
 }
 
 void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::Axis axis )
@@ -537,18 +662,19 @@ void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::
 			else { value = ofMap ( value, min, max, SpaceDefs::mColorBlue, SpaceDefs::mColorRed ); }
 			ofColor currentColor = mStatsCorpus.getColor ( file );
 			currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
+			currentColor.a = 150;
 			mStatsCorpus.setColor ( file, currentColor );
 		}
 		else
 		{
-			double value = ofMap ( value, min, max, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
+			value = ofMap ( value, min, max, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
 			glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
 			currentPoint[(int)axis] = value;
 			mStatsCorpus.setVertex ( file, currentPoint );
 		}
 	}
 
-	mPointPicker.Train ( dimensionIndex, axis, false );
+	mPointPicker->Train ( dimensionIndex, axis, false );
 }
 
 void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
@@ -577,6 +703,8 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 				}
 			}
 		}
+
+		mAudioPlayback.SetTimeCorpus ( mTimeCorpus );
 	}
 	else
 	{
@@ -596,7 +724,7 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 		}
 	}
 
-	mPointPicker.Train ( -1, axis, true );
+	mPointPicker->Train ( -1, axis, true );
 }
 
 void Explorer::LiveView::RefreshFileColors ( int fileIndex )
@@ -615,7 +743,7 @@ void Explorer::LiveView::RefreshFileColors ( int fileIndex )
 		for ( int timepoint = 0; timepoint < time->raw[fileIndex].size ( ); timepoint++ )
 		{
 			ofColor color = ofColor::fromHsb ( ofMap ( time->raw[fileIndex][timepoint][colorDimension], min, max, outputMin, outputMax ), 255, 255, 255 );
-			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointFile ( ) != -1 ) { color.a = 125; }
+			if ( mPointPicker->GetNearestMousePointFile ( ) != fileIndex && mPointPicker->GetNearestMousePointFile ( ) != -1 ) { color.a = 125; }
 			mTimeCorpus[fileIndex].setColor ( timepoint, color );
 		}
 	}
@@ -629,13 +757,13 @@ void Explorer::LiveView::RefreshFileColors ( int fileIndex )
 			int dimensionIndex = colorDimension / DATA_NUM_STATS;
 
 			ofColor color = ofColor::fromHsb ( ofMap ( stats->raw[fileIndex][dimensionIndex][statisticIndex], min, max, outputMin, outputMax ), 255, 255, 255 );
-			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointFile ( ) != -1 ) { color.a = 125; }
+			if ( mPointPicker->GetNearestMousePointFile ( ) != fileIndex && mPointPicker->GetNearestMousePointFile ( ) != -1 ) { color.a = 125; }
 			mStatsCorpus.setColor ( fileIndex, color );
 		}
 		else
 		{
 			ofColor color = ofColor::fromHsb ( ofMap ( stats->reduced[fileIndex][colorDimension], min, max, outputMin, outputMax ), 255, 255, 255 );
-			if ( mPointPicker.GetNearestPointFile ( ) != fileIndex && mPointPicker.GetNearestPointFile ( ) != -1 ) { color.a = 125; }
+			if ( mPointPicker->GetNearestMousePointFile ( ) != fileIndex && mPointPicker->GetNearestMousePointFile ( ) != -1 ) { color.a = 125; }
 			mStatsCorpus.setColor ( fileIndex, color );
 		}
 	}
@@ -680,7 +808,7 @@ void Explorer::LiveView::Zoom2DCam ( float y, bool mouse )
 	else if ( mCamera->getScale ( ).x < SpaceDefs::mZoomMax2D && y > 0.0f ) { mCamera->setScale ( zoom ); }
 	mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed * mCamera->getScale ( ).x;
 	if ( mCamera->getScale ( ).x < SpaceDefs::mZoomMin2D ) { mCamera->setScale ( SpaceDefs::mZoomMin2D ); }
-	mPointPicker.SetNearestCheckNeeded ( );
+	mPointPicker->SetNearestCheckNeeded ( );
 }
 
 void Explorer::LiveView::Zoom3DCam ( float y, bool mouse )
@@ -765,17 +893,17 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 		if ( args.type == 4 ) // scroll - zoom
 		{
 			Zoom3DCam ( args.scrollY, true);
-			mPointPicker.SetNearestCheckNeeded ( );
+			mPointPicker->SetNearestCheckNeeded ( );
 		}
 		else if ( args.type == 3 && args.button == 0 ) // left click drag - rotate
 		{
 			Rotate3DCam ( args.x, args.y, true );
-			mPointPicker.SetNearestCheckNeeded ( );
+			mPointPicker->SetNearestCheckNeeded ( );
 		}
 		else if ( args.type == 3 && args.button == 1 ) // middle click drag - pan
 		{
 			Pan3DCam ( args.x, args.y, 0, true );
-			mPointPicker.SetNearestCheckNeeded ( );
+			mPointPicker->SetNearestCheckNeeded ( );
 		}
 	}
 	else // 2D
@@ -783,13 +911,13 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
 		if ( args.type == 4 ) // scroll - zoom
 		{
 			Zoom2DCam ( args.scrollY, true );
-			mPointPicker.SetNearestCheckNeeded ( );
+			mPointPicker->SetNearestCheckNeeded ( );
 		}
 		else if ( (args.type == 3 && args.button == 0) || (args.type == 3 && args.button == 1) ) // left/middle button drag - pan
 		{
 			mCamera->boom ( (args.y - mLastMouseY) * mCamMoveSpeedScaleAdjusted );
 			mCamera->truck ( (args.x - mLastMouseX) * mCamMoveSpeedScaleAdjusted * -1 );
-			mPointPicker.SetNearestCheckNeeded ( );
+			mPointPicker->SetNearestCheckNeeded ( );
 		}
 	}
 
@@ -815,7 +943,7 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 		else if ( args.key == 'e' ) { mKeyboardMoveState[7] = true; }
 		else if ( args.key == 'z' ) { mKeyboardMoveState[8] = true; }
 		else if ( args.key == 'x' ) { mKeyboardMoveState[9] = true; }
-		else if ( args.key == ' ' ) { PlaySound ( ); }
+		else if ( args.key == ' ' ) { CreatePlayhead ( ); }
 	}
 	else if ( args.type == ofKeyEventArgs::Type::Released )
 	{
@@ -837,17 +965,17 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 		}
 		else if ( args.key == 'c' )
 		{ 
-			if ( mPointPicker.GetNearestPointFile ( ) != -1 )
+			if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
 			{
-				ofSetClipboardString ( mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
+				ofSetClipboardString ( mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )] );
 			}
 		}
 		else if ( args.key == OF_KEY_RETURN )
 		{
-			if ( mPointPicker.GetNearestPointFile ( ) != -1 )
+			if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
 			{
 #ifdef _WIN32
-				ofSystem ( "explorer /select," + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
+				ofSystem ( "explorer /select," + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )] );
 #elif __APPLE__ && __MACH__
 				ofSystem ( "open -R " + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
 #elif __linux__
