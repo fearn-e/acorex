@@ -78,7 +78,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
 
         Resample ( temp, file.samplerate ( ), targetSampleRate );
 
-        output.resize ( file.length ( ) );
+        output.resize ( temp.size ( ) );
         std::copy ( temp.begin ( ), temp.end ( ), output.data ( ) );
     }
     else
