@@ -1,3 +1,19 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2024 Elowyn Fearne
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 #include "./PointPicker.h"
 #include "./SpaceDefs.h"
 
@@ -8,11 +24,12 @@ using namespace Acorex;
 
 void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Utils::DimensionBounds& dimensionBounds )
 {
+	std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+
 	mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dataset.dimensionNames.size ( ) );
 	mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 3 );
 
-
-	bPicker = false; b3D = true; bSkipTraining = true; bNearestCheckNeeded = false;
+	bPicker = false; b3D = true; bSkipTraining = true; bNearestMouseCheckNeeded = false;
 
 	bDimensionsFilled[0] = false; bDimensionsFilled[1] = false; bDimensionsFilled[2] = false;
 	mDimensionsIndices[0] = -1; mDimensionsIndices[1] = -1; mDimensionsIndices[2] = -1;
@@ -49,12 +66,15 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
 	{
 		ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
 		ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
+		ofAddListener ( ofEvents ( ).mouseReleased, this, &Explorer::PointPicker::MouseReleased );
 		bListenersAdded = true;
 	}
 }
 
 void Explorer::PointPicker::Train ( int dimensionIndex, Utils::Axis axis, bool none )
 {
+	std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+
 	if ( axis == Utils::Axis::X ) { bDimensionsFilled[0] = !none; mDimensionsIndices[0] = dimensionIndex; }
 	else if ( axis == Utils::Axis::Y ) { bDimensionsFilled[1] = !none; mDimensionsIndices[1] = dimensionIndex; }
 	else if ( axis == Utils::Axis::Z ) { bDimensionsFilled[2] = !none; mDimensionsIndices[2] = dimensionIndex; }
@@ -111,6 +131,8 @@ void Explorer::PointPicker::RemoveListeners ( )
 	if ( bListenersAdded )
 	{
 		ofRemoveListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
+		ofRemoveListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
+		ofRemoveListener ( ofEvents ( ).mouseReleased, this, &Explorer::PointPicker::MouseReleased );
 		bListenersAdded = false;
 	}
 }
@@ -166,11 +188,6 @@ void Explorer::PointPicker::ScaleDataset ( Utils::DataSet& scaledDataset, const 
 	}
 }
 
-void Explorer::PointPicker::SlowUpdate ( )
-{
-	FindNearest ( );
-}
-
 void Explorer::PointPicker::Draw ( )
 {
 	if ( bDebug )
@@ -201,12 +218,15 @@ void Explorer::PointPicker::Draw ( )
 	}
 }
 
-void Explorer::PointPicker::FindNearest ( )
+void Explorer::PointPicker::FindNearestToMouse ( )
 {
-	if ( !ofGetMousePressed ( 2 ) && !bPicker ) { return; }
-	if ( !bTrained ) { return; }
-	if ( !bNearestCheckNeeded ) { return; }
-	bNearestCheckNeeded = false;
+	if ( !bClicked ) { return; }
+	bClicked = false;
+
+	if ( !bPicker && !bTrained && !bNearestMouseCheckNeeded ) { return; }
+	bNearestMouseCheckNeeded = false;
+
+	std::lock_guard<std::mutex> lock ( mPointPickerMutex );
 
 	mNearestPoint = -1; mNearestPointFile = -1; mNearestPointTime = -1;
 	mNearestDistance = std::numeric_limits<double>::max ( );
@@ -315,6 +335,96 @@ void Explorer::PointPicker::FindNearest ( )
 	}
 }
 
+bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed, int minTimeDiffSameFile )
+{
+	if ( maxAllowedDistanceSpaceX1000 == 0 ) { return false; }
+
+	if ( mPointPickerMutex.try_lock ( ) )
+	{
+		std::lock_guard<std::mutex> lock ( mPointPickerMutex, std::adopt_lock );
+
+		double maxAllowedDistanceSpace = (double)maxAllowedDistanceSpaceX1000 / 1000.0;
+
+		if ( !b3D )
+		{
+			// 2D nearest
+
+			glm::vec2 position2D;
+
+			if ( !bDimensionsFilled[0] ) { position2D.x = position.y; position2D.y = position.z; }
+			if ( !bDimensionsFilled[1] ) { position2D.x = position.x; position2D.y = position.z; }
+			if ( !bDimensionsFilled[2] ) { position2D.x = position.x; position2D.y = position.y; }
+
+			fluid::RealVector query ( 2 );
+
+			query[0] = ofMap ( position2D.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+			query[1] = ofMap ( position2D.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+
+			auto [dist, id] = mKDTree.kNearest ( query, maxAllowedTargets, maxAllowedDistanceSpace );
+
+			if ( dist.size ( ) == 0 ) { return false; }
+
+			double nearestDistance = std::numeric_limits<double>::max ( );
+
+			bool jumpFound = false;
+			for ( int i = 0; i < dist.size ( ); i++ )
+			{
+				if ( dist[i] < nearestDistance )
+				{
+					int point = std::stoi ( *id[i] );
+					if ( !sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file ) { continue; } // skip if jumping would jump to the same file and the option is not allowed
+					size_t timeDiff = mCorpusTimeLookUp[point] > currentPoint.time ? mCorpusTimeLookUp[point] - currentPoint.time : currentPoint.time - mCorpusTimeLookUp[point];
+					if ( sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file && timeDiff < minTimeDiffSameFile ) { continue; } // skip if jumping would jump to the same file and the time difference is too small
+
+					nearestDistance = dist[i];
+					nearestPoint.file = mCorpusFileLookUp[point];
+					nearestPoint.time = mCorpusTimeLookUp[point];
+					jumpFound = true;
+				}
+			}
+
+			return jumpFound;
+		}
+
+		// 3D nearest
+
+		fluid::RealVector query ( 3 );
+
+		query[0] = ofMap ( position.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+		query[1] = ofMap ( position.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+		query[2] = ofMap ( position.z, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+
+		auto [dist, id] = mKDTree.kNearest ( query, maxAllowedTargets, maxAllowedDistanceSpace );
+
+		if ( dist.size ( ) == 0 ) { return false; }
+
+		double nearestDistance = std::numeric_limits<double>::max ( );
+		bool jumpFound = false;
+
+		for ( int i = 0; i < dist.size ( ); i++ )
+		{
+			if ( dist[i] < nearestDistance )
+			{
+				int point = std::stoi ( *id[i] );
+				if ( !sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file ) { continue; } // skip if jumping would jump to the same file and the option is not allowed
+				size_t timeDiff = mCorpusTimeLookUp[point] > currentPoint.time ? mCorpusTimeLookUp[point] - currentPoint.time : currentPoint.time - mCorpusTimeLookUp[point];
+				if ( sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file && timeDiff < minTimeDiffSameFile ) { continue; } // skip if jumping would jump to the same file and the time difference is too small
+
+				nearestDistance = dist[i];
+				nearestPoint.file = mCorpusFileLookUp[point];
+				nearestPoint.time = mCorpusTimeLookUp[point];
+				jumpFound = true;
+			}
+
+			return jumpFound;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void Explorer::PointPicker::KeyEvent ( ofKeyEventArgs& args )
 {
 	if ( args.type == ofKeyEventArgs::Type::Released )
@@ -322,4 +432,9 @@ void Explorer::PointPicker::KeyEvent ( ofKeyEventArgs& args )
 		if ( args.key == OF_KEY_F3 ) { bDebug = !bDebug; }
 		else if ( args.key == OF_KEY_TAB ) { bPicker = !bPicker; }
 	}
+}
+
+void Explorer::PointPicker::MouseReleased ( ofMouseEventArgs& args )
+{
+	if ( args.button == 2 ) { bClicked = true; }
 }

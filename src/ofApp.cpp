@@ -1,3 +1,19 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2024 Elowyn Fearne
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
+to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 #include "ofApp.h"
 
 void ofApp::setup ( )
@@ -21,13 +37,13 @@ void ofApp::setup ( )
 
 void ofApp::update ( )
 {
-	mExplorerMenu.Update ( );
+	if ( mExploreToggle ) { mExplorerMenu.Update ( ); }
 }
 
 void ofApp::draw ( )
 {
-	mExplorerMenu.Draw ( );
-	mAnalyserMenu.Draw ( );
+	if ( mAnalyseToggle ) { mAnalyserMenu.Draw ( ); }
+	if ( mExploreToggle ) { mExplorerMenu.Draw ( ); }
 
 	{
 		ofSetColor ( mColors.interfaceBackgroundColor );
@@ -38,7 +54,7 @@ void ofApp::draw ( )
 		mDPIToggle.draw ( );
 	}
 
-	ofDrawBitmapStringHighlight ( "fps: " + ofToString ( ofGetFrameRate ( ) ), 20, ofGetHeight ( ) - 20 );
+	ofDrawBitmapStringHighlight ( "fps: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 10 );
 }
 
 void ofApp::exit ( )
@@ -96,6 +112,7 @@ void ofApp::AnalyseToggled ( bool& value )
 	if ( value )
 	{
 		mAnalyserMenu.Show ( );
+		mExploreToggle = false;
 	}
 	else
 	{
@@ -108,6 +125,7 @@ void ofApp::ExploreToggled ( bool& value )
 	if ( value )
 	{
 		mExplorerMenu.Show ( );
+		mAnalyseToggle = false;
 	}
 	else
 	{

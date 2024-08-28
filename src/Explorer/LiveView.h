@@ -1,9 +1,26 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2024 Elowyn Fearne
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 #pragma once
 
 #include "Utils/DimensionBounds.h"
 #include "./SpaceDefs.h"
 #include "./PointPicker.h"
 #include "./RawView.h"
+#include "./AudioPlayback.h"
 #include "Utils/Data.h"
 #include <ofMesh.h>
 #include <ofEasyCam.h>
@@ -19,19 +36,24 @@ public:
 	~LiveView ( ) { }
 
 	void Initialise ( );
+	void ChangeAudioSettings ( size_t bufferSize, ofSoundDevice outDevice );
+	void KillAudio ( );
 	void Exit ( );
 	void RemoveListeners ( );
 
 	// Process Functions ---------------------------
 
 	void Update ( );
-	void UpdateAudioPlayers ( );
+	void UpdatePlayheads ( );
+	void OLD_UpdateAudioPlayers ( );
 	void SlowUpdate ( );
 	void Draw ( );
 
 	// Sound Functions ------------------------------
 
-	void PlaySound ( );
+	void CreatePlayhead ( );
+	void KillPlayhead ( size_t playheadID );
+	void OLD_PlaySound ( );
 
 	// Filler Functions ----------------------------
 
@@ -61,12 +83,20 @@ public:
 
 	bool Is3D ( ) const { return b3D; }
 
+	std::vector<Utils::VisualPlayhead>& GetPlayheads ( ) { return mPlayheads; }
+
+	AudioPlayback* GetAudioPlayback ( ) { return &mAudioPlayback; }
+
 	// Listener Functions --------------------------
 
 	void KeyEvent ( ofKeyEventArgs& args );
 	void MouseEvent ( ofMouseEventArgs& args );
 
 private:
+	bool bPointersShared = false;
+
+	bool listenersAdded = false;
+
 	bool bDebug = false;
 	bool bDraw = false;
 	bool b3D = true;
@@ -93,6 +123,10 @@ private:
 	std::vector<float> mPlayingLastPositionMS;
 	std::vector<ofColor> mPlayingLastColor;
 
+	// Playheads -------------------------------------
+
+	std::vector<Utils::VisualPlayhead> mPlayheads;
+
 	// Camera ----------------------------------------
 
 	std::shared_ptr<ofCamera> mCamera;
@@ -102,7 +136,8 @@ private:
 	// Acorex Objects ------------------------------
 
 	Utils::DimensionBounds mDimensionBounds;
-	PointPicker mPointPicker;
+	std::shared_ptr<PointPicker> mPointPicker;
+	AudioPlayback mAudioPlayback;
 };
 
 } // namespace Explorer

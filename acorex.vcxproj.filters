@@ -82,6 +82,12 @@
     <ClCompile Include="src\Utils\DatasetConversion.cpp">
       <Filter>src\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utils\AudioFileLoader.cpp">
+      <Filter>src\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Explorer\AudioPlayback.cpp">
+      <Filter>src\Explorer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -225,6 +231,12 @@
       <Filter>src\Utils</Filter>
     </ClInclude>
     <ClInclude Include="src\Explorer\SpaceDefs.h">
+      <Filter>src\Explorer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\AudioFileLoader.h">
+      <Filter>src\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Explorer\AudioPlayback.h">
       <Filter>src\Explorer</Filter>
     </ClInclude>
   </ItemGroup>

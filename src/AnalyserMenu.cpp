@@ -1,3 +1,19 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2024 Elowyn Fearne
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 #include "./AnalyserMenu.h"
 
 using namespace Acorex;
@@ -102,6 +118,7 @@ void AnalyserMenu::Initialise ( bool HiDpi )
 		mAnalysisMetadataPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Shape", false ) );
 		mAnalysisMetadataPanel.add ( mAnalysisMFCCToggle.setup ( "Analyse MFCC", false ) );
 
+		mAnalysisMetadataPanel.add ( mSampleRateField.setup ( "Sample Rate: ", 44100, 8000, 96000 ) );
 		mAnalysisMetadataPanel.add ( mWindowFFTField.setup ( "Window Size: ", 1024, 512, 8192 ) );
 		mAnalysisMetadataPanel.add ( mHopFractionField.setup ( "Hop Size (Fraction of Window):  1 / ", 2, 1, 16 ) );
 		mAnalysisMetadataPanel.add ( mNBandsField.setup ( "Bands: ", 40, 1, 100 ) );
@@ -114,6 +131,7 @@ void AnalyserMenu::Initialise ( bool HiDpi )
 		mAnalysisLoudnessToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mAnalysisShapeToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mAnalysisMFCCToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mSampleRateField.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mWindowFFTField.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mHopFractionField.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mNBandsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
@@ -585,6 +603,7 @@ void AnalyserMenu::UnpackSettingsFromFile ( const Utils::AnalysisSettings& setti
 	mAnalysisLoudnessToggle = settings.bLoudness;
 	mAnalysisShapeToggle = settings.bShape;
 	mAnalysisMFCCToggle = settings.bMFCC;
+	mSampleRateField = settings.sampleRate;
 	mWindowFFTField = settings.windowFFTSize;
 	mHopFractionField = settings.hopFraction;
 	mNBandsField = settings.nBands;
@@ -605,6 +624,7 @@ void AnalyserMenu::PackSettingsFromUser ( Utils::AnalysisSettings& settings )
 	settings.bLoudness = mAnalysisLoudnessToggle;
 	settings.bShape = mAnalysisShapeToggle;
 	settings.bMFCC = mAnalysisMFCCToggle;
+	settings.sampleRate = mSampleRateField;
 	settings.windowFFTSize = mWindowFFTField;
 	settings.hopFraction = mHopFractionField;
 	settings.nBands = mNBandsField;
@@ -684,6 +704,7 @@ void AnalyserMenu::ToggleAnalysisUILockout ( bool lock )
 	mAnalysisLoudnessToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
 	mAnalysisShapeToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
 	mAnalysisMFCCToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
+	mSampleRateField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
 	mWindowFFTField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
 	mHopFractionField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
 	mNBandsField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );

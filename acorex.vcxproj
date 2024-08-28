@@ -106,6 +106,7 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Explorer\AudioPlayback.cpp" />
     <ClCompile Include="src\Explorer\PointPicker.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
@@ -116,6 +117,7 @@
     <ClCompile Include="src\ExplorerMenu.cpp" />
     <ClCompile Include="src\Explorer\LiveView.cpp" />
     <ClCompile Include="src\Explorer\RawView.cpp" />
+    <ClCompile Include="src\Utils\AudioFileLoader.cpp" />
     <ClCompile Include="src\Utils\DatasetConversion.cpp" />
     <ClCompile Include="src\Utils\JSON.cpp" />
     <ClCompile Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.cpp" />
@@ -133,6 +135,7 @@
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Explorer\AudioPlayback.h" />
     <ClInclude Include="src\Explorer\PointPicker.h" />
     <ClInclude Include="src\Explorer\SpaceDefs.h" />
     <ClInclude Include="src\ofApp.h" />
@@ -143,6 +146,7 @@
     <ClInclude Include="src\ExplorerMenu.h" />
     <ClInclude Include="src\Explorer\LiveView.h" />
     <ClInclude Include="src\Explorer\RawView.h" />
+    <ClInclude Include="src\Utils\AudioFileLoader.h" />
     <ClInclude Include="src\Utils\Data.h" />
     <ClInclude Include="src\Utils\DatasetConversion.h" />
     <ClInclude Include="src\Utils\DimensionBounds.h" />
