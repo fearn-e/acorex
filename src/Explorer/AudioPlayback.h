@@ -52,6 +52,8 @@ public:
 	void SetPointPicker ( std::shared_ptr<PointPicker>& pointPicker ) { mPointPicker = pointPicker; }
 
 	void SetLoopPlayheads ( bool loop ) { mLoopPlayheads = loop; }
+	void SetJumpSameFileAllowed ( bool allowed ) { mJumpSameFileAllowed = allowed; }
+	void SetJumpSameFileMinTimeDiff ( int timeDiff ) { mJumpSameFileMinTimeDiff = timeDiff; }
 	void SetCrossoverJumpChance ( int jumpsInAThousand ) { mCrossoverJumpChanceX1000 = jumpsInAThousand; }
 	void SetCrossfadeSampleLength ( int length ) { mCrossfadeSampleLength = length; }
 	void SetMaxJumpDistanceSpace ( int distanceX1000 ) { mMaxJumpDistanceSpaceX1000 = distanceX1000; }
@@ -78,6 +80,8 @@ private:
 	// settings -----------------------------------
 	
 	std::atomic<bool> mLoopPlayheads = false;
+	std::atomic<bool> mJumpSameFileAllowed = false;
+	std::atomic<int> mJumpSameFileMinTimeDiff = 2;
 	std::atomic<int> mCrossoverJumpChanceX1000 = 50;
 	std::atomic<int> mCrossfadeSampleLength = 256;
 	std::atomic<int> mMaxJumpDistanceSpaceX1000 = 50;

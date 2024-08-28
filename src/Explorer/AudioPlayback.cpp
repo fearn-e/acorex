@@ -197,7 +197,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 				Utils::PointFT nearestPoint;
 				Utils::PointFT currentPoint; currentPoint.file = mPlayheads[playheadIndex].fileIndex; currentPoint.time = timePointIndex;
 
-				if ( mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, mMaxJumpDistanceSpaceX1000, mMaxJumpTargets ) )
+				if ( mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileAllowed, mJumpSameFileMinTimeDiff ) )
 				{
 					jumpNext = true;
 					jumpOriginFile = mPlayheads[playheadIndex].fileIndex;

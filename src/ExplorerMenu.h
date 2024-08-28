@@ -57,6 +57,8 @@ private:
 	void SwapDimensionColor ( string& dimension );
 	void SwitchColorSpectrum ( bool& fullSpectrum );
 	void ToggleLoopPlayheads ( bool& loop );
+	void ToggleJumpSameFileAllowed ( bool& allowed );
+	void SetJumpSameFileMinTimeDiff ( int& timeDiff );
 	void SetCrossoverJumpChance ( float& jumpChance );
 	void SetCrossfadeMaxSampleLength ( int& length );
 	void SetMaxJumpDistanceSpace ( float& distance );
@@ -103,10 +105,12 @@ private:
 	unique_ptr<ofxDropdown> mDimensionDropdownColor;
 	ofxToggle mColorSpectrumSwitcher;
 
-	ofxToggle mLoopPlayheadsToggle;					
-	ofxFloatSlider mCrossoverJumpChanceSlider;		
-	ofxIntSlider mCrossfadeMaxSampleLengthSlider;	
-	ofxFloatSlider mMaxJumpDistanceSpaceSlider;		
+	ofxToggle mLoopPlayheadsToggle;
+	ofxToggle mJumpSameFileAllowedToggle;
+	ofxIntSlider mJumpSameFileMinTimeDiffSlider;
+	ofxFloatSlider mCrossoverJumpChanceSlider;
+	ofxIntSlider mCrossfadeMaxSampleLengthSlider;
+	ofxFloatSlider mMaxJumpDistanceSpaceSlider;
 	ofxIntSlider mMaxJumpTargetsSlider;
 
 	unique_ptr<ofxIntDropdown> mBufferSizeDropdown;

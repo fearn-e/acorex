@@ -150,6 +150,12 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 			mMainPanel.add ( mLoopPlayheadsToggle.setup ( "Loop when reaching end of a file", false ) );
 			mLoopPlayheadsToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
+			mMainPanel.add ( mJumpSameFileAllowedToggle.setup ( "Jump to same file allowed", false ) );
+			mJumpSameFileAllowedToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+			mMainPanel.add ( mJumpSameFileMinTimeDiffSlider.setup ( "Same file jump min point difference", 2, 1, 30 ) );
+			mJumpSameFileMinTimeDiffSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
 			mMainPanel.add ( mCrossoverJumpChanceSlider.setup ( "Crossover Jump Chance", 0.05, 0.0, 1.0 ) );
 			mCrossoverJumpChanceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
@@ -218,6 +224,8 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 		mDimensionDropdownColor->addListener ( this, &ExplorerMenu::SwapDimensionColor );
 		mColorSpectrumSwitcher.addListener ( this, &ExplorerMenu::SwitchColorSpectrum );
 		mLoopPlayheadsToggle.addListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
+		mJumpSameFileAllowedToggle.addListener ( this, &ExplorerMenu::ToggleJumpSameFileAllowed );
+		mJumpSameFileMinTimeDiffSlider.addListener ( this, &ExplorerMenu::SetJumpSameFileMinTimeDiff );
 		mCrossoverJumpChanceSlider.addListener ( this, &ExplorerMenu::SetCrossoverJumpChance );
 		mCrossfadeMaxSampleLengthSlider.addListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
 		mMaxJumpDistanceSpaceSlider.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
@@ -329,6 +337,8 @@ void ExplorerMenu::RemoveListeners ( )
 	mDimensionDropdownColor->removeListener ( this, &ExplorerMenu::SwapDimensionColor );
 	mColorSpectrumSwitcher.removeListener ( this, &ExplorerMenu::SwitchColorSpectrum );
 	mLoopPlayheadsToggle.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
+	mJumpSameFileAllowedToggle.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
+	mJumpSameFileMinTimeDiffSlider.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
 	mCrossoverJumpChanceSlider.removeListener ( this, &ExplorerMenu::SetCrossoverJumpChance );
 	mCrossfadeMaxSampleLengthSlider.removeListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
 	mMaxJumpDistanceSpaceSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
@@ -520,6 +530,16 @@ void ExplorerMenu::SwitchColorSpectrum ( bool& fullSpectrum )
 void ExplorerMenu::ToggleLoopPlayheads ( bool& loop )
 {
 	mLiveView.GetAudioPlayback ( )->SetLoopPlayheads ( loop );
+}
+
+void ExplorerMenu::ToggleJumpSameFileAllowed ( bool& allowed )
+{
+	mLiveView.GetAudioPlayback ( )->SetJumpSameFileAllowed ( allowed );
+}
+
+void ExplorerMenu::SetJumpSameFileMinTimeDiff ( int& timeDiff )
+{
+	mLiveView.GetAudioPlayback ( )->SetJumpSameFileMinTimeDiff ( timeDiff );
 }
 
 void ExplorerMenu::SetCrossoverJumpChance ( float& jumpChance )
