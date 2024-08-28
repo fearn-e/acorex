@@ -176,7 +176,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 
             for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
             {
-                allVectors[frameIndex].push_back ( frameIndex * hopSize / dataset.analysisSettings.sampleRate );
+                allVectors[frameIndex].push_back ( frameIndex * hopSize / (double)dataset.analysisSettings.sampleRate );
             }
 
 			if ( dataset.analysisSettings.bPitch )
