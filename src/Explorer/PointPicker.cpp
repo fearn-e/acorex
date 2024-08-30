@@ -414,6 +414,8 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 				size_t timeDiff = mCorpusTimeLookUp[point] > currentPoint.time ? mCorpusTimeLookUp[point] - currentPoint.time : currentPoint.time - mCorpusTimeLookUp[point];
 				if ( sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file && timeDiff < minTimeDiffSameFile ) { continue; } // skip if jumping would jump to the same file and the time difference is too small
 
+				if ( audioSet.raw[mCorpusFileLookUp[point]].getNumFrames ( ) - ((size_t)mCorpusTimeLookUp[point] * hopSize) < remainingSamplesRequired ) { continue; } // skip if there's not enough samples left in the file
+
 				nearestDistance = dist[i];
 				nearestPoint.file = mCorpusFileLookUp[point];
 				nearestPoint.time = mCorpusTimeLookUp[point];
