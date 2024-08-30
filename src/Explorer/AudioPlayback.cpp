@@ -174,7 +174,8 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			// perform checks on the current trigger, determine the parameters for the next audio segment fill --------------------------------------------
 			// after this point it is assumed that a new trigger has been reached
 
-			if ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) < 2 ) { continue; }
+			int requiredSamples = mCrossfadeSampleLength;
+			if ( mPlayheads[playheadIndex].sampleIndex + requiredSamples >= mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getNumFrames ( ) ) { continue; }
 			if ( ((double)rand ( ) / RAND_MAX) > crossoverJumpChance ) { continue; }
 			if ( mTimeCorpusMutex.try_lock ( ) )
 			{
