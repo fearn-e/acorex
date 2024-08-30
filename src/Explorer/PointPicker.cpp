@@ -367,8 +367,8 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 			if ( dist.size ( ) == 0 ) { return false; }
 
 			double nearestDistance = std::numeric_limits<double>::max ( );
-
 			bool jumpFound = false;
+			
 			for ( int i = 0; i < dist.size ( ); i++ )
 			{
 				if ( dist[i] < nearestDistance )

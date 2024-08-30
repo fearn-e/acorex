@@ -187,6 +187,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			FillAudioSegment ( &playheadBuffer, &playheadBufferPosition, &mPlayheads[playheadIndex], false );
 
 			// after this point it is assumed that a new trigger has been reached, perform jump checks for this trigger
+
 			int requiredSamples = mCrossfadeSampleLength;
 			if ( mPlayheads[playheadIndex].sampleIndex + requiredSamples >= mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getNumFrames ( ) ) { continue; }
 			if ( ((double)rand ( ) / RAND_MAX) > crossoverJumpChance ) { continue; }
