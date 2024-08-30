@@ -105,6 +105,12 @@ struct AudioPlayhead {
 
 	size_t fileIndex = 0;
 	size_t sampleIndex = 0;
+
+	bool crossfading = false;
+	size_t jumpFileIndex = 0;
+	size_t jumpSampleIndex = 0;
+	size_t crossfadeCurrentSample = 0;
+	size_t crossfadeSampleLength = 0;
 	
 	std::queue<size_t> triggerSamplePoints;
 };
