@@ -111,8 +111,6 @@ void AnalyserMenu::Initialise ( bool HiDpi )
 
 		mAnalysisMetadataPanel.setup ( "Analysis Metadata" );
 
-		mAnalysisMetadataPanel.add ( mTimeDimensionToggle.setup ( "Analyse Time", true ) );
-
 		mAnalysisMetadataPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", true ) );
 		mAnalysisMetadataPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", true ) );
 		mAnalysisMetadataPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Shape", false ) );
@@ -126,7 +124,6 @@ void AnalyserMenu::Initialise ( bool HiDpi )
 		mAnalysisMetadataPanel.add ( mMinFreqField.setup ( "Min Freq: ", 20, 20, 2000 ) );
 		mAnalysisMetadataPanel.add ( mMaxFreqField.setup ( "Max Freq: ", 5000, 20, 20000 ) );
 
-		mTimeDimensionToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mAnalysisPitchToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mAnalysisLoudnessToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mAnalysisShapeToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
@@ -598,7 +595,6 @@ void AnalyserMenu::SelectReductionOutputFile ( )
 
 void AnalyserMenu::UnpackSettingsFromFile ( const Utils::AnalysisSettings& settings )
 {
-	mTimeDimensionToggle = settings.bTime;
 	mAnalysisPitchToggle = settings.bPitch;
 	mAnalysisLoudnessToggle = settings.bLoudness;
 	mAnalysisShapeToggle = settings.bShape;
@@ -619,7 +615,7 @@ void AnalyserMenu::UnpackSettingsFromFile ( const Utils::AnalysisSettings& setti
 
 void AnalyserMenu::PackSettingsFromUser ( Utils::AnalysisSettings& settings )
 {
-	settings.bTime = mTimeDimensionToggle;
+	settings.bTime = true;
 	settings.bPitch = mAnalysisPitchToggle;
 	settings.bLoudness = mAnalysisLoudnessToggle;
 	settings.bShape = mAnalysisShapeToggle;
@@ -699,7 +695,6 @@ void AnalyserMenu::AnalysisInsertionToggleChanged ( bool& value )
 
 void AnalyserMenu::ToggleAnalysisUILockout ( bool lock )
 {
-	mTimeDimensionToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
 	mAnalysisPitchToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
 	mAnalysisLoudnessToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
 	mAnalysisShapeToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );

@@ -100,7 +100,6 @@ private:
 	//int maxSamplingRate = 22050;
 
 	bool mHasBeenReduced;
-	ofxToggle mTimeDimensionToggle;
 	ofxToggle mAnalysisPitchToggle;
 	ofxToggle mAnalysisLoudnessToggle;
 	ofxToggle mAnalysisShapeToggle;
