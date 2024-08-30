@@ -164,9 +164,10 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 			mCrossoverJumpChanceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 			mLiveView.GetAudioPlayback ( )->SetCrossoverJumpChance ( 50 );
 
-			mMainPanel.add ( mCrossfadeMaxSampleLengthSlider.setup ( "Crossfade Max Sample Length", 256, 1, 2000 ) );
+			size_t maxCrossfadeLength = mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction;
+			mMainPanel.add ( mCrossfadeMaxSampleLengthSlider.setup ( "Crossfade Max Sample Length", maxCrossfadeLength, 1, maxCrossfadeLength ) );
 			mCrossfadeMaxSampleLengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mLiveView.GetAudioPlayback ( )->SetCrossfadeSampleLength ( 256 );
+			mLiveView.GetAudioPlayback ( )->SetCrossfadeSampleLength ( maxCrossfadeLength );
 
 			mMainPanel.add ( mMaxJumpDistanceSpaceSlider.setup ( "Max Jump Distance Space", 0.05, 0.0, 1.0 ) );
 			mMaxJumpDistanceSpaceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
