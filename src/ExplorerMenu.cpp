@@ -146,27 +146,36 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 		{
 			mMainPanel.add ( mColorSpectrumSwitcher.setup ( "Color Spectrum: Red<->Blue", false ) );
 			mColorSpectrumSwitcher.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mLiveView.SetColorFullSpectrum ( false );
 
 			mMainPanel.add ( mLoopPlayheadsToggle.setup ( "Loop when reaching end of a file", false ) );
 			mLoopPlayheadsToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mLiveView.GetAudioPlayback ( )->SetLoopPlayheads ( false );
 
 			mMainPanel.add ( mJumpSameFileAllowedToggle.setup ( "Jump to same file allowed", false ) );
 			mJumpSameFileAllowedToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mLiveView.GetAudioPlayback ( )->SetJumpSameFileAllowed ( false );
 
 			mMainPanel.add ( mJumpSameFileMinTimeDiffSlider.setup ( "Same file jump min point difference", 2, 1, 30 ) );
 			mJumpSameFileMinTimeDiffSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mLiveView.GetAudioPlayback ( )->SetJumpSameFileMinTimeDiff ( 2 );
 
 			mMainPanel.add ( mCrossoverJumpChanceSlider.setup ( "Crossover Jump Chance", 0.05, 0.0, 1.0 ) );
 			mCrossoverJumpChanceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mLiveView.GetAudioPlayback ( )->SetCrossoverJumpChance ( 50 );
 
-			mMainPanel.add ( mCrossfadeMaxSampleLengthSlider.setup ( "Crossfade Max Sample Length", 256, 1, 2000 ) );
+			size_t maxCrossfadeLength = mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction;
+			mMainPanel.add ( mCrossfadeMaxSampleLengthSlider.setup ( "Crossfade Max Sample Length", maxCrossfadeLength, 1, maxCrossfadeLength ) );
 			mCrossfadeMaxSampleLengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mLiveView.GetAudioPlayback ( )->SetCrossfadeSampleLength ( maxCrossfadeLength );
 
 			mMainPanel.add ( mMaxJumpDistanceSpaceSlider.setup ( "Max Jump Distance Space", 0.05, 0.0, 1.0 ) );
 			mMaxJumpDistanceSpaceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mLiveView.GetAudioPlayback ( )->SetMaxJumpDistanceSpace ( 50 );
 
 			mMainPanel.add ( mMaxJumpTargetsSlider.setup ( "Max Jump Targets", 5, 1, 10 ) );
 			mMaxJumpTargetsSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mLiveView.GetAudioPlayback ( )->SetMaxJumpTargets ( 5 );
 		}
 
 		mBufferSizeDropdown.reset ( );

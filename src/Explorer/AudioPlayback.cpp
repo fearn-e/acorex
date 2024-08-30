@@ -103,17 +103,8 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
 	double crossoverJumpChance = (double)mCrossoverJumpChanceX1000 / 1000.0;
 
-	std::chrono::high_resolution_clock::time_point timeStart = std::chrono::high_resolution_clock::now ( );
-	std::chrono::microseconds preLoopDuration = std::chrono::microseconds ( 0 );
-	std::chrono::microseconds mainLoopDuration = std::chrono::microseconds ( 0 );
-	std::chrono::microseconds mainLoopJumpDuration = std::chrono::microseconds ( 0 );
-	std::chrono::microseconds afterLoopDuration = std::chrono::microseconds ( 0 );
-
-	std::chrono::high_resolution_clock::time_point triggerStart = std::chrono::high_resolution_clock::now ( );
-
 	for ( size_t playheadIndex = 0; playheadIndex < mPlayheads.size ( ); playheadIndex++ )
 	{
-		triggerStart = std::chrono::high_resolution_clock::now ( );
 		Utils::AudioPlayhead* currentPlayhead = &mPlayheads[playheadIndex];
 
 		ofSoundBuffer playheadBuffer;
@@ -124,13 +115,46 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 		{
 			playheadBuffer.getSample ( i, 0 ) = 0.0;
 		}
-		preLoopDuration += std::chrono::duration_cast<std::chrono::microseconds> (std::chrono::high_resolution_clock::now ( ) - triggerStart);
 
 		size_t playheadBufferPosition = 0;
-		bool jumpNext = false; size_t jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile;
+		// processing loop
 		while ( true )
 		{
-			triggerStart = std::chrono::high_resolution_clock::now ( );
+			// crossfade jump
+			// CrossfadeAudioSegment ( &playheadBuffer, &playheadBufferPosition, jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile, &mPlayheads[playheadIndex], mCrossfadeSampleLength, true );
+			if ( mPlayheads[playheadIndex].crossfading )
+			{
+				size_t crossfadeSamplesLeft = mPlayheads[playheadIndex].crossfadeSampleLength - mPlayheads[playheadIndex].crossfadeCurrentSample;
+				size_t bufferSpace = playheadBuffer.getNumFrames ( ) - playheadBufferPosition;
+				if ( crossfadeSamplesLeft > bufferSpace ) { crossfadeSamplesLeft = bufferSpace; }
+
+				for ( size_t i = 0; i < crossfadeSamplesLeft; i++ )
+				{
+					float gain_A = cos ( (float)( mPlayheads[playheadIndex].crossfadeCurrentSample + i ) / (float)mPlayheads[playheadIndex].crossfadeSampleLength * 0.5 * M_PI );
+					float gain_B = sin ( (float)( mPlayheads[playheadIndex].crossfadeCurrentSample + i ) / (float)mPlayheads[playheadIndex].crossfadeSampleLength * 0.5 * M_PI );
+
+					playheadBuffer.getSample ( playheadBufferPosition + i, 0 ) =	mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getSample ( mPlayheads[playheadIndex].sampleIndex + i, 0 ) * gain_A +
+																					mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex].getSample ( mPlayheads[playheadIndex].jumpSampleIndex + i, 0 ) * gain_B;
+				}
+
+				mPlayheads[playheadIndex].crossfadeCurrentSample += crossfadeSamplesLeft;
+				mPlayheads[playheadIndex].sampleIndex += crossfadeSamplesLeft;
+				mPlayheads[playheadIndex].jumpSampleIndex += crossfadeSamplesLeft;
+				playheadBufferPosition += crossfadeSamplesLeft;
+
+				if ( mPlayheads[playheadIndex].crossfadeCurrentSample >= mPlayheads[playheadIndex].crossfadeSampleLength )
+				{
+					mPlayheads[playheadIndex].crossfading = false;
+					mPlayheads[playheadIndex].fileIndex = mPlayheads[playheadIndex].jumpFileIndex;
+					mPlayheads[playheadIndex].sampleIndex = mPlayheads[playheadIndex].jumpSampleIndex;
+					CalculateTriggerPoints ( mPlayheads[playheadIndex] );
+				}
+				else
+				{
+					break;
+				}
+			}
+
 			// remove trigger points that have been hit
 			while ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) > 0 && mPlayheads[playheadIndex].sampleIndex >= mPlayheads[playheadIndex].triggerSamplePoints.front ( ) )
 			{
@@ -142,7 +166,8 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			{
 				if ( mLoopPlayheads )
 				{
-					JumpPlayhead ( mPlayheads[playheadIndex].fileIndex, 0, playheadIndex );
+					mPlayheads[playheadIndex].sampleIndex = 0;
+					CalculateTriggerPoints ( mPlayheads[playheadIndex] );
 				}
 				else
 				{
@@ -154,65 +179,43 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			// exit loop - no more space in outbuffer, no more triggers hit
 			if ( ( playheadBuffer.size ( ) - playheadBufferPosition ) < ( mPlayheads[playheadIndex].triggerSamplePoints.front ( ) - mPlayheads[playheadIndex].sampleIndex ) )
 			{
-				if ( jumpNext ) //jump
-				{
-					CrossfadeAudioSegment ( &playheadBuffer, &playheadBufferPosition, jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile, &mPlayheads[playheadIndex], mCrossfadeSampleLength, true );
-
-					jumpNext = false;
-				}
-				else //no jump
-				{
-					FillAudioSegment ( &playheadBuffer, &playheadBufferPosition, &mPlayheads[playheadIndex], true );
-				}
-
+				FillAudioSegment ( &playheadBuffer, &playheadBufferPosition, &mPlayheads[playheadIndex], true );
 				break;
 			}
 
-			// fill audio up to the next trigger, due to previous if we can assume there is enough space in the outbuffer
-			if ( !jumpNext ) //no jump
-			{
-				FillAudioSegment ( &playheadBuffer, &playheadBufferPosition, &mPlayheads[playheadIndex], false );
-			}
-			else //jump
-			{
-				CrossfadeAudioSegment ( &playheadBuffer, &playheadBufferPosition, jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile, &mPlayheads[playheadIndex], mCrossfadeSampleLength, false );
+			// fill audio up to the next trigger, already established that there is enough space in outBuffer
+			FillAudioSegment ( &playheadBuffer, &playheadBufferPosition, &mPlayheads[playheadIndex], false );
 
-				FillAudioSegment ( &playheadBuffer, &playheadBufferPosition, &mPlayheads[playheadIndex], false );
+			// after this point it is assumed that a new trigger has been reached, perform jump checks for this trigger
 
-				jumpNext = false;
-			}
-			mainLoopDuration += std::chrono::duration_cast<std::chrono::microseconds> (std::chrono::high_resolution_clock::now ( ) - triggerStart);
-
-			// perform checks on the current trigger, determine the parameters for the next audio segment fill --------------------------------------------
-			// after this point it is assumed that a new trigger has been reached
-
-			triggerStart = std::chrono::high_resolution_clock::now ( );
-			// if current trigger point is not the final one and causes a jump
-			if ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) > 1 && ((double)rand ( ) / RAND_MAX) < crossoverJumpChance && mTimeCorpusMutex.try_lock ( ) )
+			int requiredSamples = mCrossfadeSampleLength;
+			if ( mPlayheads[playheadIndex].sampleIndex + requiredSamples >= mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getNumFrames ( ) ) { continue; }
+			if ( ((double)rand ( ) / RAND_MAX) > crossoverJumpChance ) { continue; }
+			if ( mTimeCorpusMutex.try_lock ( ) )
 			{
 				std::lock_guard<std::mutex> lock ( mTimeCorpusMutex, std::adopt_lock );
 
-				size_t timePointIndex = mPlayheads[playheadIndex].sampleIndex / (mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction);
+				size_t hopSize = mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction;
+				size_t timePointIndex = mPlayheads[playheadIndex].sampleIndex / hopSize;
 				glm::vec3 playheadPosition = mTimeCorpus[mPlayheads[playheadIndex].fileIndex].getVertex ( timePointIndex );
 				Utils::PointFT nearestPoint;
 				Utils::PointFT currentPoint; currentPoint.file = mPlayheads[playheadIndex].fileIndex; currentPoint.time = timePointIndex;
 
-				if ( mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileAllowed, mJumpSameFileMinTimeDiff ) )
-				{
-					jumpNext = true;
-					jumpOriginFile = mPlayheads[playheadIndex].fileIndex;
-					jumpOriginStartSample = mPlayheads[playheadIndex].sampleIndex;
-					jumpOriginEndSample = mPlayheads[playheadIndex].triggerSamplePoints.front ( );
+				if ( !mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, 
+															mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileAllowed, 
+															mJumpSameFileMinTimeDiff, requiredSamples, *mRawView->GetAudioData ( ), hopSize ) )
+				{ continue; }
 
-					size_t jumpFileIndex = nearestPoint.file;
-					size_t jumpSampleIndex = nearestPoint.time * (mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction);
-					JumpPlayhead ( jumpFileIndex, jumpSampleIndex, playheadIndex );
-				}
+				if ( mRawView->GetAudioData ( )->loaded[nearestPoint.file] == false ) { continue; }
+
+				mPlayheads[playheadIndex].crossfading = true;
+				mPlayheads[playheadIndex].jumpFileIndex = nearestPoint.file;
+				mPlayheads[playheadIndex].jumpSampleIndex = nearestPoint.time * hopSize;
+				mPlayheads[playheadIndex].crossfadeCurrentSample = 0;
+				mPlayheads[playheadIndex].crossfadeSampleLength = requiredSamples;
 			}
-			mainLoopJumpDuration += std::chrono::duration_cast<std::chrono::microseconds> (std::chrono::high_resolution_clock::now ( ) - triggerStart);
 		}
 		
-		triggerStart = std::chrono::high_resolution_clock::now ( );
 		// if playhead is marked for death, apply a fade out and remove from playheads
 		{
 			std::vector<size_t>::iterator it = std::find ( playheadsToKillThisBuffer.begin ( ), playheadsToKillThisBuffer.end ( ), mPlayheads[playheadIndex].playheadID );
@@ -238,19 +241,6 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			outBuffer.getSample ( sampleIndex, 0 ) += playheadBuffer.getSample ( sampleIndex, 0 );
 			outBuffer.getSample ( sampleIndex, 1 ) += playheadBuffer.getSample ( sampleIndex, 0 );
 		}
-		afterLoopDuration += std::chrono::duration_cast<std::chrono::microseconds> (std::chrono::high_resolution_clock::now ( ) - triggerStart);
-	}
-
-	std::chrono::high_resolution_clock::time_point timeEnd = std::chrono::high_resolution_clock::now ( );
-
-	std::chrono::microseconds totalDuration = std::chrono::duration_cast<std::chrono::microseconds> (timeEnd - timeStart);
-	if ( totalDuration.count ( ) > 10000 ) // only log if over 10ms
-	{
-		ofLogNotice ( "audio" ) << totalDuration.count ( ) << "us | "
-			<< (float)preLoopDuration.count ( ) / (float)totalDuration.count ( ) * 100.0 << "% | "
-			<< (float)mainLoopDuration.count ( ) / (float)totalDuration.count ( ) * 100.0 << "% | "
-			<< (float)mainLoopJumpDuration.count ( ) / (float)totalDuration.count ( ) * 100.0 << "% | "
-			<< (float)afterLoopDuration.count ( ) / (float)totalDuration.count ( ) * 100.0 << "% | ";
 	}
 
 	if ( mVisualPlayheadUpdateMutex.try_lock ( ) )
@@ -310,24 +300,6 @@ void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, 
 
 	playhead_B->sampleIndex += crossfadeLength;
 	*outBufferPosition += crossfadeLength;
-}
-
-bool Explorer::AudioPlayback::JumpPlayhead ( size_t fileIndex, size_t sampleIndex, size_t playheadIndex )
-{
-	if ( mRawView->GetAudioData ( )->loaded[fileIndex] )
-	{
-		mPlayheads[playheadIndex].fileIndex = fileIndex;
-		mPlayheads[playheadIndex].sampleIndex = sampleIndex;
-
-		CalculateTriggerPoints ( mPlayheads[playheadIndex] );
-
-		return true;
-	}
-	else
-	{
-		ofLogError ( "AudioPlayback" ) << "File not loaded in memory, failed to move playhead for " << mRawView->GetDataset ( )->fileList[fileIndex];
-		return false;
-	}
 }
 
 bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t sampleIndex )
