@@ -174,8 +174,9 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			// perform checks on the current trigger, determine the parameters for the next audio segment fill --------------------------------------------
 			// after this point it is assumed that a new trigger has been reached
 
-			// if current trigger point is not the final one and causes a jump
-			if ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) > 1 && ((double)rand ( ) / RAND_MAX) < crossoverJumpChance && mTimeCorpusMutex.try_lock ( ) )
+			if ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) < 2 ) { continue; }
+			if ( ((double)rand ( ) / RAND_MAX) > crossoverJumpChance ) { continue; }
+			if ( mTimeCorpusMutex.try_lock ( ) )
 			{
 				std::lock_guard<std::mutex> lock ( mTimeCorpusMutex, std::adopt_lock );
 
@@ -184,17 +185,17 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 				Utils::PointFT nearestPoint;
 				Utils::PointFT currentPoint; currentPoint.file = mPlayheads[playheadIndex].fileIndex; currentPoint.time = timePointIndex;
 
-				if ( mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileAllowed, mJumpSameFileMinTimeDiff ) )
-				{
-					jumpNext = true;
-					jumpOriginFile = mPlayheads[playheadIndex].fileIndex;
-					jumpOriginStartSample = mPlayheads[playheadIndex].sampleIndex;
-					jumpOriginEndSample = mPlayheads[playheadIndex].triggerSamplePoints.front ( );
+				if ( !mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileAllowed, mJumpSameFileMinTimeDiff ) )
+				{ continue; }
 
-					size_t jumpFileIndex = nearestPoint.file;
-					size_t jumpSampleIndex = nearestPoint.time * (mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction);
-					JumpPlayhead ( jumpFileIndex, jumpSampleIndex, playheadIndex );
-				}
+				jumpNext = true;
+				jumpOriginFile = mPlayheads[playheadIndex].fileIndex;
+				jumpOriginStartSample = mPlayheads[playheadIndex].sampleIndex;
+				jumpOriginEndSample = mPlayheads[playheadIndex].triggerSamplePoints.front ( );
+
+				size_t jumpFileIndex = nearestPoint.file;
+				size_t jumpSampleIndex = nearestPoint.time * (mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction);
+				JumpPlayhead ( jumpFileIndex, jumpSampleIndex, playheadIndex );
 			}
 		}
 		
