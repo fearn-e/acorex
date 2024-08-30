@@ -64,8 +64,6 @@ private:
 	void FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utils::AudioPlayhead* playhead, bool outBufferFull );
 	void CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, size_t startSample_A, size_t endSample_A, size_t fileIndex_A, Utils::AudioPlayhead* playhead_B, size_t lengthSetting, bool outBufferFull );
 
-	bool JumpPlayhead ( size_t fileIndex, size_t sampleIndex, size_t playheadIndex );
-
 	void CalculateTriggerPoints ( Utils::AudioPlayhead& playhead );
 
 	std::vector<Utils::AudioPlayhead> mPlayheads;
