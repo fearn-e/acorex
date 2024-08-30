@@ -103,17 +103,8 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
 	double crossoverJumpChance = (double)mCrossoverJumpChanceX1000 / 1000.0;
 
-	std::chrono::high_resolution_clock::time_point timeStart = std::chrono::high_resolution_clock::now ( );
-	std::chrono::microseconds preLoopDuration = std::chrono::microseconds ( 0 );
-	std::chrono::microseconds mainLoopDuration = std::chrono::microseconds ( 0 );
-	std::chrono::microseconds mainLoopJumpDuration = std::chrono::microseconds ( 0 );
-	std::chrono::microseconds afterLoopDuration = std::chrono::microseconds ( 0 );
-
-	std::chrono::high_resolution_clock::time_point triggerStart = std::chrono::high_resolution_clock::now ( );
-
 	for ( size_t playheadIndex = 0; playheadIndex < mPlayheads.size ( ); playheadIndex++ )
 	{
-		triggerStart = std::chrono::high_resolution_clock::now ( );
 		Utils::AudioPlayhead* currentPlayhead = &mPlayheads[playheadIndex];
 
 		ofSoundBuffer playheadBuffer;
@@ -124,13 +115,11 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 		{
 			playheadBuffer.getSample ( i, 0 ) = 0.0;
 		}
-		preLoopDuration += std::chrono::duration_cast<std::chrono::microseconds> (std::chrono::high_resolution_clock::now ( ) - triggerStart);
 
 		size_t playheadBufferPosition = 0;
 		bool jumpNext = false; size_t jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile;
 		while ( true )
 		{
-			triggerStart = std::chrono::high_resolution_clock::now ( );
 			// remove trigger points that have been hit
 			while ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) > 0 && mPlayheads[playheadIndex].sampleIndex >= mPlayheads[playheadIndex].triggerSamplePoints.front ( ) )
 			{
@@ -181,12 +170,10 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
 				jumpNext = false;
 			}
-			mainLoopDuration += std::chrono::duration_cast<std::chrono::microseconds> (std::chrono::high_resolution_clock::now ( ) - triggerStart);
 
 			// perform checks on the current trigger, determine the parameters for the next audio segment fill --------------------------------------------
 			// after this point it is assumed that a new trigger has been reached
 
-			triggerStart = std::chrono::high_resolution_clock::now ( );
 			// if current trigger point is not the final one and causes a jump
 			if ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) > 1 && ((double)rand ( ) / RAND_MAX) < crossoverJumpChance && mTimeCorpusMutex.try_lock ( ) )
 			{
@@ -209,10 +196,8 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 					JumpPlayhead ( jumpFileIndex, jumpSampleIndex, playheadIndex );
 				}
 			}
-			mainLoopJumpDuration += std::chrono::duration_cast<std::chrono::microseconds> (std::chrono::high_resolution_clock::now ( ) - triggerStart);
 		}
 		
-		triggerStart = std::chrono::high_resolution_clock::now ( );
 		// if playhead is marked for death, apply a fade out and remove from playheads
 		{
 			std::vector<size_t>::iterator it = std::find ( playheadsToKillThisBuffer.begin ( ), playheadsToKillThisBuffer.end ( ), mPlayheads[playheadIndex].playheadID );
@@ -238,19 +223,6 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			outBuffer.getSample ( sampleIndex, 0 ) += playheadBuffer.getSample ( sampleIndex, 0 );
 			outBuffer.getSample ( sampleIndex, 1 ) += playheadBuffer.getSample ( sampleIndex, 0 );
 		}
-		afterLoopDuration += std::chrono::duration_cast<std::chrono::microseconds> (std::chrono::high_resolution_clock::now ( ) - triggerStart);
-	}
-
-	std::chrono::high_resolution_clock::time_point timeEnd = std::chrono::high_resolution_clock::now ( );
-
-	std::chrono::microseconds totalDuration = std::chrono::duration_cast<std::chrono::microseconds> (timeEnd - timeStart);
-	if ( totalDuration.count ( ) > 10000 ) // only log if over 10ms
-	{
-		ofLogNotice ( "audio" ) << totalDuration.count ( ) << "us | "
-			<< (float)preLoopDuration.count ( ) / (float)totalDuration.count ( ) * 100.0 << "% | "
-			<< (float)mainLoopDuration.count ( ) / (float)totalDuration.count ( ) * 100.0 << "% | "
-			<< (float)mainLoopJumpDuration.count ( ) / (float)totalDuration.count ( ) * 100.0 << "% | "
-			<< (float)afterLoopDuration.count ( ) / (float)totalDuration.count ( ) * 100.0 << "% | ";
 	}
 
 	if ( mVisualPlayheadUpdateMutex.try_lock ( ) )
