@@ -44,7 +44,9 @@ public:
 	void Draw ( );
 
 	void FindNearestToMouse ( );
-	bool FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed, int minTimeDiffSameFile );
+	bool FindNearestToPosition (	const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, 
+									int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed, 
+									int minTimeDiffSameFile, int remainingSamplesRequired, const Utils::AudioData& audioSet, size_t hopSize );
 
 	// Setters & Getters ----------------------------
 

@@ -335,7 +335,9 @@ void Explorer::PointPicker::FindNearestToMouse ( )
 	}
 }
 
-bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed, int minTimeDiffSameFile )
+bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, 
+													int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed,
+													int minTimeDiffSameFile, int remainingSamplesRequired, const Utils::AudioData& audioSet, size_t hopSize )
 {
 	if ( maxAllowedDistanceSpaceX1000 == 0 ) { return false; }
 
@@ -375,6 +377,8 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 					if ( !sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file ) { continue; } // skip if jumping would jump to the same file and the option is not allowed
 					size_t timeDiff = mCorpusTimeLookUp[point] > currentPoint.time ? mCorpusTimeLookUp[point] - currentPoint.time : currentPoint.time - mCorpusTimeLookUp[point];
 					if ( sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file && timeDiff < minTimeDiffSameFile ) { continue; } // skip if jumping would jump to the same file and the time difference is too small
+
+					if ( audioSet.raw[mCorpusFileLookUp[point]].getNumFrames ( ) - ( (size_t)mCorpusTimeLookUp[point] * hopSize ) < remainingSamplesRequired ) { continue; } // skip if there's not enough samples left in the file
 
 					nearestDistance = dist[i];
 					nearestPoint.file = mCorpusFileLookUp[point];
