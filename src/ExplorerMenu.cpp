@@ -204,8 +204,8 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 		mBufferSizeDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mOutDeviceDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-		mBufferSizeDropdown->setSelectedValueByIndex ( 3, true );
-		mOutDeviceDropdown->setSelectedValueByIndex ( 0, true );
+		mBufferSizeDropdown->setSelectedValueByIndex ( 3, true ); currentBufferSize = 512;
+		mOutDeviceDropdown->setSelectedValueByIndex ( 0, true ); currentOutDevice = outDevices[0];
 
 		mMainPanel.add ( mBufferSizeDropdown.get ( ) );
 		mMainPanel.add ( mOutDeviceDropdown.get ( ) );
