@@ -227,7 +227,7 @@ echo "OS discovered as $currentOS"
         cmake --build . --config Release
     elif [ $MEMORY_CMAKE_NEEDED == true ] && [ "$currentOS" == "mac" ]; then
         echo "macos"
-        cmake "-DCMAKE_OSX_ARCHITECTURES=x84_64;arm64" -DFOONATHAN_MEMORY_BUILD_TESTS=OFF -DFOONATHAN_MEMORY_BUILD_TOOLS=OFF -DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF .
+        cmake "-DCMAKE_OSX_ARCHITECTURES=x86_64;arm64" -DFOONATHAN_MEMORY_BUILD_TESTS=OFF -DFOONATHAN_MEMORY_BUILD_TOOLS=OFF -DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF .
 
         echo ""
         echo "creating release lib"
