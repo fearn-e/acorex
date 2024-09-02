@@ -18,7 +18,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Utils/Data.h"
 #include "Utils/JSON.h"
-#include "utils/AudioFileLoader.h"
+#include "Utils/AudioFileLoader.h"
 
 namespace Acorex {
 namespace Explorer {

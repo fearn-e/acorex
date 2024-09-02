@@ -425,10 +425,8 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 			return jumpFound;
 		}
 	}
-	else
-	{
-		return false;
-	}
+
+    return false;
 }
 
 void Explorer::PointPicker::KeyEvent ( ofKeyEventArgs& args )
