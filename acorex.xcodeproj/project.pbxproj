@@ -29,6 +29,8 @@
 		E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */; };
 		"E7809636-7AE4-4DF7-B87D-97768E73E8ED" /* ExplorerMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "7CDC9433-5F0D-4677-BB8F-D1B816D05412" /* ExplorerMenu.cpp */; };
 		E80A15F42BFB91BE002F19C1 /* libfoonathan_memory-0.7.3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E80A15F32BFB91BE002F19C1 /* libfoonathan_memory-0.7.3.a */; };
+		E856DF7F2C86094100E271F6 /* AudioFileLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E856DF7E2C86094100E271F6 /* AudioFileLoader.cpp */; };
+		E856DF822C86094F00E271F6 /* AudioPlayback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E856DF812C86094F00E271F6 /* AudioPlayback.cpp */; };
 		"EEFF4AB7-4F58-48BF-A482-B5F06F550DD2" /* ofxButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "A7B1CD76-8E07-42B3-866B-33461928C5FF" /* ofxButton.cpp */; };
 		"F8397AC1-2FFB-44DF-B424-3CE335A760CE" /* ofxLabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "FC6DEDC8-42D1-4FD1-80EF-127571DF2A6B" /* ofxLabel.cpp */; };
 		"FE06EFD9-4692-4F02-B12B-5BBEE65A7A1A" /* PointPicker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "49481083-C4E2-4912-AF05-F4AD94ECDD7A" /* PointPicker.cpp */; };
@@ -110,13 +112,17 @@
 		"DAB659A3-AB0A-4369-8C77-5E8BEDA5CFCA" /* PointPicker.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = PointPicker.h; path = src/Explorer/PointPicker.h; sourceTree = SOURCE_ROOT; };
 		"DC27638D-959E-454E-9308-1C68A3380E3E" /* JSON.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = JSON.cpp; path = src/Utils/JSON.cpp; sourceTree = SOURCE_ROOT; };
 		"E03EBDAB-831B-4312-BA84-94E6F44B3925" /* DimensionBounds.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = DimensionBounds.h; path = src/Utils/DimensionBounds.h; sourceTree = SOURCE_ROOT; };
-		E4B69B5B0A3A1756003C02F2 /* acorex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = acorex.app; path = /Users/u1856248/Downloads/of_v0.12.0_osx_release/apps/myApps/acorex/bin/acorex.app; sourceTree = "<absolute>"; };
 		E4B69E1D0A3A1BDC003C02F2 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
 		E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = ofApp.cpp; path = src/ofApp.cpp; sourceTree = SOURCE_ROOT; };
 		E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofApp.h; path = src/ofApp.h; sourceTree = SOURCE_ROOT; };
 		E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "openFrameworks-Info.plist"; sourceTree = "<group>"; };
 		E4EB6923138AFD0F00A09F29 /* Project.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
 		E80A15F32BFB91BE002F19C1 /* libfoonathan_memory-0.7.3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libfoonathan_memory-0.7.3.a"; path = "libs/libfoonathan_memory-0.7.3.a"; sourceTree = "<group>"; };
+		E856DF7C2C8600D800E271F6 /* acorexDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = acorexDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E856DF7D2C86094100E271F6 /* AudioFileLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioFileLoader.h; sourceTree = "<group>"; };
+		E856DF7E2C86094100E271F6 /* AudioFileLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioFileLoader.cpp; sourceTree = "<group>"; };
+		E856DF802C86094F00E271F6 /* AudioPlayback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayback.h; sourceTree = "<group>"; };
+		E856DF812C86094F00E271F6 /* AudioPlayback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioPlayback.cpp; sourceTree = "<group>"; };
 		"EA4B6B7C-A2B4-4454-A400-610FD995C1C6" /* ofxInputField.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = ofxInputField.cpp; path = ../../../addons/ofxGui/src/ofxInputField.cpp; sourceTree = SOURCE_ROOT; };
 		"EF3B24EB-6DC1-46CD-AC5A-DC8979DCC11B" /* ofxButton.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = ofxButton.h; path = ../../../addons/ofxGui/src/ofxButton.h; sourceTree = SOURCE_ROOT; };
 		"EFD8C9E5-18E4-4274-91B6-8087839CFB1B" /* AnalyserMenu.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = AnalyserMenu.h; path = src/AnalyserMenu.h; sourceTree = SOURCE_ROOT; };
@@ -178,6 +184,8 @@
 		"558105A1-53C0-4D75-89CC-492CF6C189CE" /* Explorer */ = {
 			isa = PBXGroup;
 			children = (
+				E856DF812C86094F00E271F6 /* AudioPlayback.cpp */,
+				E856DF802C86094F00E271F6 /* AudioPlayback.h */,
 				"B95FD5D3-AC2D-4CBE-B610-F7E3D75B5115" /* LiveView.cpp */,
 				"C30CF47B-2887-4D9D-B064-E9F3728B4BE1" /* LiveView.h */,
 				"49481083-C4E2-4912-AF05-F4AD94ECDD7A" /* PointPicker.cpp */,
@@ -278,6 +286,7 @@
 				191EF70929D778A400F35F26 /* openFrameworks */,
 				BB4B014C10F69532006C3DED /* addons */,
 				E80A15F22BFB91BE002F19C1 /* Frameworks */,
+				E856DF7C2C8600D800E271F6 /* acorexDebug.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -309,6 +318,8 @@
 		"F09FB266-3969-4333-B7D2-51577D13E11D" /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				E856DF7E2C86094100E271F6 /* AudioFileLoader.cpp */,
+				E856DF7D2C86094100E271F6 /* AudioFileLoader.h */,
 				"2D61B1DF-1EE9-4D03-9ABE-A6F2EBB39FDA" /* Data.h */,
 				"23B0128D-A418-4DBA-B00C-FB3128BC87B6" /* DatasetConversion.cpp */,
 				"92D7AA24-CC2C-4A0C-8A55-D17A7948171A" /* DatasetConversion.h */,
@@ -341,7 +352,7 @@
 			);
 			name = acorex;
 			productName = myOFApp;
-			productReference = E4B69B5B0A3A1756003C02F2 /* acorex.app */;
+			productReference = E856DF7C2C8600D800E271F6 /* acorexDebug.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -417,6 +428,8 @@
 				"77DAA348-C650-4C5E-80CA-1FAACFE5A158" /* Controller.cpp in Sources */,
 				"D1C98357-FB8D-4217-9464-BD0E2074EEDC" /* GenAnalysis.cpp in Sources */,
 				"1CF1A6E6-41C3-47BE-9424-D8DB9016E4E1" /* UMAP.cpp in Sources */,
+				E856DF7F2C86094100E271F6 /* AudioFileLoader.cpp in Sources */,
+				E856DF822C86094F00E271F6 /* AudioPlayback.cpp in Sources */,
 				"44177F94-4EE7-4ACD-828C-4485119E3452" /* AnalyserMenu.cpp in Sources */,
 				"73AB33E2-64FA-4A0B-A2DC-4DD3AF9C145D" /* LiveView.cpp in Sources */,
 				"FE06EFD9-4692-4F02-B12B-5BBEE65A7A1A" /* PointPicker.cpp in Sources */,
@@ -447,6 +460,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E4EB6923138AFD0F00A09F29 /* Project.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_ENTITLEMENTS = of.entitlements;
 				COPY_PHASE_STRIP = NO;
 				ENABLE_TESTABILITY = YES;
@@ -456,6 +470,8 @@
 					"$(OF_CORE_HEADERS)",
 					src,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = "-D__MACOSX_CORE__";
 			};
 			name = Debug;
@@ -464,6 +480,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E4EB6923138AFD0F00A09F29 /* Project.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_ENTITLEMENTS = of.entitlements;
 				COPY_PHASE_STRIP = YES;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -472,6 +489,8 @@
 					"$(OF_CORE_HEADERS)",
 					src,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = "-D__MACOSX_CORE__";
 			};
 			name = Release;
@@ -501,6 +520,8 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/libs",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",
 					"$(OF_CORE_FRAMEWORKS)",
@@ -533,6 +554,8 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/libs",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",
 					"$(OF_CORE_FRAMEWORKS)",
