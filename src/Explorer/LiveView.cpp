@@ -977,9 +977,9 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 #ifdef _WIN32
 				ofSystem ( "explorer /select," + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )] );
 #elif __APPLE__ && __MACH__
-				ofSystem ( "open -R " + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
+				ofSystem ( "open -R " + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )] );
 #elif __linux__
-				ofSystem ( "xdg-open " + mRawView->GetDataset ( )->fileList[mPointPicker.GetNearestPointFile ( )] );
+				ofSystem ( "xdg-open " + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )] );
 #endif
 			}
 		}
