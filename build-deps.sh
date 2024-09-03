@@ -80,7 +80,10 @@ set -o errexit
         git -c advice.detachedHead=false clone --depth 1 -b "0.12.0" https://github.com/openframeworks/openframeworks
         
         cd openframeworks/apps
-        mkdir myApps
+        
+        if [ ! -d "myApps" ]; then
+            mkdir myApps
+        fi
         cd ../..
 
         cp -rv acorex/ openframeworks/apps/myApps/acorex/
