@@ -77,7 +77,7 @@ set -o errexit
     if [ $OF_FOUND == false ]; then
         echo "openframeworks not found, downloading..."
         cd ..
-        git -c advice.detachedHead=false clone --depth 1 -b "0.12.0" https://github.com/openframeworks/openframeworks
+        git -c advice.detachedHead=false clone --depth 1 -b "nightly" https://github.com/openframeworks/openframeworks
         
         cd openframeworks/apps
         
