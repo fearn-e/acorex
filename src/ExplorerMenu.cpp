@@ -94,10 +94,10 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 		mDimensionDropdownZ.reset ( );
 		mDimensionDropdownColor.reset ( );
 
-		mDimensionDropdownX = make_unique<ofxDropdown> ( "X Dimension", dropdownScrollSpeed );
-		mDimensionDropdownY = make_unique<ofxDropdown> ( "Y Dimension", dropdownScrollSpeed );
-		mDimensionDropdownZ = make_unique<ofxDropdown> ( "Z Dimension", dropdownScrollSpeed );
-		mDimensionDropdownColor = make_unique<ofxDropdown> ( "Color Dimension", dropdownScrollSpeed );
+		mDimensionDropdownX = make_unique<ofxDropdown> ( (string)"X Dimension", dropdownScrollSpeed );
+		mDimensionDropdownY = make_unique<ofxDropdown>( (string)"Y Dimension", dropdownScrollSpeed);
+		mDimensionDropdownZ = make_unique<ofxDropdown>( (string)"Z Dimension", dropdownScrollSpeed);
+		mDimensionDropdownColor = make_unique<ofxDropdown>( (string)"Color Dimension", dropdownScrollSpeed);
 
 		if ( bInitialiseShouldLoad )
 		{
@@ -181,8 +181,8 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 		mBufferSizeDropdown.reset ( );
 		mOutDeviceDropdown.reset ( );
 
-		mBufferSizeDropdown = make_unique<ofxIntDropdown> ( "Buffer Size", dropdownScrollSpeed );
-		mOutDeviceDropdown = make_unique<ofxDropdown> ( "Output Device", dropdownScrollSpeed );
+		mBufferSizeDropdown = make_unique<ofxIntDropdown>( (string)"Buffer Size", dropdownScrollSpeed);
+		mOutDeviceDropdown = make_unique<ofxDropdown>( (string)"Output Device", dropdownScrollSpeed);
 
 		for ( int i = 0; i < outDevices.size ( ); i++ )
 		{
