@@ -113,7 +113,7 @@ void AnalyserMenu::Initialise ( bool HiDpi )
 
 		mAnalysisMetadataPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", true ) );
 		mAnalysisMetadataPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", true ) );
-		mAnalysisMetadataPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Shape", false ) );
+		mAnalysisMetadataPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Spectral Shape", false ) );
 		mAnalysisMetadataPanel.add ( mAnalysisMFCCToggle.setup ( "Analyse MFCC", false ) );
 
 		mAnalysisMetadataPanel.add ( mSampleRateField.setup ( "Sample Rate: ", 44100, 8000, 96000 ) );
