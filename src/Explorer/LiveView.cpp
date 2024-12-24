@@ -864,7 +864,13 @@ void Explorer::LiveView::Pan3DCam ( float x, float y, float z, bool mouse )
 	rightNormalized = glm::normalize ( rightNormalized );
 	focusNormalized = glm::normalize ( focusNormalized );
 
-	if ( mouse ) { x -= mLastMouseX; y -= mLastMouseY; }
+	if ( mouse )
+	{
+		x -= mLastMouseX;
+		y -= mLastMouseY;
+		x *= 2.0;
+		y *= 2.0;
+	}
 
 	float moveX = x * mCamMoveSpeedScaleAdjusted * -1;
 	float moveY = y * mCamMoveSpeedScaleAdjusted;
