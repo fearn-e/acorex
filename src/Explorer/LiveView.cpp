@@ -813,10 +813,22 @@ void Explorer::LiveView::Zoom2DCam ( float y, bool mouse )
 
 void Explorer::LiveView::Zoom3DCam ( float y, bool mouse )
 {
-	// TODO - get cam direction to pivot point, check after zoom that direction is still the same, if negative, revert zoom
 	float scrollDist = y * SpaceDefs::mCamZoomSpeed3D;
-	if ( mCamPivot.distance ( mCamera->getPosition ( ) ) > SpaceDefs::mZoomMin3D && scrollDist < 0.0f && scrollDist < mCamPivot.distance ( mCamera->getPosition ( ) ) ) { mCamera->dolly ( scrollDist ); }
-	else if ( mCamPivot.distance ( mCamera->getPosition ( ) ) < SpaceDefs::mZoomMax3D && scrollDist > 0.0f ) { mCamera->dolly ( scrollDist ); }
+	float camPivotDist = mCamPivot.distance ( mCamera->getPosition ( ) );
+
+	if ( scrollDist < 0.0f )
+	{
+		scrollDist *= -1;
+		if ( camPivotDist < (SpaceDefs::mZoomMin3D * 1.02) ) { return; }
+		if ( scrollDist > (camPivotDist - SpaceDefs::mZoomMin3D) ) { scrollDist = camPivotDist - SpaceDefs::mZoomMin3D; }
+		mCamera->dolly ( scrollDist * -1 );
+	}
+	else if ( scrollDist > 0.0f )
+	{
+		if ( camPivotDist > (SpaceDefs::mZoomMax3D * 0.98) ) { return; }
+		if ( scrollDist > (SpaceDefs::mZoomMax3D - camPivotDist) ) { scrollDist = SpaceDefs::mZoomMax3D - camPivotDist; }
+		mCamera->dolly ( scrollDist );
+	}
 }
 
 void Explorer::LiveView::Rotate3DCam ( float x, float y, bool mouse )
