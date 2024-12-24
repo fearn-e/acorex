@@ -25,7 +25,7 @@ namespace SpaceDefs {
 
 	static float mCamZoomSpeed3D = 200;		static float mCamZoomSpeed2D = 0.1;
 	static float mZoomMin3D = 50.0;			static float mZoomMax3D = 10000.0;
-	static float mZoomMin2D = 0.1;			static float mZoomMax2D = 10.0;
+	static float mZoomMin2D = 0.2;			static float mZoomMax2D = 10.0;
 	static float mCamMoveSpeed = 1.0;
 	static float mCamRotateSpeed = 0.006;
 	static float mKeyboardMoveSpeed = 3000.0;
