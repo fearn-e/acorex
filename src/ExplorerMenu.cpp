@@ -291,7 +291,16 @@ void ExplorerMenu::Draw ( )
 			ofSetColor ( 0, 0, 0, 255 );
 			ofDrawBitmapString ( "ID:" + ofToString ( playhead.playheadID ), playhead.panelRect.x + 5, playhead.panelRect.y + 15 );
 			// draw file index in the top left
-			ofDrawBitmapString ( "File: " + ofToString ( playhead.fileIndex ), playhead.panelRect.x + 5, playhead.panelRect.y + 30 );
+			std::string fileName = mRawView->GetDataset ( )->fileList[playhead.fileIndex];
+			fileName = fileName.substr ( fileName.find_last_of ( "/" ) + 1 );
+			fileName = fileName.substr ( fileName.find_last_of ( "\\" ) + 1 );
+			int maxLength = playhead.panelRect.width / 10 - 7;
+			if ( fileName.length ( ) > maxLength )
+			{
+				fileName = fileName.substr ( 0, maxLength );
+				fileName += "...";
+			}
+			ofDrawBitmapString ( "File: " + fileName, playhead.panelRect.x + 5, playhead.panelRect.y + 30 );
 			// draw sample index in the top left
 			ofDrawBitmapString ( "Samp: " + ofToString ( playhead.sampleIndex ), playhead.panelRect.x + 5, playhead.panelRect.y + 45 );
 
