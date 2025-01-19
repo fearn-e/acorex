@@ -144,7 +144,7 @@ echo ""
         fi
 
         cd $currentDir
-        
+
     else
         # On Windows & Mac
         cd ../../../addons
@@ -258,13 +258,13 @@ echo ""
         cmake -DFOONATHAN_MEMORY_BUILD_TESTS=OFF -DFOONATHAN_MEMORY_BUILD_TOOLS=OFF -DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF .
 
         echo ""
-        echo "creating debug lib"
+        echo "building foonathan_memory debug lib"
         echo ""
 
         cmake --build . --config Debug
 
         echo ""
-        echo "creating release lib"
+        echo "building foonathan_memory release lib"
         echo ""
 
         cmake --build . --config Release
@@ -274,7 +274,7 @@ echo ""
         cmake "-DCMAKE_OSX_ARCHITECTURES=x86_64;arm64" -DFOONATHAN_MEMORY_BUILD_TESTS=OFF -DFOONATHAN_MEMORY_BUILD_TOOLS=OFF -DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF .
 
         echo ""
-        echo "creating release lib"
+        echo "building foonathan_memory lib"
         echo ""
 
         cmake --build .
@@ -284,7 +284,7 @@ echo ""
         cmake -DFOONATHAN_MEMORY_BUILD_TESTS=OFF -DFOONATHAN_MEMORY_BUILD_TOOLS=OFF -DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF .
 
         echo ""
-        echo "creating release lib"
+        echo "building foonathan_memory lib"
         echo ""
 
         cmake --build .
