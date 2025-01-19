@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "${workspaceRoot}/../../../../libs/openFrameworks"
+		},
+		{
+			"path": "${workspaceRoot}/../../openframeworks/addons/ofxAudioFile"
+		},
+		{
+			"path": "${workspaceRoot}/../../openframeworks/addons/ofxDropdown"
+		},
+		{
+			"path": "${workspaceRoot}/../../openframeworks/addons/ofxGui"
+		}
+	],
+	"openFrameworksProjectGeneratorVersion": "0.86.0",
+	"settings": {}
+}
