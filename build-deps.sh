@@ -27,6 +27,12 @@ set -o errexit
         FORCE_DOWNLOAD=true
     elif [ $ARG1 == "-c" ] || [ $ARG2 == "-c" ]; then
         FORCE_COMPILE=true
+    elif [ $ARG1 == "-h" ] || [ $ARG2 == "-h" ]; then
+        echo "Usage: ./build-deps.sh [-d/c/h] [-d/c/h]"
+        echo "  -d  force (re)download of all dependencies"
+        echo "  -c  force (re)compile of foonathan memory"
+        echo "  -h  display this help message"
+        exit
     fi
 #
 
@@ -38,8 +44,11 @@ set -o errexit
     elif [ "$OSTYPE" == "msys" ] || [ "$OSTYPE" == "win32" ]; then
         # Lightweight shell and GNU utilities compiled for Windows (part of MinGW), not sure if win32 can even happen?
         currentOS="win"
+    elif [ "$OSTYPE" == "linux-gnu" ]; then
+        # Linux
+        currentOS="linux"
     else
-        # Unknown, cygwin, linux-gnu
+        # Unknown, cygwin
         echo "no official support for this OS, script functionality may not be as expected, continue? (y/n)"
         CONFIRM="n"
         read -p "" CONFIRM
@@ -49,83 +58,114 @@ set -o errexit
     fi
 #
 
+echo "OS discovered as $currentOS"
+echo ""
+
 # Check Current Directory & OpenFrameworks Exists
     CURRENT_FOLDER=${PWD##*/}
     if [ "$CURRENT_FOLDER" != "acorex" ]; then
         echo "Incorrect working directory"
         exit
     fi
-
-    OF_FOUND=false
-
-    cd ..
-    CURRENT_FOLDER=${PWD##*/}
-    if [ "$CURRENT_FOLDER" == "myApps" ]; then
-        cd ..
-        CURRENT_FOLDER=${PWD##*/}
-        if [ "$CURRENT_FOLDER" == "apps" ]; then
-            cd myApps/acorex
-            echo "openframeworks found"
-            OF_FOUND=true
-        else
-            cd myApps/acorex
+    if [ "$currentOS" == "linux" ]; then
+        # On Linux
+        if [ -z ${PG_OF_PATH+x} ]; then
+            echo "PG_OF_PATH is unset, set PG_OF_PATH environment variable to the path of your openframeworks installation"
+            echo "e.g. export PG_OF_PATH=/home/user/openframeworks"
+            exit
         fi
     else
-        cd acorex
-    fi
+        # On Windows & Mac
+        OF_FOUND=false
 
-    if [ $OF_FOUND == false ]; then
-        echo "openframeworks not found, downloading..."
         cd ..
-        git -c advice.detachedHead=false clone --depth 1 -b "acorex" https://github.com/fearn-e/openframeworks
-        
-        cd openframeworks/apps
-        
-        if [ ! -d "myApps" ]; then
-            mkdir myApps
-        fi
-        cd ../..
-
-        cp -rv acorex/ openframeworks/apps/myApps/acorex/
-        rm -rfv acorex
-
-        cd openframeworks/scripts
-
-        if [ "$currentOS" == "win" ]; then
-            cd vs
-            source download_libs.sh
-        elif [ "$currentOS" == "mac" ]; then
-            cd osx
-            source download_libs.sh
+        CURRENT_FOLDER=${PWD##*/}
+        if [ "$CURRENT_FOLDER" == "myApps" ]; then
+            cd ..
+            CURRENT_FOLDER=${PWD##*/}
+            if [ "$CURRENT_FOLDER" == "apps" ]; then
+                cd myApps/acorex
+                echo "openframeworks found"
+                OF_FOUND=true
+            else
+                cd myApps/acorex
+            fi
+        else
+            cd acorex
         fi
 
-        cd ../../apps/myApps/acorex
+        if [ $OF_FOUND == false ]; then
+            echo "openframeworks not found, downloading..."
+            cd ..
+            git -c advice.detachedHead=false clone --depth 1 -b "acorex" https://github.com/fearn-e/openframeworks
+            
+            cd openframeworks/apps
+            
+            if [ ! -d "myApps" ]; then
+                mkdir myApps
+            fi
+            cd ../..
+
+            cp -rv acorex/ openframeworks/apps/myApps/acorex/
+            rm -rfv acorex
+
+            cd openframeworks/scripts
+
+            if [ "$currentOS" == "win" ]; then
+                cd vs
+                source download_libs.sh
+            elif [ "$currentOS" == "mac" ]; then
+                cd osx
+                source download_libs.sh
+            fi
+
+            cd ../../apps/myApps/acorex
+        fi
     fi
 #
 
-echo "OS discovered as $currentOS"
-
-# Download repos & OF addons
+# Download OF addons
     echo "--------------------------------------------------"
     echo "downloading openframeworks addons"
     echo ""
+    if [ "$currentOS" == "linux" ]; then
+        # On Linux
+        currentDir=${PWD}
+        cd $PG_OF_PATH/addons
 
-    cd ../../../addons
+        if [ ! -d "ofxDropdown" ]; then
+            git clone --depth 1 -b master https://github.com/fearn-e/ofxDropdown
+            echo ""
+        fi
 
-    if [ ! -d "ofxDropdown" ]; then
-        git clone --depth 1 -b master https://github.com/fearn-e/ofxDropdown
-        echo ""
+        if [ ! -d "ofxAudioFile" ]; then
+            git clone --depth 1 -b master https://github.com/fearn-e/ofxAudioFile
+            echo ""
+        fi
+
+        cd $currentDir
+        
+    else
+        # On Windows & Mac
+        cd ../../../addons
+
+        if [ ! -d "ofxDropdown" ]; then
+            git clone --depth 1 -b master https://github.com/fearn-e/ofxDropdown
+            echo ""
+        fi
+
+        if [ ! -d "ofxAudioFile" ]; then
+            git clone --depth 1 -b master https://github.com/fearn-e/ofxAudioFile
+            echo ""
+        fi
+
+        cd ../apps/myApps/acorex
     fi
+#
 
-    if [ ! -d "ofxAudioFile" ]; then
-        git clone --depth 1 -b master https://github.com/fearn-e/ofxAudioFile
-        echo ""
-    fi
-
-    cd ../apps/myApps/acorex
-
+# Download dependencies
     echo "--------------------------------------------------"
-    echo "downloading repos to deps-pre-build"
+    echo "downloading dependencies to deps-pre-build"
     echo ""
 
     declare -i FORCE_DOWNLOAD_TIP=0
@@ -228,9 +268,20 @@ echo "OS discovered as $currentOS"
         echo ""
 
         cmake --build . --config Release
+
     elif [ $MEMORY_CMAKE_NEEDED == true ] && [ "$currentOS" == "mac" ]; then
         echo "macos"
         cmake "-DCMAKE_OSX_ARCHITECTURES=x86_64;arm64" -DFOONATHAN_MEMORY_BUILD_TESTS=OFF -DFOONATHAN_MEMORY_BUILD_TOOLS=OFF -DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF .
+
+        echo ""
+        echo "creating release lib"
+        echo ""
+
+        cmake --build .
+
+    elif [ $MEMORY_CMAKE_NEEDED == true ] && [ "$currentOS" == "linux" ]; then
+        echo "linux"
+        cmake -DFOONATHAN_MEMORY_BUILD_TESTS=OFF -DFOONATHAN_MEMORY_BUILD_TOOLS=OFF -DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF .
 
         echo ""
         echo "creating release lib"
@@ -282,3 +333,4 @@ echo "OS discovered as $currentOS"
 
 echo "--------------------------------------------------"
 echo "script finished"
+exit
