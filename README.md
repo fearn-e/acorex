@@ -1,5 +1,5 @@
 # ACorEx
-[3D Audio Corpus Explorer](https://fearn-e.github.io/acorex/) is a tool for exploring audio corpora, similar to existing software like AudioStellar and CataRT. It was created to investigate ideas of 3D navigation and time series analysis in this space, and to help researchers and musicians to navigate through large collections of audio files. The tool provides an interface for analysing, browsing, and listening to audio files.
+[3D Audio Corpus Explorer](https://acorex.fearne.net) is a tool for exploring audio corpora, similar to existing software like AudioStellar and CataRT. It was created to investigate ideas of 3D navigation and time series analysis in this space, and to help researchers and musicians to navigate through large collections of audio files. The tool provides an interface for analysing, browsing, and listening to audio files.
 
 # Developers 
 ### Build Requirements
