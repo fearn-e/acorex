@@ -20,6 +20,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <vector>
 #include <queue>
 #include <nlohmann/json.hpp>
+#include <raylib.h>
 
 #define DATA_CHANGE_CHECK_1
 
@@ -39,7 +40,8 @@ enum class Axis : int {
 
 struct AudioData {
 	std::vector<bool> loaded; // [file]
-	std::vector<ofSoundBuffer> raw; // [file]
+	std::vector<std::vector<float>> mono; // [file][sample]
+	std::vector<size_t> size; // [file]
 };
 
 struct TimeData {
@@ -124,8 +126,8 @@ struct VisualPlayhead {
 
 	float position[3] = { 0.0, 0.0, 0.0 };
 
-	ofColor color = ofColor ( 255, 255, 255, 255 );
-	ofRectangle panelRect = ofRectangle ( 0, 0, 0, 0 );
+	Color color = WHITE;
+	Rectangle panelRect = { 0, 0, 0, 0 };
 };
 
 } // namespace Utils

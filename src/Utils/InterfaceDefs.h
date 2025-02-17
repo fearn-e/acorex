@@ -15,6 +15,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 */
 
 #pragma once
+#include <raylib.h>
 
 #define TOP_BAR_HEIGHT					40
 #define TOP_BAR_BUTTON_WIDTH			100
@@ -25,17 +26,19 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #define INTER_PANEL_SPACING				5
 #define PANEL_BACKGROUND_MARGIN			5
 
+#define COLOR_TRANSPARENT_BLACK			{ 0, 0, 0, 150 }
+
 namespace Acorex {
 namespace Utils {
 
 	struct Colors {
 		// normal and locked text colour
-		ofColor normalTextColor = 255;
-		ofColor lockedTextColor = 130;
+		Color normalTextColor = WHITE;
+		Color lockedTextColor = GRAY;
 
 		// interface background colour
-		ofColor interfaceBackgroundColor = { 0, 0, 0, 150 };
-		ofColor transparent = { 0, 0, 0, 0 };
+		Color interfaceBackgroundColor = COLOR_TRANSPARENT_BLACK;
+		Color transparent = BLANK;
 	};
 
 	struct MenuLayout {
@@ -55,7 +58,7 @@ namespace Utils {
 
 		int analysePanelOriginX = 0; int analysePanelOriginY = topBarHeight + interPanelSpacing;
 		int explorePanelOriginY = topBarHeight + interPanelSpacing;
-		glm::vec3 hiddenPanelPosition = { -1000, -1000, 0 };
+		Vector3 hiddenPanelPosition = { -1000, -1000, 0 };
 
 		void disableHiDpi ( )
 		{
