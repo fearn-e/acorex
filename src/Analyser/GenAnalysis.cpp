@@ -28,7 +28,7 @@ using namespace Acorex;
 
 int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 {  
-    ofLogNotice ( "GenAnalysis" ) << "Calculating file lengths...";
+    std::cout << "Calculating file lengths...";
     double fileLengthSumTracker = 0;
     double fileLengthSumTotal = 0;
 
@@ -44,7 +44,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
         fileLengthSumTotal = sampleTotal;
     }
 
-    ofLogNotice ( "GenAnalysis" ) << "Total sample count: " << fileLengthSumTotal;
+    std::cout << "Total sample count: " << fileLengthSumTotal;
 
     if ( dataset.analysisSettings.bTime )
     {
@@ -256,15 +256,15 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
             int etaHours = eta / 3600; int etaMinutes = (eta - (etaHours * 3600)) / 60; int etaSeconds = eta - (etaHours * 3600) - (etaMinutes * 60);
             if ( etaHours > 0 )
             {
-                ofLogNotice ( "GenAnalysis" ) << "Progress: " << progress << "% | ETA: " << etaHours << "h " << etaMinutes << "m " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex];
+                std::cout << "Progress: " << progress << "% | ETA: " << etaHours << "h " << etaMinutes << "m " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex];
             }
             else if ( etaMinutes > 0 )
             {
-                ofLogNotice ( "GenAnalysis" ) << "Progress: " << progress << "% | ETA: " << etaMinutes << "m " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex];
+                std::cout << "Progress: " << progress << "% | ETA: " << etaMinutes << "m " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex];
             }
             else
             {
-                ofLogNotice ( "GenAnalysis" ) << "Progress: " << progress << "% | ETA: " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex];
+                std::cout << "Progress: " << progress << "% | ETA: " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex];
             }
         }
     }

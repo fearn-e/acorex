@@ -36,12 +36,12 @@ bool Analyser::Controller::CreateCorpus ( const std::string& inputPath, const st
 	int numAnalysed = mGenAnalysis.ProcessFiles ( dataset );
 	if ( numAnalysed > 0 )
 	{
-		ofLogNotice ( "Controller" ) << "Processed " << filesIn << " files into " << dataset.currentPointCount 
+		std::cout << "Processed " << filesIn << " files into " << dataset.currentPointCount 
 			<< " points, with " << dataset.fileList.size ( ) - numAnalysed << " files failed.";
 	}
 	else 
 	{ 
-		ofLogError ( "Controller" ) << "Failed to process any files.";
+		std::cerr << "Failed to process any files.";
 		return false;
 	}
 
@@ -112,14 +112,14 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
 
 		if ( newFilesTreated.empty ( ) )
 		{
-			ofLogError ( "Controller" ) << "No new files left to process.";
+			std::cerr << "No new files left to process.";
 			return false;
 		}
 
 		newFiles.clear ( );
 		newFiles = newFilesTreated;
 
-		ofLogNotice ( "Controller" ) << newFiles.size ( ) << " new files left to process, with " << preTreated - newFiles.size ( ) << " duplicates removed.";
+		std::cout << newFiles.size ( ) << " new files left to process, with " << preTreated - newFiles.size ( ) << " duplicates removed.";
 	}
 
 	Utils::DataSet newDataset;
@@ -133,12 +133,12 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
 	int numAnalysed = mGenAnalysis.ProcessFiles ( newDataset );
 	if ( numAnalysed > 0 )
 	{
-		ofLogNotice ( "Controller" ) << "Processed " << filesIn << " files into " << newDataset.currentPointCount
+		std::cout << "Processed " << filesIn << " files into " << newDataset.currentPointCount
 			<< " points, with " << newDataset.fileList.size ( ) - numAnalysed << " files failed.";
 	}
 	else
 	{
-		ofLogError ( "Controller" ) << "Failed to process any files.";
+		std::cerr << "Failed to process any files.";
 		return false;
 	}
 
@@ -146,11 +146,11 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
 
 	if ( newReplacesExisting )
 	{
-		ofLogNotice ( "Controller" ) << "Replaced existing dataset with new files, with " << mergeInfo[1] << " not previously existing added and " << mergeInfo[2] << " overwriting existing.";
+		std::cout << "Replaced existing dataset with new files, with " << mergeInfo[1] << " not previously existing added and " << mergeInfo[2] << " overwriting existing.";
 	}
 	else
 	{
-		ofLogNotice ( "Controller" ) << "Merged new files into dataset, with " << mergeInfo[0] << " already existing skipped and " << mergeInfo[1] << " not previously existing added.";
+		std::cout << "Merged new files into dataset, with " << mergeInfo[0] << " already existing skipped and " << mergeInfo[1] << " not previously existing added.";
 	}
 
 	success = mJSON.Write ( outputPath, existingDataset );
@@ -262,7 +262,7 @@ bool Analyser::Controller::SearchDirectory ( const std::string& directory, std::
 
 	if ( files.empty ( ) )
 	{
-		ofLogError ( "Controller" ) << "No files found in " << directory;
+		std::cerr << "No files found in " << directory;
 		return false;
 	}
 

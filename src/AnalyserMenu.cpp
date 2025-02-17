@@ -380,7 +380,7 @@ void AnalyserMenu::Analyse ( )
 	{
 		flashColour = 255;
 		bFlashingInvalidFileSelects = true;
-		ofLogError ( "AnalyserMenu" ) << "Analysis directory or output file not selected";
+		std::cerr << "Analysis directory or output file not selected";
 		return;
 	}
 
@@ -388,7 +388,7 @@ void AnalyserMenu::Analyse ( )
 	{
 		flashColour = 255;
 		bFlashingInvalidAnalysisToggles = true;
-		ofLogError ( "AnalyserMenu" ) << "No analysis types selected";
+		std::cerr << "No analysis types selected";
 		return;
 	}
 
@@ -416,7 +416,7 @@ void AnalyserMenu::Analyse ( )
 
 	// TODO - ask if user wants to reduce the data or view it in the corpus viewer
 	ShowMainPanel ( );
-	ofLogNotice ( "AnalyserMenu" ) << "Corpus created";
+	std::cout << "Corpus created";
 	//------------------------------------------------ TEMPORARY
 }
 
@@ -426,7 +426,7 @@ void AnalyserMenu::Reduce ( )
 	{
 		flashColour = 255;
 		bFlashingInvalidFileSelects = true;
-		ofLogError ( "AnalyserMenu" ) << "Reduction input or output file not selected";
+		std::cerr << "Reduction input or output file not selected";
 		return;
 	}
 
@@ -434,7 +434,7 @@ void AnalyserMenu::Reduce ( )
 	{
 		flashColour = 255;
 		bFlashingInvalidReductionDimensions = true;
-		ofLogError ( "AnalyserMenu" ) << "Can't reduce to more dimensions than currently exist";
+		std::cerr << "Can't reduce to more dimensions than currently exist";
 		return;
 	}
 
@@ -455,7 +455,7 @@ void AnalyserMenu::Reduce ( )
 
 	// TODO - ask if user wants to open the reduced data in the corpus viewer
 	ShowMainPanel ( );
-	ofLogNotice ( "AnalyserMenu" ) << "Corpus reduced";
+	std::cout << "Corpus reduced";
 	//------------------------------------------------ TEMPORARY
 }
 
@@ -466,12 +466,12 @@ void AnalyserMenu::SelectAnalysisDirectory ( )
 	ofFileDialogResult audioDirectory = ofSystemLoadDialog ( "Select folder containing audio files...", true, ofFilePath::getCurrentWorkingDirectory ( ) );
 	if ( !audioDirectory.bSuccess )
 	{
-		ofLogError ( "AnalyserMenu" ) << "No folder selected";
+		std::cerr << "No folder selected";
 		return;
 	}
 	if ( !ofDirectory::doesDirectoryExist ( audioDirectory.getPath ( ) ) )
 	{
-		ofLogError ( "AnalyserMenu" ) << "Invalid directory";
+		std::cerr << "Invalid directory";
 		return;
 	}
 
@@ -490,12 +490,12 @@ void AnalyserMenu::SelectAnalysisOutputFile ( )
 	ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus.json", "Save analysed corpus as..." );
 	if ( !outputFile.bSuccess )
 	{
-		ofLogError ( "AnalyserMenu" ) << "Invalid save query";
+		std::cerr << "Invalid save query";
 		return;
 	}
 	if ( outputFile.getName ( ).find ( ".json" ) == std::string::npos )
 	{
-		ofLogNotice ( "AnalyserMenu" ) << "Added missing .json extension";
+		std::cout << "Added missing .json extension";
 		outputFile.filePath += ".json";
 		outputFile.fileName += ".json";
 	}
@@ -519,7 +519,7 @@ void AnalyserMenu::SelectAnalysisOutputFile ( )
 
 		if ( settings.hasBeenReduced )
 		{
-			ofLogError ( "AnalyserMenu" ) << "Can't insert into an already reduced dataset";
+			std::cerr << "Can't insert into an already reduced dataset";
 			return;
 		}
 
@@ -537,17 +537,17 @@ void AnalyserMenu::SelectReductionInputFile ( )
 	ofFileDialogResult inputFile = ofSystemLoadDialog ( "Select a corpus file...", false, ofFilePath::getCurrentWorkingDirectory ( ) );
 	if ( !inputFile.bSuccess )
 	{
-		ofLogError ( "AnalyserMenu" ) << "No file selected";
+		std::cerr << "No file selected";
 		return;
 	}
 	if ( !ofFile::doesFileExist ( inputFile.getPath ( ) ) )
 	{
-		ofLogError ( "AnalyserMenu" ) << "Invalid file";
+		std::cerr << "Invalid file";
 		return;
 	}
 	if ( inputFile.getName ( ).find ( ".json" ) == std::string::npos )
 	{
-		ofLogError ( "AnalyserMenu" ) << "Invalid file extension";
+		std::cerr << "Invalid file extension";
 		return;
 	}
 
@@ -556,7 +556,7 @@ void AnalyserMenu::SelectReductionInputFile ( )
 	if ( !success ) { return; }
 	if ( settings.currentDimensionCount <= 2 )
 	{
-		ofLogError ( "AnalyserMenu" ) << "Analysis already contains the minimum number of dimensions";
+		std::cerr << "Analysis already contains the minimum number of dimensions";
 		return;
 	}
 
@@ -576,12 +576,12 @@ void AnalyserMenu::SelectReductionOutputFile ( )
 	ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus_reduced.json", "Save reduced corpus as..." );
 	if ( !outputFile.bSuccess )
 	{
-		ofLogError ( "AnalyserMenu" ) << "Invalid save query";
+		std::cerr << "Invalid save query";
 		return;
 	}
 	if ( outputFile.getName ( ).find ( ".json" ) == std::string::npos )
 	{
-		ofLogNotice ( "AnalyserMenu" ) << "Added missing .json extension";
+		std::cout << "Added missing .json extension";
 		outputFile.filePath += ".json";
 		outputFile.fileName += ".json";
 	}

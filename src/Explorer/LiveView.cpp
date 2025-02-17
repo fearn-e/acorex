@@ -167,7 +167,7 @@ void Explorer::LiveView::UpdatePlayheads ( )
 	{
 		if ( std::find_if ( playheadUpdates.begin ( ), playheadUpdates.end ( ), [this, i]( Utils::VisualPlayhead& playhead ) { return playhead.playheadID == mPlayheads[i].playheadID; } ) == playheadUpdates.end ( ) )
 		{
-			ofLogNotice ( "LiveView" ) << "Playhead " << mPlayheads[i].playheadID << " deleted";
+			std::cout << "Playhead " << mPlayheads[i].playheadID << " deleted";
 
 			// if not the final one, move all after it back to the left
 			int j = mPlayheads.size ( ) - 1; int end = i;
@@ -198,7 +198,7 @@ void Explorer::LiveView::UpdatePlayheads ( )
 		}
 		else
 		{
-			ofLogNotice ( "LiveView" ) << "Playhead " << playheadUpdates[i].playheadID << " added";
+			std::cout << "Playhead " << playheadUpdates[i].playheadID << " added";
 
 			mPlayheads.push_back ( playheadUpdates[i] );
 			int rectWidth = ofGetWidth ( ) / 10; int rectSpacing = ofGetWidth ( ) / 100; int rectHeight = ofGetHeight ( ) / 10;
@@ -469,7 +469,7 @@ void Explorer::LiveView::OLD_PlaySound ( )
 
 	ofSoundPlayer soundPlayer;
 	bool success = soundPlayer.load ( filePath );
-	if ( !success ) { ofLogError ( "Explorer" ) << "Failed to load sound file: " << filePath; return; }
+	if ( !success ) { std::cerr << "Failed to load sound file: " << filePath; return; }
 
 	mPlayingFiles.push_back ( mPointPicker->GetNearestMousePointFile ( ) );
 	if ( mRawView->IsTimeAnalysis ( ) )
@@ -724,7 +724,7 @@ void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
 
 void Explorer::LiveView::RefreshFileColors ( int fileIndex )
 {
-	if ( bDebug ) { ofLogNotice ( "Explorer" ) << "Refreshing file colors for file: " << mRawView->GetDataset ( )->fileList[fileIndex]; }
+	if ( bDebug ) { std::cout << "Refreshing file colors for file: " << mRawView->GetDataset ( )->fileList[fileIndex]; }
 
 	double min = mDimensionBounds.GetMinBound ( colorDimension );
 	double max = mDimensionBounds.GetMaxBound ( colorDimension );
