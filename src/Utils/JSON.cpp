@@ -31,7 +31,7 @@ bool Utils::JSON::Write ( const std::string& outputFile, const DataSet& dataset 
 	}
 	catch ( std::exception& e )
 	{
-		ofLogError ( "JSON" ) << "failed to write output to " << outputFile << " : " << e.what ( );
+		std::cerr << "failed to write output to " << outputFile << " : " << e.what ( );
 		return false;
 	}
 
@@ -52,7 +52,7 @@ bool Utils::JSON::Read ( const std::string& inputFile, DataSet& dataset )
 	}
 	catch ( std::exception& e )
 	{
-		ofLogError ( "JSON" ) << "failed to read input " << inputFile << " : " << e.what ( );
+		std::cerr << "failed to read input " << inputFile << " : " << e.what ( );
 		return false;
 	}
 
@@ -73,7 +73,7 @@ bool Utils::JSON::Read ( const std::string& inputFile, AnalysisSettings& setting
 	}
 	catch ( std::exception& e )
 	{
-		ofLogError ( "JSON" ) << "failed to read input " << inputFile << " : " << e.what ( );
+		std::cerr << "failed to read input " << inputFile << " : " << e.what ( );
 		return false;
 	}
 

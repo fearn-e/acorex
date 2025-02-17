@@ -461,7 +461,7 @@ int ExplorerMenu::GetDimensionIndex ( std::string& dimension )
 			return i;
 		}
 	}
-	ofLogWarning ( "LiveView" ) << "Dimension " << dimension << " not found";
+	std::cerr << "Dimension " << dimension << " not found";
 	return -1;
 }
 

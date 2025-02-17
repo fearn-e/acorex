@@ -109,9 +109,9 @@ void Explorer::PointPicker::Train ( int dimensionIndex, Utils::Axis axis, bool n
 		mLiveFluidSet.add ( mFullFluidSet.getIds ( )[point], pointData );
 	}
 
-	ofLogNotice ( "PointPicker" ) << "Training KDTree...";
+	std::cout << "Training KDTree...";
 	mKDTree = fluid::algorithm::KDTree ( mLiveFluidSet );
-	ofLogNotice ( "PointPicker" ) << "KDTree Trained.";
+	std::cout << "KDTree Trained.";
 	bTrained = true;
 
 	if ( dimsFilled == 2 ) { b3D = false; }

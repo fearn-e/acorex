@@ -25,7 +25,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
 
     if ( !ofFile::doesFileExist ( filename ) )
     {
-        ofLogError ( "GenAnalysis" ) << "input file " << filename << " does not exist";
+        std::cerr << "input file " << filename << " does not exist";
         return false;
     }
 
@@ -35,16 +35,16 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
 
         if ( !file.is_open ( ) )
         {
-            ofLogError ( "GenAnalysis" ) << "input file " << filename << " could not be opened";
+            std::cerr << "input file " << filename << " could not be opened";
             return false;
         }
 
         if ( file.is_error ( ) )
         {
-            ofLogError ( "GenAnalysis" ) << "input file " << filename << " returned errors:";
+            std::cerr << "input file " << filename << " returned errors:";
             for ( auto& error : file.get_errors ( ) )
             {
-				ofLogError ( "GenAnalysis" ) << file.error_string ( error );
+				std::cerr << file.error_string ( error );
 			}
             return false;
         }
@@ -66,7 +66,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
 
         if ( !file.loaded ( ) )
         {
-            ofLogError ( "GenAnalysis" ) << "input file " << filename << " could not be opened";
+            std::cerr << "input file " << filename << " could not be opened";
             return false;
         }
 
@@ -81,7 +81,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
     }
     else
     {
-        ofLogError ( "GenAnalysis" ) << "input file " << filename << " is not supported";
+        std::cerr << "input file " << filename << " is not supported";
 		return false;
     }
 
