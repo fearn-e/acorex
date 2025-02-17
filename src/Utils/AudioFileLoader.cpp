@@ -15,57 +15,30 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 */
 
 #include "./AudioFileLoader.h"
+#include "./ResampleAudio.h"
+#include <raylib.h>
 #include <iostream>
+#include <filesystem>
 
 using namespace Acorex;
 
+//for files ending in .wav, .flac, .mp3, .ogg
 bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVector& output, double targetSampleRate )
 {
-    //if file ends in .wav, .aiff, .flac - use htl::in_audio_file
-    //if file ends in .mp3, .ogg - use ofxAudioFile
-
-    if ( !ofFile::doesFileExist ( filename ) )
+    if ( std::filesystem::exists (filename ) )
     {
         std::cerr << "input file " << filename << " does not exist";
         return false;
     }
 
-    /*if ( filename.find ( ".wav" ) != std::string::npos || filename.find ( ".flac" ) != std::string::npos )
-    {
-        htl::in_audio_file file ( filename.c_str ( ) );
-
-        if ( !file.is_open ( ) )
-        {
-            std::cerr << "input file " << filename << " could not be opened";
-            return false;
-        }
-
-        if ( file.is_error ( ) )
-        {
-            std::cerr << "input file " << filename << " returned errors:";
-            for ( auto& error : file.get_errors ( ) )
-            {
-				std::cerr << file.error_string ( error );
-			}
-            return false;
-        }
-
-        std::vector<float> temp;
-
-        ReadToMono ( temp, file );
-
-        Resample ( temp, file.sampling_rate ( ), targetSampleRate );
-
-        output.resize ( file.frames ( ) );
-        std::copy ( temp.begin ( ), temp.end ( ), output.data ( ) );
-    }*/
     if ( filename.find ( ".mp3" ) != std::string::npos || filename.find ( ".ogg" ) != std::string::npos ||
         filename.find ( ".wav" ) != std::string::npos || filename.find ( ".flac" ) != std::string::npos )
     {
-        ofxAudioFile file;
-        file.load ( filename );
+        Wave file;
 
-        if ( !file.loaded ( ) )
+        file = LoadWave ( filename.c_str ( ) );
+
+        if ( IsWaveValid ( file ) )
         {
             std::cerr << "input file " << filename << " could not be opened";
             return false;
@@ -75,8 +48,14 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
 
         ReadToMono ( temp, file );
 
-        Resample ( temp, file.samplerate ( ), targetSampleRate );
-
+        ResampleAudio resampler;
+        bool success = resampler.hermiteResampleTo (    temp, (double)file.sampleRate, targetSampleRate, 
+                                                        (file.frameCount / file.channels), file.channels );
+        if (!success)
+        {
+            std::cerr << "loading failed due to resampling error, file: " << filename;
+            return false;
+        }
         output.resize ( temp.size ( ) );
         std::copy ( temp.begin ( ), temp.end ( ), output.data ( ) );
     }
@@ -89,76 +68,32 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
     return true;
 }
 
-//void Utils::AudioFileLoader::ReadToMono ( std::vector<float>& output, htl::in_audio_file& file )
-//{
-//    int numChannels = file.channels ( );
-//    int numSamples = file.frames ( );
-//    output.resize ( numSamples );
-//
-//    if ( numChannels == 1 )
-//    {
-//        file.read_channel ( output.data ( ), numSamples, 0 );
-//        return;
-//    }
-//
-//    std::fill ( output.begin ( ), output.end ( ), 0 );
-//
-//    std::vector<std::vector<double>> allChannels ( numChannels, std::vector<double> ( numSamples ) );
-//
-//    for ( int channel = 0; channel < numChannels; channel++ )
-//    {
-//        file.read_channel ( allChannels[channel].data ( ), numSamples, channel );
-//    }
-//
-//#pragma omp parallel for
-//    for ( int sample = 0; sample < numSamples; sample++ )
-//    {
-//        for ( int channel = 0; channel < numChannels; channel++ )
-//        {
-//            output[sample] += allChannels[channel][sample];
-//        }
-//        output[sample] /= numChannels;
-//    }
-//
-//}
-
-void Utils::AudioFileLoader::ReadToMono ( std::vector<float>& output, ofxAudioFile& file )
+void Utils::AudioFileLoader::ReadToMono ( std::vector<float>& output, Wave& file )
 {
-    int numChannels = file.channels ( );
-    int numSamples = file.length ( );
+    size_t numChannels = file.channels;
+    size_t numSamples = file.frameCount / numChannels;
     output.resize ( numSamples );
+
+    float* samples = LoadWaveSamples ( file );
 
     if ( numChannels == 1 )
     {
-        for ( int sample = 0; sample < numSamples; sample++ )
-        {
-            output[sample] = file.sample ( sample, 0 );
-        }
-        return;
+        output.assign(samples, samples + numSamples);
     }
-
-    std::fill ( output.begin ( ), output.end ( ), 0 );
+    else
+    {
+        std::fill ( output.begin ( ), output.end ( ), 0 );
 
 #pragma omp parallel for
-    for ( int sample = 0; sample < numSamples; sample++ )
-    {
-        for ( int channel = 0; channel < numChannels; channel++ )
+        for ( size_t sample = 0; sample < numSamples; sample++ )
         {
-            output[sample] += file.sample ( sample, channel );
+            for ( size_t channel = 0; channel < numChannels; channel++ )
+            {
+                output[sample] += samples[sample * numChannels + channel];
+            }
+            output[sample] /= numChannels;
         }
-        output[sample] /= numChannels;
     }
-}
 
-void Utils::AudioFileLoader::Resample ( std::vector<float>& audio, double fileRate, double targetRate  )
-{
-    ofSoundBuffer resampleBuffer;
-
-    resampleBuffer.copyFrom ( audio, 1, fileRate );
-    
-    resampleBuffer.resample ( (fileRate / targetRate), ofSoundBuffer::Hermite );
-    resampleBuffer.setSampleRate ( targetRate );
-
-    audio.resize ( resampleBuffer.size ( ) );
-    resampleBuffer.copyTo ( audio.data ( ), resampleBuffer.size ( ), 1, 0, false );
+    UnloadWaveSamples(samples);
 }
