@@ -15,6 +15,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 */
 
 #include "raylib.h"
+#include "app.h"
 
 int main ()
 {
@@ -29,7 +30,7 @@ int main ()
 		BeginDrawing();
 			ClearBackground(BLACK);
 
-			DrawText("Hello Raylib", 200,200,20,WHITE);
+			DrawText("test", 200,200,20,WHITE);
 
 		EndDrawing();
 	}
