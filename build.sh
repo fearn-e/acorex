@@ -30,7 +30,7 @@ set -o errexit
     elif [ $ARG1 == "-h" ] || [ $ARG2 == "-h" ]; then
         echo "Usage: ./build-deps.sh [-d/c/h] [-d/c/h]"
         echo "  -d  force (re)download of all dependencies"
-        echo "  -c  force (re)compile of foonathan memory"
+        echo "  -c  force (re)compile of libraries"
         echo "  -h  display this help message"
         exit
     fi
@@ -61,115 +61,11 @@ set -o errexit
 echo "OS discovered as $currentOS"
 echo ""
 
-# Check Current Directory & OpenFrameworks Exists
+# Check Current Directory
     CURRENT_FOLDER=${PWD##*/}
     if [ "$CURRENT_FOLDER" != "acorex" ]; then
         echo "Incorrect working directory"
         exit
-    fi
-    if [ "$currentOS" == "linux" ]; then
-        # On Linux
-        if [ -z ${PG_OF_PATH+x} ]; then
-            echo "PG_OF_PATH is unset, set PG_OF_PATH environment variable to the path of your openframeworks installation"
-            echo "e.g. export PG_OF_PATH=/home/user/openframeworks"
-            exit
-        else
-            echo "OpenFrameworks found at $PG_OF_PATH"
-        fi
-    else
-        # On Windows & Mac
-        OF_FOUND=false
-
-        cd ..
-        CURRENT_FOLDER=${PWD##*/}
-        if [ "$CURRENT_FOLDER" == "myApps" ]; then
-            cd ..
-            CURRENT_FOLDER=${PWD##*/}
-            if [ "$CURRENT_FOLDER" == "apps" ]; then
-                cd myApps/acorex
-                echo "openframeworks found"
-                OF_FOUND=true
-            else
-                cd myApps/acorex
-            fi
-        else
-            cd acorex
-        fi
-
-        if [ $OF_FOUND == false ]; then
-            echo "openframeworks not found, downloading..."
-            cd ..
-            git -c advice.detachedHead=false clone --depth 1 -b "acorex" https://github.com/fearn-e/openframeworks
-            
-            cd openframeworks/apps
-            
-            if [ ! -d "myApps" ]; then
-                mkdir myApps
-            fi
-            cd ../..
-
-            cp -rv acorex/ openframeworks/apps/myApps/acorex/
-            rm -rfv acorex
-
-            cd openframeworks/scripts
-
-            if [ "$currentOS" == "win" ]; then
-                cd vs
-                source download_libs.sh
-            elif [ "$currentOS" == "mac" ]; then
-                cd osx
-                source download_libs.sh
-            fi
-
-            cd ../../apps/myApps/acorex
-        fi
-    fi
-#
-
-# Download OF addons
-    echo "--------------------------------------------------"
-    echo "downloading openframeworks addons"
-    echo ""
-    if [ "$currentOS" == "linux" ]; then
-        # On Linux
-        currentDir=${PWD}
-        cd $PG_OF_PATH/addons
-
-        if [ ! -d "ofxDropdown" ]; then
-            git clone --depth 1 -b master https://github.com/fearn-e/ofxDropdown
-            echo ""
-        else
-            echo "ofxDropdown already exists"
-        fi
-
-        if [ ! -d "ofxAudioFile" ]; then
-            git clone --depth 1 -b master https://github.com/fearn-e/ofxAudioFile
-            echo ""
-        else
-            echo "ofxAudioFile already exists"
-        fi
-
-        cd $currentDir
-
-    else
-        # On Windows & Mac
-        cd ../../../addons
-
-        if [ ! -d "ofxDropdown" ]; then
-            git clone --depth 1 -b master https://github.com/fearn-e/ofxDropdown
-            echo ""
-        else
-            echo "ofxDropdown already exists"
-        fi
-
-        if [ ! -d "ofxAudioFile" ]; then
-            git clone --depth 1 -b master https://github.com/fearn-e/ofxAudioFile
-            echo ""
-        else
-            echo "ofxAudioFile already exists"
-        fi
-
-        cd ../apps/myApps/acorex
     fi
 #
 
