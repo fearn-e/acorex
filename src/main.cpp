@@ -19,7 +19,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 int main ()
 {
 	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
-	InitWindow(1920, 1080, "Hello Raylib");
+	InitWindow(1920, 1080, "ACorEx");
 	SetExitKey(KEY_NULL);
 	
 	// main loop
