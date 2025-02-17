@@ -15,6 +15,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 */
 
 #include "./GenAnalysis.h"
+#include <iostream>
 
 #if __has_include(<omp.h>)
 #include <omp.h>

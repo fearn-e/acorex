@@ -16,6 +16,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "./RawView.h"
 #include <data/TensorTypes.hpp>
+#include <iostream>
 
 using namespace Acorex;
 
@@ -24,7 +25,7 @@ bool Explorer::RawView::LoadCorpus ( )
 	ofFileDialogResult corpusFile = ofSystemLoadDialog ( "Select corpus file" );
 	if ( !corpusFile.bSuccess )
 	{
-		ofLogError ( "RawView" ) << "Invalid load query";
+		std::cerr << "Invalid load query";
 		return false;
 	}
 	
@@ -37,12 +38,12 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
 {
 	if ( name.find ( ".json" ) == std::string::npos )
 	{
-		ofLogError ( "RawView" ) << "Invalid file type";
+		std::cerr << "Invalid file type";
 		return false;
 	}
 	if ( !ofFile::doesFileExist ( path ) )
 	{
-		ofLogError ( "RawView" ) << "File does not exist";
+		std::cerr << "File does not exist";
 		return false;
 	}
 
@@ -68,7 +69,7 @@ bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
 
 		if ( !mAudioLoader.ReadAudioFile ( dataset.fileList[fileIndex], fileData, dataset.analysisSettings.sampleRate ) )
 		{
-			ofLogError ( "RawView" ) << "Failed to load audio file: " << dataset.fileList[fileIndex];
+			std::cerr << "Failed to load audio file: " << dataset.fileList[fileIndex];
 			dataset.audio.loaded.push_back ( false );
 			dataset.audio.raw.push_back ( ofSoundBuffer ( ) );
 			continue;
@@ -93,7 +94,7 @@ bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
 
 	if ( failedToLoad )
 	{
-		ofLogError ( "RawView" ) << "Failed to load any audio files";
+		std::cerr << "Failed to load any audio files";
 		return false;
 	}
 

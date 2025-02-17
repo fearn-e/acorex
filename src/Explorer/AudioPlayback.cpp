@@ -16,6 +16,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "./AudioPlayback.h"
 #include <random>
+#include <iostream>
 
 using namespace Acorex;
 
@@ -307,7 +308,7 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t sampleIn
 		std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
 		if ( mNewPlayheads.size ( ) > 3 )
 		{
-			ofLogWarning ( "AudioPlayback" ) << "Too many playheads queued already, failed to create new playhead";
+			std::cerr << "Too many playheads queued already, failed to create new playhead";
 			return false;
 		}
 	}
@@ -328,7 +329,7 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t sampleIn
 	}
 	else
 	{
-		ofLogError ( "AudioPlayback" ) << "File not loaded in memory, failed to create playhead for " << mRawView->GetDataset ( )->fileList[fileIndex];
+		std::cerr << "File not loaded in memory, failed to create playhead for " << mRawView->GetDataset ( )->fileList[fileIndex];
 		return false;
 	}
 }
