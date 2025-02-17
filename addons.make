@@ -1,3 +1,0 @@
-ofxAudioFile
-ofxDropdown
-ofxGui
