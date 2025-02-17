@@ -74,6 +74,8 @@ echo ""
     echo "downloading dependencies to deps-pre-build"
     echo ""
 
+    cd include
+
     declare -i FORCE_DOWNLOAD_TIP=0
 
     if [ $FORCE_DOWNLOAD == true ] && [ -d "deps-pre-build" ]; then
@@ -85,6 +87,13 @@ echo ""
     fi
 
     cd deps-pre-build
+
+    if [ ! -d "clay" ]; then
+        git -c advice.detachedHead=false clone --depth 1 -b "v0.13" https://github.com/nicbarker/clay
+        echo ""
+    else
+        FORCE_DOWNLOAD_TIP+=1
+    fi
 
     if [ ! -d "flucoma-core" ]; then
         git -c advice.detachedHead=false clone --depth 1 -b acorex https://github.com/fearn-e/flucoma-core
@@ -222,6 +231,8 @@ echo ""
     cp -r   deps-pre-build/hisstools_library/include/                           deps/hisstools_library/
     cp -r   deps-pre-build/spectra/include/Spectra/                             deps/Spectra/
     cp -r   deps-pre-build/json/include/nlohmann/                               deps/nlohmann/
+    mkdir   deps/clay
+    cp      deps-pre-build/clay/clay.h                                          deps/clay/clay.h
 
     echo "copying libs..."
     #copy foonathan_memory compiled lib files
@@ -231,7 +242,7 @@ echo ""
     elif [ "$currentOS" == "mac" ] || [ "$currentOS" == "linux" ]; then
             cp  deps-pre-build/compiled-memory/src/libfoonathan_memory-*.a             libs/
     fi
-    
+
     #copy extra compiled foonathan_memory headers
     cp      deps-pre-build/compiled-memory/src/config_impl.hpp                  deps/memory/
     cp      deps-pre-build/compiled-memory/src/container_node_sizes_impl.hpp    deps/memory/
