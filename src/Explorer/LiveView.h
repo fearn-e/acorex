@@ -22,9 +22,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "./RawView.h"
 #include "./AudioPlayback.h"
 #include "Utils/Data.h"
-#include <ofMesh.h>
-#include <ofEasyCam.h>
-#include <ofSoundPlayer.h>
 
 namespace Acorex {
 namespace Explorer {

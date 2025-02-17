@@ -21,8 +21,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Utils/DatasetConversion.h"
 #include <algorithms/public/KDTree.hpp>
 #include <data/FluidDataSet.hpp>
-#include <ofCamera.h>
-#include <ofEvents.h>
 #include <mutex>
 #include <atomic>
 

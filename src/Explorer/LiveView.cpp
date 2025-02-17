@@ -15,11 +15,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 */
 
 #include "./LiveView.h"
-#include <ofLog.h>
-#include <of3dGraphics.h>
-#include <ofGraphics.h>
-#include <of3dUtils.h>
-#include <ofEvents.h>
 #include <random>
 
 using namespace Acorex;

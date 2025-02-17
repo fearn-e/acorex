@@ -15,7 +15,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 */
 
 #include "./AudioPlayback.h"
-#include "ofLog.h"
 #include <random>
 
 using namespace Acorex;
