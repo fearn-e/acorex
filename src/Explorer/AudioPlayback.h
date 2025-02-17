@@ -19,9 +19,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "./RawView.h"
 #include "./PointPicker.h"
 #include "Utils/Data.h"
-#include <ofSoundBuffer.h>
-#include <ofSoundStream.h>
-#include <ofMesh.h>
 #include <vector>
 #include <mutex>
 #include <atomic>

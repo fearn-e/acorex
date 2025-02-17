@@ -31,7 +31,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <data/FluidJSON.hpp>
 #include <data/FluidMemory.hpp>
 #include <data/TensorTypes.hpp>
-#include <ofxAudioFile.h>
 #include <vector>
 #include <string>
 

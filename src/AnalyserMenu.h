@@ -20,8 +20,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Utils/JSON.h"
 #include "Analyser/Controller.h"
 #include "Utils/InterfaceDefs.h"
-#include <ofxGui.h>
-#include <ofSystemUtils.h>
 
 namespace Acorex {
 
