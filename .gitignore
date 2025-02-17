@@ -1,12 +1,26 @@
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
 
-bin/
+.history/
 
-obj/
+*.vsix
 
+# Visual Studio
 .vs/
 
+# Dependencies and libs
 deps/
 
 deps-pre-build/
 
 libs/
+
+# Build outputs
+bin/
+
+obj/
