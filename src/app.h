@@ -18,14 +18,12 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "AnalyserMenu.h"
 #include "ExplorerMenu.h"
-#include <ofMain.h>
-#include <ofxGui.h>
 
-class ofApp : public ofBaseApp {
+class app {
 
 public:
-	ofApp ( ) { }
-	~ofApp ( ) { }
+	app ( ) { }
+	~app ( ) { }
 
 	void setup ( );
 	void update ( );
@@ -33,9 +31,7 @@ public:
 	void exit ( );
 	
 	void windowResized ( int w, int h );
-	//void dragEvent ( ofDragInfo dragInfo );
-	//void gotMessage ( ofMessage msg );
-
+	
 private:
 	void RemoveListeners ( );
 	void SetupUI ( bool keepValues );

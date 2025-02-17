@@ -14,9 +14,9 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "ofApp.h"
+#include "app.h"
 
-void ofApp::setup ( )
+void app::setup ( )
 {    
 	ofSetWindowTitle ( "ACorEx" );
 	
@@ -35,12 +35,12 @@ void ofApp::setup ( )
 	mExplorerMenu.Initialise ( false );
 }
 
-void ofApp::update ( )
+void app::update ( )
 {
 	if ( mExploreToggle ) { mExplorerMenu.Update ( ); }
 }
 
-void ofApp::draw ( )
+void app::draw ( )
 {
 	if ( mAnalyseToggle ) { mAnalyserMenu.Draw ( ); }
 	if ( mExploreToggle ) { mExplorerMenu.Draw ( ); }
@@ -57,13 +57,13 @@ void ofApp::draw ( )
 	ofDrawBitmapStringHighlight ( "fps: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 10 );
 }
 
-void ofApp::exit ( )
+void app::exit ( )
 {
 	mAnalyserMenu.Exit ( );
 	mExplorerMenu.Exit ( );
 }
 
-void ofApp::windowResized ( int w, int h )
+void app::windowResized ( int w, int h )
 {
 	mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout.topBarHeight / 4 );
 	mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout.topBarHeight / 4 );
@@ -72,18 +72,18 @@ void ofApp::windowResized ( int w, int h )
 	mExplorerMenu.WindowResized ( );
 }
 
-void ofApp::RemoveListeners ( )
+void app::RemoveListeners ( )
 {
 	if ( bListenersAdded )
 	{
-		mAnalyseToggle.removeListener ( this, &ofApp::AnalyseToggled );
-		mExploreToggle.removeListener ( this, &ofApp::ExploreToggled );
-		mDPIToggle.removeListener ( this, &ofApp::DPIToggled );
+		mAnalyseToggle.removeListener ( this, &app::AnalyseToggled );
+		mExploreToggle.removeListener ( this, &app::ExploreToggled );
+		mDPIToggle.removeListener ( this, &app::DPIToggled );
 		bListenersAdded = false;
 	}
 }
 
-void ofApp::SetupUI ( bool keepValues )
+void app::SetupUI ( bool keepValues )
 {
 	RemoveListeners ( );
 
@@ -102,13 +102,13 @@ void ofApp::SetupUI ( bool keepValues )
 	mDPIToggle.setPosition ( ofGetWidth ( ) - mLayout.topBarButtonWidth - 5, mLayout.topBarHeight / 4 );
 	mDPIToggle.setBackgroundColor ( mColors.transparent );
 
-	mAnalyseToggle.addListener ( this, &ofApp::AnalyseToggled );
-	mExploreToggle.addListener ( this, &ofApp::ExploreToggled );
-	mDPIToggle.addListener ( this, &ofApp::DPIToggled );
+	mAnalyseToggle.addListener ( this, &app::AnalyseToggled );
+	mExploreToggle.addListener ( this, &app::ExploreToggled );
+	mDPIToggle.addListener ( this, &app::DPIToggled );
 	bListenersAdded = true;
 }
 
-void ofApp::AnalyseToggled ( bool& value )
+void app::AnalyseToggled ( bool& value )
 {
 	if ( value )
 	{
@@ -121,7 +121,7 @@ void ofApp::AnalyseToggled ( bool& value )
 	}
 }
 
-void ofApp::ExploreToggled ( bool& value )
+void app::ExploreToggled ( bool& value )
 {
 	if ( value )
 	{
@@ -134,7 +134,7 @@ void ofApp::ExploreToggled ( bool& value )
 	}
 }
 
-void ofApp::DPIToggled ( bool& value )
+void app::DPIToggled ( bool& value )
 {
 	if ( value )
 	{
