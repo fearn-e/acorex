@@ -16,6 +16,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "./JSON.h"
 #include <fstream>
+#include <iostream>
 
 using namespace Acorex;
 
