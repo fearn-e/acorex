@@ -18,7 +18,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "./SpaceDefs.h"
 
 #include <ofGraphics.h>
-#include <of3DGraphics.h>
+#include <of3dGraphics.h>
 
 using namespace Acorex;
 

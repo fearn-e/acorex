@@ -1,16 +1,23 @@
-#include "ofMain.h"
-#include "ofApp.h"
+#include "raylib.h"
 
-//========================================================================
-int main( ){
+int main ()
+{
+	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+	InitWindow(1920, 1080, "Hello Raylib");
+	SetExitKey(KEY_NULL);
+	
+	// main loop
+	while (!WindowShouldClose())
+	{
+		// drawing
+		BeginDrawing();
+			ClearBackground(BLACK);
 
-	ofGLWindowSettings settings;
-	settings.setSize(1024, 768);
-	settings.windowMode = OF_WINDOW;
+			DrawText("Hello Raylib", 200,200,20,WHITE);
 
-	auto window = ofCreateWindow(settings);
-
-	ofRunApp(window, make_shared<ofApp>());
-	ofRunMainLoop();
-
+		EndDrawing();
+	}
+	
+	CloseWindow();
+	return 0;
 }
