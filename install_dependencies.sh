@@ -88,6 +88,14 @@ echo ""
 
     cd deps-pre-build
 
+    if [ ! -d "nfd-extended" ]; then
+        git -c advice.detachedHead=false clone --depth 1 -b "v1.2.1" https://github.com/btzy/nativefiledialog-extended nfd-extended
+
+        echo ""
+    else
+        FORCE_DOWNLOAD_TIP+=1
+    fi
+
     if [ ! -d "clay" ]; then
         git -c advice.detachedHead=false clone --depth 1 -b "v0.13" https://github.com/nicbarker/clay
         echo ""
@@ -141,11 +149,14 @@ echo ""
         echo "$FORCE_DOWNLOAD_TIP downloads already exist and were skipped (force this step with -d)"
         echo ""
     fi
+
+    cd ..
 #
 
 # Build memory in a new directory
+    cd deps-pre-build
     echo "--------------------------------------------------"
-    echo "cmaking foonathan memory libs"
+    echo "building foonathan memory libs"
     echo ""
     MEMORY_CMAKE_NEEDED=false
 
@@ -173,13 +184,7 @@ echo ""
         cmake -DFOONATHAN_MEMORY_BUILD_TESTS=OFF -DFOONATHAN_MEMORY_BUILD_TOOLS=OFF -DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF .
 
         echo ""
-        echo "building foonathan_memory debug lib"
-        echo ""
-
-        cmake --build . --config Debug
-
-        echo ""
-        echo "building foonathan_memory release lib"
+        echo "building foonathan_memory lib"
         echo ""
 
         cmake --build . --config Release
@@ -203,6 +208,75 @@ echo ""
         echo ""
 
         cmake --build .
+    fi
+
+    cd ../..
+#
+
+# Build nfd-extended in a new directory
+    cd deps-pre-build
+    echo "--------------------------------------------------"
+    echo "building nfd-extended libs"
+    echo ""
+    NFD_CMAKE_NEEDED=false
+
+    if [ $FORCE_COMPILE == true ] && [ -d "compiled-nfd-extended" ]; then
+        rm -rfv compiled-nfd-extended
+        cp -rv nfd-extended/ compiled-nfd-extended/
+        NFD_CMAKE_NEEDED=true
+    fi
+
+    if [ ! -d "compiled-nfd-extended" ]; then
+        cp -rv nfd-extended/ compiled-nfd-extended/
+        NFD_CMAKE_NEEDED=true
+    fi
+
+    if [ $NFD_CMAKE_NEEDED == false ]; then
+        echo "compiled-nfd-extended already exists, skipping compilation (force this step with -c)"
+        echo ""
+    fi
+
+    #build nfd-extended libs
+    cd compiled-nfd-extended
+
+    if [ $NFD_CMAKE_NEEDED == true ] && [ "$currentOS" == "win" ]; then
+        echo "windows"
+        mkdir build
+        cd build
+        cmake -DNFD_BUILD_TESTS=OFF -DNFD_INSTALL=OFF ..
+
+        echo ""
+        echo "building nfd-extended lib"
+        echo ""
+
+        cmake --build . --config Release
+        cd ..
+
+    elif [ $NFD_CMAKE_NEEDED == true ] && [ "$currentOS" == "mac" ]; then
+        echo "macos"
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DNFD_BUILD_TESTS=OFF -DNFD_INSTALL=OFF ..
+
+        echo ""
+        echo "building nfd-extended lib"
+        echo ""
+
+        cmake --build .
+        cd ..
+
+    elif [ $NFD_CMAKE_NEEDED == true ] && [ "$currentOS" == "linux" ]; then
+        echo "linux"
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DNFD_BUILD_TESTS=OFF -DNFD_INSTALL=OFF ..
+
+        echo ""
+        echo "building nfd-extended lib"
+        echo ""
+
+        cmake --build .
+        cd ..
     fi
 
     cd ../..
@@ -235,17 +309,19 @@ echo ""
     cp      deps-pre-build/clay/clay.h                                          deps/clay/clay.h
 
     echo "copying libs..."
-    #copy foonathan_memory compiled lib files
+    #copy compiled lib files
     if [ "$currentOS" == "win" ]; then
-        cp  deps-pre-build/compiled-memory/src/Debug/*                          libs/
-        cp  deps-pre-build/compiled-memory/src/Release/*                        libs/
+        cp  deps-pre-build/compiled-memory/src/Release/*.a                      libs/
+        cp  deps-pre-build/compiled-nfd-extended/build/src/*.a                  libs/
     elif [ "$currentOS" == "mac" ] || [ "$currentOS" == "linux" ]; then
-            cp  deps-pre-build/compiled-memory/src/libfoonathan_memory-*.a             libs/
+            cp  deps-pre-build/compiled-memory/src/libfoonathan_memory-*.a      libs/
+            cp  deps-pre-build/compiled-nfd-extended/build/src/libnfd.a         libs/
     fi
 
-    #copy extra compiled foonathan_memory headers
+    #copy extra compiled files
     cp      deps-pre-build/compiled-memory/src/config_impl.hpp                  deps/memory/
     cp      deps-pre-build/compiled-memory/src/container_node_sizes_impl.hpp    deps/memory/
+    cp -r   deps-pre-build/compiled-nfd-extended/src/include/                   deps/nfd-extended/
 #
 
 echo "--------------------------------------------------"
