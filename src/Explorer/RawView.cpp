@@ -98,6 +98,10 @@ bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
 		std::cerr << "Failed to load any audio files" << std::endl;
 		return false;
 	}
+	else if ( loadedCount < dataset.fileList.size ( ) )
+	{
+		std::cerr << "Failed to load all audio files, missing: " << dataset.fileList.size ( ) - loadedCount << std::endl;
+	}
 
 	return true;
 }
