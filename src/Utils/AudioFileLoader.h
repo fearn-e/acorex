@@ -17,7 +17,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #pragma once
 
 #include <raylib.h>
-#include <data/TensorTypes.hpp>
 #include <string>
 
 namespace Acorex {
@@ -28,7 +27,7 @@ public:
 	AudioFileLoader ( ) { }
 	~AudioFileLoader ( ) { }
 
-	bool ReadAudioFile ( std::string filename, fluid::RealVector& output, double targetSampleRate );
+	bool ReadAudioFile ( std::string filename, std::vector<float>& output, double targetSampleRate );
 
 private:
 	//void ReadToMono ( std::vector<float>& output, htl::in_audio_file& file );

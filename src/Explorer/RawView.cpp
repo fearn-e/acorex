@@ -15,7 +15,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 */
 
 #include "./RawView.h"
-#include <data/TensorTypes.hpp>
 #include <iostream>
 
 using namespace Acorex;
@@ -61,25 +60,27 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
 bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
 {
 	dataset.audio.loaded.clear ( );
-	dataset.audio.raw.clear ( );
+	dataset.audio.mono.clear ( );
+	dataset.audio.size.clear ( );
+	int loadedCount = 0;
 
 	for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
 	{
-		fluid::RealVector fileData;
+		std::vector<float> fileData;
 
 		if ( !mAudioLoader.ReadAudioFile ( dataset.fileList[fileIndex], fileData, dataset.analysisSettings.sampleRate ) )
 		{
 			std::cerr << "Failed to load audio file: " << dataset.fileList[fileIndex] << std::endl;
 			dataset.audio.loaded.push_back ( false );
-			dataset.audio.raw.push_back ( ofSoundBuffer ( ) );
+			dataset.audio.mono.push_back ( std::vector<float> ( ) );
+			dataset.audio.size.push_back ( 0 );
 			continue;
 		}
 
-		ofSoundBuffer audioData;
-		audioData.copyFrom ( std::vector<float> ( fileData.begin ( ), fileData.end ( ) ), 1, dataset.analysisSettings.sampleRate );
-
-		dataset.audio.raw.push_back ( audioData );
 		dataset.audio.loaded.push_back ( true );
+		dataset.audio.mono.push_back ( fileData );
+		dataset.audio.size.push_back ( fileData.size ( ) );
+		loadedCount++;
 	}
 	
 	bool failedToLoad = true;
