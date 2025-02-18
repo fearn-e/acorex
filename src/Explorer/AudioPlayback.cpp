@@ -308,7 +308,7 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t sampleIn
 		std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
 		if ( mNewPlayheads.size ( ) > 3 )
 		{
-			std::cerr << "Too many playheads queued already, failed to create new playhead";
+			std::cerr << "Too many playheads queued already, failed to create new playhead" << std::endl;
 			return false;
 		}
 	}
@@ -329,7 +329,7 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t sampleIn
 	}
 	else
 	{
-		std::cerr << "File not loaded in memory, failed to create playhead for " << mRawView->GetDataset ( )->fileList[fileIndex];
+		std::cerr << "File not loaded in memory, failed to create playhead for " << mRawView->GetDataset ( )->fileList[fileIndex] << std::endl;
 		return false;
 	}
 }

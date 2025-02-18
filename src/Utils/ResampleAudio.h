@@ -57,7 +57,7 @@ public:
 		if(totalModBufferSize < modifiedBuffer.max_size()) {
 			modifiedBuffer.resize(totalModBufferSize,0);
 		} else {
-			std::cerr << "resampling would create a buffer size of " << totalModBufferSize << " (too large for std::vector)";
+			std::cerr << "resampling would create a buffer size of " << totalModBufferSize << " (too large for std::vector)" << std::endl;
 			return false;
 		}
 		

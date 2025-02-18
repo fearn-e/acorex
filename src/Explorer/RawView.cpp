@@ -25,7 +25,7 @@ bool Explorer::RawView::LoadCorpus ( )
 	ofFileDialogResult corpusFile = ofSystemLoadDialog ( "Select corpus file" );
 	if ( !corpusFile.bSuccess )
 	{
-		std::cerr << "Invalid load query";
+		std::cerr << "Invalid load query" << std::endl;
 		return false;
 	}
 	
@@ -38,12 +38,12 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
 {
 	if ( name.find ( ".json" ) == std::string::npos )
 	{
-		std::cerr << "Invalid file type";
+		std::cerr << "Invalid file type" << std::endl;
 		return false;
 	}
 	if ( !ofFile::doesFileExist ( path ) )
 	{
-		std::cerr << "File does not exist";
+		std::cerr << "File does not exist" << std::endl;
 		return false;
 	}
 
@@ -69,7 +69,7 @@ bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
 
 		if ( !mAudioLoader.ReadAudioFile ( dataset.fileList[fileIndex], fileData, dataset.analysisSettings.sampleRate ) )
 		{
-			std::cerr << "Failed to load audio file: " << dataset.fileList[fileIndex];
+			std::cerr << "Failed to load audio file: " << dataset.fileList[fileIndex] << std::endl;
 			dataset.audio.loaded.push_back ( false );
 			dataset.audio.raw.push_back ( ofSoundBuffer ( ) );
 			continue;
@@ -94,7 +94,7 @@ bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
 
 	if ( failedToLoad )
 	{
-		std::cerr << "Failed to load any audio files";
+		std::cerr << "Failed to load any audio files" << std::endl;
 		return false;
 	}
 

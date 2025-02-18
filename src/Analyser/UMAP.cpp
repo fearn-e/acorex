@@ -39,11 +39,11 @@ bool Analyser::UMAP::Fit ( Utils::DataSet& dataset, const Utils::ReductionSettin
 		k = dataset.currentPointCount;
 	}
 
-	std::cout << "Training UMAP with " << dataset.currentPointCount << " points and " << dataset.analysisSettings.currentDimensionCount << " dimensions";
+	std::cout << "Training UMAP with " << dataset.currentPointCount << " points and " << dataset.analysisSettings.currentDimensionCount << " dimensions" << std::endl;
 
 	fluidsetOUT = algorithm.train ( fluidsetIN, k, settings.dimensionReductionTarget, 0.1, settings.maxIterations, 0.1 ); // TODO - check if this can be parallelised
 
-	std::cout << "UMAP training complete";
+	std::cout << "UMAP training complete" << std::endl;
 
 	mConversion.FluidToCorpus ( dataset, fluidsetOUT, filePointLength, settings.dimensionReductionTarget );
 
