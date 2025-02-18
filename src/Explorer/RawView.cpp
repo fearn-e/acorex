@@ -16,20 +16,40 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "./RawView.h"
 #include <iostream>
+#include <filesystem>
+#include "nfd-extended/nfd.h"
 
 using namespace Acorex;
 
 bool Explorer::RawView::LoadCorpus ( )
 {
-	ofFileDialogResult corpusFile = ofSystemLoadDialog ( "Select corpus file" );
-	if ( !corpusFile.bSuccess )
+	NFD_Init ( );
+
+	nfdu8char_t* dialogPath = nullptr;
+	nfdu8filteritem_t filters = { "JSON Files", "json" };
+	nfdopendialogu8args_t args = {
+		.filterList = &filters,
+		.filterCount = 1
+	};
+	nfdresult_t result = NFD_OpenDialogU8_With ( &dialogPath, &args );
+
+	if ( result == NFD_CANCEL )
 	{
-		std::cerr << "Invalid load query" << std::endl;
+		NFD_Quit ( );
 		return false;
 	}
+	else if ( result != NFD_OKAY )
+	{
+		std::cerr << "NFD error: " << NFD_GetError ( ) << std::endl;
+	}
+
+	std::string path = dialogPath;
+	std::string name = path.substr ( path.find_last_of ( '/' ) + 1 );
 	
-	bool success = LoadCorpus ( corpusFile.getPath ( ), corpusFile.getName ( ) );
-	
+	bool success = LoadCorpus ( path, name );
+
+	NFD_FreePathU8 ( dialogPath );
+	NFD_Quit ( );
 	return success;
 }
 
@@ -40,7 +60,7 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
 		std::cerr << "Invalid file type" << std::endl;
 		return false;
 	}
-	if ( !ofFile::doesFileExist ( path ) )
+	if ( !std::filesystem::exists ( path ) )
 	{
 		std::cerr << "File does not exist" << std::endl;
 		return false;
