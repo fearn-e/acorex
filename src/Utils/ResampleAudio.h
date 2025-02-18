@@ -23,7 +23,6 @@ IN THE SOFTWARE.
 */
 #pragma once
 
-#include <raylib.h>
 #include <cstring>
 #include <iostream>
 #include <vector>
