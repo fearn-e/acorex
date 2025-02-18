@@ -97,7 +97,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
     //    dataset.stats.raw.reserve ( reserveSize );
     //}
 
-    double startTime = ofGetElapsedTimef ( );
+    std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
     for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
     {
         fluid::RealVector in ( 0 );
@@ -251,7 +251,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 
         { // Progress logging
             fileLengthSumTracker += in.size ( );
-            double elapsedTime = ofGetElapsedTimef ( ) - startTime;
+            double elapsedTime = (double)(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startTime).count()) / 1000.0;
             double progress = fileLengthSumTracker / fileLengthSumTotal * 100.0f;
             double eta = (elapsedTime / progress) * (100.0f - progress);
             int etaHours = eta / 3600; int etaMinutes = (eta - (etaHours * 3600)) / 60; int etaSeconds = eta - (etaHours * 3600) - (etaMinutes * 60);
