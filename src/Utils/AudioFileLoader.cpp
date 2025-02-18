@@ -27,7 +27,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
 {
     if ( std::filesystem::exists (filename ) )
     {
-        std::cerr << "input file " << filename << " does not exist";
+        std::cerr << "input file " << filename << " does not exist" << std::endl;
         return false;
     }
 
@@ -40,7 +40,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
 
         if ( IsWaveValid ( file ) )
         {
-            std::cerr << "input file " << filename << " could not be opened";
+            std::cerr << "input file " << filename << " could not be opened" << std::endl;
             return false;
         }
 
@@ -53,7 +53,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
                                                         (file.frameCount / file.channels), file.channels );
         if (!success)
         {
-            std::cerr << "loading failed due to resampling error, file: " << filename;
+            std::cerr << "loading failed due to resampling error, file: " << filename << std::endl;
             return false;
         }
         output.resize ( temp.size ( ) );
@@ -61,7 +61,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
     }
     else
     {
-        std::cerr << "input file " << filename << " is not supported";
+        std::cerr << "input file " << filename << " is not supported" << std::endl;
 		return false;
     }
 

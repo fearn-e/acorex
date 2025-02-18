@@ -38,11 +38,11 @@ bool Analyser::Controller::CreateCorpus ( const std::string& inputPath, const st
 	if ( numAnalysed > 0 )
 	{
 		std::cout << "Processed " << filesIn << " files into " << dataset.currentPointCount 
-			<< " points, with " << dataset.fileList.size ( ) - numAnalysed << " files failed.";
+			<< " points, with " << dataset.fileList.size ( ) - numAnalysed << " files failed." << std::endl;
 	}
 	else 
 	{ 
-		std::cerr << "Failed to process any files.";
+		std::cerr << "Failed to process any files." << std::endl;
 		return false;
 	}
 
@@ -113,14 +113,14 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
 
 		if ( newFilesTreated.empty ( ) )
 		{
-			std::cerr << "No new files left to process.";
+			std::cerr << "No new files left to process." << std::endl;
 			return false;
 		}
 
 		newFiles.clear ( );
 		newFiles = newFilesTreated;
 
-		std::cout << newFiles.size ( ) << " new files left to process, with " << preTreated - newFiles.size ( ) << " duplicates removed.";
+		std::cout << newFiles.size ( ) << " new files left to process, with " << preTreated - newFiles.size ( ) << " duplicates removed." << std::endl;
 	}
 
 	Utils::DataSet newDataset;
@@ -135,11 +135,11 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
 	if ( numAnalysed > 0 )
 	{
 		std::cout << "Processed " << filesIn << " files into " << newDataset.currentPointCount
-			<< " points, with " << newDataset.fileList.size ( ) - numAnalysed << " files failed.";
+			<< " points, with " << newDataset.fileList.size ( ) - numAnalysed << " files failed." << std::endl;
 	}
 	else
 	{
-		std::cerr << "Failed to process any files.";
+		std::cerr << "Failed to process any files." << std::endl;
 		return false;
 	}
 
@@ -147,11 +147,11 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
 
 	if ( newReplacesExisting )
 	{
-		std::cout << "Replaced existing dataset with new files, with " << mergeInfo[1] << " not previously existing added and " << mergeInfo[2] << " overwriting existing.";
+		std::cout << "Replaced existing dataset with new files, with " << mergeInfo[1] << " not previously existing added and " << mergeInfo[2] << " overwriting existing." << std::endl;
 	}
 	else
 	{
-		std::cout << "Merged new files into dataset, with " << mergeInfo[0] << " already existing skipped and " << mergeInfo[1] << " not previously existing added.";
+		std::cout << "Merged new files into dataset, with " << mergeInfo[0] << " already existing skipped and " << mergeInfo[1] << " not previously existing added." << std::endl;
 	}
 
 	success = mJSON.Write ( outputPath, existingDataset );
@@ -263,7 +263,7 @@ bool Analyser::Controller::SearchDirectory ( const std::string& directory, std::
 
 	if ( files.empty ( ) )
 	{
-		std::cerr << "No files found in " << directory;
+		std::cerr << "No files found in " << directory << std::endl;
 		return false;
 	}
 

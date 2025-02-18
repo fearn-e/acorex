@@ -29,7 +29,7 @@ using namespace Acorex;
 
 int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
 {  
-    std::cout << "Calculating file lengths...";
+    std::cout << "Calculating file lengths..." << std::endl;
     double fileLengthSumTracker = 0;
     double fileLengthSumTotal = 0;
 
@@ -45,7 +45,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
         fileLengthSumTotal = sampleTotal;
     }
 
-    std::cout << "Total sample count: " << fileLengthSumTotal;
+    std::cout << "Total sample count: " << fileLengthSumTotal << std::endl;
 
     if ( dataset.analysisSettings.bTime )
     {
@@ -257,15 +257,15 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
             int etaHours = eta / 3600; int etaMinutes = (eta - (etaHours * 3600)) / 60; int etaSeconds = eta - (etaHours * 3600) - (etaMinutes * 60);
             if ( etaHours > 0 )
             {
-                std::cout << "Progress: " << progress << "% | ETA: " << etaHours << "h " << etaMinutes << "m " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex];
+                std::cout << "Progress: " << progress << "% | ETA: " << etaHours << "h " << etaMinutes << "m " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex] << std::endl;
             }
             else if ( etaMinutes > 0 )
             {
-                std::cout << "Progress: " << progress << "% | ETA: " << etaMinutes << "m " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex];
+                std::cout << "Progress: " << progress << "% | ETA: " << etaMinutes << "m " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex] << std::endl;
             }
             else
             {
-                std::cout << "Progress: " << progress << "% | ETA: " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex];
+                std::cout << "Progress: " << progress << "% | ETA: " << etaSeconds << "s | Analysed " << dataset.fileList[fileIndex] << std::endl;
             }
         }
     }
