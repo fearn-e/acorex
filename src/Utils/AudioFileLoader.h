@@ -18,6 +18,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include <raylib.h>
 #include <string>
+#include <vector>
 
 namespace Acorex {
 namespace Utils {
