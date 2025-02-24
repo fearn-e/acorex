@@ -35,6 +35,7 @@ void Explorer::LiveView::Initialise ( )
 
 	mStatsCorpus.clear ( );
 	mTimeCorpus.clear ( );
+	mTimeCorpus123.clear ( );
 
 	b3D = true;
 	bColorFullSpectrum = false;

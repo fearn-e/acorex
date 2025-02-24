@@ -15,7 +15,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 */
 
 #include "raylib.h"
-#include "app.h"
+//#include "app.h"
+#include "Explorer/RawView.h"
 
 int main ()
 {
@@ -26,6 +27,9 @@ int main ()
 	// main loop
 	while (!WindowShouldClose())
 	{
+		Acorex::Explorer::RawView rawView;
+		rawView.LoadCorpus();
+
 		// drawing
 		BeginDrawing();
 			ClearBackground(BLACK);

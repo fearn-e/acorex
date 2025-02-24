@@ -22,6 +22,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "./RawView.h"
 #include "./AudioPlayback.h"
 #include "../Utils/Data.h"
+#include <raylib.h>
 
 namespace Acorex {
 namespace Explorer {
@@ -111,14 +112,14 @@ private:
 	int colorDimension = -1;
 
 	std::shared_ptr<RawView> mRawView; // might need to be weak_ptr?
-	std::vector<ofMesh> mTimeCorpus;
-	ofMesh mStatsCorpus;
+	std::vector<Mesh> mTimeCorpus123;
+	Mesh mStatsCorpus123;
 
 	std::vector<ofSoundPlayer> mSoundPlayers;
 	std::vector<int> mPlayingFiles;
 	std::vector<int> mPlayingTimeHeads;
 	std::vector<float> mPlayingLastPositionMS;
-	std::vector<ofColor> mPlayingLastColor;
+	std::vector<Color> mPlayingLastColor123;
 
 	// Playheads -------------------------------------
 
@@ -126,8 +127,9 @@ private:
 
 	// Camera ----------------------------------------
 
-	std::shared_ptr<ofCamera> mCamera;
-	ofPoint mCamPivot = ofPoint(0, 0, 0);
+	std::shared_ptr<Camera3D> mCamera3D;
+	std::shared_ptr<Camera2D> mCamera2D;
+	Vector3 mCamPivot123 = { 0, 0, 0 };
 	int mLastMouseX = 0, mLastMouseY = 0;
 
 	// Acorex Objects ------------------------------
