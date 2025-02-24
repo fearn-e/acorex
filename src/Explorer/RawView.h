@@ -16,9 +16,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "Utils/Data.h"
-#include "Utils/JSON.h"
-#include "Utils/AudioFileLoader.h"
+#include "../Utils/Data.h"
+#include "../Utils/JSON.h"
+#include "../Utils/AudioFileLoader.h"
 
 namespace Acorex {
 namespace Explorer {

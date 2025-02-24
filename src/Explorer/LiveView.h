@@ -16,12 +16,12 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "Utils/DimensionBounds.h"
+#include "../Utils/DimensionBounds.h"
 #include "./SpaceDefs.h"
 #include "./PointPicker.h"
 #include "./RawView.h"
 #include "./AudioPlayback.h"
-#include "Utils/Data.h"
+#include "../Utils/Data.h"
 
 namespace Acorex {
 namespace Explorer {

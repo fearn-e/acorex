@@ -17,8 +17,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #pragma once
 
 #include "./RawView.h"
-#include "Utils/DimensionBounds.h"
-#include "Utils/DatasetConversion.h"
+#include "../Utils/DimensionBounds.h"
+#include "../Utils/DatasetConversion.h"
 #include <algorithms/public/KDTree.hpp>
 #include <data/FluidDataSet.hpp>
 #include <mutex>
