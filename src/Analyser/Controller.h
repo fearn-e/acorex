@@ -16,10 +16,10 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "Utils/Data.h"
-#include "Utils/JSON.h"
-#include "Analyser/GenAnalysis.h"
-#include "Analyser/UMAP.h"
+#include "../Utils/Data.h"
+#include "../Utils/JSON.h"
+#include "./GenAnalysis.h"
+#include "./UMAP.h"
 #include <vector>
 #include <string>
 
