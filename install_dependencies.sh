@@ -71,22 +71,20 @@ echo ""
 
 # Download dependencies
     echo "--------------------------------------------------"
-    echo "downloading dependencies to deps-pre-build"
+    echo "downloading dependencies to tmp"
     echo ""
-
-    cd include
 
     declare -i FORCE_DOWNLOAD_TIP=0
 
-    if [ $FORCE_DOWNLOAD == true ] && [ -d "deps-pre-build" ]; then
-        rm -rfv deps-pre-build
+    if [ $FORCE_DOWNLOAD == true ] && [ -d "tmp" ]; then
+        rm -rfv tmp
     fi
 
-    if [ ! -d "deps-pre-build" ]; then
-        mkdir -v deps-pre-build
+    if [ ! -d "tmp" ]; then
+        mkdir -v tmp
     fi
 
-    cd deps-pre-build
+    cd tmp
 
     if [ ! -d "nfd-extended" ]; then
         git -c advice.detachedHead=false clone --depth 1 -b "v1.2.1" https://github.com/btzy/nativefiledialog-extended nfd-extended
@@ -146,7 +144,7 @@ echo ""
     fi
 
     if [ $FORCE_DOWNLOAD_TIP > 0 ]; then
-        echo "$FORCE_DOWNLOAD_TIP downloads already exist and were skipped (force this step with -d)"
+        echo "$FORCE_DOWNLOAD_TIP downloads in tmp already exist and were skipped (force this step with -d)"
         echo ""
     fi
 
@@ -154,7 +152,7 @@ echo ""
 #
 
 # Build memory in a new directory
-    cd deps-pre-build
+    cd tmp
     echo "--------------------------------------------------"
     echo "building foonathan memory libs"
     echo ""
@@ -214,7 +212,7 @@ echo ""
 #
 
 # Build nfd-extended in a new directory
-    cd deps-pre-build
+    cd tmp
     echo "--------------------------------------------------"
     echo "building nfd-extended libs"
     echo ""
@@ -282,14 +280,14 @@ echo ""
     cd ../..
 #
 
-# Install dependencies to deps folder
+# Install dependencies to include and libs folders
     echo "--------------------------------------------------"
-    echo "installing dependencies and libraries"
+    echo "installing headers and libraries"
     echo ""
-    if [ -d "deps" ]; then
-        rm -rf deps
+    if [ -d "include" ]; then
+        rm -rf include
     fi
-    mkdir -v deps
+    mkdir -v include
 
     if [ -d "libs" ]; then
         rm -rf libs
@@ -298,30 +296,30 @@ echo ""
 
     echo "copying headers..."
     #copy dependency headerfiles
-    cp -r   deps-pre-build/eigen/Eigen/                                         deps/Eigen/
-    cp -r   deps-pre-build/eigen/unsupported/                                   deps/unsupported/
-    cp -r   deps-pre-build/flucoma-core/include/                                deps/flucoma-core/
-    cp -r   deps-pre-build/memory/include/foonathan/memory/                     deps/memory/
-    cp -r   deps-pre-build/hisstools_library/include/                           deps/hisstools_library/
-    cp -r   deps-pre-build/spectra/include/Spectra/                             deps/Spectra/
-    cp -r   deps-pre-build/json/include/nlohmann/                               deps/nlohmann/
-    mkdir   deps/clay
-    cp      deps-pre-build/clay/clay.h                                          deps/clay/clay.h
+    cp -r   tmp/eigen/Eigen/                                         include/Eigen/
+    cp -r   tmp/eigen/unsupported/                                   include/unsupported/
+    cp -r   tmp/flucoma-core/include/                                include/flucoma-core/
+    cp -r   tmp/memory/include/foonathan/memory/                     include/memory/
+    cp -r   tmp/hisstools_library/include/                           include/hisstools_library/
+    cp -r   tmp/spectra/include/Spectra/                             include/Spectra/
+    cp -r   tmp/json/include/nlohmann/                               include/nlohmann/
+    mkdir   include/clay
+    cp      tmp/clay/clay.h                                          include/clay/clay.h
 
     echo "copying libs..."
     #copy compiled lib files
     if [ "$currentOS" == "win" ]; then
-        cp  deps-pre-build/compiled-memory/src/Release/*.a                      libs/
-        cp  deps-pre-build/compiled-nfd-extended/build/src/*.a                  libs/
+        cp  tmp/compiled-memory/src/Release/*.a                      libs/
+        cp  tmp/compiled-nfd-extended/build/src/*.a                  libs/
     elif [ "$currentOS" == "mac" ] || [ "$currentOS" == "linux" ]; then
-            cp  deps-pre-build/compiled-memory/src/libfoonathan_memory-*.a      libs/
-            cp  deps-pre-build/compiled-nfd-extended/build/src/libnfd.a         libs/
+            cp  tmp/compiled-memory/src/libfoonathan_memory-*.a      libs/
+            cp  tmp/compiled-nfd-extended/build/src/libnfd.a         libs/
     fi
 
     #copy extra compiled files
-    cp      deps-pre-build/compiled-memory/src/config_impl.hpp                  deps/memory/
-    cp      deps-pre-build/compiled-memory/src/container_node_sizes_impl.hpp    deps/memory/
-    cp -r   deps-pre-build/compiled-nfd-extended/src/include/                   deps/nfd-extended/
+    cp      tmp/compiled-memory/src/config_impl.hpp                  include/memory/
+    cp      tmp/compiled-memory/src/container_node_sizes_impl.hpp    include/memory/
+    cp -r   tmp/compiled-nfd-extended/src/include/                   include/nfd-extended/
 #
 
 echo "--------------------------------------------------"
