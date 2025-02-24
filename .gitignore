@@ -404,3 +404,6 @@ Makefile
 include/
 libs/
 tmp/
+build/
+flucoma-core/
+examples/
