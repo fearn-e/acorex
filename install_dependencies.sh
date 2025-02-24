@@ -86,6 +86,14 @@ echo ""
 
     cd tmp
 
+    if [ ! -d "raylib" ]; then
+        git -c advice.detachedHead=false clone --depth 1 -b "5.5" https://github.com/raysan5/raylib raylib
+
+        echo ""
+    else
+        FORCE_DOWNLOAD_TIP+=1
+    fi
+
     if [ ! -d "nfd-extended" ]; then
         git -c advice.detachedHead=false clone --depth 1 -b "v1.2.1" https://github.com/btzy/nativefiledialog-extended nfd-extended
 
@@ -280,6 +288,8 @@ echo ""
     cd ../..
 #
 
+# ADD RAYLIB BUILD STEP
+
 # Install dependencies to include and libs folders
     echo "--------------------------------------------------"
     echo "installing headers and libraries"
@@ -305,6 +315,8 @@ echo ""
     cp -r   tmp/json/include/nlohmann/                               include/nlohmann/
     mkdir   include/clay
     cp      tmp/clay/clay.h                                          include/clay/clay.h
+    mkdir   include/raylib
+    cp      tmp/raylib/src/raylib.h                                  include/raylib/raylib.h
 
     echo "copying libs..."
     #copy compiled lib files
@@ -314,6 +326,7 @@ echo ""
     elif [ "$currentOS" == "mac" ] || [ "$currentOS" == "linux" ]; then
             cp  tmp/compiled-memory/src/libfoonathan_memory-*.a      libs/
             cp  tmp/compiled-nfd-extended/build/src/libnfd.a         libs/
+    # ADD RAYLIB LIBS
     fi
 
     #copy extra compiled files
