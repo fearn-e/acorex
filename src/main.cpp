@@ -14,31 +14,31 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "raylib.h"
+//#include "raylib.h"
 //#include "app.h"
 #include "Explorer/RawView.h"
 
-int main ()
+int main ( )
 {
-	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
-	InitWindow(1920, 1080, "ACorEx");
-	SetExitKey(KEY_NULL);
-	
+	SetConfigFlags ( FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI );
+	InitWindow ( 1920, 1080, "ACorEx" );
+	SetExitKey ( KEY_NULL );
+
 	// main loop
-	while (!WindowShouldClose())
+	while ( !WindowShouldClose ( ) )
 	{
 		Acorex::Explorer::RawView rawView;
-		rawView.LoadCorpus();
+		rawView.LoadCorpus ( );
 
 		// drawing
-		BeginDrawing();
-			ClearBackground(BLACK);
+		BeginDrawing ( );
+		ClearBackground ( BLACK );
 
-			DrawText("test", 200,200,20,WHITE);
+		DrawText ( "test", 200, 200, 20, WHITE );
 
-		EndDrawing();
+		EndDrawing ( );
 	}
-	
-	CloseWindow();
+
+	CloseWindow ( );
 	return 0;
 }

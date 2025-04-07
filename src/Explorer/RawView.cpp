@@ -17,7 +17,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "./RawView.h"
 #include <iostream>
 #include <filesystem>
-#include "nfd-extended/nfd.h"
+#include "nfd.h"
 
 using namespace Acorex;
 
@@ -45,7 +45,7 @@ bool Explorer::RawView::LoadCorpus ( )
 
 	std::string path = dialogPath;
 	std::string name = path.substr ( path.find_last_of ( '/' ) + 1 );
-	
+
 	bool success = LoadCorpus ( path, name );
 
 	NFD_FreePathU8 ( dialogPath );
@@ -73,7 +73,7 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
 	mCorpusName = name.substr ( 0, name.size ( ) - 5 );
 
 	success = LoadAudioSet ( mDataset );
-	
+
 	return success;
 }
 
@@ -88,9 +88,9 @@ bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
 	{
 		std::vector<float> fileData;
 
-		if ( !mAudioLoader.ReadAudioFile ( dataset.fileList[fileIndex], fileData, dataset.analysisSettings.sampleRate ) )
+		if ( !mAudioLoader.ReadAudioFile ( dataset.fileList [fileIndex], fileData, dataset.analysisSettings.sampleRate ) )
 		{
-			std::cerr << "Failed to load audio file: " << dataset.fileList[fileIndex] << std::endl;
+			std::cerr << "Failed to load audio file: " << dataset.fileList [fileIndex] << std::endl;
 			dataset.audio.loaded.push_back ( false );
 			dataset.audio.mono.push_back ( std::vector<float> ( ) );
 			dataset.audio.size.push_back ( 0 );
@@ -102,11 +102,11 @@ bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
 		dataset.audio.size.push_back ( fileData.size ( ) );
 		loadedCount++;
 	}
-	
+
 	bool failedToLoad = true;
 	for ( int i = 0; i < dataset.audio.loaded.size ( ); i++ )
 	{
-		if ( dataset.audio.loaded[i] )
+		if ( dataset.audio.loaded [i] )
 		{
 			failedToLoad = false;
 			break;
