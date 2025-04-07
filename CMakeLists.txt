@@ -47,22 +47,31 @@ FetchContent_Declare(
 #)
 #
 
-#FetchContent_MakeAvailable(raylib nfd clay json)
-FetchContent_MakeAvailable(raylib nfd json flucoma-core)
+FetchContent_MakeAvailable(raylib nfd json flucoma-core) #clay
 
 # Add source and header files from src/ folder
-# file(GLOB_RECURSE SOURCES src/*.cpp src/*.h)
+#file(GLOB_RECURSE SOURCES src/*.cpp src/*.h)
 set(SOURCES
     src/main.cpp
+    #src/Explorer/AudioPlayback.cpp
+    #src/Explorer/AudioPlayback.h
+    #src/Explorer/LiveView.cpp
+    #src/Explorer/LiveView.h
+    #src/Explorer/PointPicker.cpp
+    #src/Explorer/PointPicker.h
     src/Explorer/RawView.cpp
     src/Explorer/RawView.h
-    src/Utils/JSON.cpp
-    src/Utils/JSON.h
-    src/Utils/Data.h
+    src/Explorer/SpaceDefs.h
     src/Utils/AudioFileLoader.cpp
     src/Utils/AudioFileLoader.h
+    src/Utils/Data.h
     src/Utils/DatasetConversion.cpp
     src/Utils/DatasetConversion.h
+    src/Utils/DimensionBounds.h
+    src/Utils/InterfaceDefs.h
+    src/Utils/JSON.cpp
+    src/Utils/JSON.h
+    src/Utils/ResampleAudio.h
 )
 
 # Add the executable
