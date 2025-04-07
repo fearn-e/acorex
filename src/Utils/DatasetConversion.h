@@ -17,12 +17,15 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #pragma once
 
 #include "./Data.h"
-#include <data/FluidDataSet.hpp>
+#include <flucoma/data/FluidDataSet.hpp>
 
-namespace Acorex {
-namespace Utils {
+namespace Acorex
+{
+namespace Utils
+{
 
-class DatasetConversion {
+class DatasetConversion
+{
 public:
 	DatasetConversion ( ) { }
 	~DatasetConversion ( ) { }

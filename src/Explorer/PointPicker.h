@@ -19,15 +19,18 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "./RawView.h"
 #include "../Utils/DimensionBounds.h"
 #include "../Utils/DatasetConversion.h"
-#include <algorithms/public/KDTree.hpp>
-#include <data/FluidDataSet.hpp>
+#include <flucoma/algorithms/public/KDTree.hpp>
+#include <flucoma/data/FluidDataSet.hpp>
 #include <mutex>
 #include <atomic>
 
-namespace Acorex {
-namespace Explorer {
+namespace Acorex
+{
+namespace Explorer
+{
 
-class PointPicker {
+class PointPicker
+{
 public:
 	PointPicker ( ) { }
 	~PointPicker ( ) { }
@@ -42,11 +45,11 @@ public:
 	void Draw ( );
 
 	void FindNearestToMouse ( );
-	bool FindNearestToPosition (	const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, 
-									int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed, 
-									int minTimeDiffSameFile, int remainingSamplesRequired, const Utils::AudioData& audioSet, size_t hopSize );
+	bool FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint,
+		int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed,
+		int minTimeDiffSameFile, int remainingSamplesRequired, const Utils::AudioData& audioSet, size_t hopSize );
 
-	// Setters & Getters ----------------------------
+// Setters & Getters ----------------------------
 
 	void SetCamera ( std::shared_ptr<ofCamera> camera ) { mCamera = camera; }
 	void SetNearestCheckNeeded ( ) { bNearestMouseCheckNeeded = true; }
@@ -76,13 +79,13 @@ private:
 	bool bSkipTraining = true;
 	bool bListenersAdded = false;
 	bool bNearestMouseCheckNeeded = false;
-	bool bDimensionsFilled[3] = { false, false, false };
+	bool bDimensionsFilled [3] = { false, false, false };
 
 	// Variables ------------------------------------
 
 	std::shared_ptr<ofCamera> mCamera;
 
-	int mDimensionsIndices[3] = { -1, -1, -1 };
+	int mDimensionsIndices [3] = { -1, -1, -1 };
 
 	int mNearestPoint = -1;
 	double mNearestDistance = -1;
@@ -96,7 +99,7 @@ private:
 	fluid::FluidDataSet<std::string, double, 1> mLiveFluidSet;
 	std::vector<int> mCorpusFileLookUp; int mNearestPointFile = -1;
 	std::vector<int> mCorpusTimeLookUp; int mNearestPointTime = -1;
-	
+
 	Utils::DatasetConversion mDatasetConversion;
 
 	std::vector<glm::vec3> testPoints;
