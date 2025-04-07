@@ -288,7 +288,74 @@ echo ""
     cd ../..
 #
 
-# ADD RAYLIB BUILD STEP
+# Build raylib in a new directory
+    cd tmp
+    echo "--------------------------------------------------"
+    echo "building raylib"
+    echo ""
+    RAYLIB_CMAKE_NEEDED=false
+
+    if [ $FORCE_COMPILE == true ] && [ -d "compiled-raylib" ]; then
+        rm -rfv compiled-raylib
+        cp -rv raylib/ compiled-raylib/
+        RAYLIB_CMAKE_NEEDED=true
+    fi
+
+    if [ ! -d "compiled-raylib" ]; then
+        cp -rv raylib/ compiled-raylib/
+        RAYLIB_CMAKE_NEEDED=true
+    fi
+
+    if [ $RAYLIB_CMAKE_NEEDED == false ]; then
+        echo "compiled-raylib already exists, skipping compilation (force this step with -c)"
+        echo ""
+    fi
+
+    # Build raylib libs
+    cd compiled-raylib
+
+    if [ $RAYLIB_CMAKE_NEEDED == true ] && [ "$currentOS" == "win" ]; then
+        echo "windows"
+        mkdir build
+        cd build
+        cmake -DBUILD_SHARED_LIBS=OFF -DSUPPORT_MODULE_RTEXT=OFF -DSUPPORT_MODULE_RNET=OFF ..
+
+        echo ""
+        echo "building raylib lib"
+        echo ""
+
+        cmake --build . --config Release
+        cd ..
+
+    elif [ $RAYLIB_CMAKE_NEEDED == true ] && [ "$currentOS" == "mac" ]; then
+        echo "macos"
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSUPPORT_MODULE_RTEXT=OFF -DSUPPORT_MODULE_RNET=OFF ..
+
+        echo ""
+        echo "building raylib lib"
+        echo ""
+
+        cmake --build .
+        cd ..
+
+    elif [ $RAYLIB_CMAKE_NEEDED == true ] && [ "$currentOS" == "linux" ]; then
+        echo "linux"
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSUPPORT_MODULE_RTEXT=OFF -DSUPPORT_MODULE_RNET=OFF ..
+
+        echo ""
+        echo "building raylib lib"
+        echo ""
+
+        cmake --build .
+        cd ..
+    fi
+
+    cd ../..
+#
 
 # Install dependencies to include and libs folders
     echo "--------------------------------------------------"
@@ -326,7 +393,7 @@ echo ""
     elif [ "$currentOS" == "mac" ] || [ "$currentOS" == "linux" ]; then
             cp  tmp/compiled-memory/src/libfoonathan_memory-*.a      libs/
             cp  tmp/compiled-nfd-extended/build/src/libnfd.a         libs/
-    # ADD RAYLIB LIBS
+            cp  tmp/compiled-raylib/build/raylib/libraylib.a         libs/
     fi
 
     #copy extra compiled files
