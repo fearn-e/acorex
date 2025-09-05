@@ -218,7 +218,13 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 		mOutDeviceDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
 
 		mBufferSizeDropdown->setSelectedValueByIndex ( 3, true ); currentBufferSize = 512;
-		mOutDeviceDropdown->setSelectedValueByIndex ( 0, true ); currentOutDevice = outDevices[0];
+		//find the device named "Default Device"
+		size_t defaultDevice = 0;
+		for ( size_t i = 0; i < outDevices.size ( ); i++ )
+		{
+			if ( outDevices[i].name == "Default Device" ) { defaultDevice = i; break; }
+		}
+		mOutDeviceDropdown->setSelectedValueByIndex(defaultDevice, true); currentOutDevice = outDevices[defaultDevice];
 
 		mMainPanel.add ( mBufferSizeDropdown.get ( ) );
 		mMainPanel.add ( mOutDeviceDropdown.get ( ) );
