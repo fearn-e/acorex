@@ -33,6 +33,8 @@ void ofApp::setup ( )
 
 	mAnalyserMenu.Initialise ( false );
 	mExplorerMenu.Initialise ( false );
+
+	mExplorerMenu.Show ( );
 }
 
 void ofApp::update ( )
@@ -92,7 +94,7 @@ void ofApp::SetupUI ( bool keepValues )
 	mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout.topBarHeight / 4 );
 	mAnalyseToggle.setBackgroundColor ( mColors.transparent );
 
-	bool tmpExplore = keepValues ? mExploreToggle : false;
+	bool tmpExplore = keepValues ? mExploreToggle : true;
 	mExploreToggle.setup ( "Explore", tmpExplore, mLayout.topBarButtonWidth, mLayout.topBarHeight / 2 );
 	mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout.topBarHeight / 4 );
 	mExploreToggle.setBackgroundColor ( mColors.transparent );
