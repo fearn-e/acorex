@@ -148,21 +148,21 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 			mColorSpectrumSwitcher.setBackgroundColor ( mColors.interfaceBackgroundColor );
 			mLiveView.SetColorFullSpectrum ( false );
 
-			mMainPanel.add ( mLoopPlayheadsToggle.setup ( "Loop when reaching end of a file", false ) );
+			mMainPanel.add ( mLoopPlayheadsToggle.setup ( "Loop when reaching end of a file", true ) );
 			mLoopPlayheadsToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mLiveView.GetAudioPlayback ( )->SetLoopPlayheads ( false );
+			mLiveView.GetAudioPlayback ( )->SetLoopPlayheads ( true );
 
-			mMainPanel.add ( mJumpSameFileAllowedToggle.setup ( "Jump to same file allowed", false ) );
+			mMainPanel.add ( mJumpSameFileAllowedToggle.setup ( "Jump to same file allowed", true ) );
 			mJumpSameFileAllowedToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mLiveView.GetAudioPlayback ( )->SetJumpSameFileAllowed ( false );
+			mLiveView.GetAudioPlayback ( )->SetJumpSameFileAllowed ( true );
 
 			mMainPanel.add ( mJumpSameFileMinTimeDiffSlider.setup ( "Same file jump min point difference", 2, 1, 30 ) );
 			mJumpSameFileMinTimeDiffSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 			mLiveView.GetAudioPlayback ( )->SetJumpSameFileMinTimeDiff ( 2 );
 
-			mMainPanel.add ( mCrossoverJumpChanceSlider.setup ( "Crossover Jump Chance", 0.05, 0.0, 1.0 ) );
+			mMainPanel.add ( mCrossoverJumpChanceSlider.setup ( "Crossover Jump Chance", 0.95, 0.0, 1.0 ) );
 			mCrossoverJumpChanceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mLiveView.GetAudioPlayback ( )->SetCrossoverJumpChance ( 50 );
+			mLiveView.GetAudioPlayback ( )->SetCrossoverJumpChance ( 950 );
 
 			size_t maxCrossfadeLength = mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction;
 			mMainPanel.add ( mCrossfadeMaxSampleLengthSlider.setup ( "Crossfade Max Sample Length", maxCrossfadeLength, 1, maxCrossfadeLength ) );
