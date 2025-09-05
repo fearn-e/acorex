@@ -405,10 +405,10 @@ void ExplorerMenu::OpenCorpus ( )
 		int dimensionCount = mRawView->GetDimensions ( ).size ( );
 		if ( mRawView->IsTimeAnalysis ( ) || mRawView->IsReduction ( ) )
 		{
-			xDimension = mRawView->GetDimensions ( ).size ( ) > 0 ? mRawView->GetDimensions ( )[0] : "None";
-			yDimension = mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : "None";
-			zDimension = mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : "None";
-			colorDimension = mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : "None";
+			xDimension = mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : "None";
+			yDimension = mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : "None";
+			zDimension = mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : "None";
+			colorDimension = mRawView->GetDimensions ( )[0];
 		}
 		else
 		{
