@@ -63,6 +63,7 @@ private:
 	void SetCrossfadeMaxSampleLength ( int& length );
 	void SetMaxJumpDistanceSpace ( float& distance );
 	void SetMaxJumpTargets ( int& targets );
+	void SetVolume(float & volume);
 
 	void MouseReleased ( ofMouseEventArgs& args );
 
@@ -112,6 +113,8 @@ private:
 	ofxIntSlider mCrossfadeMaxSampleLengthSlider;
 	ofxFloatSlider mMaxJumpDistanceSpaceSlider;
 	ofxIntSlider mMaxJumpTargetsSlider;
+
+	ofxFloatSlider mVolumeSlider;
 
 	unique_ptr<ofxIntDropdown> mBufferSizeDropdown;
 	unique_ptr<ofxDropdown> mOutDeviceDropdown;

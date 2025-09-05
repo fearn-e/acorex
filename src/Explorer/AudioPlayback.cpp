@@ -102,6 +102,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 	}
 
 	double crossoverJumpChance = (double)mCrossoverJumpChanceX1000 / 1000.0;
+	double volume = (double)mVolumeX1000 / 1000.0;
 
 	for ( size_t playheadIndex = 0; playheadIndex < mPlayheads.size ( ); playheadIndex++ )
 	{
@@ -241,6 +242,13 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			outBuffer.getSample ( sampleIndex, 0 ) += playheadBuffer.getSample ( sampleIndex, 0 );
 			outBuffer.getSample ( sampleIndex, 1 ) += playheadBuffer.getSample ( sampleIndex, 0 );
 		}
+	}
+
+	// multiply outbuffer by volume
+	for ( size_t sampleIndex = 0; sampleIndex < outBuffer.getNumFrames ( ); sampleIndex++ )
+	{
+		outBuffer.getSample ( sampleIndex, 0 ) *= volume;
+		outBuffer.getSample ( sampleIndex, 1 ) *= volume;
 	}
 
 	if ( mVisualPlayheadUpdateMutex.try_lock ( ) )

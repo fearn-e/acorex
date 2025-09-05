@@ -176,6 +176,10 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 			mMainPanel.add ( mMaxJumpTargetsSlider.setup ( "Max Jump Targets", 5, 1, 10 ) );
 			mMaxJumpTargetsSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 			mLiveView.GetAudioPlayback ( )->SetMaxJumpTargets ( 5 );
+
+			mMainPanel.add(mVolumeSlider.setup("Volume", 0.5, 0.0, 1.0));
+			mVolumeSlider.setBackgroundColor(mColors.interfaceBackgroundColor);
+			mLiveView.GetAudioPlayback()->SetVolume(500);
 		}
 
 		mBufferSizeDropdown.reset ( );
@@ -242,6 +246,7 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 
 		mBufferSizeDropdown->addListener ( this, &ExplorerMenu::SetBufferSize );
 		mOutDeviceDropdown->addListener ( this, &ExplorerMenu::SetOutDevice );
+		mVolumeSlider.addListener(this, &ExplorerMenu::SetVolume);
 
 		ofAddListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
 		bListenersAdded = true;
@@ -361,6 +366,7 @@ void ExplorerMenu::RemoveListeners ( )
 	mCrossfadeMaxSampleLengthSlider.removeListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
 	mMaxJumpDistanceSpaceSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
 	mMaxJumpTargetsSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpTargets );
+	mVolumeSlider.removeListener(this, &ExplorerMenu::SetVolume);
 
 	ofRemoveListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
 	bListenersAdded = false;
@@ -578,6 +584,10 @@ void ExplorerMenu::SetMaxJumpDistanceSpace ( float& distance )
 void ExplorerMenu::SetMaxJumpTargets ( int& targets )
 {
 	mLiveView.GetAudioPlayback ( )->SetMaxJumpTargets ( targets );
+}
+
+void ExplorerMenu::SetVolume(float & volume) {
+	mLiveView.GetAudioPlayback()->SetVolume((int)(volume * 1000));
 }
 
 void ExplorerMenu::MouseReleased ( ofMouseEventArgs& args )

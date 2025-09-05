@@ -58,6 +58,7 @@ public:
 	void SetCrossfadeSampleLength ( int length ) { mCrossfadeSampleLength = length; }
 	void SetMaxJumpDistanceSpace ( int distanceX1000 ) { mMaxJumpDistanceSpaceX1000 = distanceX1000; }
 	void SetMaxJumpTargets ( int targets ) { mMaxJumpTargets = targets; }
+	void SetVolume(int volumeX1000) { mVolumeX1000 = volumeX1000; }
 
 private:
 
@@ -84,6 +85,7 @@ private:
 	std::atomic<int> mCrossfadeSampleLength = 256;
 	std::atomic<int> mMaxJumpDistanceSpaceX1000 = 50;
 	std::atomic<int> mMaxJumpTargets = 5;
+	std::atomic<int> mVolumeX1000 = 500;
 
 	// thread safety ------------------------------
 
