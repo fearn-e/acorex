@@ -310,7 +310,7 @@ void ExplorerMenu::Draw ( )
 			ofDrawBitmapString ( "Samp: " + ofToString ( playhead.sampleIndex ), playhead.panelRect.x + 5, playhead.panelRect.y + 45 );
 
 			// draw another smaller rectangle in the top right corner of the panel
-			int smallRectSize = ( playhead.panelRect.width + playhead.panelRect.height ) / 20;
+			int smallRectSize = ( playhead.panelRect.width + playhead.panelRect.height ) / 10;
 			ofSetColor ( mColors.interfaceBackgroundColor );
 			ofDrawRectangle ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, smallRectSize, smallRectSize );
 			// draw an X in the top right corner of the panel
@@ -594,7 +594,7 @@ void ExplorerMenu::MouseReleased ( ofMouseEventArgs& args )
 {
 	for ( auto& playhead : mLiveView.GetPlayheads ( ) )
 	{
-		int smallRectSize = ( playhead.panelRect.width + playhead.panelRect.height ) / 20;
+		int smallRectSize = ( playhead.panelRect.width + playhead.panelRect.height ) / 10;
 		ofRectangle smallRect = ofRectangle ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, smallRectSize, smallRectSize );
 
 		if ( smallRect.inside ( args.x, args.y ) )
