@@ -18,13 +18,13 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Utils/Data.h"
 #include "Utils/DatasetConversion.h"
-#include <algorithms/public/UMAP.hpp>
+#include <flucoma/algorithms/public/UMAP.hpp>
 #include <Eigen/Core>
-#include <data/FluidDataSet.hpp>
-#include <data/FluidIndex.hpp>
-#include <data/FluidJSON.hpp>
-#include <data/FluidMemory.hpp>
-#include <data/TensorTypes.hpp>
+#include <flucoma/data/FluidDataSet.hpp>
+#include <flucoma/data/FluidIndex.hpp>
+#include <flucoma/data/FluidJSON.hpp>
+#include <flucoma/data/FluidMemory.hpp>
+#include <flucoma/data/TensorTypes.hpp>
 #include <vector>
 
 namespace Acorex {
