@@ -1,115 +1,144 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>ACorEx</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="google-site-verification" content="pzRac9G-UwBGfut0gppSKqMkdgaqQg-sMjQ-Cn7CJI4" />
-<link rel="stylesheet" href="styles.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-<style>
-body, html {
-  height: 100%;
-  font-family: "Atkinson Hyperlegible", sans-serif;
-}
+  <title>ACorEx</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-site-verification" content="pzRac9G-UwBGfut0gppSKqMkdgaqQg-sMjQ-Cn7CJI4" />
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    rel="stylesheet">
+  <style>
+    body,
+    html {
+      height: 100%;
+      font-family: "Atkinson Hyperlegible", sans-serif;
+    }
 
-.bgimg {
-  background-position: center;
-  background-size: cover;
-  background-color: gray;
-  background-image: url("acorex_examples.jpg");
-  min-height: 75%;
-}
+    .bgimg {
+      background-position: center;
+      background-size: cover;
+      background-color: gray;
+      background-image: url("acorex_examples.jpg");
+      min-height: 75%;
+    }
 
- a:link {
-  color: green;
-}
+    a:link {
+      color: green;
+    }
 
-a:visited {
-  color: red;
-}
+    a:visited {
+      color: red;
+    }
 
-a:hover {
-  color: hotpink;
-}
+    a:hover {
+      color: hotpink;
+    }
 
-a:active {
-  color: blue;
-} 
-
-</style>
+    a:active {
+      color: blue;
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- Links (sit on top) -->
-<div class="w3-top">
-  <div class="w3-row w3-padding w3-black">
-    <div class="w3-col s2">
-      <a href="#about" class="w3-button w3-block w3-black">ABOUT</a>
-    </div>
-    <div class="w3-col s2">
-      <a href="#contact" class="w3-button w3-block w3-black">CONTACT</a>
-    </div>
-    <div class="w3-col s4">
-      <a href="#" class="w3-button w3-block w3-black">HOME</a>
-    </div>
-    <div class="w3-col s2">
-      <a href="#download" class="w3-button w3-block w3-black">DOWNLOAD</a>
-    </div>
-    <div class="w3-col s2">
-      <a href="https://github.com/fearn-e/acorex" class="w3-button w3-block w3-black">GITHUB</a>
+  <!-- Links (sit on top) -->
+  <div class="w3-top">
+    <div class="w3-row w3-padding w3-black">
+      <div class="w3-col s2">
+        <a href="#about" class="w3-button w3-block w3-black">ABOUT</a>
+      </div>
+      <div class="w3-col s2">
+        <a href="#contact" class="w3-button w3-block w3-black">CONTACT</a>
+      </div>
+      <div class="w3-col s4">
+        <a href="#" class="w3-button w3-block w3-black">HOME</a>
+      </div>
+      <div class="w3-col s2">
+        <a href="#download" class="w3-button w3-block w3-black">DOWNLOAD</a>
+      </div>
+      <div class="w3-col s2">
+        <a href="https://github.com/fearn-e/acorex" class="w3-button w3-block w3-black">GITHUB</a>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Header with image -->
-<header class="bgimg w3-display-container w3-grayscale-min" id="home">
-  <div class="w3-display-middle w3-center w3-wide">
-    <span class="w3-text-sand" style="font-size:3.5vw;background-color:rgba(0, 0, 0, 0.5);border-radius:15px;">A<sup style="color:gray">udio </sup>Cor<sup style="color:gray">pus </sup>Ex<sup style="color:gray">plorer</sup></span>
-  </div>
-</header>
+  <!-- Header with image -->
+  <header class="bgimg w3-display-container w3-grayscale-min" id="home">
+    <div class="w3-display-middle w3-center w3-wide">
+      <span class="w3-text-sand" style="font-size:3.5vw;background-color:rgba(0, 0, 0, 0.5);border-radius:15px;">A<sup
+          style="color:gray">udio </sup>Cor<sup style="color:gray">pus </sup>Ex<sup
+          style="color:gray">plorer</sup></span>
+    </div>
+  </header>
 
-<!-- Add a background color and large text to the whole page -->
-<div class="w3-sand w3-grayscale w3-large">
+  <!-- Add a background color and large text to the whole page -->
+  <div class="w3-sand w3-grayscale w3-large">
 
-<!-- About Container -->
-<div class="w3-container" id="about">
-  <div class="w3-content" style="max-width:700px;">
-  <h5 class="w3-center w3-padding-64"><span class="w3-tag w3-wide">ABOUT</span></h5>
-    <p style="margin-top:-10px;">ACorEx is a visualised corpus browser for corpus-based concatenative synthesis, similar to existing software such as AudioStellar and CataRT. It was created to investigate ideas of three-dimensional visualisation within CBCS, as well as find novel approaches to concatenative synthesis, utilising chronological segment information within the synthesis engine. The tool provides an interface for musical synthesis, as well as analysing and browsing collections of audio samples.</p>
-    <p>ACorEx was developed by <a href="https://github.com/fearn-e">Elowyn Fearne</a> at the <a href="https://www.hud.ac.uk/">University of Huddersfield</a> in England as part of her Master's by Research degree, utilising <a href="https://openframeworks.cc/">OpenFrameworks</a> and <a href="https://www.flucoma.org/">FluCoMa-Core</a>. The tool is open-source and free to use. It is available for Windows and MacOS, with a Linux version in development.</p>
-    <p>While development has slowed down, some updates are still planned — for queries and suggestions, please see the <a href="#contact">contact links</a>.</p>
-  </div>
-</div>
+    <!-- About Container -->
+    <div class="w3-container" id="about">
+      <div class="w3-content" style="max-width:700px;">
+        <h5 class="w3-center w3-padding-64"><span class="w3-tag w3-wide">ABOUT</span></h5>
+        <p style="margin-top:-10px;">ACorEx is a visualised corpus browser for corpus-based concatenative synthesis,
+          similar to existing software such as AudioStellar and CataRT. It was created to investigate ideas of
+          three-dimensional visualisation within CBCS, as well as find novel approaches to concatenative synthesis,
+          utilising chronological segment information within the synthesis engine. The tool provides an interface for
+          musical synthesis, as well as analysing and browsing collections of audio samples.</p>
+        <p>ACorEx was developed by <a href="https://github.com/fearn-e">Elowyn Fearne</a> at the <a
+            href="https://www.hud.ac.uk/">University of Huddersfield</a> in England as part of her Master's by Research
+          degree, utilising <a href="https://openframeworks.cc/">OpenFrameworks</a> and <a
+            href="https://www.flucoma.org/">FluCoMa-Core</a>. The tool is open-source and free to use. It is available
+          for Windows and MacOS, with a Linux version in development.</p>
+        <p>While development has slowed down, some updates are still planned — for queries and suggestions, please see
+          the <a href="#contact">contact links</a>.</p>
+      </div>
 
-<br>
-<hr style="border-color:black;margin-left:30vw;margin-right:30vw">
+      <div class="w3-content" style="max-width:700px;">
+        <h5 class="w3-center w3-padding-32"><span class="w3-tag w3-wide">ACOREX IN PRACTICE</span></h5>
+        <iframe style="border: 0; width: 100%; height: 42px;"
+          src="https://bandcamp.com/EmbeddedPlayer/track=2949756298/size=small/bgcol=333333/linkcol=2ebd35/transparent=true/"
+          seamless><a href="https://fearn-e.bandcamp.com/track/observed">observed by Elowyn Fearne</a></iframe>
+        <iframe width="100%" height="395"
+          src="https://www.youtube.com/embed/DoiruquJjtk?autoplay=0&mute=0&controls=1&rel=0"
+          title="YouTube video player" frameborder="0" allowfullscreen>
+        </iframe>
+        <p style="margin-top:-10px;"><i>First live performance using ACorEx — observed, by Elowyn Fearne (2025)</i></p>
+      </div>
+    </div>
 
-<!-- Download Container -->
-<div class="w3-container" id="download">
-  <div class="w3-content" style="max-width:700px">
-    <h5 class="w3-center w3-padding-64"><span class="w3-tag w3-wide">DOWNLOAD LINKS</span></h5>
-    <p style="text-align: center; font-size: larger;margin-top:-20px;">Latest version:</p>
-    <div style="margin-top: -20px;">
-        <div style="display: flex; justify-content: center;">
+    <br>
+    <hr style="border-color:black;margin-left:30vw;margin-right:30vw">
+
+    <!-- Download Container -->
+    <div class="w3-container" id="download">
+      <div class="w3-content" style="max-width:700px">
+        <h5 class="w3-center w3-padding-64"><span class="w3-tag w3-wide">DOWNLOAD LINKS</span></h5>
+        <p style="text-align: center; font-size: larger;margin-top:-20px;">Latest version:</p>
+        <div style="margin-top: -20px;">
+          <div style="display: flex; justify-content: center;">
             <!-- replace these with new version -->
             <a href="acorex_v1.0.0_win.zip">
-                <p><button style="margin-right:20px;" class="w3-button w3-black" type="button"><strong>Windows v1.0.0</strong></button></p>
+              <p><button style="margin-right:20px;" class="w3-button w3-black" type="button"><strong>Windows
+                    v1.0.0</strong></button></p>
             </a>
             <a href="acorex_v1.0.0_mac.app.zip">
-                <p><button class="w3-button w3-black" type="button"><strong>MacOS (UB) v1.0.0</strong></button></p>
+              <p><button class="w3-button w3-black" type="button"><strong>MacOS (UB) v1.0.0</strong></button></p>
             </a>
-        </div>
-        <div style="display: flex; justify-content: center; margin-top: -15px;">
+          </div>
+          <div style="display: flex; justify-content: center; margin-top: -15px;">
             <a href="README.md">
-                <p><button class="w3-button w3-black" type="button"><strong>User Manual</strong></button></p>
+              <p><button class="w3-button w3-black" type="button"><strong>User Manual</strong></button></p>
             </a>
+          </div>
+          <p style="text-align: center;margin-bottom:-15px;">Older versions may be found on the <a
+              href="https://github.com/fearn-e/acorex/tags"><strong>GitHub repo</strong></a>.</p>
         </div>
-      <p style="text-align: center;margin-bottom:-15px;">Older versions may be found on the <a href="https://github.com/fearn-e/acorex/tags"><strong>GitHub repo</strong></a>.</p>
-    </div>
-    <!-- <br>
+        <!-- <br>
     <br>
     <p style="text-align: center;font-size:larger;">Previous versions:</p>
     !-- add old versions here --
@@ -124,28 +153,31 @@ a:active {
         </a>
     </div>
     </div> -->
+      </div>
+    </div>
+
+    <br>
+    <br>
+    <hr style="border-color:black;margin-left:30vw;margin-right:30vw">
+
+    <!-- Contact Container -->
+    <div class="w3-container" id="contact">
+      <div class="w3-content" style="max-width:700px">
+        <h5 class="w3-center w3-padding-48"><span class="w3-tag w3-wide">CONTACT</span></h5>
+        <p style="text-align:center;margin-top:-20px;">For any queries or feedback, <br> please contact Elowyn Fearne at
+          <a href="mailto:gitfearne@proton.me">gitfearne@proton.me</a>,<br> or leave a detailed issue on the <a
+            href="https://github.com/fearn-e/acorex/issues"><strong>GitHub repo</strong></a>.
+        </p>
+      </div>
+    </div>
+
+    <!-- End page content -->
   </div>
-</div>
 
-<br>
-<br>
-<hr style="border-color:black;margin-left:30vw;margin-right:30vw">
-
-<!-- Contact Container -->
-<div class="w3-container" id="contact">
-  <div class="w3-content" style="max-width:700px">
-    <h5 class="w3-center w3-padding-48"><span class="w3-tag w3-wide">CONTACT</span></h5>
-    <p style="text-align:center;margin-top:-20px;">For any queries or feedback, <br> please contact Elowyn Fearne at <a href="mailto:gitfearne@proton.me">gitfearne@proton.me</a>,<br> or leave a detailed issue on the <a href="https://github.com/fearn-e/acorex/issues"><strong>GitHub repo</strong></a>.
-    </p>
-  </div>
-</div>
-
-<!-- End page content -->
-</div>
-
-<!-- Footer -->
-<footer class="w3-center w3-light-grey w3-padding-48 w3-large">
-</footer>
+  <!-- Footer -->
+  <footer class="w3-center w3-light-grey w3-padding-48 w3-large">
+  </footer>
 
 </body>
+
 </html>
