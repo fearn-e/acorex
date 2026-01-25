@@ -114,8 +114,6 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 				mDimensionDropdownColor->add ( dimension );
 			}
 
-			bool needStatisticDropdowns = !mRawView->IsTimeAnalysis ( ) && !mRawView->IsReduction ( );
-
 			mMainPanel.add ( mDimensionDropdownX.get ( ) );
 			mMainPanel.add ( mDimensionDropdownY.get ( ) );
 			mMainPanel.add ( mDimensionDropdownZ.get ( ) );
