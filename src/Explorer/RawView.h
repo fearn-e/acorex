@@ -40,9 +40,12 @@ public:
 	Utils::TimeData* GetTimeData ( ); // get time data from dataset
 	Utils::StatsData* GetStatsData ( ); // get stats data from dataset
 	Utils::DataSet* GetDataset ( ); // get dataset
+	size_t GetHopSize ( ) const; // get hop size used in analysis
 
 private:
 	bool LoadAudioSet ( Utils::DataSet& dataset ); // load all audio files in dataset into memory
+
+	size_t mHopSize = 512;
 
 	std::string mCorpusName;
 	Utils::DataSet mDataset;

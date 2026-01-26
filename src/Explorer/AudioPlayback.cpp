@@ -196,22 +196,21 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			{
 				std::lock_guard<std::mutex> lock ( mTimeCorpusMutex, std::adopt_lock );
 
-				size_t hopSize = mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction;
-				size_t timePointIndex = mPlayheads[playheadIndex].sampleIndex / hopSize;
+				size_t timePointIndex = mPlayheads[playheadIndex].sampleIndex / mRawView->GetHopSize ( );
 				glm::vec3 playheadPosition = mTimeCorpus[mPlayheads[playheadIndex].fileIndex].getVertex ( timePointIndex );
 				Utils::PointFT nearestPoint;
 				Utils::PointFT currentPoint; currentPoint.file = mPlayheads[playheadIndex].fileIndex; currentPoint.time = timePointIndex;
 
 				if ( !mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, 
 															mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileAllowed, 
-															mJumpSameFileMinTimeDiff, requiredSamples, *mRawView->GetAudioData ( ), hopSize ) )
+															mJumpSameFileMinTimeDiff, requiredSamples, *mRawView->GetAudioData ( ), mRawView->GetHopSize ( ) ) )
 				{ continue; }
 
 				if ( mRawView->GetAudioData ( )->loaded[nearestPoint.file] == false ) { continue; }
 
 				mPlayheads[playheadIndex].crossfading = true;
 				mPlayheads[playheadIndex].jumpFileIndex = nearestPoint.file;
-				mPlayheads[playheadIndex].jumpSampleIndex = nearestPoint.time * hopSize;
+				mPlayheads[playheadIndex].jumpSampleIndex = nearestPoint.time * mRawView->GetHopSize ( );
 				mPlayheads[playheadIndex].crossfadeCurrentSample = 0;
 				mPlayheads[playheadIndex].crossfadeSampleLength = requiredSamples;
 			}

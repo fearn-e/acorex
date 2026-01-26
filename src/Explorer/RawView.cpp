@@ -57,6 +57,8 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
 
 	success = LoadAudioSet ( mDataset );
 	
+	if ( success ) { mHopSize = mDataset.analysisSettings.windowFFTSize / mDataset.analysisSettings.hopFraction; }
+
 	return success;
 }
 
@@ -146,4 +148,9 @@ Utils::StatsData* Explorer::RawView::GetStatsData ( )
 Utils::DataSet* Explorer::RawView::GetDataset ( )
 {
 	return &mDataset;
+}
+
+size_t Explorer::RawView::GetHopSize ( ) const
+{
+	return mHopSize;
 }
