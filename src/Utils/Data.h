@@ -40,6 +40,11 @@ enum class Axis : int {
 	MULTIPLE = 5
 };
 
+struct DimensionBoundsData {
+	std::vector<double> min; // [dimension]
+	std::vector<double> max; // [dimension]
+};
+
 struct AudioData {
 	std::vector<bool> loaded; // [file]
 	std::vector<ofSoundBuffer> raw; // [file]

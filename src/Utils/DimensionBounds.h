@@ -33,17 +33,17 @@ public:
 
 	void CalculateBounds ( const DataSet& dataset )
 	{
-		minBounds.clear ( );
-		maxBounds.clear ( );
+		bounds.min.clear ( );
+		bounds.max.clear ( );
 
-		minBounds.resize ( dataset.dimensionNames.size ( ) );
-		maxBounds.resize ( dataset.dimensionNames.size ( ) );
+		bounds.min.resize ( dataset.dimensionNames.size ( ) );
+		bounds.max.resize ( dataset.dimensionNames.size ( ) );
 
 #pragma omp parallel for
 		for ( int dimension = 0; dimension < dataset.dimensionNames.size ( ); dimension++ )
 		{
-			minBounds[dimension] = std::numeric_limits<double>::max ( );
-			maxBounds[dimension] = std::numeric_limits<double>::max ( ) * -1;
+			bounds.min[dimension] = std::numeric_limits<double>::max ( );
+			bounds.max[dimension] = std::numeric_limits<double>::max ( ) * -1;
 
 			for ( int file = 0; file < dataset.fileList.size ( ); file++ )
 			{
@@ -51,32 +51,32 @@ public:
 				{
 					for ( int timepoint = 0; timepoint < dataset.time.raw[file].size ( ); timepoint++ )
 					{
-						if ( dataset.time.raw[file][timepoint][dimension] < minBounds[dimension] ) { minBounds[dimension] = dataset.time.raw[file][timepoint][dimension]; }
-						if ( dataset.time.raw[file][timepoint][dimension] > maxBounds[dimension] ) { maxBounds[dimension] = dataset.time.raw[file][timepoint][dimension]; }
+						if ( dataset.time.raw[file][timepoint][dimension] < bounds.min[dimension] ) { bounds.min[dimension] = dataset.time.raw[file][timepoint][dimension]; }
+						if ( dataset.time.raw[file][timepoint][dimension] > bounds.max[dimension] ) { bounds.max[dimension] = dataset.time.raw[file][timepoint][dimension]; }
 					}
 				}
 				else if ( dataset.analysisSettings.hasBeenReduced )
 				{
-					if ( dataset.stats.reduced[file][dimension] < minBounds[dimension] ) { minBounds[dimension] = dataset.stats.reduced[file][dimension]; }
-					if ( dataset.stats.reduced[file][dimension] > maxBounds[dimension] ) { maxBounds[dimension] = dataset.stats.reduced[file][dimension]; }
+					if ( dataset.stats.reduced[file][dimension] < bounds.min[dimension] ) { bounds.min[dimension] = dataset.stats.reduced[file][dimension]; }
+					if ( dataset.stats.reduced[file][dimension] > bounds.max[dimension] ) { bounds.max[dimension] = dataset.stats.reduced[file][dimension]; }
 				}
 				else
 				{
 					int tempDim = dimension / DATA_NUM_STATS;
 					int tempStat = dimension % DATA_NUM_STATS;
-					if ( dataset.stats.raw[file][tempDim][tempStat] < minBounds[dimension] ) { minBounds[dimension] = dataset.stats.raw[file][tempDim][tempStat]; }
-					if ( dataset.stats.raw[file][tempDim][tempStat] > maxBounds[dimension] ) { maxBounds[dimension] = dataset.stats.raw[file][tempDim][tempStat]; }
+					if ( dataset.stats.raw[file][tempDim][tempStat] < bounds.min[dimension] ) { bounds.min[dimension] = dataset.stats.raw[file][tempDim][tempStat]; }
+					if ( dataset.stats.raw[file][tempDim][tempStat] > bounds.max[dimension] ) { bounds.max[dimension] = dataset.stats.raw[file][tempDim][tempStat]; }
 				}
 			}
 		}
 	}
 
-	double GetMinBound ( int dimension ) const { return minBounds[dimension]; }
-	double GetMaxBound ( int dimension ) const { return maxBounds[dimension]; }
+	double GetMinBound ( int dimension ) const { return bounds.min[dimension]; }
+	double GetMaxBound ( int dimension ) const { return bounds.max[dimension]; }
+	Utils::DimensionBoundsData GetBoundsData ( ) const { return bounds; }
 
 private:
-	std::vector<double> minBounds;
-	std::vector<double> maxBounds;
+	Utils::DimensionBoundsData bounds;
 };
 
 } // namespace Utils
