@@ -65,7 +65,7 @@ void Explorer::LiveView::Initialise ( )
 	if ( mPlayingFiles.size ( ) > 0 ) { mPlayingFiles.clear ( ); }
 	if ( mPlayingTimeHeads.size ( ) > 0 ) { mPlayingTimeHeads.clear ( ); }
 
-	mAudioPlayback.Initialise ( );
+	mAudioPlayback.Initialise ( mDimensionBounds.GetBoundsData ( ) );
 	mAudioPlayback.SetRawView ( mRawView );
 
 	if ( !listenersAdded )

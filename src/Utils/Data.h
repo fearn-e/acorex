@@ -37,7 +37,8 @@ enum class Axis : int {
 	Z = 2,
 	COLOR = 3,
 	NONE = 4,
-	MULTIPLE = 5
+	MULTIPLE = 5,
+	DYNAMIC_PAN = 6
 };
 
 struct DimensionBoundsData {

@@ -65,6 +65,9 @@ private:
 	void SetMaxJumpTargets ( int& targets );
 	void SetVolume(float & volume);
 
+	void SwapDimensionDynamicPan ( string& dimension );
+	void SetPanningStrength ( float& strength );
+
 	void MouseReleased ( ofMouseEventArgs& args );
 
 	void SetBufferSize ( int& bufferSize );
@@ -115,6 +118,9 @@ private:
 	ofxIntSlider mMaxJumpTargetsSlider;
 
 	ofxFloatSlider mVolumeSlider;
+
+	unique_ptr<ofxDropdown> mDimensionDropdownDynamicPan;
+	ofxFloatSlider mPanningStrengthSlider;
 
 	unique_ptr<ofxIntDropdown> mBufferSizeDropdown;
 	unique_ptr<ofxDropdown> mOutDeviceDropdown;

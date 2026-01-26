@@ -93,11 +93,13 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 		mDimensionDropdownY.reset ( );
 		mDimensionDropdownZ.reset ( );
 		mDimensionDropdownColor.reset ( );
+		mDimensionDropdownDynamicPan.reset ( );
 
 		mDimensionDropdownX = make_unique<ofxDropdown> ( (string)"X Dimension", dropdownScrollSpeed );
 		mDimensionDropdownY = make_unique<ofxDropdown>( (string)"Y Dimension", dropdownScrollSpeed);
 		mDimensionDropdownZ = make_unique<ofxDropdown>( (string)"Z Dimension", dropdownScrollSpeed);
 		mDimensionDropdownColor = make_unique<ofxDropdown>( (string)"Color Dimension", dropdownScrollSpeed);
+		mDimensionDropdownDynamicPan = make_unique<ofxDropdown> ( (string)"Dynamic Panning Dimension", dropdownScrollSpeed );
 
 		if ( bInitialiseShouldLoad )
 		{
@@ -105,6 +107,7 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 			mDimensionDropdownY->add ( "None" );
 			mDimensionDropdownZ->add ( "None" );
 			mDimensionDropdownColor->add ( "None" );
+			mDimensionDropdownDynamicPan->add ( "None" );
 
 			for ( auto& dimension : mRawView->GetDimensions ( ) )
 			{
@@ -112,33 +115,39 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 				mDimensionDropdownY->add ( dimension );
 				mDimensionDropdownZ->add ( dimension );
 				mDimensionDropdownColor->add ( dimension );
+				mDimensionDropdownDynamicPan->add ( dimension );
 			}
 
 			mMainPanel.add ( mDimensionDropdownX.get ( ) );
 			mMainPanel.add ( mDimensionDropdownY.get ( ) );
 			mMainPanel.add ( mDimensionDropdownZ.get ( ) );
 			mMainPanel.add ( mDimensionDropdownColor.get ( ) );
+			mMainPanel.add ( mDimensionDropdownDynamicPan.get ( ) ); // TODO - move this down in the UI with the other pan controls
 		}
 
 		mDimensionDropdownX->disableMultipleSelection ( );
 		mDimensionDropdownY->disableMultipleSelection ( );
 		mDimensionDropdownZ->disableMultipleSelection ( );
 		mDimensionDropdownColor->disableMultipleSelection ( );
+		mDimensionDropdownDynamicPan->disableMultipleSelection ( );
 
 		mDimensionDropdownX->enableCollapseOnSelection ( );
 		mDimensionDropdownY->enableCollapseOnSelection ( );
 		mDimensionDropdownZ->enableCollapseOnSelection ( );
 		mDimensionDropdownColor->enableCollapseOnSelection ( );
+		mDimensionDropdownDynamicPan->enableCollapseOnSelection ( );
 
 		mDimensionDropdownX->setDropDownPosition ( ofxDropdown::DD_LEFT );
 		mDimensionDropdownY->setDropDownPosition ( ofxDropdown::DD_LEFT );
 		mDimensionDropdownZ->setDropDownPosition ( ofxDropdown::DD_LEFT );
 		mDimensionDropdownColor->setDropDownPosition ( ofxDropdown::DD_LEFT );
+		mDimensionDropdownDynamicPan->setDropDownPosition ( ofxDropdown::DD_LEFT );
 
 		mDimensionDropdownX->setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mDimensionDropdownY->setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mDimensionDropdownZ->setBackgroundColor ( mColors.interfaceBackgroundColor );
 		mDimensionDropdownColor->setBackgroundColor ( mColors.interfaceBackgroundColor );
+		mDimensionDropdownDynamicPan->setBackgroundColor ( mColors.interfaceBackgroundColor );
 
 		if ( bInitialiseShouldLoad )
 		{
@@ -178,6 +187,10 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 			mMainPanel.add(mVolumeSlider.setup("Volume", 0.5, 0.0, 1.0));
 			mVolumeSlider.setBackgroundColor(mColors.interfaceBackgroundColor);
 			mLiveView.GetAudioPlayback()->SetVolume(500);
+			
+			mMainPanel.add ( mPanningStrengthSlider.setup ( "Panning Width", 1.0, 0.0, 1.0) );
+			mPanningStrengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+			mLiveView.GetAudioPlayback ( )->SetPanningStrength ( 1000 );
 		}
 
 		mBufferSizeDropdown.reset ( );
@@ -247,10 +260,13 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 		mCrossfadeMaxSampleLengthSlider.addListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
 		mMaxJumpDistanceSpaceSlider.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
 		mMaxJumpTargetsSlider.addListener ( this, &ExplorerMenu::SetMaxJumpTargets );
+		mVolumeSlider.addListener ( this, &ExplorerMenu::SetVolume );
+
+		mDimensionDropdownDynamicPan->addListener ( this, &ExplorerMenu::SwapDimensionDynamicPan );
+		mPanningStrengthSlider.addListener ( this, &ExplorerMenu::SetPanningStrength );
 
 		mBufferSizeDropdown->addListener ( this, &ExplorerMenu::SetBufferSize );
 		mOutDeviceDropdown->addListener ( this, &ExplorerMenu::SetOutDevice );
-		mVolumeSlider.addListener(this, &ExplorerMenu::SetVolume);
 
 		ofAddListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
 		bListenersAdded = true;
@@ -372,6 +388,9 @@ void ExplorerMenu::RemoveListeners ( )
 	mMaxJumpTargetsSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpTargets );
 	mVolumeSlider.removeListener(this, &ExplorerMenu::SetVolume);
 
+	mDimensionDropdownDynamicPan->removeListener ( this, &ExplorerMenu::SwapDimensionDynamicPan );
+	mPanningStrengthSlider.removeListener ( this, &ExplorerMenu::SetPanningStrength );
+
 	ofRemoveListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
 	bListenersAdded = false;
 }
@@ -404,7 +423,7 @@ void ExplorerMenu::OpenCorpus ( )
 	mLiveView.CreatePoints ( );
 
 	// set default dropdown values
-	std::string xDimension = "None", yDimension = "None", zDimension = "None", colorDimension = "None";
+	std::string xDimension = "None", yDimension = "None", zDimension = "None", colorDimension = "None", dynamicPanDimension = "None";
 	{
 		int dimensionCount = mRawView->GetDimensions ( ).size ( );
 		if ( mRawView->IsTimeAnalysis ( ) || mRawView->IsReduction ( ) )
@@ -413,13 +432,17 @@ void ExplorerMenu::OpenCorpus ( )
 			yDimension = mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : "None";
 			zDimension = mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : "None";
 			colorDimension = mRawView->GetDimensions ( )[0];
+			dynamicPanDimension = "None";
+			// could be better served to immediately load one of the dimensions here?
+			//dynamicPanDimension = mRawView->GetDimensions ( ).size ( ) > 4 ? mRawView->GetDimensions ( )[4] : "None";
 		}
-		else
+		else // TODO - i think this is old stats code, remove?
 		{
 			xDimension = mRawView->GetDimensions ( ).size ( ) > 0 ? mRawView->GetDimensions ( )[0] : "None";
 			yDimension = mRawView->GetDimensions ( ).size ( ) > 7 ? mRawView->GetDimensions ( )[7] : "None";
 			zDimension = mRawView->GetDimensions ( ).size ( ) > 14 ? mRawView->GetDimensions ( )[14] : "None";
 			colorDimension = mRawView->GetDimensions ( ).size ( ) > 21 ? mRawView->GetDimensions ( )[21] : "None";
+			dynamicPanDimension = mRawView->GetDimensions ( ).size ( ) > 28 ? mRawView->GetDimensions ( )[28] : "None";
 		}
 		
 	}
@@ -428,6 +451,7 @@ void ExplorerMenu::OpenCorpus ( )
 	mDimensionDropdownY->setSelectedValueByName ( yDimension, true );
 	mDimensionDropdownZ->setSelectedValueByName ( zDimension, true );
 	mDimensionDropdownColor->setSelectedValueByName ( colorDimension, true );
+	mDimensionDropdownDynamicPan->setSelectedValueByName ( dynamicPanDimension, true );
 
 	bBlockDimensionFilling = false;
 
@@ -438,6 +462,7 @@ void ExplorerMenu::OpenCorpus ( )
 	bIsCorpusOpen = true;
 
 	SwapDimension ( colorDimension, Utils::Axis::COLOR );
+	SwapDimension ( dynamicPanDimension, Utils::Axis::DYNAMIC_PAN );
 
 	mLiveView.ChangeAudioSettings ( currentBufferSize, currentOutDevice );
 }
@@ -445,6 +470,22 @@ void ExplorerMenu::OpenCorpus ( )
 void ExplorerMenu::SwapDimension ( string dimension, Utils::Axis axis )
 {
 	if ( bBlockDimensionFilling ) { return; }
+
+	if ( axis == Utils::Axis::DYNAMIC_PAN )
+	{
+		if ( dimension == "None" )
+		{
+			mLiveView.GetAudioPlayback ( )->SetDynamicPan ( false, 0 );
+		}
+		else
+		{
+			int dimensionIndex = GetDimensionIndex ( dimension );
+			if ( dimensionIndex == -1 ) { return; }
+			mLiveView.GetAudioPlayback ( )->SetDynamicPan ( true, dimensionIndex );
+		}
+
+		return;
+	}
 
 	if ( dimension == "None" )					{ mLiveView.FillDimensionNone ( axis ); }
 	else
@@ -591,7 +632,17 @@ void ExplorerMenu::SetMaxJumpTargets ( int& targets )
 }
 
 void ExplorerMenu::SetVolume(float & volume) {
-	mLiveView.GetAudioPlayback()->SetVolume((int)(volume * 1000));
+	mLiveView.GetAudioPlayback ( )->SetVolume ( (int)(volume * 1000) );
+}
+
+void ExplorerMenu::SwapDimensionDynamicPan ( string& dimension )
+{
+	SwapDimension ( dimension, Utils::Axis::DYNAMIC_PAN );
+}
+
+void ExplorerMenu::SetPanningStrength ( float& strength )
+{
+	mLiveView.GetAudioPlayback ( )->SetPanningStrength ( (int)(strength * 1000) );
 }
 
 void ExplorerMenu::MouseReleased ( ofMouseEventArgs& args )

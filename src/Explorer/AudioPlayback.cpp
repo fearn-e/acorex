@@ -20,9 +20,11 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
-void Explorer::AudioPlayback::Initialise ( )
+void Explorer::AudioPlayback::Initialise ( Utils::DimensionBoundsData dimensionBoundsData )
 {
 	srand ( time ( NULL ) );
+
+	mDimensionBounds = dimensionBoundsData;
 
 	ofSoundDevice outDevice;
 
@@ -103,18 +105,22 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
 	double crossoverJumpChance = (double)mCrossoverJumpChanceX1000 / 1000.0;
 	double volume = (double)mVolumeX1000 / 1000.0;
+	double panningStrength = (double)mPanningStrengthX1000 / 1000.0;
 
 	for ( size_t playheadIndex = 0; playheadIndex < mPlayheads.size ( ); playheadIndex++ )
 	{
-		Utils::AudioPlayhead* currentPlayhead = &mPlayheads[playheadIndex];
+
+
+		Utils::AudioPlayhead* currentPlayhead = &mPlayheads[playheadIndex]; // TODO - why is this not used - replace all instances of mPlayheads[playheadIndex] with currentPlayhead?
 
 		ofSoundBuffer playheadBuffer;
 		playheadBuffer.setSampleRate ( mSoundStream.getSampleRate ( ) );
-		playheadBuffer.allocate ( outBuffer.getNumFrames ( ), 1 );
+		playheadBuffer.allocate ( outBuffer.getNumFrames ( ), 2 );
 		
-		for ( size_t i = 0; i < playheadBuffer.size ( ); i++ )
+		for ( size_t i = 0; i < playheadBuffer.getNumFrames ( ); i++ )
 		{
 			playheadBuffer.getSample ( i, 0 ) = 0.0;
+			playheadBuffer.getSample ( i, 1 ) = 0.0;
 		}
 
 		size_t playheadBufferPosition = 0;
@@ -129,13 +135,49 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 				size_t bufferSpace = playheadBuffer.getNumFrames ( ) - playheadBufferPosition;
 				if ( crossfadeSamplesLeft > bufferSpace ) { crossfadeSamplesLeft = bufferSpace; }
 
+				float panStartNorm = 0.5f, panEndNorm = 0.5f;
+				if ( mDynamicPanEnabled && panningStrength > 0.0 )
+				{
+					size_t thisTimePointIndex = mPlayheads[playheadIndex].sampleIndex / mRawView->GetHopSize ( );
+					size_t jumpTimePointIndex = mPlayheads[playheadIndex].jumpSampleIndex / mRawView->GetHopSize ( );
+					
+					float panStart = mRawView->GetTimeData ( )->raw[mPlayheads[playheadIndex].fileIndex][thisTimePointIndex][mDynamicPanDimensionIndex];
+					float panEnd = mRawView->GetTimeData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex][jumpTimePointIndex][mDynamicPanDimensionIndex];
+					
+					panStartNorm = glm::clamp ( (float)(panStart - mDimensionBounds.min[mDynamicPanDimensionIndex]) / 
+												(float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]),
+												0.0f, 1.0f );
+					panEndNorm = glm::clamp (	(float)(panEnd - mDimensionBounds.min[mDynamicPanDimensionIndex]) / 
+												(float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]),
+												0.0f, 1.0f );
+				}
+
 				for ( size_t i = 0; i < crossfadeSamplesLeft; i++ )
 				{
-					float gain_A = cos ( (float)( mPlayheads[playheadIndex].crossfadeCurrentSample + i ) / (float)mPlayheads[playheadIndex].crossfadeSampleLength * 0.5 * M_PI );
-					float gain_B = sin ( (float)( mPlayheads[playheadIndex].crossfadeCurrentSample + i ) / (float)mPlayheads[playheadIndex].crossfadeSampleLength * 0.5 * M_PI );
+					float crossfadeProgress = (float)(mPlayheads[playheadIndex].crossfadeCurrentSample + i) / (float)mPlayheads[playheadIndex].crossfadeSampleLength;
+					
+					float gain_A = cos ( crossfadeProgress * 0.5 * M_PI );
+					float gain_B = sin ( crossfadeProgress * 0.5 * M_PI );
 
-					playheadBuffer.getSample ( playheadBufferPosition + i, 0 ) =	mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getSample ( mPlayheads[playheadIndex].sampleIndex + i, 0 ) * gain_A +
-																					mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex].getSample ( mPlayheads[playheadIndex].jumpSampleIndex + i, 0 ) * gain_B;
+					float sample_A = mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getSample ( mPlayheads[playheadIndex].sampleIndex + i, 0 );
+					float sample_B = mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex].getSample ( mPlayheads[playheadIndex].jumpSampleIndex + i, 0 );
+					float samplePostCrossfade = ( sample_A * gain_A ) + ( sample_B * gain_B );
+
+					float panGainL = 1.0f, panGainR = 1.0f;
+					if ( mDynamicPanEnabled && panningStrength > 0.0 )
+					{
+						float panPostCrossfade = panStartNorm + (panEndNorm - panStartNorm) * crossfadeProgress;
+						panGainL = cos ( panPostCrossfade * 0.5 * M_PI );
+						panGainR = sin ( panPostCrossfade * 0.5 * M_PI );
+
+						panGainL = 1.0f - panningStrength * (1.0f - panGainL);
+						panGainR = 1.0f - panningStrength * (1.0f - panGainR);
+						// TODO - could have a power curve here instead of linear - something like: float result = 1.0f - pow(Y, power) * (1.0f - X);
+						// TODO - same thing further down in FillAudioSegment();
+					}
+
+					playheadBuffer.getSample ( playheadBufferPosition + i, 0 ) = samplePostCrossfade * panGainL;
+					playheadBuffer.getSample ( playheadBufferPosition + i, 1 ) = samplePostCrossfade * panGainR;
 				}
 
 				mPlayheads[playheadIndex].crossfadeCurrentSample += crossfadeSamplesLeft;
@@ -178,7 +220,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			}
 
 			// exit loop - no more space in outbuffer, no more triggers hit
-			if ( ( playheadBuffer.size ( ) - playheadBufferPosition ) < ( mPlayheads[playheadIndex].triggerSamplePoints.front ( ) - mPlayheads[playheadIndex].sampleIndex ) )
+			if ( ( playheadBuffer.getNumFrames ( ) - playheadBufferPosition ) < ( mPlayheads[playheadIndex].triggerSamplePoints.front ( ) - mPlayheads[playheadIndex].sampleIndex ) )
 			{
 				FillAudioSegment ( &playheadBuffer, &playheadBufferPosition, &mPlayheads[playheadIndex], true );
 				break;
@@ -222,10 +264,11 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 			size_t killIndex = std::distance ( playheadsToKillThisBuffer.begin ( ), it );
 			if ( it != playheadsToKillThisBuffer.end ( ) )
 			{
-				for ( size_t i = 0; i < playheadBuffer.size ( ); i++ )
+				for ( size_t i = 0; i < playheadBuffer.getNumFrames ( ); i++ )
 				{
-					float gain = cos ( (float)i / (float)playheadBuffer.size ( ) * 0.5 * M_PI );
+					float gain = cos ( (float)i / (float)playheadBuffer.getNumFrames ( ) * 0.5 * M_PI );
 					playheadBuffer.getSample ( i, 0 ) *= gain;
+					playheadBuffer.getSample ( i, 1 ) *= gain;
 				}
 
 				playheadsToKillThisBuffer.erase ( playheadsToKillThisBuffer.begin ( ) + killIndex );
@@ -239,7 +282,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 		for ( size_t sampleIndex = 0; sampleIndex < outBuffer.getNumFrames ( ); sampleIndex++ )
 		{
 			outBuffer.getSample ( sampleIndex, 0 ) += playheadBuffer.getSample ( sampleIndex, 0 );
-			outBuffer.getSample ( sampleIndex, 1 ) += playheadBuffer.getSample ( sampleIndex, 0 );
+			outBuffer.getSample ( sampleIndex, 1 ) += playheadBuffer.getSample ( sampleIndex, 1 );
 		}
 	}
 
@@ -267,22 +310,40 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
 void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utils::AudioPlayhead* playhead, bool outBufferFull )
 {
+	float panGainL = 1.0f, panGainR = 1.0f;
+	double panningStrength = (double)mPanningStrengthX1000 / 1000.0;
+	if ( mDynamicPanEnabled && panningStrength > 0.0 )
+	{
+		size_t timePointIndex = playhead->sampleIndex / mRawView->GetHopSize ( );
+		float pan = mRawView->GetTimeData ( )->raw[playhead->fileIndex][timePointIndex][mDynamicPanDimensionIndex];
+		float panNorm = glm::clamp (	(float)(pan - mDimensionBounds.min[mDynamicPanDimensionIndex]) / 
+										(float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]),
+										0.0f, 1.0f );
+		panGainL = cos ( panNorm * 0.5 * M_PI );
+		panGainR = sin ( panNorm * 0.5 * M_PI );
+
+		panGainL = 1.0f - panningStrength * (1.0f - panGainL);
+		panGainR = 1.0f - panningStrength * (1.0f - panGainR);
+	}
+
 	size_t segmentLength = playhead->triggerSamplePoints.front ( ) - playhead->sampleIndex;
 
-	if ( outBufferFull && segmentLength > (outBuffer->size ( ) - *outBufferPosition) ) // cut off early if outBuffer is full
+	if ( outBufferFull && segmentLength > (outBuffer->getNumFrames ( ) - *outBufferPosition) ) // cut off early if outBuffer is full
 	{
-		segmentLength = outBuffer->size ( ) - *outBufferPosition;
+		segmentLength = outBuffer->getNumFrames ( ) - *outBufferPosition;
 	}
 
 	for ( size_t i = 0; i < segmentLength; i++ )
 	{
-		outBuffer->getSample ( *outBufferPosition + i, 0 ) = mRawView->GetAudioData ( )->raw[playhead->fileIndex].getSample ( playhead->sampleIndex + i, 0 );
+		outBuffer->getSample ( *outBufferPosition + i, 0 ) = mRawView->GetAudioData ( )->raw[playhead->fileIndex].getSample ( playhead->sampleIndex + i, 0 ) * panGainL;
+		outBuffer->getSample ( *outBufferPosition + i, 1 ) = mRawView->GetAudioData ( )->raw[playhead->fileIndex].getSample ( playhead->sampleIndex + i, 0 ) * panGainR;
 	}
 
 	playhead->sampleIndex += segmentLength;
 	*outBufferPosition += segmentLength;
 }
 
+// TODO - i think this function is no longer used - remove?
 void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, size_t startSample_A, size_t endSample_A, size_t fileIndex_A, Utils::AudioPlayhead* playhead_B, size_t lengthSetting, bool outBufferFull )
 {
 	size_t originLength = endSample_A - startSample_A;
@@ -290,9 +351,9 @@ void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, 
 	size_t crossfadeLength = (originLength < jumpLength) ? originLength : jumpLength;
 	crossfadeLength = (crossfadeLength < lengthSetting) ? crossfadeLength : lengthSetting;
 
-	if ( outBufferFull && crossfadeLength > ( outBuffer->size ( ) - *outBufferPosition ) ) // cut off early if outBuffer is full
+	if ( outBufferFull && crossfadeLength > ( outBuffer->getNumFrames ( ) - *outBufferPosition ) ) // cut off early if outBuffer is full
 	{
-		crossfadeLength = outBuffer->size ( ) - *outBufferPosition;
+		crossfadeLength = outBuffer->getNumFrames ( ) - *outBufferPosition;
 	}
 
 
@@ -386,10 +447,10 @@ void Explorer::AudioPlayback::CalculateTriggerPoints ( Utils::AudioPlayhead& pla
 		playhead.triggerSamplePoints.pop ( );
 	}
 
-	int triggerPointDistance = mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction;
+	int triggerPointDistance = mRawView->GetHopSize ( );
 	int currentTriggerPoint = triggerPointDistance;
 
-	while ( currentTriggerPoint < mRawView->GetAudioData ( )->raw[playhead.fileIndex].size ( ) )
+	while ( currentTriggerPoint < mRawView->GetAudioData ( )->raw[playhead.fileIndex].size ( ) ) // might have to change if stereo input support is added
 	{
 		if ( currentTriggerPoint > playhead.sampleIndex )
 		{
@@ -398,5 +459,5 @@ void Explorer::AudioPlayback::CalculateTriggerPoints ( Utils::AudioPlayhead& pla
 		currentTriggerPoint += triggerPointDistance;
 	}
 
-	playhead.triggerSamplePoints.push ( mRawView->GetAudioData ( )->raw[playhead.fileIndex].size ( ) - 1 );
+	playhead.triggerSamplePoints.push ( mRawView->GetAudioData ( )->raw[playhead.fileIndex].size ( ) - 1 ); // might have to change if stereo input support is added
 }

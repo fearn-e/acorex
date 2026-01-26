@@ -19,6 +19,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "./RawView.h"
 #include "./PointPicker.h"
 #include "Utils/Data.h"
+#include "Utils/DimensionBounds.h"
 #include <ofSoundBuffer.h>
 #include <ofSoundStream.h>
 #include <ofMesh.h>
@@ -34,7 +35,7 @@ public:
 	AudioPlayback ( ) { }
 	~AudioPlayback ( ) { }
 
-	void Initialise ( );
+	void Initialise ( Utils::DimensionBoundsData dimensionBoundsData );
 	void RestartAudio ( size_t sampleRate, size_t bufferSize, ofSoundDevice outDevice );
 
 	void audioOut ( ofSoundBuffer& outBuffer );
@@ -59,6 +60,9 @@ public:
 	void SetMaxJumpDistanceSpace ( int distanceX1000 ) { mMaxJumpDistanceSpaceX1000 = distanceX1000; }
 	void SetMaxJumpTargets ( int targets ) { mMaxJumpTargets = targets; }
 	void SetVolume(int volumeX1000) { mVolumeX1000 = volumeX1000; }
+	void SetDynamicPan ( bool enabled, int dimensionIndex ) {	mDynamicPanEnabled = enabled;
+																mDynamicPanDimensionIndex = dimensionIndex; }
+	void SetPanningStrength ( int panStrengthX1000 ) { mPanningStrengthX1000 = panStrengthX1000; }
 
 private:
 
@@ -71,6 +75,8 @@ private:
 
 	std::shared_ptr<RawView> mRawView;
 	std::shared_ptr<PointPicker> mPointPicker;
+
+	Utils::DimensionBoundsData mDimensionBounds;
 
 	ofSoundStream mSoundStream;
 
@@ -86,6 +92,14 @@ private:
 	std::atomic<int> mMaxJumpDistanceSpaceX1000 = 50;
 	std::atomic<int> mMaxJumpTargets = 5;
 	std::atomic<int> mVolumeX1000 = 500;
+	std::atomic<bool> mDynamicPanEnabled = false;
+	std::atomic<int> mDynamicPanDimensionIndex = 0;
+	std::atomic<int> mPanningStrengthX1000 = 1000;
+
+	// TODO //implement stereo loading of source files, not just mono
+	// TODO //panning bias? to globally statically shift this acorex instance left/right
+	// TODO //pan smoothing? average dynamic pan position with the previous and next X segments
+
 
 	// thread safety ------------------------------
 
