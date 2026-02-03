@@ -83,7 +83,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
     }
     else
     {
-        ofLogError ( "GenAnalysis" ) << "input file " << filename << " is not supported";
+        ofLogError ( "GenAnalysis" ) << "input file " << filename << " is not valid. Supported file types: mp3, ogg, wav, flac";
 		return false;
     }
 
