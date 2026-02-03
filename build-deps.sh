@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 # 
-# Copyright (c) 2024 Elowyn Fearne
+# Copyright (c) 2024-2026 Elowyn Fearne
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
 # to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
@@ -11,7 +11,6 @@
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 
 set -o nounset
 set -o errexit
@@ -77,7 +76,7 @@ set -o errexit
     if [ $OF_FOUND == false ]; then
         echo "openframeworks not found, downloading..."
         cd ..
-        git -c advice.detachedHead=false clone --depth 1 -b "acorex" https://github.com/fearn-e/openframeworks
+        git -c advice.detachedHead=false clone --depth 1 -b "acorex" https://github.com/fearn-e/openframeworks #acorex branch
         
         cd openframeworks/apps
         
@@ -113,12 +112,12 @@ echo "OS discovered as $currentOS"
     cd ../../../addons
 
     if [ ! -d "ofxDropdown" ]; then
-        git clone --depth 1 -b master https://github.com/fearn-e/ofxDropdown
+        git clone --depth 1 -b master https://github.com/fearn-e/ofxDropdown #master branch
         echo ""
     fi
 
     if [ ! -d "ofxAudioFile" ]; then
-        git clone --depth 1 -b master https://github.com/fearn-e/ofxAudioFile
+        git clone --depth 1 -b master https://github.com/fearn-e/ofxAudioFile #master branch
         echo ""
     fi
 
@@ -141,21 +140,24 @@ echo "OS discovered as $currentOS"
     cd deps-pre-build
 
     if [ ! -d "flucoma-core" ]; then
-        git -c advice.detachedHead=false clone --depth 1 -b acorex https://github.com/fearn-e/flucoma-core
+        git -c advice.detachedHead=false clone --depth 1 -b acorex https://github.com/fearn-e/flucoma-core #acorex branch
         echo ""
     else
         FORCE_DOWNLOAD_TIP+=1
     fi
 
     if [ ! -d "eigen" ]; then
-        git -c advice.detachedHead=false clone --depth 1 -b "3.4.0" https://gitlab.com/libeigen/eigen
+        git -c advice.detachedHead=false clone --depth 1 -b "3.4.0" https://gitlab.com/libeigen/eigen #version should be the same as in https://github.com/fearn-e/flucoma-core/blob/acorex/CMakeLists.txt
         echo ""
     else
         FORCE_DOWNLOAD_TIP+=1
     fi
 
     if [ ! -d "hisstools_library" ]; then
-        git -c advice.detachedHead=false clone --depth 1 -b header-only https://github.com/alexharker/hisstools_library
+        git -c advice.detachedHead=false clone https://github.com/alexharker/hisstools_library
+        cd hisstools_library
+        git checkout f3292ad #version should be the same as in https://github.com/fearn-e/flucoma-core/blob/acorex/CMakeLists.txt
+        cd ..
         echo ""
     else
         FORCE_DOWNLOAD_TIP+=1
@@ -169,14 +171,14 @@ echo "OS discovered as $currentOS"
     fi
 
     if [ ! -d "spectra" ]; then
-        git -c advice.detachedHead=false clone --depth 1 -b "v1.0.1" https://github.com/yixuan/spectra
+        git -c advice.detachedHead=false clone --depth 1 -b "v1.0.1" https://github.com/yixuan/spectra #version should be the same as in https://github.com/fearn-e/flucoma-core/blob/acorex/CMakeLists.txt
         echo ""
     else
         FORCE_DOWNLOAD_TIP+=1
     fi
 
     if [ ! -d "json" ]; then
-        git -c advice.detachedHead=false clone --depth 1 -b "v3.11.2" https://github.com/nlohmann/json
+        git -c advice.detachedHead=false clone --depth 1 -b "v3.11.2" https://github.com/nlohmann/json #version should be the same as in https://github.com/fearn-e/flucoma-core/blob/acorex/CMakeLists.txt
         echo ""
     else
         FORCE_DOWNLOAD_TIP+=1
