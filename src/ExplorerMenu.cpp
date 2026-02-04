@@ -46,15 +46,9 @@ void ExplorerMenu::Initialise ( bool HiDpi )
         mMainPanel.clear ( );
 
         mLiveView.Initialise ( );
-    }
 
-    // Variables ----------------------------------
-    {
         mLastUpdateTime = 0;
-        mSlowUpdateInterval = 100;
-
         mOpenCorpusButtonClickTime = 0;
-        mOpenCorpusButtonTimeout = 3000;
     }
 
     // States ------------------------------------

@@ -93,10 +93,10 @@ private:
     // Timing --------------------------------------
 
     int mLastUpdateTime = 0;
-    int mSlowUpdateInterval = 100;
+    const int mSlowUpdateInterval = 100;
 
     int mOpenCorpusButtonClickTime = 0;
-    int mOpenCorpusButtonTimeout = 3000;
+    const int mOpenCorpusButtonTimeout = 3000;
 
     // Panels --------------------------------------
 
