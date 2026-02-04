@@ -241,32 +241,7 @@ void ExplorerMenu::Initialise ( bool HiDpi )
         mMainPanel.disableHeader ( );
     }
 
-    // Listeners --------------------------------
-    {
-        mOpenCorpusButton.addListener ( this, &ExplorerMenu::OpenCorpus );
-        mDimensionDropdownX->addListener ( this, &ExplorerMenu::SwapDimensionX );
-        mDimensionDropdownY->addListener ( this, &ExplorerMenu::SwapDimensionY );
-        mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SwapDimensionZ );
-        mDimensionDropdownColor->addListener ( this, &ExplorerMenu::SwapDimensionColor );
-        mColorSpectrumSwitcher.addListener ( this, &ExplorerMenu::SwitchColorSpectrum );
-        mLoopPlayheadsToggle.addListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
-        mJumpSameFileAllowedToggle.addListener ( this, &ExplorerMenu::ToggleJumpSameFileAllowed );
-        mJumpSameFileMinTimeDiffSlider.addListener ( this, &ExplorerMenu::SetJumpSameFileMinTimeDiff );
-        mCrossoverJumpChanceSlider.addListener ( this, &ExplorerMenu::SetCrossoverJumpChance );
-        mCrossfadeMaxSampleLengthSlider.addListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
-        mMaxJumpDistanceSpaceSlider.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
-        mMaxJumpTargetsSlider.addListener ( this, &ExplorerMenu::SetMaxJumpTargets );
-        mVolumeSlider.addListener ( this, &ExplorerMenu::SetVolume );
-
-        mDimensionDropdownDynamicPan->addListener ( this, &ExplorerMenu::SwapDimensionDynamicPan );
-        mPanningStrengthSlider.addListener ( this, &ExplorerMenu::SetPanningStrength );
-
-        mBufferSizeDropdown->addListener ( this, &ExplorerMenu::SetBufferSize );
-        mOutDeviceDropdown->addListener ( this, &ExplorerMenu::SetOutDevice );
-
-        ofAddListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
-        bListenersAdded = true;
-    }
+    AddListeners ( );
 
     bInitialiseShouldLoad = false;
 }
@@ -364,6 +339,34 @@ void ExplorerMenu::Exit ( )
 {
     RemoveListeners ( );
     mLiveView.Exit ( );
+}
+
+void ExplorerMenu::AddListeners ( )
+{
+    if ( bListenersAdded ) { return; }
+    mOpenCorpusButton.addListener ( this, &ExplorerMenu::OpenCorpus );
+    mDimensionDropdownX->addListener ( this, &ExplorerMenu::SwapDimensionX );
+    mDimensionDropdownY->addListener ( this, &ExplorerMenu::SwapDimensionY );
+    mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SwapDimensionZ );
+    mDimensionDropdownColor->addListener ( this, &ExplorerMenu::SwapDimensionColor );
+    mColorSpectrumSwitcher.addListener ( this, &ExplorerMenu::SwitchColorSpectrum );
+    mLoopPlayheadsToggle.addListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
+    mJumpSameFileAllowedToggle.addListener ( this, &ExplorerMenu::ToggleJumpSameFileAllowed );
+    mJumpSameFileMinTimeDiffSlider.addListener ( this, &ExplorerMenu::SetJumpSameFileMinTimeDiff );
+    mCrossoverJumpChanceSlider.addListener ( this, &ExplorerMenu::SetCrossoverJumpChance );
+    mCrossfadeMaxSampleLengthSlider.addListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
+    mMaxJumpDistanceSpaceSlider.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
+    mMaxJumpTargetsSlider.addListener ( this, &ExplorerMenu::SetMaxJumpTargets );
+    mVolumeSlider.addListener ( this, &ExplorerMenu::SetVolume );
+
+    mDimensionDropdownDynamicPan->addListener ( this, &ExplorerMenu::SwapDimensionDynamicPan );
+    mPanningStrengthSlider.addListener ( this, &ExplorerMenu::SetPanningStrength );
+
+    mBufferSizeDropdown->addListener ( this, &ExplorerMenu::SetBufferSize );
+    mOutDeviceDropdown->addListener ( this, &ExplorerMenu::SetOutDevice );
+
+    ofAddListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
+    bListenersAdded = true;
 }
 
 void ExplorerMenu::RemoveListeners ( )

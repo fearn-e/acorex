@@ -42,6 +42,7 @@ public:
 
 private:
     void SlowUpdate ( );
+    void AddListeners ( );
     void RemoveListeners ( );
 
     // Main Functions ------------------------------
