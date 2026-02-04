@@ -154,4 +154,5 @@ void ofApp::DPIToggled ( bool& value )
     mExplorerMenu.Initialise ( value );
     mAnalyserMenu.Initialise ( value );
     if ( mAnalyseToggle ) { mAnalyserMenu.Show ( ); }
+    else if ( mExploreToggle ) { mExplorerMenu.Show ( ); }
 }
