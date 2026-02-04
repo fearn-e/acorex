@@ -56,8 +56,7 @@ void ExplorerMenu::Initialise ( bool HiDpi )
         bIsCorpusOpen = false;
         bOpenCorpusDrawWarning = false;
     }
-
-    int dropdownScrollSpeed = 32;
+    }
 
     // Find Audio Devices --------------------------
     {
@@ -92,11 +91,11 @@ void ExplorerMenu::Initialise ( bool HiDpi )
         mDimensionDropdownColor.reset ( );
         mDimensionDropdownDynamicPan.reset ( );
 
-        mDimensionDropdownX = make_unique<ofxDropdown> ( (string)"X Dimension", dropdownScrollSpeed );
-        mDimensionDropdownY = make_unique<ofxDropdown>( (string)"Y Dimension", dropdownScrollSpeed);
-        mDimensionDropdownZ = make_unique<ofxDropdown>( (string)"Z Dimension", dropdownScrollSpeed);
-        mDimensionDropdownColor = make_unique<ofxDropdown>( (string)"Color Dimension", dropdownScrollSpeed);
-        mDimensionDropdownDynamicPan = make_unique<ofxDropdown> ( (string)"Dynamic Panning Dimension", dropdownScrollSpeed );
+        mDimensionDropdownX = make_unique<ofxDropdown> ( (string)"X Dimension", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
+        mDimensionDropdownY = make_unique<ofxDropdown>( (string)"Y Dimension", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
+        mDimensionDropdownZ = make_unique<ofxDropdown>( (string)"Z Dimension", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
+        mDimensionDropdownColor = make_unique<ofxDropdown>( (string)"Color Dimension", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
+        mDimensionDropdownDynamicPan = make_unique<ofxDropdown> ( (string)"Dynamic Panning Dimension", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
 
         if ( bInitialiseShouldLoad )
         {
@@ -193,8 +192,8 @@ void ExplorerMenu::Initialise ( bool HiDpi )
         mBufferSizeDropdown.reset ( );
         mOutDeviceDropdown.reset ( );
 
-        mBufferSizeDropdown = make_unique<ofxIntDropdown>( (string)"Buffer Size", dropdownScrollSpeed);
-        mOutDeviceDropdown = make_unique<ofxDropdown>( (string)"Output Device", dropdownScrollSpeed);
+        mBufferSizeDropdown = make_unique<ofxIntDropdown>( (string)"Buffer Size", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
+        mOutDeviceDropdown = make_unique<ofxDropdown>( (string)"Output Device", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
 
         for ( int i = 0; i < outDevices.size ( ); i++ )
         {
