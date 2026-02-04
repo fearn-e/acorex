@@ -78,7 +78,12 @@ set -o errexit
         cd ..
         git -c advice.detachedHead=false clone --depth 1 -b "acorex" https://github.com/fearn-e/openframeworks #acorex branch
         
-        cd openframeworks/apps
+        cd openframeworks
+
+        rm .editorconfig
+        rm .clang-format
+
+        cd apps
         
         if [ ! -d "myApps" ]; then
             mkdir myApps
@@ -99,8 +104,21 @@ set -o errexit
         fi
 
         cd ../../apps/myApps/acorex
+    else
+        cd ../../..
+        if [ -f ".editorconfig" ]; then
+            rm .editorconfig
+            echo "removed .editorconfig from openframeworks"
+        fi
+        if [ -f ".clang-format" ]; then
+            rm .clang-format
+            echo "removed .clang-format from openframeworks"
+        fi
+        cd apps/myApps/acorex
     fi
 #
+
+exit
 
 echo "OS discovered as $currentOS"
 
