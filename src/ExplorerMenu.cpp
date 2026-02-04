@@ -390,6 +390,9 @@ void ExplorerMenu::RemoveListeners ( )
     mDimensionDropdownDynamicPan->removeListener ( this, &ExplorerMenu::SwapDimensionDynamicPan );
     mPanningStrengthSlider.removeListener ( this, &ExplorerMenu::SetPanningStrength );
 
+    mBufferSizeDropdown->removeListener ( this, &ExplorerMenu::SetBufferSize );
+    mOutDeviceDropdown->removeListener ( this, &ExplorerMenu::SetOutDevice );
+
     ofRemoveListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
     bListenersAdded = false;
 }
