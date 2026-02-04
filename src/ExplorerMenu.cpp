@@ -429,9 +429,8 @@ void ExplorerMenu::OpenCorpus ( )
             yDimension = mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : "None";
             zDimension = mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : "None";
             colorDimension = mRawView->GetDimensions ( )[0];
-            dynamicPanDimension = "None";
-            // could be better served to immediately load one of the dimensions here?
-            //dynamicPanDimension = mRawView->GetDimensions ( ).size ( ) > 4 ? mRawView->GetDimensions ( )[4] : "None";
+            size_t randomPanDimIndex = ofRandom ( 1, mRawView->GetDimensions ( ).size ( ) );
+            dynamicPanDimension = mRawView->GetDimensions ( )[randomPanDimIndex];
         }
         else // TODO - i think this is old stats code, remove?
         {
