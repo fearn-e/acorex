@@ -976,19 +976,21 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
         else if ( args.key == 'z' ) { mKeyboardMoveState[8] = false; }
         else if ( args.key == 'x' ) { mKeyboardMoveState[9] = false; }
         else if ( args.key == OF_KEY_F3 ) { bDebug = !bDebug; }
-        else if ( args.key == 'l' )
+        else if ( args.key == 'l' ) // TODO - delete, deprecated, tied to old sound system
         {
             bLoopAudio = !bLoopAudio;
             for ( auto& each : mSoundPlayers ) { each.setLoop ( bLoopAudio ); }
         }
-        else if ( args.key == 'c' )
+        else if ( args.key == 'c' ) // TODO - might not need this key either just like the ENTER key below, remove also?
         { 
             if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
             {
                 ofSetClipboardString ( mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )] );
             }
         }
-        else if ( args.key == OF_KEY_RETURN )
+        /*else if ( args.key == OF_KEY_RETURN ) // TODO - decide whether change key or just remove entirely? enter triggers this even when
+        *                                       // typing in file dialogs or settings boxes, so it's annoying
+        *                                       // -- but might not even need this functionality at all anymore, i don't really use it
         {
             if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
             {
@@ -1000,6 +1002,6 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
                 ofSystem ( "xdg-open " + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )] );
 #endif
             }
-        }
+        }*/
     }
 }
