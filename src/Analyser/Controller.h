@@ -28,27 +28,27 @@ namespace Analyser {
 
 class Controller {
 public:
-	Controller ( ) { };
-	~Controller ( ) { };
+    Controller ( ) { };
+    ~Controller ( ) { };
 
-	bool CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const Utils::AnalysisSettings& settings );
+    bool CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const Utils::AnalysisSettings& settings );
 
-	bool ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const Utils::ReductionSettings& settings );
+    bool ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const Utils::ReductionSettings& settings );
 
-	bool InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const bool newReplacesExisting );
+    bool InsertIntoCorpus ( const std::string& inputPath, const std::string& outputPath, const bool newReplacesExisting );
 
 private:
-	std::vector<int> MergeDatasets ( Utils::DataSet& newDataset, const Utils::DataSet& existingDataset, const bool newReplacesExisting );
+    std::vector<int> MergeDatasets ( Utils::DataSet& newDataset, const Utils::DataSet& existingDataset, const bool newReplacesExisting );
 
-	bool SearchDirectory ( const std::string& directory, std::vector<std::string>& files );
+    bool SearchDirectory ( const std::string& directory, std::vector<std::string>& files );
 
-	void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::AnalysisSettings& settings );
-	void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::ReductionSettings& settings, bool time );
-	void Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames );
+    void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::AnalysisSettings& settings );
+    void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::ReductionSettings& settings, bool time );
+    void Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames );
 
-	Utils::JSON mJSON;
-	Analyser::GenAnalysis mGenAnalysis;
-	Analyser::UMAP mUMAP;
+    Utils::JSON mJSON;
+    Analyser::GenAnalysis mGenAnalysis;
+    Analyser::UMAP mUMAP;
 };
 
 } // namespace Analyser

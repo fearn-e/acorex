@@ -23,443 +23,443 @@ using namespace Acorex;
 
 void Explorer::AudioPlayback::Initialise ( Utils::DimensionBoundsData dimensionBoundsData )
 {
-	srand ( time ( NULL ) );
+    srand ( time ( NULL ) );
 
-	mDimensionBounds = dimensionBoundsData;
+    mDimensionBounds = dimensionBoundsData;
 
-	ofSoundDevice outDevice;
-	std::vector<ofSoundDevice::Api> platformAPIs = { ACOREX_PLATFORM_AUDIO_APIS };
+    ofSoundDevice outDevice;
+    std::vector<ofSoundDevice::Api> platformAPIs = { ACOREX_PLATFORM_AUDIO_APIS };
 
-	for ( int i = 1; i < platformAPIs.size ( ); i++ )
-	{
-		std::vector<ofSoundDevice> devices = mSoundStream.getDeviceList ( platformAPIs[i] );
-		for ( auto& device : devices )
-		{
-			if ( device.outputChannels == 0 ) { continue; }
-			outDevice = device;
-		}
-	}
-	RestartAudio ( 44100, 512, outDevice );
+    for ( int i = 1; i < platformAPIs.size ( ); i++ )
+    {
+        std::vector<ofSoundDevice> devices = mSoundStream.getDeviceList ( platformAPIs[i] );
+        for ( auto& device : devices )
+        {
+            if ( device.outputChannels == 0 ) { continue; }
+            outDevice = device;
+        }
+    }
+    RestartAudio ( 44100, 512, outDevice );
 }
 
 void Explorer::AudioPlayback::RestartAudio ( size_t sampleRate, size_t bufferSize, ofSoundDevice outDevice )
 {
-	if ( bStreamStarted )
-	{
-		SetFlagReset ( );
-		WaitForResetConfirm ( );
-	}
+    if ( bStreamStarted )
+    {
+        SetFlagReset ( );
+        WaitForResetConfirm ( );
+    }
 
-	if ( bStreamStarted ) { mSoundStream.close ( ); }
+    if ( bStreamStarted ) { mSoundStream.close ( ); }
 
-	ofSoundStreamSettings settings;
-	settings.numInputChannels = 0;
-	settings.numOutputChannels = 2;
-	settings.sampleRate = sampleRate;
-	settings.bufferSize = bufferSize;
-	settings.numBuffers = 4;
-	settings.setOutListener ( this );
-	settings.setOutDevice ( outDevice );
+    ofSoundStreamSettings settings;
+    settings.numInputChannels = 0;
+    settings.numOutputChannels = 2;
+    settings.sampleRate = sampleRate;
+    settings.bufferSize = bufferSize;
+    settings.numBuffers = 4;
+    settings.setOutListener ( this );
+    settings.setOutDevice ( outDevice );
 
-	mSoundStream.setup ( settings );
+    mSoundStream.setup ( settings );
 
-	bStreamStarted = true;
+    bStreamStarted = true;
 }
 
 void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 {
-	if ( bResetFlag )
-	{
-		for ( size_t i = 0; i < mPlayheads.size ( ); i++ )
-		{
-			mPlayheads.erase ( mPlayheads.begin ( ) + i );
-			i--;
-		}
+    if ( bResetFlag )
+    {
+        for ( size_t i = 0; i < mPlayheads.size ( ); i++ )
+        {
+            mPlayheads.erase ( mPlayheads.begin ( ) + i );
+            i--;
+        }
 
-		bResetFlag = false;
-	}
+        bResetFlag = false;
+    }
 
-	for ( size_t sampleIndex = 0; sampleIndex < outBuffer.getNumFrames ( ); sampleIndex++ )
-	{
-		outBuffer.getSample ( sampleIndex, 0 ) = 0.0;
-		outBuffer.getSample ( sampleIndex, 1 ) = 0.0;
-	}
+    for ( size_t sampleIndex = 0; sampleIndex < outBuffer.getNumFrames ( ); sampleIndex++ )
+    {
+        outBuffer.getSample ( sampleIndex, 0 ) = 0.0;
+        outBuffer.getSample ( sampleIndex, 1 ) = 0.0;
+    }
 
-	std::vector<size_t> playheadsToKillThisBuffer;
+    std::vector<size_t> playheadsToKillThisBuffer;
 
-	// get new playheads and playheads to kill from main thread
-	if ( mNewPlayheadMutex.try_lock ( ) )
-	{
-		std::lock_guard<std::mutex> lock ( mNewPlayheadMutex, std::adopt_lock );
+    // get new playheads and playheads to kill from main thread
+    if ( mNewPlayheadMutex.try_lock ( ) )
+    {
+        std::lock_guard<std::mutex> lock ( mNewPlayheadMutex, std::adopt_lock );
 
-		while ( !mNewPlayheads.empty ( ) )
-		{
-			mPlayheads.push_back ( mNewPlayheads.front ( ) );
-			mNewPlayheads.pop ( );
-		}
+        while ( !mNewPlayheads.empty ( ) )
+        {
+            mPlayheads.push_back ( mNewPlayheads.front ( ) );
+            mNewPlayheads.pop ( );
+        }
 
-		while ( !mPlayheadsToKill.empty ( ) )
-		{
-			playheadsToKillThisBuffer.push_back ( mPlayheadsToKill.front ( ) );
-			mPlayheadsToKill.pop ( );
-		}
-	}
+        while ( !mPlayheadsToKill.empty ( ) )
+        {
+            playheadsToKillThisBuffer.push_back ( mPlayheadsToKill.front ( ) );
+            mPlayheadsToKill.pop ( );
+        }
+    }
 
-	double crossoverJumpChance = (double)mCrossoverJumpChanceX1000 / 1000.0;
-	double volume = (double)mVolumeX1000 / 1000.0;
-	double panningStrength = (double)mPanningStrengthX1000 / 1000.0;
+    double crossoverJumpChance = (double)mCrossoverJumpChanceX1000 / 1000.0;
+    double volume = (double)mVolumeX1000 / 1000.0;
+    double panningStrength = (double)mPanningStrengthX1000 / 1000.0;
 
-	for ( size_t playheadIndex = 0; playheadIndex < mPlayheads.size ( ); playheadIndex++ )
-	{
+    for ( size_t playheadIndex = 0; playheadIndex < mPlayheads.size ( ); playheadIndex++ )
+    {
 
 
-		Utils::AudioPlayhead* currentPlayhead = &mPlayheads[playheadIndex]; // TODO - why is this not used - replace all instances of mPlayheads[playheadIndex] with currentPlayhead?
+        Utils::AudioPlayhead* currentPlayhead = &mPlayheads[playheadIndex]; // TODO - why is this not used - replace all instances of mPlayheads[playheadIndex] with currentPlayhead?
 
-		ofSoundBuffer playheadBuffer;
-		playheadBuffer.setSampleRate ( mSoundStream.getSampleRate ( ) );
-		playheadBuffer.allocate ( outBuffer.getNumFrames ( ), 2 );
-		
-		for ( size_t i = 0; i < playheadBuffer.getNumFrames ( ); i++ )
-		{
-			playheadBuffer.getSample ( i, 0 ) = 0.0;
-			playheadBuffer.getSample ( i, 1 ) = 0.0;
-		}
+        ofSoundBuffer playheadBuffer;
+        playheadBuffer.setSampleRate ( mSoundStream.getSampleRate ( ) );
+        playheadBuffer.allocate ( outBuffer.getNumFrames ( ), 2 );
+        
+        for ( size_t i = 0; i < playheadBuffer.getNumFrames ( ); i++ )
+        {
+            playheadBuffer.getSample ( i, 0 ) = 0.0;
+            playheadBuffer.getSample ( i, 1 ) = 0.0;
+        }
 
-		size_t playheadBufferPosition = 0;
-		// processing loop
-		while ( true )
-		{
-			// crossfade jump
-			// CrossfadeAudioSegment ( &playheadBuffer, &playheadBufferPosition, jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile, &mPlayheads[playheadIndex], mCrossfadeSampleLength, true );
-			if ( mPlayheads[playheadIndex].crossfading )
-			{
-				size_t crossfadeSamplesLeft = mPlayheads[playheadIndex].crossfadeSampleLength - mPlayheads[playheadIndex].crossfadeCurrentSample;
-				size_t bufferSpace = playheadBuffer.getNumFrames ( ) - playheadBufferPosition;
-				if ( crossfadeSamplesLeft > bufferSpace ) { crossfadeSamplesLeft = bufferSpace; }
+        size_t playheadBufferPosition = 0;
+        // processing loop
+        while ( true )
+        {
+            // crossfade jump
+            // CrossfadeAudioSegment ( &playheadBuffer, &playheadBufferPosition, jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile, &mPlayheads[playheadIndex], mCrossfadeSampleLength, true );
+            if ( mPlayheads[playheadIndex].crossfading )
+            {
+                size_t crossfadeSamplesLeft = mPlayheads[playheadIndex].crossfadeSampleLength - mPlayheads[playheadIndex].crossfadeCurrentSample;
+                size_t bufferSpace = playheadBuffer.getNumFrames ( ) - playheadBufferPosition;
+                if ( crossfadeSamplesLeft > bufferSpace ) { crossfadeSamplesLeft = bufferSpace; }
 
-				float panStartNorm = 0.5f, panEndNorm = 0.5f;
-				if ( mDynamicPanEnabled && panningStrength > 0.0 )
-				{
-					size_t thisTimePointIndex = mPlayheads[playheadIndex].sampleIndex / mRawView->GetHopSize ( );
-					size_t jumpTimePointIndex = mPlayheads[playheadIndex].jumpSampleIndex / mRawView->GetHopSize ( );
-					
-					float panStart = mRawView->GetTimeData ( )->raw[mPlayheads[playheadIndex].fileIndex][thisTimePointIndex][mDynamicPanDimensionIndex];
-					float panEnd = mRawView->GetTimeData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex][jumpTimePointIndex][mDynamicPanDimensionIndex];
-					
-					panStartNorm = glm::clamp ( (float)(panStart - mDimensionBounds.min[mDynamicPanDimensionIndex]) / 
-												(float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]),
-												0.0f, 1.0f );
-					panEndNorm = glm::clamp (	(float)(panEnd - mDimensionBounds.min[mDynamicPanDimensionIndex]) / 
-												(float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]),
-												0.0f, 1.0f );
-				}
+                float panStartNorm = 0.5f, panEndNorm = 0.5f;
+                if ( mDynamicPanEnabled && panningStrength > 0.0 )
+                {
+                    size_t thisTimePointIndex = mPlayheads[playheadIndex].sampleIndex / mRawView->GetHopSize ( );
+                    size_t jumpTimePointIndex = mPlayheads[playheadIndex].jumpSampleIndex / mRawView->GetHopSize ( );
+                    
+                    float panStart = mRawView->GetTimeData ( )->raw[mPlayheads[playheadIndex].fileIndex][thisTimePointIndex][mDynamicPanDimensionIndex];
+                    float panEnd = mRawView->GetTimeData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex][jumpTimePointIndex][mDynamicPanDimensionIndex];
+                    
+                    panStartNorm = glm::clamp ( (float)(panStart - mDimensionBounds.min[mDynamicPanDimensionIndex]) / 
+                                                (float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]),
+                                                0.0f, 1.0f );
+                    panEndNorm = glm::clamp (	(float)(panEnd - mDimensionBounds.min[mDynamicPanDimensionIndex]) / 
+                                                (float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]),
+                                                0.0f, 1.0f );
+                }
 
-				for ( size_t i = 0; i < crossfadeSamplesLeft; i++ )
-				{
-					float crossfadeProgress = (float)(mPlayheads[playheadIndex].crossfadeCurrentSample + i) / (float)mPlayheads[playheadIndex].crossfadeSampleLength;
-					
-					float gain_A = cos ( crossfadeProgress * 0.5 * M_PI );
-					float gain_B = sin ( crossfadeProgress * 0.5 * M_PI );
+                for ( size_t i = 0; i < crossfadeSamplesLeft; i++ )
+                {
+                    float crossfadeProgress = (float)(mPlayheads[playheadIndex].crossfadeCurrentSample + i) / (float)mPlayheads[playheadIndex].crossfadeSampleLength;
+                    
+                    float gain_A = cos ( crossfadeProgress * 0.5 * M_PI );
+                    float gain_B = sin ( crossfadeProgress * 0.5 * M_PI );
 
-					float sample_A = mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getSample ( mPlayheads[playheadIndex].sampleIndex + i, 0 );
-					float sample_B = mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex].getSample ( mPlayheads[playheadIndex].jumpSampleIndex + i, 0 );
-					float samplePostCrossfade = ( sample_A * gain_A ) + ( sample_B * gain_B );
+                    float sample_A = mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getSample ( mPlayheads[playheadIndex].sampleIndex + i, 0 );
+                    float sample_B = mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex].getSample ( mPlayheads[playheadIndex].jumpSampleIndex + i, 0 );
+                    float samplePostCrossfade = ( sample_A * gain_A ) + ( sample_B * gain_B );
 
-					float panGainL = 1.0f, panGainR = 1.0f;
-					if ( mDynamicPanEnabled && panningStrength > 0.0 )
-					{
-						float panPostCrossfade = panStartNorm + (panEndNorm - panStartNorm) * crossfadeProgress;
-						panGainL = cos ( panPostCrossfade * 0.5 * M_PI );
-						panGainR = sin ( panPostCrossfade * 0.5 * M_PI );
+                    float panGainL = 1.0f, panGainR = 1.0f;
+                    if ( mDynamicPanEnabled && panningStrength > 0.0 )
+                    {
+                        float panPostCrossfade = panStartNorm + (panEndNorm - panStartNorm) * crossfadeProgress;
+                        panGainL = cos ( panPostCrossfade * 0.5 * M_PI );
+                        panGainR = sin ( panPostCrossfade * 0.5 * M_PI );
 
-						panGainL = 1.0f - panningStrength * (1.0f - panGainL);
-						panGainR = 1.0f - panningStrength * (1.0f - panGainR);
-						// TODO - could have a power curve here instead of linear - something like: float result = 1.0f - pow(Y, power) * (1.0f - X);
-						// TODO - same thing further down in FillAudioSegment();
-					}
+                        panGainL = 1.0f - panningStrength * (1.0f - panGainL);
+                        panGainR = 1.0f - panningStrength * (1.0f - panGainR);
+                        // TODO - could have a power curve here instead of linear - something like: float result = 1.0f - pow(Y, power) * (1.0f - X);
+                        // TODO - same thing further down in FillAudioSegment();
+                    }
 
-					playheadBuffer.getSample ( playheadBufferPosition + i, 0 ) = samplePostCrossfade * panGainL;
-					playheadBuffer.getSample ( playheadBufferPosition + i, 1 ) = samplePostCrossfade * panGainR;
-				}
+                    playheadBuffer.getSample ( playheadBufferPosition + i, 0 ) = samplePostCrossfade * panGainL;
+                    playheadBuffer.getSample ( playheadBufferPosition + i, 1 ) = samplePostCrossfade * panGainR;
+                }
 
-				mPlayheads[playheadIndex].crossfadeCurrentSample += crossfadeSamplesLeft;
-				mPlayheads[playheadIndex].sampleIndex += crossfadeSamplesLeft;
-				mPlayheads[playheadIndex].jumpSampleIndex += crossfadeSamplesLeft;
-				playheadBufferPosition += crossfadeSamplesLeft;
+                mPlayheads[playheadIndex].crossfadeCurrentSample += crossfadeSamplesLeft;
+                mPlayheads[playheadIndex].sampleIndex += crossfadeSamplesLeft;
+                mPlayheads[playheadIndex].jumpSampleIndex += crossfadeSamplesLeft;
+                playheadBufferPosition += crossfadeSamplesLeft;
 
-				if ( mPlayheads[playheadIndex].crossfadeCurrentSample >= mPlayheads[playheadIndex].crossfadeSampleLength )
-				{
-					mPlayheads[playheadIndex].crossfading = false;
-					mPlayheads[playheadIndex].fileIndex = mPlayheads[playheadIndex].jumpFileIndex;
-					mPlayheads[playheadIndex].sampleIndex = mPlayheads[playheadIndex].jumpSampleIndex;
-					CalculateTriggerPoints ( mPlayheads[playheadIndex] );
-				}
-				else
-				{
-					break;
-				}
-			}
+                if ( mPlayheads[playheadIndex].crossfadeCurrentSample >= mPlayheads[playheadIndex].crossfadeSampleLength )
+                {
+                    mPlayheads[playheadIndex].crossfading = false;
+                    mPlayheads[playheadIndex].fileIndex = mPlayheads[playheadIndex].jumpFileIndex;
+                    mPlayheads[playheadIndex].sampleIndex = mPlayheads[playheadIndex].jumpSampleIndex;
+                    CalculateTriggerPoints ( mPlayheads[playheadIndex] );
+                }
+                else
+                {
+                    break;
+                }
+            }
 
-			// remove trigger points that have been hit
-			while ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) > 0 && mPlayheads[playheadIndex].sampleIndex >= mPlayheads[playheadIndex].triggerSamplePoints.front ( ) )
-			{
-				mPlayheads[playheadIndex].triggerSamplePoints.pop ( );
-			}
+            // remove trigger points that have been hit
+            while ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) > 0 && mPlayheads[playheadIndex].sampleIndex >= mPlayheads[playheadIndex].triggerSamplePoints.front ( ) )
+            {
+                mPlayheads[playheadIndex].triggerSamplePoints.pop ( );
+            }
 
-			// if EOF: loop/kill
-			if ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) == 0 )
-			{
-				if ( mLoopPlayheads )
-				{
-					mPlayheads[playheadIndex].sampleIndex = 0;
-					CalculateTriggerPoints ( mPlayheads[playheadIndex] );
-				}
-				else
-				{
-					playheadsToKillThisBuffer.push_back ( mPlayheads[playheadIndex].playheadID );
-					break;
-				}
-			}
+            // if EOF: loop/kill
+            if ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) == 0 )
+            {
+                if ( mLoopPlayheads )
+                {
+                    mPlayheads[playheadIndex].sampleIndex = 0;
+                    CalculateTriggerPoints ( mPlayheads[playheadIndex] );
+                }
+                else
+                {
+                    playheadsToKillThisBuffer.push_back ( mPlayheads[playheadIndex].playheadID );
+                    break;
+                }
+            }
 
-			// exit loop - no more space in outbuffer, no more triggers hit
-			if ( ( playheadBuffer.getNumFrames ( ) - playheadBufferPosition ) < ( mPlayheads[playheadIndex].triggerSamplePoints.front ( ) - mPlayheads[playheadIndex].sampleIndex ) )
-			{
-				FillAudioSegment ( &playheadBuffer, &playheadBufferPosition, &mPlayheads[playheadIndex], true );
-				break;
-			}
+            // exit loop - no more space in outbuffer, no more triggers hit
+            if ( ( playheadBuffer.getNumFrames ( ) - playheadBufferPosition ) < ( mPlayheads[playheadIndex].triggerSamplePoints.front ( ) - mPlayheads[playheadIndex].sampleIndex ) )
+            {
+                FillAudioSegment ( &playheadBuffer, &playheadBufferPosition, &mPlayheads[playheadIndex], true );
+                break;
+            }
 
-			// fill audio up to the next trigger, already established that there is enough space in outBuffer
-			FillAudioSegment ( &playheadBuffer, &playheadBufferPosition, &mPlayheads[playheadIndex], false );
+            // fill audio up to the next trigger, already established that there is enough space in outBuffer
+            FillAudioSegment ( &playheadBuffer, &playheadBufferPosition, &mPlayheads[playheadIndex], false );
 
-			// after this point it is assumed that a new trigger has been reached, perform jump checks for this trigger
+            // after this point it is assumed that a new trigger has been reached, perform jump checks for this trigger
 
-			int requiredSamples = mCrossfadeSampleLength;
-			if ( mPlayheads[playheadIndex].sampleIndex + requiredSamples >= mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getNumFrames ( ) ) { continue; }
-			if ( ((double)rand ( ) / RAND_MAX) > crossoverJumpChance ) { continue; }
-			if ( mTimeCorpusMutex.try_lock ( ) )
-			{
-				std::lock_guard<std::mutex> lock ( mTimeCorpusMutex, std::adopt_lock );
+            int requiredSamples = mCrossfadeSampleLength;
+            if ( mPlayheads[playheadIndex].sampleIndex + requiredSamples >= mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getNumFrames ( ) ) { continue; }
+            if ( ((double)rand ( ) / RAND_MAX) > crossoverJumpChance ) { continue; }
+            if ( mTimeCorpusMutex.try_lock ( ) )
+            {
+                std::lock_guard<std::mutex> lock ( mTimeCorpusMutex, std::adopt_lock );
 
-				size_t timePointIndex = mPlayheads[playheadIndex].sampleIndex / mRawView->GetHopSize ( );
-				glm::vec3 playheadPosition = mTimeCorpus[mPlayheads[playheadIndex].fileIndex].getVertex ( timePointIndex );
-				Utils::PointFT nearestPoint;
-				Utils::PointFT currentPoint; currentPoint.file = mPlayheads[playheadIndex].fileIndex; currentPoint.time = timePointIndex;
+                size_t timePointIndex = mPlayheads[playheadIndex].sampleIndex / mRawView->GetHopSize ( );
+                glm::vec3 playheadPosition = mTimeCorpus[mPlayheads[playheadIndex].fileIndex].getVertex ( timePointIndex );
+                Utils::PointFT nearestPoint;
+                Utils::PointFT currentPoint; currentPoint.file = mPlayheads[playheadIndex].fileIndex; currentPoint.time = timePointIndex;
 
-				if ( !mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, 
-															mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileAllowed, 
-															mJumpSameFileMinTimeDiff, requiredSamples, *mRawView->GetAudioData ( ), mRawView->GetHopSize ( ) ) )
-				{ continue; }
+                if ( !mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint, 
+                                                            mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileAllowed, 
+                                                            mJumpSameFileMinTimeDiff, requiredSamples, *mRawView->GetAudioData ( ), mRawView->GetHopSize ( ) ) )
+                { continue; }
 
-				if ( mRawView->GetAudioData ( )->loaded[nearestPoint.file] == false ) { continue; }
+                if ( mRawView->GetAudioData ( )->loaded[nearestPoint.file] == false ) { continue; }
 
-				mPlayheads[playheadIndex].crossfading = true;
-				mPlayheads[playheadIndex].jumpFileIndex = nearestPoint.file;
-				mPlayheads[playheadIndex].jumpSampleIndex = nearestPoint.time * mRawView->GetHopSize ( );
-				mPlayheads[playheadIndex].crossfadeCurrentSample = 0;
-				mPlayheads[playheadIndex].crossfadeSampleLength = requiredSamples;
-			}
-		}
-		
-		// if playhead is marked for death, apply a fade out and remove from playheads
-		{
-			std::vector<size_t>::iterator it = std::find ( playheadsToKillThisBuffer.begin ( ), playheadsToKillThisBuffer.end ( ), mPlayheads[playheadIndex].playheadID );
-			size_t killIndex = std::distance ( playheadsToKillThisBuffer.begin ( ), it );
-			if ( it != playheadsToKillThisBuffer.end ( ) )
-			{
-				for ( size_t i = 0; i < playheadBuffer.getNumFrames ( ); i++ )
-				{
-					float gain = cos ( (float)i / (float)playheadBuffer.getNumFrames ( ) * 0.5 * M_PI );
-					playheadBuffer.getSample ( i, 0 ) *= gain;
-					playheadBuffer.getSample ( i, 1 ) *= gain;
-				}
+                mPlayheads[playheadIndex].crossfading = true;
+                mPlayheads[playheadIndex].jumpFileIndex = nearestPoint.file;
+                mPlayheads[playheadIndex].jumpSampleIndex = nearestPoint.time * mRawView->GetHopSize ( );
+                mPlayheads[playheadIndex].crossfadeCurrentSample = 0;
+                mPlayheads[playheadIndex].crossfadeSampleLength = requiredSamples;
+            }
+        }
+        
+        // if playhead is marked for death, apply a fade out and remove from playheads
+        {
+            std::vector<size_t>::iterator it = std::find ( playheadsToKillThisBuffer.begin ( ), playheadsToKillThisBuffer.end ( ), mPlayheads[playheadIndex].playheadID );
+            size_t killIndex = std::distance ( playheadsToKillThisBuffer.begin ( ), it );
+            if ( it != playheadsToKillThisBuffer.end ( ) )
+            {
+                for ( size_t i = 0; i < playheadBuffer.getNumFrames ( ); i++ )
+                {
+                    float gain = cos ( (float)i / (float)playheadBuffer.getNumFrames ( ) * 0.5 * M_PI );
+                    playheadBuffer.getSample ( i, 0 ) *= gain;
+                    playheadBuffer.getSample ( i, 1 ) *= gain;
+                }
 
-				playheadsToKillThisBuffer.erase ( playheadsToKillThisBuffer.begin ( ) + killIndex );
+                playheadsToKillThisBuffer.erase ( playheadsToKillThisBuffer.begin ( ) + killIndex );
 
-				mPlayheads.erase ( mPlayheads.begin ( ) + playheadIndex );
-				playheadIndex--;
-			}
-		}
+                mPlayheads.erase ( mPlayheads.begin ( ) + playheadIndex );
+                playheadIndex--;
+            }
+        }
 
-		// processing done, add to outBuffer
-		for ( size_t sampleIndex = 0; sampleIndex < outBuffer.getNumFrames ( ); sampleIndex++ )
-		{
-			outBuffer.getSample ( sampleIndex, 0 ) += playheadBuffer.getSample ( sampleIndex, 0 );
-			outBuffer.getSample ( sampleIndex, 1 ) += playheadBuffer.getSample ( sampleIndex, 1 );
-		}
-	}
+        // processing done, add to outBuffer
+        for ( size_t sampleIndex = 0; sampleIndex < outBuffer.getNumFrames ( ); sampleIndex++ )
+        {
+            outBuffer.getSample ( sampleIndex, 0 ) += playheadBuffer.getSample ( sampleIndex, 0 );
+            outBuffer.getSample ( sampleIndex, 1 ) += playheadBuffer.getSample ( sampleIndex, 1 );
+        }
+    }
 
-	// multiply outbuffer by volume
-	for ( size_t sampleIndex = 0; sampleIndex < outBuffer.getNumFrames ( ); sampleIndex++ )
-	{
-		outBuffer.getSample ( sampleIndex, 0 ) *= volume;
-		outBuffer.getSample ( sampleIndex, 1 ) *= volume;
-	}
+    // multiply outbuffer by volume
+    for ( size_t sampleIndex = 0; sampleIndex < outBuffer.getNumFrames ( ); sampleIndex++ )
+    {
+        outBuffer.getSample ( sampleIndex, 0 ) *= volume;
+        outBuffer.getSample ( sampleIndex, 1 ) *= volume;
+    }
 
-	if ( mVisualPlayheadUpdateMutex.try_lock ( ) )
-	{
-		std::lock_guard<std::mutex> lock ( mVisualPlayheadUpdateMutex, std::adopt_lock );
+    if ( mVisualPlayheadUpdateMutex.try_lock ( ) )
+    {
+        std::lock_guard<std::mutex> lock ( mVisualPlayheadUpdateMutex, std::adopt_lock );
 
-		if ( mVisualPlayheads.size ( ) > 0 ) { mVisualPlayheads.clear ( ); }
+        if ( mVisualPlayheads.size ( ) > 0 ) { mVisualPlayheads.clear ( ); }
 
-		for ( size_t i = 0; i < mPlayheads.size ( ); i++ )
-		{
-			mVisualPlayheads.push_back ( Utils::VisualPlayhead ( mPlayheads[i].playheadID, mPlayheads[i].fileIndex, mPlayheads[i].sampleIndex ) );
-		}
-	}
+        for ( size_t i = 0; i < mPlayheads.size ( ); i++ )
+        {
+            mVisualPlayheads.push_back ( Utils::VisualPlayhead ( mPlayheads[i].playheadID, mPlayheads[i].fileIndex, mPlayheads[i].sampleIndex ) );
+        }
+    }
 
-	mActivePlayheads = mPlayheads.size ( );
+    mActivePlayheads = mPlayheads.size ( );
 }
 
 void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utils::AudioPlayhead* playhead, bool outBufferFull )
 {
-	float panGainL = 1.0f, panGainR = 1.0f;
-	double panningStrength = (double)mPanningStrengthX1000 / 1000.0;
-	if ( mDynamicPanEnabled && panningStrength > 0.0 )
-	{
-		size_t timePointIndex = playhead->sampleIndex / mRawView->GetHopSize ( );
-		float pan = mRawView->GetTimeData ( )->raw[playhead->fileIndex][timePointIndex][mDynamicPanDimensionIndex];
-		float panNorm = glm::clamp (	(float)(pan - mDimensionBounds.min[mDynamicPanDimensionIndex]) / 
-										(float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]),
-										0.0f, 1.0f );
-		panGainL = cos ( panNorm * 0.5 * M_PI );
-		panGainR = sin ( panNorm * 0.5 * M_PI );
+    float panGainL = 1.0f, panGainR = 1.0f;
+    double panningStrength = (double)mPanningStrengthX1000 / 1000.0;
+    if ( mDynamicPanEnabled && panningStrength > 0.0 )
+    {
+        size_t timePointIndex = playhead->sampleIndex / mRawView->GetHopSize ( );
+        float pan = mRawView->GetTimeData ( )->raw[playhead->fileIndex][timePointIndex][mDynamicPanDimensionIndex];
+        float panNorm = glm::clamp (	(float)(pan - mDimensionBounds.min[mDynamicPanDimensionIndex]) / 
+                                        (float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]),
+                                        0.0f, 1.0f );
+        panGainL = cos ( panNorm * 0.5 * M_PI );
+        panGainR = sin ( panNorm * 0.5 * M_PI );
 
-		panGainL = 1.0f - panningStrength * (1.0f - panGainL);
-		panGainR = 1.0f - panningStrength * (1.0f - panGainR);
-	}
+        panGainL = 1.0f - panningStrength * (1.0f - panGainL);
+        panGainR = 1.0f - panningStrength * (1.0f - panGainR);
+    }
 
-	size_t segmentLength = playhead->triggerSamplePoints.front ( ) - playhead->sampleIndex;
+    size_t segmentLength = playhead->triggerSamplePoints.front ( ) - playhead->sampleIndex;
 
-	if ( outBufferFull && segmentLength > (outBuffer->getNumFrames ( ) - *outBufferPosition) ) // cut off early if outBuffer is full
-	{
-		segmentLength = outBuffer->getNumFrames ( ) - *outBufferPosition;
-	}
+    if ( outBufferFull && segmentLength > (outBuffer->getNumFrames ( ) - *outBufferPosition) ) // cut off early if outBuffer is full
+    {
+        segmentLength = outBuffer->getNumFrames ( ) - *outBufferPosition;
+    }
 
-	for ( size_t i = 0; i < segmentLength; i++ )
-	{
-		outBuffer->getSample ( *outBufferPosition + i, 0 ) = mRawView->GetAudioData ( )->raw[playhead->fileIndex].getSample ( playhead->sampleIndex + i, 0 ) * panGainL;
-		outBuffer->getSample ( *outBufferPosition + i, 1 ) = mRawView->GetAudioData ( )->raw[playhead->fileIndex].getSample ( playhead->sampleIndex + i, 0 ) * panGainR;
-	}
+    for ( size_t i = 0; i < segmentLength; i++ )
+    {
+        outBuffer->getSample ( *outBufferPosition + i, 0 ) = mRawView->GetAudioData ( )->raw[playhead->fileIndex].getSample ( playhead->sampleIndex + i, 0 ) * panGainL;
+        outBuffer->getSample ( *outBufferPosition + i, 1 ) = mRawView->GetAudioData ( )->raw[playhead->fileIndex].getSample ( playhead->sampleIndex + i, 0 ) * panGainR;
+    }
 
-	playhead->sampleIndex += segmentLength;
-	*outBufferPosition += segmentLength;
+    playhead->sampleIndex += segmentLength;
+    *outBufferPosition += segmentLength;
 }
 
 // TODO - i think this function is no longer used - remove?
 void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, size_t startSample_A, size_t endSample_A, size_t fileIndex_A, Utils::AudioPlayhead* playhead_B, size_t lengthSetting, bool outBufferFull )
 {
-	size_t originLength = endSample_A - startSample_A;
-	size_t jumpLength = playhead_B->triggerSamplePoints.front ( ) - playhead_B->sampleIndex;
-	size_t crossfadeLength = (originLength < jumpLength) ? originLength : jumpLength;
-	crossfadeLength = (crossfadeLength < lengthSetting) ? crossfadeLength : lengthSetting;
+    size_t originLength = endSample_A - startSample_A;
+    size_t jumpLength = playhead_B->triggerSamplePoints.front ( ) - playhead_B->sampleIndex;
+    size_t crossfadeLength = (originLength < jumpLength) ? originLength : jumpLength;
+    crossfadeLength = (crossfadeLength < lengthSetting) ? crossfadeLength : lengthSetting;
 
-	if ( outBufferFull && crossfadeLength > ( outBuffer->getNumFrames ( ) - *outBufferPosition ) ) // cut off early if outBuffer is full
-	{
-		crossfadeLength = outBuffer->getNumFrames ( ) - *outBufferPosition;
-	}
+    if ( outBufferFull && crossfadeLength > ( outBuffer->getNumFrames ( ) - *outBufferPosition ) ) // cut off early if outBuffer is full
+    {
+        crossfadeLength = outBuffer->getNumFrames ( ) - *outBufferPosition;
+    }
 
 
-	for ( size_t i = 0; i < crossfadeLength; i++ )
-	{
-		float gain_A = cos ( (float)i / (float)crossfadeLength * 0.5 * M_PI );
-		float gain_B = sin ( (float)i / (float)crossfadeLength * 0.5 * M_PI );
+    for ( size_t i = 0; i < crossfadeLength; i++ )
+    {
+        float gain_A = cos ( (float)i / (float)crossfadeLength * 0.5 * M_PI );
+        float gain_B = sin ( (float)i / (float)crossfadeLength * 0.5 * M_PI );
 
-		outBuffer->getSample ( *outBufferPosition + i, 0 ) =	mRawView->GetAudioData ( )->raw[fileIndex_A].getSample ( startSample_A + i, 0 ) * gain_A +
-																mRawView->GetAudioData ( )->raw[playhead_B->fileIndex].getSample ( playhead_B->sampleIndex + i, 0 ) * gain_B;
-	}
+        outBuffer->getSample ( *outBufferPosition + i, 0 ) =	mRawView->GetAudioData ( )->raw[fileIndex_A].getSample ( startSample_A + i, 0 ) * gain_A +
+                                                                mRawView->GetAudioData ( )->raw[playhead_B->fileIndex].getSample ( playhead_B->sampleIndex + i, 0 ) * gain_B;
+    }
 
-	playhead_B->sampleIndex += crossfadeLength;
-	*outBufferPosition += crossfadeLength;
+    playhead_B->sampleIndex += crossfadeLength;
+    *outBufferPosition += crossfadeLength;
 }
 
 bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t sampleIndex )
 {
-	{
-		std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
-		if ( mNewPlayheads.size ( ) > 3 )
-		{
-			ofLogWarning ( "AudioPlayback" ) << "Too many playheads queued already, failed to create new playhead";
-			return false;
-		}
-	}
+    {
+        std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
+        if ( mNewPlayheads.size ( ) > 3 )
+        {
+            ofLogWarning ( "AudioPlayback" ) << "Too many playheads queued already, failed to create new playhead";
+            return false;
+        }
+    }
 
-	if ( mRawView->GetAudioData ( )->loaded[fileIndex] )
-	{
-		Utils::AudioPlayhead newPlayhead ( playheadCounter, fileIndex, sampleIndex );
-		playheadCounter++;
+    if ( mRawView->GetAudioData ( )->loaded[fileIndex] )
+    {
+        Utils::AudioPlayhead newPlayhead ( playheadCounter, fileIndex, sampleIndex );
+        playheadCounter++;
 
-		CalculateTriggerPoints ( newPlayhead );
+        CalculateTriggerPoints ( newPlayhead );
 
-		{
-			std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
-			mNewPlayheads.push ( newPlayhead );
-		}
+        {
+            std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
+            mNewPlayheads.push ( newPlayhead );
+        }
 
-		return true;
-	}
-	else
-	{
-		ofLogError ( "AudioPlayback" ) << "File not loaded in memory, failed to create playhead for " << mRawView->GetDataset ( )->fileList[fileIndex];
-		return false;
-	}
+        return true;
+    }
+    else
+    {
+        ofLogError ( "AudioPlayback" ) << "File not loaded in memory, failed to create playhead for " << mRawView->GetDataset ( )->fileList[fileIndex];
+        return false;
+    }
 }
 
 bool Explorer::AudioPlayback::KillPlayhead ( size_t playheadID )
 {
-	{
-		std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
-		mPlayheadsToKill.push ( playheadID );
-	}
+    {
+        std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
+        mPlayheadsToKill.push ( playheadID );
+    }
 
-	return true;
+    return true;
 }
 
 std::vector<Utils::VisualPlayhead> Explorer::AudioPlayback::GetPlayheadInfo ( )
 {
-	std::lock_guard<std::mutex> lock ( mVisualPlayheadUpdateMutex );
+    std::lock_guard<std::mutex> lock ( mVisualPlayheadUpdateMutex );
 
-	return mVisualPlayheads;
+    return mVisualPlayheads;
 }
 
 void Explorer::AudioPlayback::SetFlagReset ( )
 {
-	bResetFlag = true;
+    bResetFlag = true;
 }
 
 void Explorer::AudioPlayback::WaitForResetConfirm ( )
 {
-	if ( !bStreamStarted ) { return; }
-	while ( bResetFlag )
-	{
-		if ( mActivePlayheads == 0 ) { return; }
-	}
+    if ( !bStreamStarted ) { return; }
+    while ( bResetFlag )
+    {
+        if ( mActivePlayheads == 0 ) { return; }
+    }
 }
 
 void Explorer::AudioPlayback::SetTimeCorpus ( const std::vector<ofMesh>& timeCorpus )
 {
-	std::lock_guard<std::mutex> lock ( mTimeCorpusMutex );
+    std::lock_guard<std::mutex> lock ( mTimeCorpusMutex );
 
-	mTimeCorpus = timeCorpus;
+    mTimeCorpus = timeCorpus;
 }
 
 void Explorer::AudioPlayback::CalculateTriggerPoints ( Utils::AudioPlayhead& playhead )
 {
-	while ( !playhead.triggerSamplePoints.empty ( ) )
-	{
-		playhead.triggerSamplePoints.pop ( );
-	}
+    while ( !playhead.triggerSamplePoints.empty ( ) )
+    {
+        playhead.triggerSamplePoints.pop ( );
+    }
 
-	int triggerPointDistance = mRawView->GetHopSize ( );
-	int currentTriggerPoint = triggerPointDistance;
+    int triggerPointDistance = mRawView->GetHopSize ( );
+    int currentTriggerPoint = triggerPointDistance;
 
-	while ( currentTriggerPoint < mRawView->GetAudioData ( )->raw[playhead.fileIndex].size ( ) ) // might have to change if stereo input support is added
-	{
-		if ( currentTriggerPoint > playhead.sampleIndex )
-		{
-			playhead.triggerSamplePoints.push ( currentTriggerPoint );
-		}
-		currentTriggerPoint += triggerPointDistance;
-	}
+    while ( currentTriggerPoint < mRawView->GetAudioData ( )->raw[playhead.fileIndex].size ( ) ) // might have to change if stereo input support is added
+    {
+        if ( currentTriggerPoint > playhead.sampleIndex )
+        {
+            playhead.triggerSamplePoints.push ( currentTriggerPoint );
+        }
+        currentTriggerPoint += triggerPointDistance;
+    }
 
-	playhead.triggerSamplePoints.push ( mRawView->GetAudioData ( )->raw[playhead.fileIndex].size ( ) - 1 ); // might have to change if stereo input support is added
+    playhead.triggerSamplePoints.push ( mRawView->GetAudioData ( )->raw[playhead.fileIndex].size ( ) - 1 ); // might have to change if stereo input support is added
 }

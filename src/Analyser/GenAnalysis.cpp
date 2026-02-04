@@ -52,10 +52,10 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
     {
         dataset.time.raw.clear ( );
     }
-	else
-	{
-		dataset.stats.raw.clear ( );
-	}
+    else
+    {
+        dataset.stats.raw.clear ( );
+    }
 
     int analysedFileIndex = 0;
     std::vector<std::string> analysedFiles;
@@ -74,8 +74,8 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
     }
     else
     {
-		dataset.analysisSettings.currentDimensionCount = numDimensions;
-	}
+        dataset.analysisSettings.currentDimensionCount = numDimensions;
+    }
 
     fluid::index nBins = dataset.analysisSettings.windowFFTSize / 2 + 1;
     fluid::index hopSize = dataset.analysisSettings.windowFFTSize / dataset.analysisSettings.hopFraction;
@@ -159,7 +159,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
                 fluid::RealVector     shapeDesc ( 7 );
                 shape.processFrame ( magnitude, shapeDesc, dataset.analysisSettings.sampleRate, 0, -1, 0.95, false, false, fluid::FluidDefaultAllocator ( ) );
                 shapeMat.row ( frameIndex ) <<= shapeDesc;
-			}
+            }
 
             if ( dataset.analysisSettings.bMFCC )
             {
@@ -180,19 +180,19 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
                 allVectors[frameIndex].push_back ( frameIndex * hopSize / (double)dataset.analysisSettings.sampleRate );
             }
 
-			if ( dataset.analysisSettings.bPitch )
-			{
+            if ( dataset.analysisSettings.bPitch )
+            {
                 for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
-				{
+                {
                     for ( int dimIndex = 0; dimIndex < numPitchDimensions; dimIndex++ )
                     {
                         allVectors[frameIndex].push_back ( pitchMat ( frameIndex, dimIndex ) );
                     }
-				}
-			}
+                }
+            }
 
             if ( dataset.analysisSettings.bLoudness )
-			{
+            {
                 for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
                 {
                     for ( int dimIndex = 0; dimIndex < numLoudnessDimensions; dimIndex++ )
@@ -200,29 +200,29 @@ int Analyser::GenAnalysis::ProcessFiles ( Utils::DataSet& dataset )
                         allVectors[frameIndex].push_back ( loudnessMat ( frameIndex, dimIndex ) );
                     }
                 }
-			}
+            }
 
             if ( dataset.analysisSettings.bShape )
             {
                 for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
-				{
-					for ( int dimIndex = 0; dimIndex < numShapeDimensions; dimIndex++ )
-					{
-						allVectors[frameIndex].push_back ( shapeMat ( frameIndex, dimIndex ) );
-					}
-				}
+                {
+                    for ( int dimIndex = 0; dimIndex < numShapeDimensions; dimIndex++ )
+                    {
+                        allVectors[frameIndex].push_back ( shapeMat ( frameIndex, dimIndex ) );
+                    }
+                }
             }
 
             if ( dataset.analysisSettings.bMFCC )
-			{
+            {
                 for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
                 {
                     for ( int dimIndex = 0; dimIndex < numMFCCDimensions; dimIndex++ )
-					{
-						allVectors[frameIndex].push_back ( mfccMat ( frameIndex, dimIndex ) );
-					}
+                    {
+                        allVectors[frameIndex].push_back ( mfccMat ( frameIndex, dimIndex ) );
+                    }
                 }
-			}
+            }
 
             dataset.time.raw.push_back ( allVectors );
             dataset.currentPointCount += nFrames;
@@ -298,9 +298,9 @@ void Analyser::GenAnalysis::Push7Stats ( fluid::RealVector& stats, std::vector<s
         int index = fileData.size ( ) - 1;
 
         for ( fluid::index statistic = 0; statistic < DATA_NUM_STATS; statistic++ )
-		{
+        {
             int statsIndex = ( dimension * 7 ) + statistic;
             fileData[index].push_back ( stats[statsIndex] );
-		}
+        }
     }
 }

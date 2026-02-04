@@ -25,15 +25,15 @@ namespace Utils {
 
 class AudioFileLoader {
 public:
-	AudioFileLoader ( ) { }
-	~AudioFileLoader ( ) { }
+    AudioFileLoader ( ) { }
+    ~AudioFileLoader ( ) { }
 
-	bool ReadAudioFile ( std::string filename, fluid::RealVector& output, double targetSampleRate );
+    bool ReadAudioFile ( std::string filename, fluid::RealVector& output, double targetSampleRate );
 
 private:
-	void ReadToMono ( std::vector<float>& output, ofxAudioFile& file );
+    void ReadToMono ( std::vector<float>& output, ofxAudioFile& file );
 
-	void Resample ( std::vector<float>& audio, double fileRate, double targetRate );
+    void Resample ( std::vector<float>& audio, double fileRate, double targetRate );
 };
 
 } // namespace Utils

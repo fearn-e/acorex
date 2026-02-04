@@ -26,111 +26,111 @@ namespace Acorex {
 
 class ExplorerMenu {
 public:
-	ExplorerMenu ( ) { }
-	~ExplorerMenu ( ) { }
+    ExplorerMenu ( ) { }
+    ~ExplorerMenu ( ) { }
 
-	void Initialise ( bool HiDpi );
-	void Show ( );
-	void Hide ( );
-	void Draw ( );
-	void Update ( );
-	void Exit ( );
+    void Initialise ( bool HiDpi );
+    void Show ( );
+    void Hide ( );
+    void Draw ( );
+    void Update ( );
+    void Exit ( );
 
-	void WindowResized ( );
+    void WindowResized ( );
 
 private:
-	void SlowUpdate ( );
-	void RemoveListeners ( );
+    void SlowUpdate ( );
+    void RemoveListeners ( );
 
-	// Main Functions ------------------------------
+    // Main Functions ------------------------------
 
-	void OpenCorpus ( );
-	void SwapDimension ( string dimension, Utils::Axis axis );
-	int GetDimensionIndex ( std::string& dimension );
-	void CameraSwitcher ( );
+    void OpenCorpus ( );
+    void SwapDimension ( string dimension, Utils::Axis axis );
+    int GetDimensionIndex ( std::string& dimension );
+    void CameraSwitcher ( );
 
-	// Listener Functions --------------------------
+    // Listener Functions --------------------------
 
-	void SwapDimensionX ( string& dimension );
-	void SwapDimensionY ( string& dimension );
-	void SwapDimensionZ ( string& dimension );
-	void SwapDimensionColor ( string& dimension );
-	void SwitchColorSpectrum ( bool& fullSpectrum );
-	void ToggleLoopPlayheads ( bool& loop );
-	void ToggleJumpSameFileAllowed ( bool& allowed );
-	void SetJumpSameFileMinTimeDiff ( int& timeDiff );
-	void SetCrossoverJumpChance ( float& jumpChance );
-	void SetCrossfadeMaxSampleLength ( int& length );
-	void SetMaxJumpDistanceSpace ( float& distance );
-	void SetMaxJumpTargets ( int& targets );
-	void SetVolume(float & volume);
+    void SwapDimensionX ( string& dimension );
+    void SwapDimensionY ( string& dimension );
+    void SwapDimensionZ ( string& dimension );
+    void SwapDimensionColor ( string& dimension );
+    void SwitchColorSpectrum ( bool& fullSpectrum );
+    void ToggleLoopPlayheads ( bool& loop );
+    void ToggleJumpSameFileAllowed ( bool& allowed );
+    void SetJumpSameFileMinTimeDiff ( int& timeDiff );
+    void SetCrossoverJumpChance ( float& jumpChance );
+    void SetCrossfadeMaxSampleLength ( int& length );
+    void SetMaxJumpDistanceSpace ( float& distance );
+    void SetMaxJumpTargets ( int& targets );
+    void SetVolume(float & volume);
 
-	void SwapDimensionDynamicPan ( string& dimension );
-	void SetPanningStrength ( float& strength );
+    void SwapDimensionDynamicPan ( string& dimension );
+    void SetPanningStrength ( float& strength );
 
-	void MouseReleased ( ofMouseEventArgs& args );
+    void MouseReleased ( ofMouseEventArgs& args );
 
-	void SetBufferSize ( int& bufferSize );
-	void SetOutDevice ( string& outDevice );
+    void SetBufferSize ( int& bufferSize );
+    void SetOutDevice ( string& outDevice );
 
-	std::vector<ofSoundDevice> outDevices;
-	ofSoundDevice currentOutDevice;
-	int currentBufferSize;
+    std::vector<ofSoundDevice> outDevices;
+    ofSoundDevice currentOutDevice;
+    int currentBufferSize;
 
-	// States --------------------------------------
+    // States --------------------------------------
 
-	bool bDraw = false;
+    bool bDraw = false;
 
-	bool bIsCorpusOpen = false; bool bBlockDimensionFilling = false;
-	bool bOpenCorpusDrawWarning = false;
-	bool bInitialiseShouldLoad = false;
-	bool bListenersAdded = false;
-	
-	bool bViewPointerShared = false;
+    bool bIsCorpusOpen = false; bool bBlockDimensionFilling = false;
+    bool bOpenCorpusDrawWarning = false;
+    bool bInitialiseShouldLoad = false;
+    bool bListenersAdded = false;
+    
+    bool bViewPointerShared = false;
 
-	Utils::Axis mDisabledAxis = Utils::Axis::NONE;
+    Utils::Axis mDisabledAxis = Utils::Axis::NONE;
 
-	// Timing --------------------------------------
+    // Timing --------------------------------------
 
-	int mLastUpdateTime = 0;
-	int mSlowUpdateInterval = 100;
+    int mLastUpdateTime = 0;
+    int mSlowUpdateInterval = 100;
 
-	int mOpenCorpusButtonClickTime = 0;
-	int mOpenCorpusButtonTimeout = 3000;
+    int mOpenCorpusButtonClickTime = 0;
+    int mOpenCorpusButtonTimeout = 3000;
 
-	// Panels --------------------------------------
+    // Panels --------------------------------------
 
-	ofxPanel mMainPanel;
-	ofxLabel mCorpusNameLabel;
-	ofxButton mOpenCorpusButton;
-	unique_ptr<ofxDropdown> mDimensionDropdownX;
-	unique_ptr<ofxDropdown> mDimensionDropdownY;
-	unique_ptr<ofxDropdown> mDimensionDropdownZ;
-	unique_ptr<ofxDropdown> mDimensionDropdownColor;
-	ofxToggle mColorSpectrumSwitcher;
+    ofxPanel mMainPanel;
+    ofxLabel mCorpusNameLabel;
+    ofxButton mOpenCorpusButton;
+    unique_ptr<ofxDropdown> mDimensionDropdownX;
+    unique_ptr<ofxDropdown> mDimensionDropdownY;
+    unique_ptr<ofxDropdown> mDimensionDropdownZ;
+    unique_ptr<ofxDropdown> mDimensionDropdownColor;
+    ofxToggle mColorSpectrumSwitcher;
 
-	ofxToggle mLoopPlayheadsToggle;
-	ofxToggle mJumpSameFileAllowedToggle;
-	ofxIntSlider mJumpSameFileMinTimeDiffSlider;
-	ofxFloatSlider mCrossoverJumpChanceSlider;
-	ofxIntSlider mCrossfadeMaxSampleLengthSlider;
-	ofxFloatSlider mMaxJumpDistanceSpaceSlider;
-	ofxIntSlider mMaxJumpTargetsSlider;
+    ofxToggle mLoopPlayheadsToggle;
+    ofxToggle mJumpSameFileAllowedToggle;
+    ofxIntSlider mJumpSameFileMinTimeDiffSlider;
+    ofxFloatSlider mCrossoverJumpChanceSlider;
+    ofxIntSlider mCrossfadeMaxSampleLengthSlider;
+    ofxFloatSlider mMaxJumpDistanceSpaceSlider;
+    ofxIntSlider mMaxJumpTargetsSlider;
 
-	ofxFloatSlider mVolumeSlider;
+    ofxFloatSlider mVolumeSlider;
 
-	unique_ptr<ofxDropdown> mDimensionDropdownDynamicPan;
-	ofxFloatSlider mPanningStrengthSlider;
+    unique_ptr<ofxDropdown> mDimensionDropdownDynamicPan;
+    ofxFloatSlider mPanningStrengthSlider;
 
-	unique_ptr<ofxIntDropdown> mBufferSizeDropdown;
-	unique_ptr<ofxDropdown> mOutDeviceDropdown;
+    unique_ptr<ofxIntDropdown> mBufferSizeDropdown;
+    unique_ptr<ofxDropdown> mOutDeviceDropdown;
 
-	// Acorex Objects ------------------------------
+    // Acorex Objects ------------------------------
 
-	std::shared_ptr<Explorer::RawView> mRawView;
-	Explorer::LiveView mLiveView;
-	Utils::Colors mColors;
-	Utils::MenuLayout mLayout;
+    std::shared_ptr<Explorer::RawView> mRawView;
+    Explorer::LiveView mLiveView;
+    Utils::Colors mColors;
+    Utils::MenuLayout mLayout;
 };
 
 } // namespace Acorex

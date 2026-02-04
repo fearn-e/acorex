@@ -24,33 +24,33 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 class ofApp : public ofBaseApp {
 
 public:
-	ofApp ( ) { }
-	~ofApp ( ) { }
+    ofApp ( ) { }
+    ~ofApp ( ) { }
 
-	void setup ( );
-	void update ( );
-	void draw ( );
-	void exit ( );
-	
-	void windowResized ( int w, int h );
-	//void dragEvent ( ofDragInfo dragInfo );
-	//void gotMessage ( ofMessage msg );
+    void setup ( );
+    void update ( );
+    void draw ( );
+    void exit ( );
+    
+    void windowResized ( int w, int h );
+    //void dragEvent ( ofDragInfo dragInfo );
+    //void gotMessage ( ofMessage msg );
 
 private:
-	void RemoveListeners ( );
-	void SetupUI ( bool keepValues );
-	void AnalyseToggled ( bool& value );
-	void ExploreToggled ( bool& value );
-	void DPIToggled ( bool& value );
+    void RemoveListeners ( );
+    void SetupUI ( bool keepValues );
+    void AnalyseToggled ( bool& value );
+    void ExploreToggled ( bool& value );
+    void DPIToggled ( bool& value );
 
-	Acorex::AnalyserMenu mAnalyserMenu;
-	Acorex::ExplorerMenu mExplorerMenu;
-	Acorex::Utils::MenuLayout mLayout;
-	Acorex::Utils::Colors mColors;
+    Acorex::AnalyserMenu mAnalyserMenu;
+    Acorex::ExplorerMenu mExplorerMenu;
+    Acorex::Utils::MenuLayout mLayout;
+    Acorex::Utils::Colors mColors;
 
-	ofxToggle mAnalyseToggle;
-	ofxToggle mExploreToggle;
-	ofxToggle mDPIToggle;
+    ofxToggle mAnalyseToggle;
+    ofxToggle mExploreToggle;
+    ofxToggle mDPIToggle;
 
-	bool bListenersAdded = false;
+    bool bListenersAdded = false;
 };

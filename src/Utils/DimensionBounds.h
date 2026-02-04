@@ -28,55 +28,55 @@ namespace Utils {
 
 class DimensionBounds {
 public:
-	DimensionBounds ( ) { }
-	~DimensionBounds ( ) { }
+    DimensionBounds ( ) { }
+    ~DimensionBounds ( ) { }
 
-	void CalculateBounds ( const DataSet& dataset )
-	{
-		bounds.min.clear ( );
-		bounds.max.clear ( );
+    void CalculateBounds ( const DataSet& dataset )
+    {
+        bounds.min.clear ( );
+        bounds.max.clear ( );
 
-		bounds.min.resize ( dataset.dimensionNames.size ( ) );
-		bounds.max.resize ( dataset.dimensionNames.size ( ) );
+        bounds.min.resize ( dataset.dimensionNames.size ( ) );
+        bounds.max.resize ( dataset.dimensionNames.size ( ) );
 
 #pragma omp parallel for
-		for ( int dimension = 0; dimension < dataset.dimensionNames.size ( ); dimension++ )
-		{
-			bounds.min[dimension] = std::numeric_limits<double>::max ( );
-			bounds.max[dimension] = std::numeric_limits<double>::max ( ) * -1;
+        for ( int dimension = 0; dimension < dataset.dimensionNames.size ( ); dimension++ )
+        {
+            bounds.min[dimension] = std::numeric_limits<double>::max ( );
+            bounds.max[dimension] = std::numeric_limits<double>::max ( ) * -1;
 
-			for ( int file = 0; file < dataset.fileList.size ( ); file++ )
-			{
-				if ( dataset.analysisSettings.bTime )
-				{
-					for ( int timepoint = 0; timepoint < dataset.time.raw[file].size ( ); timepoint++ )
-					{
-						if ( dataset.time.raw[file][timepoint][dimension] < bounds.min[dimension] ) { bounds.min[dimension] = dataset.time.raw[file][timepoint][dimension]; }
-						if ( dataset.time.raw[file][timepoint][dimension] > bounds.max[dimension] ) { bounds.max[dimension] = dataset.time.raw[file][timepoint][dimension]; }
-					}
-				}
-				else if ( dataset.analysisSettings.hasBeenReduced )
-				{
-					if ( dataset.stats.reduced[file][dimension] < bounds.min[dimension] ) { bounds.min[dimension] = dataset.stats.reduced[file][dimension]; }
-					if ( dataset.stats.reduced[file][dimension] > bounds.max[dimension] ) { bounds.max[dimension] = dataset.stats.reduced[file][dimension]; }
-				}
-				else
-				{
-					int tempDim = dimension / DATA_NUM_STATS;
-					int tempStat = dimension % DATA_NUM_STATS;
-					if ( dataset.stats.raw[file][tempDim][tempStat] < bounds.min[dimension] ) { bounds.min[dimension] = dataset.stats.raw[file][tempDim][tempStat]; }
-					if ( dataset.stats.raw[file][tempDim][tempStat] > bounds.max[dimension] ) { bounds.max[dimension] = dataset.stats.raw[file][tempDim][tempStat]; }
-				}
-			}
-		}
-	}
+            for ( int file = 0; file < dataset.fileList.size ( ); file++ )
+            {
+                if ( dataset.analysisSettings.bTime )
+                {
+                    for ( int timepoint = 0; timepoint < dataset.time.raw[file].size ( ); timepoint++ )
+                    {
+                        if ( dataset.time.raw[file][timepoint][dimension] < bounds.min[dimension] ) { bounds.min[dimension] = dataset.time.raw[file][timepoint][dimension]; }
+                        if ( dataset.time.raw[file][timepoint][dimension] > bounds.max[dimension] ) { bounds.max[dimension] = dataset.time.raw[file][timepoint][dimension]; }
+                    }
+                }
+                else if ( dataset.analysisSettings.hasBeenReduced )
+                {
+                    if ( dataset.stats.reduced[file][dimension] < bounds.min[dimension] ) { bounds.min[dimension] = dataset.stats.reduced[file][dimension]; }
+                    if ( dataset.stats.reduced[file][dimension] > bounds.max[dimension] ) { bounds.max[dimension] = dataset.stats.reduced[file][dimension]; }
+                }
+                else
+                {
+                    int tempDim = dimension / DATA_NUM_STATS;
+                    int tempStat = dimension % DATA_NUM_STATS;
+                    if ( dataset.stats.raw[file][tempDim][tempStat] < bounds.min[dimension] ) { bounds.min[dimension] = dataset.stats.raw[file][tempDim][tempStat]; }
+                    if ( dataset.stats.raw[file][tempDim][tempStat] > bounds.max[dimension] ) { bounds.max[dimension] = dataset.stats.raw[file][tempDim][tempStat]; }
+                }
+            }
+        }
+    }
 
-	double GetMinBound ( int dimension ) const { return bounds.min[dimension]; }
-	double GetMaxBound ( int dimension ) const { return bounds.max[dimension]; }
-	Utils::DimensionBoundsData GetBoundsData ( ) const { return bounds; }
+    double GetMinBound ( int dimension ) const { return bounds.min[dimension]; }
+    double GetMaxBound ( int dimension ) const { return bounds.max[dimension]; }
+    Utils::DimensionBoundsData GetBoundsData ( ) const { return bounds; }
 
 private:
-	Utils::DimensionBoundsData bounds;
+    Utils::DimensionBoundsData bounds;
 };
 
 } // namespace Utils

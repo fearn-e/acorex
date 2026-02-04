@@ -31,13 +31,13 @@ class JSON {
 #define TO_A_SETTINGS( x ) j.at ( #x ).get_to ( a.analysisSettings.x )
 
 public:
-	JSON ( ) { };
-	~JSON ( ) { };
+    JSON ( ) { };
+    ~JSON ( ) { };
 
-	bool Write ( const std::string& outputFile, const DataSet& dataset );
+    bool Write ( const std::string& outputFile, const DataSet& dataset );
 
-	bool Read ( const std::string& inputFile, DataSet& dataset );
-	bool Read ( const std::string& inputFile, AnalysisSettings& settings );
+    bool Read ( const std::string& inputFile, DataSet& dataset );
+    bool Read ( const std::string& inputFile, AnalysisSettings& settings );
 };
 
 void to_json ( nlohmann::json& j, const DataSet& a );
