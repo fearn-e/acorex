@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -152,6 +152,7 @@
     <ClInclude Include="src\Utils\DimensionBounds.h" />
     <ClInclude Include="src\Utils\InterfaceDefs.h" />
     <ClInclude Include="src\Utils\JSON.h" />
+    <ClInclude Include="src\Utils\PlatformAudioAPIs.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\libs\dr_flac.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\libs\dr_mp3.h" />

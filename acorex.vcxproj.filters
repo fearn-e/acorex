@@ -239,6 +239,9 @@
     <ClInclude Include="src\Explorer\AudioPlayback.h">
       <Filter>src\Explorer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Utils\PlatformAudioAPIs.h">
+      <Filter>src\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

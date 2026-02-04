@@ -16,6 +16,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "./AudioPlayback.h"
 #include "ofLog.h"
+#include "Utils/PlatformAudioAPIs.h"
 #include <random>
 
 using namespace Acorex;
@@ -27,10 +28,11 @@ void Explorer::AudioPlayback::Initialise ( Utils::DimensionBoundsData dimensionB
 	mDimensionBounds = dimensionBoundsData;
 
 	ofSoundDevice outDevice;
+	std::vector<ofSoundDevice::Api> platformAPIs = { ACOREX_PLATFORM_AUDIO_APIS };
 
-	for ( int i = 1; i < ofSoundDevice::Api::NUM_APIS; i++ )
+	for ( int i = 1; i < platformAPIs.size ( ); i++ )
 	{
-		std::vector<ofSoundDevice> devices = mSoundStream.getDeviceList ( (ofSoundDevice::Api)i );
+		std::vector<ofSoundDevice> devices = mSoundStream.getDeviceList ( platformAPIs[i] );
 		for ( auto& device : devices )
 		{
 			if ( device.outputChannels == 0 ) { continue; }

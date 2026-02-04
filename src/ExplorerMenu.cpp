@@ -15,6 +15,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 */
 
 #include "./ExplorerMenu.h"
+#include "Utils/PlatformAudioAPIs.h"
 #include <ofUtils.h>
 #include <of3dGraphics.h>
 
@@ -68,9 +69,11 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 	{
 		outDevices.clear ( );
 		ofSoundStream temp;
-		for ( int i = 1; i < ofSoundDevice::Api::NUM_APIS; i++ )
+		std::vector<ofSoundDevice::Api> platformAPIs = { ACOREX_PLATFORM_AUDIO_APIS };
+
+		for ( int i = 1; i < platformAPIs.size ( ); i++ )
 		{
-			std::vector<ofSoundDevice> devices = temp.getDeviceList ( (ofSoundDevice::Api)i );
+			std::vector<ofSoundDevice> devices = temp.getDeviceList ( platformAPIs[i] );
 			for ( auto& device : devices )
 			{
 				if ( device.outputChannels == 0 ) { continue; }
