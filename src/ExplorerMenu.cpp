@@ -15,6 +15,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 */
 
 #include "./ExplorerMenu.h"
+#include "Utils/InterfaceDefs.h"
 #include "Utils/PlatformAudioAPIs.h"
 #include <ofUtils.h>
 #include <of3dGraphics.h>
@@ -91,11 +92,11 @@ void ExplorerMenu::Initialise ( bool HiDpi )
         mDimensionDropdownColor.reset ( );
         mDimensionDropdownDynamicPan.reset ( );
 
-        mDimensionDropdownX = make_unique<ofxDropdown> ( (string)"X Dimension", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
-        mDimensionDropdownY = make_unique<ofxDropdown>( (string)"Y Dimension", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
-        mDimensionDropdownZ = make_unique<ofxDropdown>( (string)"Z Dimension", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
-        mDimensionDropdownColor = make_unique<ofxDropdown>( (string)"Color Dimension", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
-        mDimensionDropdownDynamicPan = make_unique<ofxDropdown> ( (string)"Dynamic Panning Dimension", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
+        mDimensionDropdownX = make_unique<ofxDropdown> ( (string)"X Dimension", Utils::ofxDropdownScrollSpeed );
+        mDimensionDropdownY = make_unique<ofxDropdown> ( (string)"Y Dimension", Utils::ofxDropdownScrollSpeed );
+        mDimensionDropdownZ = make_unique<ofxDropdown> ( (string)"Z Dimension", Utils::ofxDropdownScrollSpeed );
+        mDimensionDropdownColor = make_unique<ofxDropdown> ( (string)"Color Dimension", Utils::ofxDropdownScrollSpeed );
+        mDimensionDropdownDynamicPan = make_unique<ofxDropdown> ( (string)"Dynamic Panning Dimension", Utils::ofxDropdownScrollSpeed );
 
         if ( bInitialiseShouldLoad )
         {
@@ -192,8 +193,8 @@ void ExplorerMenu::Initialise ( bool HiDpi )
         mBufferSizeDropdown.reset ( );
         mOutDeviceDropdown.reset ( );
 
-        mBufferSizeDropdown = make_unique<ofxIntDropdown>( (string)"Buffer Size", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
-        mOutDeviceDropdown = make_unique<ofxDropdown>( (string)"Output Device", ACOREX_OFX_DROPDOWN_SCROLL_SPEED );
+        mBufferSizeDropdown = make_unique<ofxIntDropdown> ( (string)"Buffer Size", Utils::ofxDropdownScrollSpeed );
+        mOutDeviceDropdown = make_unique<ofxDropdown> ( (string)"Output Device", Utils::ofxDropdownScrollSpeed );
 
         for ( int i = 0; i < outDevices.size ( ); i++ )
         {
