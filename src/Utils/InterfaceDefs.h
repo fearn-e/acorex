@@ -21,78 +21,71 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 namespace Acorex {
 namespace Utils {
 
-namespace detail {
-    inline constexpr unsigned int INTERFACE_HI_DPI_MULT         = 2;
-    inline constexpr unsigned int TOP_BAR_HEIGHT                = 40;
-    inline constexpr unsigned int TOP_BAR_BUTTON_WIDTH          = 100;
-    inline constexpr unsigned int ANALYSE_MAIN_PANEL_WIDTH      = 200;
-    inline constexpr unsigned int ANALYSE_ANALYSIS_PANEL_WIDTH  = 315;
-    inline constexpr unsigned int ANALYSE_REDUCTION_PANEL_WIDTH = 300;
-    inline constexpr unsigned int EXPLORE_PANEL_WIDTH           = 315;
-    inline constexpr unsigned int INTER_PANEL_SPACING           = 5;
-    inline constexpr unsigned int PANEL_BACKGROUND_MARGIN       = 5;
-} // namespace detail
-
 inline constexpr unsigned int ofxDropdownScrollSpeed = 32;
 
 struct Colors {
     // normal and locked text colour
-    ofColor normalTextColor = 255;
-    ofColor lockedTextColor = 130;
+    const ofColor normalTextColor = 255;
+    const ofColor lockedTextColor = 130;
 
     // interface background colour
-    ofColor interfaceBackgroundColor = { 0, 0, 0, 150 };
-    ofColor transparent = { 0, 0, 0, 0 };
+    const ofColor interfaceBackgroundColor = { 0, 0, 0, 150 };
+    const ofColor transparent = { 0, 0, 0, 0 };
 };
 
 struct MenuLayout {
-    bool HiDpi = false;
-    //TODO - change to u ints?
-    int topBarHeight = TOP_BAR_HEIGHT;
-    int topBarButtonWidth = TOP_BAR_BUTTON_WIDTH;
+private:
+    bool bHiDpi = false;
+    const unsigned int hiDpiMultiplier = 2;
 
-    int analyseMainPanelWidth = ANALYSE_MAIN_PANEL_WIDTH;
-    int analyseAnalysisPanelWidth = ANALYSE_ANALYSIS_PANEL_WIDTH;
-    int analyseReductionPanelWidth = ANALYSE_REDUCTION_PANEL_WIDTH;
+    // default values when bHiDpi = false
+    unsigned int topBarHeight               = 40;
+    unsigned int topBarButtonWidth          = 100;
+    unsigned int analyseMainPanelWidth      = 200;
+    unsigned int analyseAnalysisPanelWidth  = 315;
+    unsigned int analyseReductionPanelWidth = 300;
+    unsigned int explorePanelWidth          = 315;
+    unsigned int interPanelSpacing          = 5;
+    unsigned int panelBackgroundMargin      = 5;
 
-    int explorePanelWidth = EXPLORE_PANEL_WIDTH;
+    int modePanelOriginY = topBarHeight + interPanelSpacing;
+    const int analysePanelOriginX = 0;
 
-    int interPanelSpacing = INTER_PANEL_SPACING;
-    int panelBackgroundMargin = PANEL_BACKGROUND_MARGIN;
+    const glm::vec3 hiddenPanelPosition = { -1000, -1000, 0 };
 
-    int analysePanelOriginX = 0; int analysePanelOriginY = topBarHeight + interPanelSpacing;
-    int explorePanelOriginY = topBarHeight + interPanelSpacing;
-    glm::vec3 hiddenPanelPosition = { -1000, -1000, 0 };
+public:
 
-    void disableHiDpi ( )
+    void toggleHiDpi ( bool hiDpi )
     {
-        HiDpi = false;
-        topBarHeight                = TOP_BAR_HEIGHT;
-        topBarButtonWidth           = TOP_BAR_BUTTON_WIDTH;
-        analyseMainPanelWidth       = ANALYSE_MAIN_PANEL_WIDTH;
-        analyseAnalysisPanelWidth   = ANALYSE_ANALYSIS_PANEL_WIDTH;
-        analyseReductionPanelWidth  = ANALYSE_REDUCTION_PANEL_WIDTH;
-        explorePanelWidth           = EXPLORE_PANEL_WIDTH;
-        interPanelSpacing           = INTER_PANEL_SPACING;
-        panelBackgroundMargin       = PANEL_BACKGROUND_MARGIN;
-        analysePanelOriginX = 0; analysePanelOriginY = topBarHeight + interPanelSpacing;
-        explorePanelOriginY = topBarHeight + interPanelSpacing;
-    }
+        if ( hiDpi == bHiDpi ) { return; }
 
-    void enableHiDpi ( )
-    {
-        HiDpi = true;
-        topBarHeight                = TOP_BAR_HEIGHT                * detail::INTERFACE_HI_DPI_MULT;
-        topBarButtonWidth           = TOP_BAR_BUTTON_WIDTH          * detail::INTERFACE_HI_DPI_MULT;
-        analyseMainPanelWidth       = ANALYSE_MAIN_PANEL_WIDTH      * detail::INTERFACE_HI_DPI_MULT;
-        analyseAnalysisPanelWidth   = ANALYSE_ANALYSIS_PANEL_WIDTH  * detail::INTERFACE_HI_DPI_MULT;
-        analyseReductionPanelWidth  = ANALYSE_REDUCTION_PANEL_WIDTH * detail::INTERFACE_HI_DPI_MULT;
-        explorePanelWidth           = EXPLORE_PANEL_WIDTH           * detail::INTERFACE_HI_DPI_MULT;
-        interPanelSpacing           = INTER_PANEL_SPACING           * detail::INTERFACE_HI_DPI_MULT;
-        panelBackgroundMargin       = PANEL_BACKGROUND_MARGIN       * detail::INTERFACE_HI_DPI_MULT;
-        analysePanelOriginX = 0; analysePanelOriginY = topBarHeight + interPanelSpacing;
-        explorePanelOriginY = topBarHeight + interPanelSpacing;
+        bHiDpi = hiDpi;
+
+        topBarHeight                = (hiDpi ? topBarHeight * hiDpiMultiplier               : topBarHeight / hiDpiMultiplier);
+        topBarButtonWidth           = (hiDpi ? topBarButtonWidth * hiDpiMultiplier          : topBarButtonWidth / hiDpiMultiplier);
+        analyseMainPanelWidth       = (hiDpi ? analyseMainPanelWidth * hiDpiMultiplier      : analyseMainPanelWidth / hiDpiMultiplier);
+        analyseAnalysisPanelWidth   = (hiDpi ? analyseAnalysisPanelWidth * hiDpiMultiplier  : analyseAnalysisPanelWidth / hiDpiMultiplier);
+        analyseReductionPanelWidth  = (hiDpi ? analyseReductionPanelWidth * hiDpiMultiplier : analyseReductionPanelWidth / hiDpiMultiplier);
+        explorePanelWidth           = (hiDpi ? explorePanelWidth * hiDpiMultiplier          : explorePanelWidth / hiDpiMultiplier);
+        interPanelSpacing           = (hiDpi ? interPanelSpacing * hiDpiMultiplier          : interPanelSpacing / hiDpiMultiplier);
+        panelBackgroundMargin       = (hiDpi ? panelBackgroundMargin * hiDpiMultiplier      : panelBackgroundMargin / hiDpiMultiplier);
+
+        modePanelOriginY = topBarHeight + interPanelSpacing;
     }
+    
+    bool isHiDpi ( ) const { return bHiDpi; }
+
+    unsigned int getTopBarHeight ( ) const { return topBarHeight; }
+    unsigned int getTopBarButtonWidth ( ) const { return topBarButtonWidth; }
+    unsigned int getAnalyseMainPanelWidth ( ) const { return analyseMainPanelWidth; }
+    unsigned int getAnalyseAnalysisPanelWidth ( ) const { return analyseAnalysisPanelWidth; }
+    unsigned int getAnalyseReductionPanelWidth ( ) const { return analyseReductionPanelWidth; }
+    unsigned int getExplorePanelWidth ( ) const { return explorePanelWidth; }
+    unsigned int getInterPanelSpacing ( ) const { return interPanelSpacing; }
+    unsigned int getPanelBackgroundMargin ( ) const { return panelBackgroundMargin; }
+    int getModePanelOriginY ( ) const { return modePanelOriginY; }
+    int getAnalysePanelOriginX ( ) const { return analysePanelOriginX; }
+    glm::vec3 getHiddenPanelPosition ( ) const { return hiddenPanelPosition; }
 };
 } // namespace Utils
 } // namespace Acorex
