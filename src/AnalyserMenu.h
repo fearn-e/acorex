@@ -36,10 +36,23 @@ public:
     void Draw ( );
     void Exit ( );
 
+    void RefreshUI ( );
     void SetMenuLayout ( std::shared_ptr<Utils::MenuLayout>& menuLayout ) { mLayout = menuLayout; }
 
 private:
-    void InitialiseUI ( );
+    // UI Management ------------------------------
+    void ClearUI ( );
+    void InitialiseMainPanelUI ( );
+    void InitialiseAnalysisPanelUI ( );
+    void InitialiseInsertionPanelUI ( );
+    void InitialiseReductionPanelUI ( );
+
+    void RefreshMainPanelUI ( );
+    void RefreshAnalysisPanelUI ( );
+    void RefreshInsertionPanelUI ( );
+    void RefreshReductionPanelUI ( );
+
+    // Listeners ---------------------------------
 
     void AddListeners ( );
     void RemoveListeners ( );
@@ -88,14 +101,14 @@ private:
     bool bDrawAnalysisPanel;
     bool bDrawAnalysisInsertionPanel;
     bool bDrawReductionPanel;
-    
+
     bool bInsertingIntoCorpus;
 
     bool bAnalysisDirectorySelected;
     bool bAnalysisOutputSelected;
     bool bReductionInputSelected;
     bool bReductionOutputSelected;
-    
+
     bool bFlashingInvalidFileSelects;
     bool bFlashingInvalidAnalysisToggles;
     bool bFlashingInvalidReductionDimensions;

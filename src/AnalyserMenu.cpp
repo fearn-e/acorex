@@ -198,9 +198,14 @@ void AnalyserMenu::Exit ( )
     RemoveListeners ( );
 }
 
-void AnalyserMenu::InitialiseUI ( )
+// UI Management --------------------------------
+
+void AnalyserMenu::RefreshUI ( )
 {
-    // Clear --------------------------------------
+
+}
+
+void AnalyserMenu::ClearUI ( )
     {
         mMainPanel.clear ( );
         mAnalysisPanel.clear ( );
@@ -210,9 +215,8 @@ void AnalyserMenu::InitialiseUI ( )
         mAnalysisInsertionPanel.clear ( );
     }
 
-    // Main Panel ---------------------------------
+void AnalyserMenu::InitialiseMainPanelUI ( )
     {
-
         mMainPanel.setup ( "Menu" );
 
         mMainPanel.add ( mCreateCorpusButton.setup ( "Analyse Corpus" ) );
@@ -226,7 +230,7 @@ void AnalyserMenu::InitialiseUI ( )
         mMainPanel.disableHeader ( );
     }
 
-    // Analysis Panel -----------------------------
+void AnalyserMenu::InitialiseAnalysisPanelUI ( )
     {
         mAnalysisPanel.setup ( "Analysis" );
 
@@ -290,7 +294,7 @@ void AnalyserMenu::InitialiseUI ( )
         mAnalysisConfirmPanel.disableHeader ( );
     }
 
-    // Insertion Duplicate Question Panel ---------
+void AnalyserMenu::InitialiseInsertionPanelUI ( )
     {
         mAnalysisInsertionPanel.setup ( "Insertion Question" );
 
@@ -305,7 +309,7 @@ void AnalyserMenu::InitialiseUI ( )
         mAnalysisInsertionPanel.disableHeader ( );
     }
 
-    // Reduction Panel ----------------------------
+void AnalyserMenu::InitialiseReductionPanelUI ( )
     {
         mReductionPanel.setup ( "Reduction" );
 
@@ -333,6 +337,24 @@ void AnalyserMenu::InitialiseUI ( )
         mReductionPanel.setWidthElements ( mLayout->getAnalyseReductionPanelWidth ( ) );
         mReductionPanel.disableHeader ( );
     }
+
+void AnalyserMenu::RefreshMainPanelUI ( )
+{
+
+}
+
+void AnalyserMenu::RefreshAnalysisPanelUI ( )
+{
+
+}
+
+void AnalyserMenu::RefreshInsertionPanelUI ( )
+{
+
+}
+
+void AnalyserMenu::RefreshReductionPanelUI ( )
+{
 
 }
 
