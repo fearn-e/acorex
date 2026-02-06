@@ -128,17 +128,14 @@ void ofApp::RefreshUI ( )
 {
     mAnalyseToggle.setSize ( mLayout->getTopBarButtonWidth ( ), mLayout->getTopBarHeight ( ) / 2 );
     mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout->getTopBarHeight ( ) / 4 );
-    mAnalyseToggle.setBackgroundColor ( mColors.transparent );
     mAnalyseToggle.sizeChangedCB ( );
 
     mExploreToggle.setSize ( mLayout->getTopBarButtonWidth ( ), mLayout->getTopBarHeight ( ) / 2 );
     mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout->getTopBarHeight ( ) / 4 );
-    mExploreToggle.setBackgroundColor ( mColors.transparent );
     mExploreToggle.sizeChangedCB ( );
 
     mDPIToggle.setSize ( mLayout->getTopBarButtonWidth ( ), mLayout->getTopBarHeight ( ) / 2 );
     mDPIToggle.setPosition ( ofGetWidth ( ) - mLayout->getTopBarButtonWidth ( ) - 5, mLayout->getTopBarHeight ( ) / 4 );
-    mDPIToggle.setBackgroundColor ( mColors.transparent );
     mDPIToggle.sizeChangedCB ( );
 }
 
