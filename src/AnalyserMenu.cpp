@@ -16,6 +16,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "./AnalyserMenu.h"
 
+#include "Utils/TemporaryDefaults.h"
+
 using namespace Acorex;
 
 AnalyserMenu::AnalyserMenu ( )
@@ -110,18 +112,18 @@ void AnalyserMenu::Initialise ( bool HiDpi )
 
         mAnalysisMetadataPanel.setup ( "Analysis Metadata" );
 
-        mAnalysisMetadataPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", true ) );
-        mAnalysisMetadataPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", true ) );
-        mAnalysisMetadataPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Spectral Shape", false ) );
-        mAnalysisMetadataPanel.add ( mAnalysisMFCCToggle.setup ( "Analyse MFCC", false ) );
+        mAnalysisMetadataPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", DEFAULT_ANALYSE_PITCH ) );
+        mAnalysisMetadataPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", DEFAULT_ANALYSE_LOUDNESS ) );
+        mAnalysisMetadataPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Spectral Shape", DEFAULT_ANALYSE_SPEC_SHAPE ) );
+        mAnalysisMetadataPanel.add ( mAnalysisMFCCToggle.setup ( "Analyse MFCC", DEFAULT_ANALYSE_MFCC ) );
 
-        mAnalysisMetadataPanel.add ( mSampleRateField.setup ( "Sample Rate: ", 44100, 8000, 96000 ) );
-        mAnalysisMetadataPanel.add ( mWindowFFTField.setup ( "Window Size: ", 1024, 512, 8192 ) );
-        mAnalysisMetadataPanel.add ( mHopFractionField.setup ( "Hop Size (Fraction of Window):  1 / ", 2, 1, 16 ) );
-        mAnalysisMetadataPanel.add ( mNBandsField.setup ( "Bands: ", 40, 1, 100 ) );
-        mAnalysisMetadataPanel.add ( mNCoefsField.setup ( "Coefs: ", 13, 1, 20 ) );
-        mAnalysisMetadataPanel.add ( mMinFreqField.setup ( "Min Freq: ", 20, 20, 2000 ) );
-        mAnalysisMetadataPanel.add ( mMaxFreqField.setup ( "Max Freq: ", 5000, 20, 20000 ) );
+        mAnalysisMetadataPanel.add ( mSampleRateField.setup ( "Sample Rate: ", DEFAULT_ANALYSE_SAMPLE_RATE, 8000, 96000 ) );
+        mAnalysisMetadataPanel.add ( mWindowFFTField.setup ( "Window Size: ", DEFAULT_ANALYSE_WINDOW_SIZE, 512, 8192 ) );
+        mAnalysisMetadataPanel.add ( mHopFractionField.setup ( "Hop Size (Fraction of Window):  1 / ", DEFAULT_ANALYSE_HOP_SIZE_FRACTION, 1, 16 ) );
+        mAnalysisMetadataPanel.add ( mNBandsField.setup ( "Bands: ", DEFAULT_ANALYSE_MFCC_BANDS, 1, 100 ) );
+        mAnalysisMetadataPanel.add ( mNCoefsField.setup ( "Coefs: ", DEFAULT_ANALYSE_MFCC_COEFS, 1, 20 ) );
+        mAnalysisMetadataPanel.add ( mMinFreqField.setup ( "Min Freq: ", DEFAULT_ANALYSE_MIN_FREQ, 20, 2000 ) );
+        mAnalysisMetadataPanel.add ( mMaxFreqField.setup ( "Max Freq: ", DEFAULT_ANALYSE_MAX_FREQ, 20, 20000 ) );
 
         mAnalysisPitchToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
         mAnalysisLoudnessToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
@@ -158,7 +160,7 @@ void AnalyserMenu::Initialise ( bool HiDpi )
         mAnalysisInsertionPanel.setup ( "Insertion Question" );
 
         mAnalysisInsertionPanel.add ( mAnalysisInsertionQuestionLabel.setup ( "For files already existing in the set, which version to use?", "" ) );
-        mAnalysisInsertionPanel.add ( mAnalysisInsertionReplaceWithNewToggle.setup ( "Existing Files", false ) );
+        mAnalysisInsertionPanel.add ( mAnalysisInsertionReplaceWithNewToggle.setup ( "Existing Files", DEFAULT_ANALYSE_INSERT_FILES_REPLACE ) );
 
         mAnalysisInsertionQuestionLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
         mAnalysisInsertionReplaceWithNewToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
@@ -177,8 +179,8 @@ void AnalyserMenu::Initialise ( bool HiDpi )
         mReductionPanel.add ( mReductionPickOutputFileButton.setup ( "Pick Output File" ) );
         mReductionPanel.add ( mReductionOutputLabel.setup ( "", "?" ) );
 
-        mReductionPanel.add ( mReducedDimensionsField.setup ( "Reduced Dimensions", 4, 2, 32 ) );
-        mReductionPanel.add ( mMaxIterationsField.setup ( "Max Training Iterations", 200, 1, 1000 ) );
+        mReductionPanel.add ( mReducedDimensionsField.setup ( "Reduced Dimensions", DEFAULT_REDUCE_DIMENSIONS, 2, 32 ) );
+        mReductionPanel.add ( mMaxIterationsField.setup ( "Max Training Iterations", DEFAULT_MAX_TRAINING_ITERATIONS, 1, 1000 ) );
 
         mReductionPanel.add ( mConfirmReductionButton.setup ( "Confirm" ) );
         mReductionPanel.add ( mCancelReductionButton.setup ( "Cancel" ) );
