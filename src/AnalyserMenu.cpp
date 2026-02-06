@@ -20,7 +20,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
-AnalyserMenu::AnalyserMenu ( )
+void AnalyserMenu::ResetVariables ( )
 {
     bDraw = false;
     bProcessing = false;
@@ -54,7 +54,9 @@ void AnalyserMenu::Initialise ( )
 {
         RemoveListeners ( );
 
-    InitialiseUI ( );
+    ResetVariables ( );
+
+    ClearUI ( );
 
     AddListeners ( );
 
@@ -69,7 +71,7 @@ void AnalyserMenu::Show ( )
 // fully resets all values and hides the menu
 void AnalyserMenu::Hide ( )
 {
-    Initialise ( mLayout->isHiDpi ( ) );
+    Initialise ( );
 }
 
 void AnalyserMenu::Draw ( )

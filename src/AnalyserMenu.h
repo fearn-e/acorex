@@ -27,7 +27,7 @@ namespace Acorex {
 
 class AnalyserMenu {
 public:
-    AnalyserMenu ( );
+    AnalyserMenu ( ) { ResetVariables ( ); }
     ~AnalyserMenu ( ) { };
 
     void Initialise ( );
@@ -40,6 +40,8 @@ public:
     void SetMenuLayout ( std::shared_ptr<Utils::MenuLayout>& menuLayout ) { mLayout = menuLayout; }
 
 private:
+    void ResetVariables ( );
+
     // UI Management ------------------------------
     void ClearUI ( );
     void InitialiseMainPanelUI ( );
