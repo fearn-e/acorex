@@ -41,7 +41,7 @@ private:
     void AddListeners ( );
     void RemoveListeners ( );
     void InitialiseUI ( );
-    void RefreshUI ( bool hiDpiChanged, bool hiDpi );
+    void RefreshUI ( );
     void AnalyseToggled ( bool& value );
     void ExploreToggled ( bool& value );
     void DPIToggled ( bool& value );

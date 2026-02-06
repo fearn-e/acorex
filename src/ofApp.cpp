@@ -118,7 +118,7 @@ void ofApp::InitialiseUI ( )
     AddListeners ( );
 }
 
-void ofApp::RefreshUI ( bool hiDpiChanged, bool hiDpi )
+void ofApp::RefreshUI ( )
 {
     mAnalyseToggle.setSize ( mLayout->getTopBarButtonWidth ( ), mLayout->getTopBarHeight ( ) / 2 );
     mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout->getTopBarHeight ( ) / 4 );
