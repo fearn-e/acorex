@@ -20,11 +20,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
-AnalyserMenu::AnalyserMenu ( )
-{
-    Initialise ( false );
-}
-
 void AnalyserMenu::Initialise ( bool HiDpi )
 {
     // DPI ----------------------------------------

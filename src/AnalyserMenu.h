@@ -27,7 +27,7 @@ namespace Acorex {
 
 class AnalyserMenu {
 public:
-    AnalyserMenu ( );
+    AnalyserMenu ( ) { };
     ~AnalyserMenu ( ) { };
 
     void Initialise ( bool HiDpi );
