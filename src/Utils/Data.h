@@ -24,6 +24,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofColor.h>
 #include <ofRectangle.h>
 
+#include "Utils/TemporaryDefaults.h"
+
 #define DATA_CHANGE_CHECK_1
 
 #define DATA_NUM_STATS 7
@@ -63,18 +65,18 @@ struct StatsData {
 struct AnalysisSettings {
     int currentDimensionCount = 0;
     bool hasBeenReduced = false;
-    bool bTime = false;
+    bool bTime = false; // TODO - remove, old stats code
     bool bPitch = false;
     bool bLoudness = false;
     bool bShape = false;
     bool bMFCC = false;
-    int sampleRate = 44100;
-    int windowFFTSize = 1024;
-    int hopFraction = 2;
-    int nBands = 40;
-    int nCoefs = 13;
-    int minFreq = 20;
-    int maxFreq = 5000;
+    int sampleRate = DEFAULT_ANALYSE_SAMPLE_RATE;
+    int windowFFTSize = DEFAULT_ANALYSE_WINDOW_SIZE;
+    int hopFraction = DEFAULT_ANALYSE_HOP_SIZE_FRACTION;
+    int nBands = DEFAULT_ANALYSE_MFCC_BANDS;
+    int nCoefs = DEFAULT_ANALYSE_MFCC_COEFS;
+    int minFreq = DEFAULT_ANALYSE_MIN_FREQ;
+    int maxFreq = DEFAULT_ANALYSE_MAX_FREQ;
 };
 
 struct ReductionSettings {
