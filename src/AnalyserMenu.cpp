@@ -44,8 +44,6 @@ AnalyserMenu::AnalyserMenu ( )
     bFlashingInvalidReductionDimensions = false;
     mFlashColour = 255;
 
-    bHasBeenReduced = false;
-
     mCurrentDimensionCount = 0;
 
     inputPath = "";

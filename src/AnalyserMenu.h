@@ -106,7 +106,6 @@ private:
     //stats - mean, standard deviation, skewness, kurtosis, low percentile, middle (median default), high percentile
     //int maxSamplingRate = 22050;
 
-    bool mHasBeenReduced;
     ofxToggle mAnalysisPitchToggle;
     ofxToggle mAnalysisLoudnessToggle;
     ofxToggle mAnalysisShapeToggle;
