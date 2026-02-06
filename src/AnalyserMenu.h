@@ -31,8 +31,8 @@ public:
     ~AnalyserMenu ( ) { };
 
     void Initialise ( );
-    void Show ( );
-    void Hide ( );
+    void Open ( );
+    void Close ( );
     void Draw ( );
     void Exit ( );
 
@@ -55,6 +55,8 @@ private:
     void RefreshReductionPanelUI ( );
 
     void ToggleAnalysisUILockout ( bool lock );
+
+    // Panel Management ---------------------------
 
     void ShowMainPanel ( );
     void ShowAnalysisPanel ( );
@@ -161,7 +163,6 @@ private:
     ofxPanel mAnalysisInsertionPanel;
     ofxLabel mAnalysisInsertionQuestionLabel;
     ofxToggle mAnalysisInsertionReplaceWithNewToggle;
-
 
     ofxPanel mReductionPanel;
     ofxButton mReductionPickInputFileButton;

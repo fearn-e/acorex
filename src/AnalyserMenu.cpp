@@ -50,6 +50,7 @@ void AnalyserMenu::ResetVariables ( )
     outputPath = "";
 }
 
+// initial state is a blank slate - Open ( ) must be called to actually load anything
 void AnalyserMenu::Initialise ( )
 {
         RemoveListeners ( );
@@ -63,13 +64,13 @@ void AnalyserMenu::Initialise ( )
     ToggleAnalysisUILockout ( false );
 }
 
-void AnalyserMenu::Show ( )
+void AnalyserMenu::Open ( )
 {
     ShowMainPanel ( );
 }
 
 // fully resets all values and hides the menu
-void AnalyserMenu::Hide ( )
+void AnalyserMenu::Close ( )
 {
     Initialise ( );
 }

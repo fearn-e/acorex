@@ -45,6 +45,7 @@ void ofApp::setup ( )
     //mAnalyserMenu.Initialise ( );
     //mExplorerMenu.Initialise ( );
 
+    mAnalyserMenu.Open ( );
     //mExplorerMenu.Show ( );
 }
 
@@ -143,12 +144,12 @@ void ofApp::AnalyseToggled ( bool& value )
 {
     if ( value )
     {
-        //mAnalyserMenu.Show ( );
+        mAnalyserMenu.Open ( );
         mExploreToggle = false;
     }
     else
     {
-        //mAnalyserMenu.Hide ( );
+        mAnalyserMenu.Close ( );
     }
 }
 
