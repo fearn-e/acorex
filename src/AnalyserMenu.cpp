@@ -129,24 +129,24 @@ void AnalyserMenu::Draw ( )
     {
         if ( bDrawAnalysisPanel && !bAnalysisDirectorySelected )
         {
-            mAnalysisDirectoryLabel.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+            mAnalysisDirectoryLabel.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
         }
         if ( bDrawAnalysisPanel && !bAnalysisOutputSelected )
         {
-            mAnalysisOutputLabel.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+            mAnalysisOutputLabel.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
         }
         if ( bDrawReductionPanel && !bReductionInputSelected )
         {
-            mReductionInputLabel.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+            mReductionInputLabel.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
         }
         if ( bDrawReductionPanel && !bReductionOutputSelected )
         {
-            mReductionOutputLabel.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+            mReductionOutputLabel.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
         }
 
-        if ( flashColour <= 0 )
+        if ( mFlashColour <= 0 )
         {
-            flashColour = 255;
+            mFlashColour = 255;
             bFlashingInvalidFileSelects = false;
             mAnalysisDirectoryLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
             mAnalysisOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
@@ -157,14 +157,14 @@ void AnalyserMenu::Draw ( )
 
     if ( bFlashingInvalidAnalysisToggles )
     {
-        mAnalysisLoudnessToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
-        mAnalysisPitchToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
-        mAnalysisShapeToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
-        mAnalysisMFCCToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+        mAnalysisLoudnessToggle.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
+        mAnalysisPitchToggle.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
+        mAnalysisShapeToggle.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
+        mAnalysisMFCCToggle.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
 
-        if ( flashColour <= 0 )
+        if ( mFlashColour <= 0 )
         {
-            flashColour = 255;
+            mFlashColour = 255;
             bFlashingInvalidAnalysisToggles = false;
             mAnalysisLoudnessToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
             mAnalysisPitchToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
@@ -175,11 +175,11 @@ void AnalyserMenu::Draw ( )
 
     if ( bFlashingInvalidReductionDimensions )
     {
-        mReducedDimensionsField.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+        mReducedDimensionsField.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
 
-        if ( flashColour <= 0 )
+        if ( mFlashColour <= 0 )
         {
-            flashColour = 255;
+            mFlashColour = 255;
             bFlashingInvalidReductionDimensions = false;
             mReducedDimensionsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
         }
@@ -188,8 +188,8 @@ void AnalyserMenu::Draw ( )
 
     if ( bFlashingInvalidAnalysisToggles || bFlashingInvalidFileSelects || bFlashingInvalidReductionDimensions )
     {
-        flashColour -= 2;
-        if ( flashColour < 0 ) { flashColour = 0; }
+        mFlashColour -= 2;
+        if ( mFlashColour < 0 ) { mFlashColour = 0; }
     }
 }
 
@@ -378,7 +378,7 @@ void AnalyserMenu::Analyse ( )
 {
     if ( !bAnalysisDirectorySelected || !bAnalysisOutputSelected )
     {
-        flashColour = 255;
+        mFlashColour = 255;
         bFlashingInvalidFileSelects = true;
         ofLogError ( "AnalyserMenu" ) << "Analysis directory or output file not selected";
         return;
@@ -386,7 +386,7 @@ void AnalyserMenu::Analyse ( )
 
     if ( !mAnalysisLoudnessToggle && !mAnalysisPitchToggle && !mAnalysisShapeToggle && !mAnalysisMFCCToggle )
     {
-        flashColour = 255;
+        mFlashColour = 255;
         bFlashingInvalidAnalysisToggles = true;
         ofLogError ( "AnalyserMenu" ) << "No analysis types selected";
         return;
@@ -424,7 +424,7 @@ void AnalyserMenu::Reduce ( )
 {
     if ( !bReductionInputSelected || !bReductionOutputSelected )
     {
-        flashColour = 255;
+        mFlashColour = 255;
         bFlashingInvalidFileSelects = true;
         ofLogError ( "AnalyserMenu" ) << "Reduction input or output file not selected";
         return;
@@ -432,7 +432,7 @@ void AnalyserMenu::Reduce ( )
 
     if ( mReducedDimensionsField >= mCurrentDimensionCount )
     {
-        flashColour = 255;
+        mFlashColour = 255;
         bFlashingInvalidReductionDimensions = true;
         ofLogError ( "AnalyserMenu" ) << "Can't reduce to more dimensions than currently exist";
         return;

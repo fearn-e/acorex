@@ -99,7 +99,7 @@ private:
     bool bFlashingInvalidFileSelects;
     bool bFlashingInvalidAnalysisToggles;
     bool bFlashingInvalidReductionDimensions;
-    int flashColour;
+    int mFlashColour;
 
     // Metadata -----------------------------------
 
