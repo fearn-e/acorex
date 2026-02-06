@@ -77,34 +77,34 @@ private:
 
     // State --------------------------------------
 
-    bool bDraw;
-    bool bProcessing;
+    bool bDraw = false;
+    bool bProcessing = false;
 
-    bool bListenersAdded;
+    bool bListenersAdded = false;
 
-    bool bDrawMainPanel;
-    bool bDrawAnalysisPanel;
-    bool bDrawAnalysisInsertionPanel;
-    bool bDrawReductionPanel;
+    bool bDrawMainPanel = false;
+    bool bDrawAnalysisPanel = false;
+    bool bDrawAnalysisInsertionPanel = false;
+    bool bDrawReductionPanel = false;
     
-    bool bInsertingIntoCorpus;
+    bool bInsertingIntoCorpus = false;
 
-    bool bAnalysisDirectorySelected;
-    bool bAnalysisOutputSelected;
-    bool bReductionInputSelected;
-    bool bReductionOutputSelected;
+    bool bAnalysisDirectorySelected = false;
+    bool bAnalysisOutputSelected = false;
+    bool bReductionInputSelected = false;
+    bool bReductionOutputSelected = false;
     
-    bool bFlashingInvalidFileSelects;
-    bool bFlashingInvalidAnalysisToggles;
-    bool bFlashingInvalidReductionDimensions;
-    int flashColour;
+    bool bFlashingInvalidFileSelects = false;
+    bool bFlashingInvalidAnalysisToggles = false;
+    bool bFlashingInvalidReductionDimensions = false;
+    int flashColour = 255;
 
     // Metadata -----------------------------------
 
     //stats - mean, standard deviation, skewness, kurtosis, low percentile, middle (median default), high percentile
     //int maxSamplingRate = 22050;
 
-    bool mHasBeenReduced;
+    bool mHasBeenReduced = false;
     ofxToggle mAnalysisPitchToggle;
     ofxToggle mAnalysisLoudnessToggle;
     ofxToggle mAnalysisShapeToggle;
@@ -117,15 +117,15 @@ private:
     ofxIntField mMinFreqField;
     ofxIntField mMaxFreqField;
 
-    int mCurrentDimensionCount;
+    int mCurrentDimensionCount = 0;
 
     ofxIntField mReducedDimensionsField;
     ofxIntField mMaxIterationsField;
 
     // File Paths ---------------------------------
 
-    std::string inputPath;
-    std::string outputPath;
+    std::string inputPath = "";
+    std::string outputPath = "";
 
     // Panels -------------------------------------
 

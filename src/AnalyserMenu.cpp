@@ -34,36 +34,31 @@ void AnalyserMenu::Initialise ( )
         mAnalysisInsertionPanel.clear ( );
     }
 
-    // Variables ----------------------------------
-    {
-        mHasBeenReduced = false;
-        inputPath = "";
-        outputPath = "";
-    }
+    // Variables ---------------------------------- // MIGHT NOT BE NECESSARY WITH REFACTOR?
+    //{
+    //    mHasBeenReduced = false; 
+    //    inputPath = "";
+    //    outputPath = "";
+    //}
 
-    // States -------------------------------------
-    {
-        bDraw = false;
-        bProcessing = false;
-
-        bDrawMainPanel = false;
-        bDrawAnalysisPanel = false;
-        bDrawReductionPanel = false;
-        bDrawAnalysisInsertionPanel = false;
-
-        bInsertingIntoCorpus = false;
-
-        bAnalysisDirectorySelected = false;
-        bAnalysisOutputSelected = false;
-        bReductionInputSelected = false;
-        bReductionOutputSelected = false;
-
-        bFlashingInvalidFileSelects = false;
-        bFlashingInvalidAnalysisToggles = false;
-        bFlashingInvalidReductionDimensions = false;
-
-        flashColour = 255;
-    }
+    // States ------------------------------------- // MIGHT NOT BE NECESSARY WITH REFACTOR?
+    //{
+    //    bDraw = false;
+    //    bProcessing = false;
+    //    bDrawMainPanel = false;
+    //    bDrawAnalysisPanel = false;
+    //    bDrawAnalysisInsertionPanel = false;
+    //    bDrawReductionPanel = false;
+    //    bInsertingIntoCorpus = false;
+    //    bAnalysisDirectorySelected = false;
+    //    bAnalysisOutputSelected = false;
+    //    bReductionInputSelected = false;
+    //    bReductionOutputSelected = false;
+    //    bFlashingInvalidFileSelects = false;
+    //    bFlashingInvalidAnalysisToggles = false;
+    //    bFlashingInvalidReductionDimensions = false;
+    //    flashColour = 255;
+    //}
 
     // Main Panel ---------------------------------
     {
