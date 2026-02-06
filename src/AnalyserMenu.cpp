@@ -204,7 +204,10 @@ void AnalyserMenu::Exit ( )
 
 void AnalyserMenu::RefreshUI ( )
 {
-
+    if ( bDrawMainPanel ) { RefreshMainPanelUI ( ); }
+    if ( bDrawAnalysisPanel ) { RefreshAnalysisPanelUI ( ); }
+    if ( bDrawInsertionPanel ) { RefreshInsertionPanelUI ( ); }
+    if ( bDrawReductionPanel ) { RefreshReductionPanelUI ( ); }
 }
 
 void AnalyserMenu::ClearUI ( )
@@ -342,22 +345,38 @@ void AnalyserMenu::InitialiseReductionPanelUI ( )
 
 void AnalyserMenu::RefreshMainPanelUI ( )
 {
-
+    mMainPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
+    mMainPanel.setWidthElements ( mLayout->getAnalyseMainPanelWidth ( ) );
+    mMainPanel.sizeChangedCB ( );
 }
 
 void AnalyserMenu::RefreshAnalysisPanelUI ( )
 {
+    mAnalysisPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
+    mAnalysisPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisPanel.sizeChangedCB ( );
 
+    mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+    mAnalysisMetadataPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisMetadataPanel.sizeChangedCB ( );
+
+    mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+    mAnalysisConfirmPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisConfirmPanel.sizeChangedCB ( );
 }
 
 void AnalyserMenu::RefreshInsertionPanelUI ( )
 {
-
+    mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+    mAnalysisInsertionPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisInsertionPanel.sizeChangedCB ( );
 }
 
 void AnalyserMenu::RefreshReductionPanelUI ( )
 {
-
+    mReductionPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
+    mReductionPanel.setWidthElements ( mLayout->getAnalyseReductionPanelWidth ( ) );
+    mReductionPanel.sizeChangedCB ( );
 }
 
 void AnalyserMenu::ToggleAnalysisUILockout ( bool lock )
