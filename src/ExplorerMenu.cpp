@@ -26,8 +26,7 @@ void ExplorerMenu::Initialise ( bool HiDpi )
 {
     // DPI -----------------------------------------
     {
-        if ( HiDpi ) { mLayout.enableHiDpi ( ); }
-        else { mLayout.disableHiDpi ( ); }
+        mLayout.toggleHiDpi ( HiDpi );
     }
     
     // Pointer Sharing -----------------------------
@@ -237,8 +236,8 @@ void ExplorerMenu::Initialise ( bool HiDpi )
         mMainPanel.add ( mBufferSizeDropdown.get ( ) );
         mMainPanel.add ( mOutDeviceDropdown.get ( ) );
 
-        mMainPanel.setPosition ( ofGetWidth ( ) - mLayout.explorePanelWidth, mLayout.explorePanelOriginY );
-        mMainPanel.setWidthElements ( mLayout.explorePanelWidth );
+        mMainPanel.setPosition ( ofGetWidth ( ) - mLayout.getExplorePanelWidth ( ), mLayout.getModePanelOriginY ( ) );
+        mMainPanel.setWidthElements ( mLayout.getExplorePanelWidth ( ) );
         mMainPanel.disableHeader ( );
     }
 
@@ -421,7 +420,7 @@ void ExplorerMenu::OpenCorpus ( )
     if ( !success ) { return; }
     
     bInitialiseShouldLoad = true;
-    Initialise ( mLayout.HiDpi );
+    Initialise ( mLayout.isHiDpi ( ), false );
 
     mLiveView.CreatePoints ( );
 
@@ -558,7 +557,7 @@ void ExplorerMenu::CameraSwitcher ( )
 
 void ExplorerMenu::WindowResized ( )
 {
-    mMainPanel.setPosition ( ofGetWidth ( ) - mLayout.explorePanelWidth, mLayout.explorePanelOriginY );
+    mMainPanel.setPosition ( ofGetWidth ( ) - mLayout.getExplorePanelWidth ( ), mLayout.getModePanelOriginY ( ) );
 
     int rectWidth = ofGetWidth ( ) / 10; int rectSpacing = ofGetWidth ( ) / 100; int rectHeight = ofGetHeight ( ) / 10;
     for ( auto& playhead : mLiveView.GetPlayheads ( ) )
@@ -633,7 +632,8 @@ void ExplorerMenu::SetMaxJumpTargets ( int& targets )
     mLiveView.GetAudioPlayback ( )->SetMaxJumpTargets ( targets );
 }
 
-void ExplorerMenu::SetVolume(float & volume) {
+void ExplorerMenu::SetVolume(float & volume)
+{
     mLiveView.GetAudioPlayback ( )->SetVolume ( (int)(volume * 1000) );
 }
 
