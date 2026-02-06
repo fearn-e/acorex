@@ -37,6 +37,7 @@ public:
     void Exit ( );
 
 private:
+    void AddListeners ( );
     void RemoveListeners ( );
 
     // Analyse and Reduce --------------------------
@@ -76,6 +77,8 @@ private:
 
     bool bDraw;
     bool bProcessing;
+
+    bool bListenersAdded;
 
     bool bDrawMainPanel;
     bool bDrawAnalysisPanel;

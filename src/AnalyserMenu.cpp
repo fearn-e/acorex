@@ -199,22 +199,7 @@ void AnalyserMenu::Initialise ( bool HiDpi )
         mReductionPanel.disableHeader ( );
     }
 
-    // Listeners ----------------------------------
-    {
-        mCreateCorpusButton.addListener ( this, &AnalyserMenu::ShowAnalysisPanel );
-        mReduceCorpusButton.addListener ( this, &AnalyserMenu::ShowReductionPanel );
-        mCancelAnalysisButton.addListener ( this, &AnalyserMenu::ShowMainPanel );
-        mCancelReductionButton.addListener ( this, &AnalyserMenu::ShowMainPanel );
-        mAnalysisPickDirectoryButton.addListener ( this, &AnalyserMenu::SelectAnalysisDirectory );
-        mAnalysisPickOutputFileButton.addListener ( this, &AnalyserMenu::SelectAnalysisOutputFile );
-        mReductionPickInputFileButton.addListener ( this, &AnalyserMenu::SelectReductionInputFile );
-        mReductionPickOutputFileButton.addListener ( this, &AnalyserMenu::SelectReductionOutputFile );
-        mWindowFFTField.addListener ( this, &AnalyserMenu::QuantiseWindowSize );
-        mHopFractionField.addListener ( this, &AnalyserMenu::QuantiseHopFraction );
-        mConfirmAnalysisButton.addListener ( this, &AnalyserMenu::Analyse );
-        mConfirmReductionButton.addListener ( this, &AnalyserMenu::Reduce );
-        mAnalysisInsertionReplaceWithNewToggle.addListener ( this, &AnalyserMenu::AnalysisInsertionToggleChanged );
-    }
+    AddListeners ( );
 
     ToggleAnalysisUILockout ( false );
 }
@@ -356,8 +341,27 @@ void AnalyserMenu::Exit ( )
     RemoveListeners ( );
 }
 
+void AnalyserMenu::AddListeners ( )
+{
+    if ( bListenersAdded ) { return; }
+    mCreateCorpusButton.addListener ( this, &AnalyserMenu::ShowAnalysisPanel );
+    mReduceCorpusButton.addListener ( this, &AnalyserMenu::ShowReductionPanel );
+    mCancelAnalysisButton.addListener ( this, &AnalyserMenu::ShowMainPanel );
+    mCancelReductionButton.addListener ( this, &AnalyserMenu::ShowMainPanel );
+    mAnalysisPickDirectoryButton.addListener ( this, &AnalyserMenu::SelectAnalysisDirectory );
+    mAnalysisPickOutputFileButton.addListener ( this, &AnalyserMenu::SelectAnalysisOutputFile );
+    mReductionPickInputFileButton.addListener ( this, &AnalyserMenu::SelectReductionInputFile );
+    mReductionPickOutputFileButton.addListener ( this, &AnalyserMenu::SelectReductionOutputFile );
+    mWindowFFTField.addListener ( this, &AnalyserMenu::QuantiseWindowSize );
+    mHopFractionField.addListener ( this, &AnalyserMenu::QuantiseHopFraction );
+    mConfirmAnalysisButton.addListener ( this, &AnalyserMenu::Analyse );
+    mConfirmReductionButton.addListener ( this, &AnalyserMenu::Reduce );
+    mAnalysisInsertionReplaceWithNewToggle.addListener ( this, &AnalyserMenu::AnalysisInsertionToggleChanged );
+}
+
 void AnalyserMenu::RemoveListeners ( )
 {
+    if ( !bListenersAdded ) { return; }
     mCreateCorpusButton.removeListener ( this, &AnalyserMenu::ShowAnalysisPanel );
     mReduceCorpusButton.removeListener ( this, &AnalyserMenu::ShowReductionPanel );
     mCancelAnalysisButton.removeListener ( this, &AnalyserMenu::ShowMainPanel );
