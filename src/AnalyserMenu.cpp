@@ -54,17 +54,7 @@ AnalyserMenu::AnalyserMenu ( )
 
 void AnalyserMenu::Initialise ( )
 {
-    // Clear --------------------------------------
-    {
         RemoveListeners ( );
-
-        mMainPanel.clear ( );
-        mAnalysisPanel.clear ( );
-        mAnalysisMetadataPanel.clear ( );
-        mAnalysisConfirmPanel.clear ( );
-        mReductionPanel.clear ( );
-        mAnalysisInsertionPanel.clear ( );
-    }
 
     InitialiseUI ( );
 
@@ -212,6 +202,16 @@ void AnalyserMenu::Exit ( )
 
 void AnalyserMenu::InitialiseUI ( )
 {
+    // Clear --------------------------------------
+    {
+        mMainPanel.clear ( );
+        mAnalysisPanel.clear ( );
+        mAnalysisMetadataPanel.clear ( );
+        mAnalysisConfirmPanel.clear ( );
+        mReductionPanel.clear ( );
+        mAnalysisInsertionPanel.clear ( );
+    }
+
     // Main Panel ---------------------------------
     {
 
