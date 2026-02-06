@@ -48,7 +48,7 @@ private:
 
     //Acorex::AnalyserMenu mAnalyserMenu;
     //Acorex::ExplorerMenu mExplorerMenu;
-    Acorex::Utils::MenuLayout mLayout;
+    std::shared_ptr<Acorex::Utils::MenuLayout> mLayout;
     Acorex::Utils::Colors mColors;
 
     ofxToggle mAnalyseToggle;

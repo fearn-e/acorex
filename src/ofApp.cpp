@@ -28,7 +28,9 @@ void ofApp::setup ( )
     ofSetWindowShape ( ofGetScreenWidth ( ) * 0.75, ofGetScreenHeight ( ) * 0.75 );
     ofSetWindowPosition ( ofGetScreenWidth ( ) / 2 - ofGetWidth ( ) / 2, ofGetScreenHeight ( ) / 2 - ofGetHeight ( ) / 2 );
 
-    mLayout.toggleHiDpi ( DEFAULT_HI_DPI );
+    mLayout = std::make_shared<Acorex::Utils::MenuLayout> ( );
+
+    mLayout->toggleHiDpi ( DEFAULT_HI_DPI );
     if ( DEFAULT_HI_DPI ) { ofxGuiEnableHiResDisplay ( ); }
     else { ofxGuiDisableHiResDisplay ( ); }
 
@@ -52,7 +54,7 @@ void ofApp::draw ( )
 
     {
         ofSetColor ( mColors.interfaceBackgroundColor );
-        ofDrawRectangle ( 0, 0, ofGetWidth ( ), mLayout.getTopBarHeight ( ) );
+        ofDrawRectangle ( 0, 0, ofGetWidth ( ), mLayout->getTopBarHeight ( ) );
 
         mAnalyseToggle.draw ( );
         mExploreToggle.draw ( );
@@ -70,9 +72,9 @@ void ofApp::exit ( )
 
 void ofApp::windowResized ( int w, int h )
 {
-    mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout.getTopBarHeight ( ) / 4 );
-    mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout.getTopBarHeight ( ) / 4 );
-    mDPIToggle.setPosition ( ofGetWidth ( ) - mLayout.getTopBarButtonWidth ( ) - 5, mLayout.getTopBarHeight ( ) / 4 );
+    mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout->getTopBarHeight ( ) / 4 );
+    mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout->getTopBarHeight ( ) / 4 );
+    mDPIToggle.setPosition ( ofGetWidth ( ) - mLayout->getTopBarButtonWidth ( ) - 5, mLayout->getTopBarHeight ( ) / 4 );
 
     //mExplorerMenu.WindowResized ( );
 }
@@ -101,16 +103,16 @@ void ofApp::InitialiseUI ( )
 {
     RemoveListeners ( );
 
-    mAnalyseToggle.setup ( "Analyse", DEFAULT_ANALYSE_OPEN, mLayout.getTopBarButtonWidth ( ), mLayout.getTopBarHeight ( ) / 2 );
-    mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout.getTopBarHeight ( ) / 4 );
+    mAnalyseToggle.setup ( "Analyse", DEFAULT_ANALYSE_OPEN, mLayout->getTopBarButtonWidth ( ), mLayout->getTopBarHeight ( ) / 2 );
+    mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout->getTopBarHeight ( ) / 4 );
     mAnalyseToggle.setBackgroundColor ( mColors.transparent );
 
-    mExploreToggle.setup ( "Explore", DEFAULT_EXPLORE_OPEN, mLayout.getTopBarButtonWidth ( ), mLayout.getTopBarHeight ( ) / 2 );
-    mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout.getTopBarHeight ( ) / 4 );
+    mExploreToggle.setup ( "Explore", DEFAULT_EXPLORE_OPEN, mLayout->getTopBarButtonWidth ( ), mLayout->getTopBarHeight ( ) / 2 );
+    mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout->getTopBarHeight ( ) / 4 );
     mExploreToggle.setBackgroundColor ( mColors.transparent );
 
-    mDPIToggle.setup ( "Bigger UI", DEFAULT_HI_DPI, mLayout.getTopBarButtonWidth ( ), mLayout.getTopBarHeight ( ) / 2 );
-    mDPIToggle.setPosition ( ofGetWidth ( ) - mLayout.getTopBarButtonWidth ( ) - 5, mLayout.getTopBarHeight ( ) / 4 );
+    mDPIToggle.setup ( "Bigger UI", DEFAULT_HI_DPI, mLayout->getTopBarButtonWidth ( ), mLayout->getTopBarHeight ( ) / 2 );
+    mDPIToggle.setPosition ( ofGetWidth ( ) - mLayout->getTopBarButtonWidth ( ) - 5, mLayout->getTopBarHeight ( ) / 4 );
     mDPIToggle.setBackgroundColor ( mColors.transparent );
 
     AddListeners ( );
@@ -118,18 +120,18 @@ void ofApp::InitialiseUI ( )
 
 void ofApp::RefreshUI ( bool hiDpiChanged, bool hiDpi )
 {
-    mAnalyseToggle.setSize ( mLayout.getTopBarButtonWidth ( ), mLayout.getTopBarHeight ( ) / 2 );
-    mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout.getTopBarHeight ( ) / 4 );
+    mAnalyseToggle.setSize ( mLayout->getTopBarButtonWidth ( ), mLayout->getTopBarHeight ( ) / 2 );
+    mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout->getTopBarHeight ( ) / 4 );
     mAnalyseToggle.setBackgroundColor ( mColors.transparent );
     mAnalyseToggle.sizeChangedCB ( );
 
-    mExploreToggle.setSize ( mLayout.getTopBarButtonWidth ( ), mLayout.getTopBarHeight ( ) / 2 );
-    mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout.getTopBarHeight ( ) / 4 );
+    mExploreToggle.setSize ( mLayout->getTopBarButtonWidth ( ), mLayout->getTopBarHeight ( ) / 2 );
+    mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout->getTopBarHeight ( ) / 4 );
     mExploreToggle.setBackgroundColor ( mColors.transparent );
     mExploreToggle.sizeChangedCB ( );
 
-    mDPIToggle.setSize ( mLayout.getTopBarButtonWidth ( ), mLayout.getTopBarHeight ( ) / 2 );
-    mDPIToggle.setPosition ( ofGetWidth ( ) - mLayout.getTopBarButtonWidth ( ) - 5, mLayout.getTopBarHeight ( ) / 4 );
+    mDPIToggle.setSize ( mLayout->getTopBarButtonWidth ( ), mLayout->getTopBarHeight ( ) / 2 );
+    mDPIToggle.setPosition ( ofGetWidth ( ) - mLayout->getTopBarButtonWidth ( ) - 5, mLayout->getTopBarHeight ( ) / 4 );
     mDPIToggle.setBackgroundColor ( mColors.transparent );
     mDPIToggle.sizeChangedCB ( );
 }
@@ -162,7 +164,7 @@ void ofApp::ExploreToggled ( bool& value )
 
 void ofApp::DPIToggled ( bool& value )
 {
-    mLayout.toggleHiDpi ( value );
+    mLayout->toggleHiDpi ( value );
     if ( value ) { ofxGuiEnableHiResDisplay ( ); }
     else { ofxGuiDisableHiResDisplay ( ); }
 
