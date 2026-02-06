@@ -110,10 +110,10 @@ private:
     bool bReductionInputSelected;
     bool bReductionOutputSelected;
 
-    bool bFlashingInvalidFileSelects;
-    bool bFlashingInvalidAnalysisToggles;
-    bool bFlashingInvalidReductionDimensions;
-    int mFlashColour;
+    bool bInvalidPulseFileSelects;
+    bool bInvalidPulseAnalysisToggles;
+    bool bInvalidPulseReductionDimensions;
+    int mInvalidPulseColour;
 
     // Metadata -----------------------------------
 

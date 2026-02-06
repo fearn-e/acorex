@@ -39,10 +39,10 @@ void AnalyserMenu::ResetVariables ( )
     bReductionInputSelected = false;
     bReductionOutputSelected = false;
 
-    bFlashingInvalidFileSelects = false;
-    bFlashingInvalidAnalysisToggles = false;
-    bFlashingInvalidReductionDimensions = false;
-    mFlashColour = 255;
+    bInvalidPulseFileSelects = false;
+    bInvalidPulseAnalysisToggles = false;
+    bInvalidPulseReductionDimensions = false;
+    mInvalidPulseColour = 255;
 
     mCurrentDimensionCount = 0;
 
@@ -127,29 +127,29 @@ void AnalyserMenu::Draw ( )
         mReductionPanel.draw ( );
     }
 
-    if ( bFlashingInvalidFileSelects )
+    if ( bInvalidPulseFileSelects )
     {
         if ( bDrawAnalysisPanel && !bAnalysisDirectorySelected )
         {
-            mAnalysisDirectoryLabel.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
+            mAnalysisDirectoryLabel.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
         }
         if ( bDrawAnalysisPanel && !bAnalysisOutputSelected )
         {
-            mAnalysisOutputLabel.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
+            mAnalysisOutputLabel.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
         }
         if ( bDrawReductionPanel && !bReductionInputSelected )
         {
-            mReductionInputLabel.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
+            mReductionInputLabel.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
         }
         if ( bDrawReductionPanel && !bReductionOutputSelected )
         {
-            mReductionOutputLabel.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
+            mReductionOutputLabel.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
         }
 
-        if ( mFlashColour <= 0 )
+        if ( mInvalidPulseColour <= 0 )
         {
-            mFlashColour = 255;
-            bFlashingInvalidFileSelects = false;
+            mInvalidPulseColour = 255;
+            bInvalidPulseFileSelects = false;
             mAnalysisDirectoryLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
             mAnalysisOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
             mReductionInputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
@@ -157,17 +157,17 @@ void AnalyserMenu::Draw ( )
         }
     }
 
-    if ( bFlashingInvalidAnalysisToggles )
+    if ( bInvalidPulseAnalysisToggles )
     {
-        mAnalysisLoudnessToggle.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
-        mAnalysisPitchToggle.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
-        mAnalysisShapeToggle.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
-        mAnalysisMFCCToggle.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
+        mAnalysisLoudnessToggle.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
+        mAnalysisPitchToggle.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
+        mAnalysisShapeToggle.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
+        mAnalysisMFCCToggle.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
 
-        if ( mFlashColour <= 0 )
+        if ( mInvalidPulseColour <= 0 )
         {
-            mFlashColour = 255;
-            bFlashingInvalidAnalysisToggles = false;
+            mInvalidPulseColour = 255;
+            bInvalidPulseAnalysisToggles = false;
             mAnalysisLoudnessToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
             mAnalysisPitchToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
             mAnalysisShapeToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
@@ -175,23 +175,23 @@ void AnalyserMenu::Draw ( )
         }
     }
 
-    if ( bFlashingInvalidReductionDimensions )
+    if ( bInvalidPulseReductionDimensions )
     {
-        mReducedDimensionsField.setBackgroundColor ( ofColor ( mFlashColour, 0, 0 ) );
+        mReducedDimensionsField.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
 
-        if ( mFlashColour <= 0 )
+        if ( mInvalidPulseColour <= 0 )
         {
-            mFlashColour = 255;
-            bFlashingInvalidReductionDimensions = false;
+            mInvalidPulseColour = 255;
+            bInvalidPulseReductionDimensions = false;
             mReducedDimensionsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
         }
     
     }
 
-    if ( bFlashingInvalidAnalysisToggles || bFlashingInvalidFileSelects || bFlashingInvalidReductionDimensions )
+    if ( bInvalidPulseAnalysisToggles || bInvalidPulseFileSelects || bInvalidPulseReductionDimensions )
     {
-        mFlashColour -= 2;
-        if ( mFlashColour < 0 ) { mFlashColour = 0; }
+        mInvalidPulseColour -= 2;
+        if ( mInvalidPulseColour < 0 ) { mInvalidPulseColour = 0; }
     }
 }
 
@@ -489,16 +489,16 @@ void AnalyserMenu::Analyse ( )
 {
     if ( !bAnalysisDirectorySelected || !bAnalysisOutputSelected )
     {
-        mFlashColour = 255;
-        bFlashingInvalidFileSelects = true;
+        mInvalidPulseColour = 255;
+        bInvalidPulseFileSelects = true;
         ofLogError ( "AnalyserMenu" ) << "Analysis directory or output file not selected";
         return;
     }
 
     if ( !mAnalysisLoudnessToggle && !mAnalysisPitchToggle && !mAnalysisShapeToggle && !mAnalysisMFCCToggle )
     {
-        mFlashColour = 255;
-        bFlashingInvalidAnalysisToggles = true;
+        mInvalidPulseColour = 255;
+        bInvalidPulseAnalysisToggles = true;
         ofLogError ( "AnalyserMenu" ) << "No analysis types selected";
         return;
     }
@@ -535,16 +535,16 @@ void AnalyserMenu::Reduce ( )
 {
     if ( !bReductionInputSelected || !bReductionOutputSelected )
     {
-        mFlashColour = 255;
-        bFlashingInvalidFileSelects = true;
+        mInvalidPulseColour = 255;
+        bInvalidPulseFileSelects = true;
         ofLogError ( "AnalyserMenu" ) << "Reduction input or output file not selected";
         return;
     }
 
     if ( mReducedDimensionsField >= mCurrentDimensionCount )
     {
-        mFlashColour = 255;
-        bFlashingInvalidReductionDimensions = true;
+        mInvalidPulseColour = 255;
+        bInvalidPulseReductionDimensions = true;
         ofLogError ( "AnalyserMenu" ) << "Can't reduce to more dimensions than currently exist";
         return;
     }
