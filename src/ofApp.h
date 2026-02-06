@@ -25,7 +25,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 class ofApp : public ofBaseApp {
 
 public:
-    ofApp ( ) { }
+    ofApp ( );
     ~ofApp ( ) { }
 
     void setup ( );
@@ -55,5 +55,5 @@ private:
     ofxToggle mExploreToggle;
     ofxToggle mDPIToggle;
 
-    bool bListenersAdded = false;
+    bool bListenersAdded;
 };

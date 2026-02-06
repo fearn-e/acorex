@@ -20,6 +20,38 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
+AnalyserMenu::AnalyserMenu ( )
+{
+    bDraw = false;
+    bProcessing = false;
+
+    bListenersAdded = false;
+
+    bDrawMainPanel = false;
+    bDrawAnalysisPanel = false;
+    bDrawAnalysisInsertionPanel = false;
+    bDrawReductionPanel = false;
+
+    bInsertingIntoCorpus = false;
+
+    bAnalysisDirectorySelected = false;
+    bAnalysisOutputSelected = false;
+    bReductionInputSelected = false;
+    bReductionOutputSelected = false;
+
+    bFlashingInvalidFileSelects = false;
+    bFlashingInvalidAnalysisToggles = false;
+    bFlashingInvalidReductionDimensions = false;
+    mFlashColour = 255;
+
+    bHasBeenReduced = false;
+
+    mCurrentDimensionCount = 0;
+
+    inputPath = "";
+    outputPath = "";
+}
+
 void AnalyserMenu::Initialise ( )
 {
     // Clear --------------------------------------
@@ -33,32 +65,6 @@ void AnalyserMenu::Initialise ( )
         mReductionPanel.clear ( );
         mAnalysisInsertionPanel.clear ( );
     }
-
-    // Variables ---------------------------------- // MIGHT NOT BE NECESSARY WITH REFACTOR?
-    //{
-    //    mHasBeenReduced = false; 
-    //    inputPath = "";
-    //    outputPath = "";
-    //}
-
-    // States ------------------------------------- // MIGHT NOT BE NECESSARY WITH REFACTOR?
-    //{
-    //    bDraw = false;
-    //    bProcessing = false;
-    //    bDrawMainPanel = false;
-    //    bDrawAnalysisPanel = false;
-    //    bDrawAnalysisInsertionPanel = false;
-    //    bDrawReductionPanel = false;
-    //    bInsertingIntoCorpus = false;
-    //    bAnalysisDirectorySelected = false;
-    //    bAnalysisOutputSelected = false;
-    //    bReductionInputSelected = false;
-    //    bReductionOutputSelected = false;
-    //    bFlashingInvalidFileSelects = false;
-    //    bFlashingInvalidAnalysisToggles = false;
-    //    bFlashingInvalidReductionDimensions = false;
-    //    flashColour = 255;
-    //}
 
     InitialiseUI ( );
 

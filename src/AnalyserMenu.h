@@ -27,7 +27,7 @@ namespace Acorex {
 
 class AnalyserMenu {
 public:
-    AnalyserMenu ( ) { };
+    AnalyserMenu ( );
     ~AnalyserMenu ( ) { };
 
     void Initialise ( );
@@ -79,34 +79,34 @@ private:
 
     // State --------------------------------------
 
-    bool bDraw = false;
-    bool bProcessing = false;
+    bool bDraw;
+    bool bProcessing;
 
-    bool bListenersAdded = false;
+    bool bListenersAdded;
 
-    bool bDrawMainPanel = false;
-    bool bDrawAnalysisPanel = false;
-    bool bDrawAnalysisInsertionPanel = false;
-    bool bDrawReductionPanel = false;
+    bool bDrawMainPanel;
+    bool bDrawAnalysisPanel;
+    bool bDrawAnalysisInsertionPanel;
+    bool bDrawReductionPanel;
     
-    bool bInsertingIntoCorpus = false;
+    bool bInsertingIntoCorpus;
 
-    bool bAnalysisDirectorySelected = false;
-    bool bAnalysisOutputSelected = false;
-    bool bReductionInputSelected = false;
-    bool bReductionOutputSelected = false;
+    bool bAnalysisDirectorySelected;
+    bool bAnalysisOutputSelected;
+    bool bReductionInputSelected;
+    bool bReductionOutputSelected;
     
-    bool bFlashingInvalidFileSelects = false;
-    bool bFlashingInvalidAnalysisToggles = false;
-    bool bFlashingInvalidReductionDimensions = false;
-    int flashColour = 255;
+    bool bFlashingInvalidFileSelects;
+    bool bFlashingInvalidAnalysisToggles;
+    bool bFlashingInvalidReductionDimensions;
+    int flashColour;
 
     // Metadata -----------------------------------
 
     //stats - mean, standard deviation, skewness, kurtosis, low percentile, middle (median default), high percentile
     //int maxSamplingRate = 22050;
 
-    bool mHasBeenReduced = false;
+    bool mHasBeenReduced;
     ofxToggle mAnalysisPitchToggle;
     ofxToggle mAnalysisLoudnessToggle;
     ofxToggle mAnalysisShapeToggle;
@@ -119,15 +119,15 @@ private:
     ofxIntField mMinFreqField;
     ofxIntField mMaxFreqField;
 
-    int mCurrentDimensionCount = 0;
+    int mCurrentDimensionCount;
 
     ofxIntField mReducedDimensionsField;
     ofxIntField mMaxIterationsField;
 
     // File Paths ---------------------------------
 
-    std::string inputPath = "";
-    std::string outputPath = "";
+    std::string inputPath;
+    std::string outputPath;
 
     // Panels -------------------------------------
 
