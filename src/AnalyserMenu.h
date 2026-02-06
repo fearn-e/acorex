@@ -39,6 +39,8 @@ public:
     void SetMenuLayout ( std::shared_ptr<Utils::MenuLayout>& menuLayout ) { mLayout = menuLayout; }
 
 private:
+    void InitialiseUI ( );
+
     void AddListeners ( );
     void RemoveListeners ( );
 
