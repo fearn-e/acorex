@@ -66,8 +66,17 @@ private:
 
     // Listeners ---------------------------------
 
-    void AddListeners ( );
-    void RemoveListeners ( );
+    void AddListenersMain ( );
+    void RemoveListenersMain ( );
+
+    void AddListenersAnalysis ( );
+    void RemoveListenersAnalysis ( );
+
+    void AddListenersInsertion ( );
+    void RemoveListenersInsertion ( );
+
+    void AddListenersReduction ( );
+    void RemoveListenersReduction ( );
 
     // Analyse and Reduce --------------------------
 
@@ -98,7 +107,10 @@ private:
     bool bDraw;
     bool bProcessing;
 
-    bool bListenersAdded;
+    bool bListenersAddedMain;
+    bool bListenersAddedAnalysis;
+    bool bListenersAddedInsertion;
+    bool bListenersAddedReduction;
 
     bool bDrawMainPanel;
     bool bDrawAnalysisPanel;
