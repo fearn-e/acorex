@@ -74,15 +74,24 @@ void ofApp::windowResized ( int w, int h )
     mExplorerMenu.WindowResized ( );
 }
 
+void ofApp::AddListeners ( )
+{
+    if ( bListenersAdded ) { return; }
+
+    mAnalyseToggle.addListener ( this, &ofApp::AnalyseToggled );
+    mExploreToggle.addListener ( this, &ofApp::ExploreToggled );
+    mDPIToggle.addListener ( this, &ofApp::DPIToggled );
+    bListenersAdded = true;
+}
+
 void ofApp::RemoveListeners ( )
 {
-    if ( bListenersAdded )
-    {
+    if ( !bListenersAdded ) { return; }
+
         mAnalyseToggle.removeListener ( this, &ofApp::AnalyseToggled );
         mExploreToggle.removeListener ( this, &ofApp::ExploreToggled );
         mDPIToggle.removeListener ( this, &ofApp::DPIToggled );
         bListenersAdded = false;
-    }
 }
 
 void ofApp::SetupUI ( bool keepValues )
@@ -104,10 +113,7 @@ void ofApp::SetupUI ( bool keepValues )
     mDPIToggle.setPosition ( ofGetWidth ( ) - mLayout.topBarButtonWidth - 5, mLayout.topBarHeight / 4 );
     mDPIToggle.setBackgroundColor ( mColors.transparent );
 
-    mAnalyseToggle.addListener ( this, &ofApp::AnalyseToggled );
-    mExploreToggle.addListener ( this, &ofApp::ExploreToggled );
-    mDPIToggle.addListener ( this, &ofApp::DPIToggled );
-    bListenersAdded = true;
+    AddListeners ( );
 }
 
 void ofApp::AnalyseToggled ( bool& value )

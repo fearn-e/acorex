@@ -37,6 +37,7 @@ public:
     //void gotMessage ( ofMessage msg );
 
 private:
+    void AddListeners ( );
     void RemoveListeners ( );
     void SetupUI ( bool keepValues );
     void AnalyseToggled ( bool& value );
