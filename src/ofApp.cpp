@@ -174,10 +174,7 @@ void ofApp::DPIToggled ( bool& value )
     if ( value ) { ofxGuiEnableHiResDisplay ( ); }
     else { ofxGuiDisableHiResDisplay ( ); }
 
-    RefreshUI ( true, value );
-
-    /*mExplorerMenu.RefreshUI ( true );
-    mAnalyserMenu.RefreshUI ( true );
-    if ( mAnalyseToggle ) { mAnalyserMenu.Show ( ); }
-    else if ( mExploreToggle ) { mExplorerMenu.Show ( ); }*/
+    RefreshUI ( );
+    //mExplorerMenu.RefreshUI ( );
+    //mAnalyserMenu.RefreshUI ( );
 }
