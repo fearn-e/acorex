@@ -29,7 +29,7 @@ AnalyserMenu::AnalyserMenu ( )
 
     bDrawMainPanel = false;
     bDrawAnalysisPanel = false;
-    bDrawAnalysisInsertionPanel = false;
+    bDrawInsertionPanel = false;
     bDrawReductionPanel = false;
 
     bInsertingIntoCorpus = false;
@@ -94,7 +94,7 @@ void AnalyserMenu::Draw ( )
 
         mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
         mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
-        if ( bDrawAnalysisInsertionPanel )
+        if ( bDrawInsertionPanel )
         {
             backgroundHeight += mAnalysisInsertionPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( );
             mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
@@ -110,7 +110,7 @@ void AnalyserMenu::Draw ( )
         mAnalysisPanel.draw ( );
         mAnalysisMetadataPanel.draw ( );
         mAnalysisConfirmPanel.draw ( );
-        if ( bDrawAnalysisInsertionPanel ) { mAnalysisInsertionPanel.draw ( ); }
+        if ( bDrawInsertionPanel ) { mAnalysisInsertionPanel.draw ( ); }
     }
 
     if ( bDrawReductionPanel ) 
@@ -406,13 +406,13 @@ void AnalyserMenu::ShowAnalysisPanel ( )
 
 void AnalyserMenu::ShowAnalysisInsertionPanel ( )
 {
-    bDrawAnalysisInsertionPanel = true;
+    bDrawInsertionPanel = true;
     mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
 }
 
 void AnalyserMenu::HideAnalysisInsertionPanel ( )
 {
-    bDrawAnalysisInsertionPanel = false;
+    bDrawInsertionPanel = false;
     mAnalysisInsertionPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
 }
 

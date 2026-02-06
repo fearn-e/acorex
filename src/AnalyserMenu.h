@@ -98,7 +98,7 @@ private:
 
     bool bDrawMainPanel;
     bool bDrawAnalysisPanel;
-    bool bDrawAnalysisInsertionPanel;
+    bool bDrawInsertionPanel;
     bool bDrawReductionPanel;
 
     bool bInsertingIntoCorpus;
