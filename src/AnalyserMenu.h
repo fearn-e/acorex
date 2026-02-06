@@ -52,6 +52,14 @@ private:
     void RefreshInsertionPanelUI ( );
     void RefreshReductionPanelUI ( );
 
+    void ToggleAnalysisUILockout ( bool lock );
+
+    void ShowMainPanel ( );
+    void ShowAnalysisPanel ( );
+    void ShowAnalysisInsertionPanel ( );
+    void HideAnalysisInsertionPanel ( );
+    void ShowReductionPanel ( );
+
     // Listeners ---------------------------------
 
     void AddListeners ( );
@@ -80,15 +88,6 @@ private:
     void QuantiseWindowSize ( int& value );
     void QuantiseHopFraction ( int& value );
     void AnalysisInsertionToggleChanged ( bool& value );
-
-    // Panel Management ----------------------------
-
-    void ToggleAnalysisUILockout ( bool lock );
-    void ShowMainPanel ( );
-    void ShowAnalysisPanel ( );
-    void ShowAnalysisInsertionPanel ( );
-    void HideAnalysisInsertionPanel ( );
-    void ShowReductionPanel ( );
 
     // State --------------------------------------
 
