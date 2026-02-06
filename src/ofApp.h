@@ -16,8 +16,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "AnalyserMenu.h"
-#include "ExplorerMenu.h"
+//#include "AnalyserMenu.h"
+//#include "ExplorerMenu.h"
+#include "Utils/InterfaceDefs.h"
 #include <ofMain.h>
 #include <ofxGui.h>
 
@@ -39,13 +40,14 @@ public:
 private:
     void AddListeners ( );
     void RemoveListeners ( );
-    void SetupUI ( bool keepValues );
+    void InitialiseUI ( );
+    void RefreshUI ( bool hiDpiChanged, bool hiDpi );
     void AnalyseToggled ( bool& value );
     void ExploreToggled ( bool& value );
     void DPIToggled ( bool& value );
 
-    Acorex::AnalyserMenu mAnalyserMenu;
-    Acorex::ExplorerMenu mExplorerMenu;
+    //Acorex::AnalyserMenu mAnalyserMenu;
+    //Acorex::ExplorerMenu mExplorerMenu;
     Acorex::Utils::MenuLayout mLayout;
     Acorex::Utils::Colors mColors;
 
