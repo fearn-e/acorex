@@ -29,6 +29,7 @@ void ofApp::setup ( )
     ofSetWindowPosition ( ofGetScreenWidth ( ) / 2 - ofGetWidth ( ) / 2, ofGetScreenHeight ( ) / 2 - ofGetHeight ( ) / 2 );
 
     mLayout = std::make_shared<Acorex::Utils::MenuLayout> ( );
+    mAnalyserMenu.SetMenuLayout ( mLayout );
 
     mLayout->toggleHiDpi ( DEFAULT_HI_DPI );
     if ( DEFAULT_HI_DPI ) { ofxGuiEnableHiResDisplay ( ); }

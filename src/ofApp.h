@@ -16,7 +16,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-//#include "AnalyserMenu.h"
+#include "AnalyserMenu.h"
 //#include "ExplorerMenu.h"
 #include "Utils/InterfaceDefs.h"
 #include <ofMain.h>
@@ -46,7 +46,7 @@ private:
     void ExploreToggled ( bool& value );
     void DPIToggled ( bool& value );
 
-    //Acorex::AnalyserMenu mAnalyserMenu;
+    Acorex::AnalyserMenu mAnalyserMenu;
     //Acorex::ExplorerMenu mExplorerMenu;
     std::shared_ptr<Acorex::Utils::MenuLayout> mLayout;
     Acorex::Utils::Colors mColors;

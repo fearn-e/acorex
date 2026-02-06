@@ -30,11 +30,13 @@ public:
     AnalyserMenu ( ) { };
     ~AnalyserMenu ( ) { };
 
-    void Initialise ( bool HiDpi );
+    void Initialise ( );
     void Show ( );
     void Hide ( );
     void Draw ( );
     void Exit ( );
+
+    void SetMenuLayout ( std::shared_ptr<Utils::MenuLayout>& menuLayout ) { mLayout = menuLayout; }
 
 private:
     void AddListeners ( );
@@ -159,7 +161,7 @@ private:
     Analyser::Controller mController;
     Utils::JSON mJSON;
     Utils::Colors mColors;
-    Utils::MenuLayout mLayout;
+    std::shared_ptr<Utils::MenuLayout> mLayout;
 };
 
 } // namespace Acorex

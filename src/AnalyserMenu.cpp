@@ -20,13 +20,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
-void AnalyserMenu::Initialise ( bool HiDpi )
+void AnalyserMenu::Initialise ( )
 {
-    // DPI ----------------------------------------
-    {
-        mLayout.toggleHiDpi ( HiDpi );
-    }
-
     // Clear --------------------------------------
     {
         RemoveListeners ( );
@@ -81,8 +76,8 @@ void AnalyserMenu::Initialise ( bool HiDpi )
         mCreateCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
         mReduceCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-        mMainPanel.setPosition ( mLayout.getHiddenPanelPosition ( ) );
-        mMainPanel.setWidthElements ( mLayout.getAnalyseMainPanelWidth ( ) );
+        mMainPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+        mMainPanel.setWidthElements ( mLayout->getAnalyseMainPanelWidth ( ) );
         mMainPanel.disableHeader ( );
     }
 
@@ -100,8 +95,8 @@ void AnalyserMenu::Initialise ( bool HiDpi )
         mAnalysisPickOutputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
         mAnalysisOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-        mAnalysisPanel.setPosition ( mLayout.getHiddenPanelPosition ( ) );
-        mAnalysisPanel.setWidthElements ( mLayout.getAnalyseAnalysisPanelWidth ( ) );
+        mAnalysisPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+        mAnalysisPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
         mAnalysisPanel.disableHeader ( );
 
 
@@ -132,8 +127,8 @@ void AnalyserMenu::Initialise ( bool HiDpi )
         mMinFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
         mMaxFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-        mAnalysisMetadataPanel.setPosition ( mLayout.getHiddenPanelPosition ( ) );
-        mAnalysisMetadataPanel.setWidthElements ( mLayout.getAnalyseAnalysisPanelWidth ( ) );
+        mAnalysisMetadataPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+        mAnalysisMetadataPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
         mAnalysisMetadataPanel.disableHeader ( );
 
 
@@ -145,8 +140,8 @@ void AnalyserMenu::Initialise ( bool HiDpi )
         mConfirmAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
         mCancelAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-        mAnalysisConfirmPanel.setPosition ( mLayout.getHiddenPanelPosition ( ) );
-        mAnalysisConfirmPanel.setWidthElements ( mLayout.getAnalyseAnalysisPanelWidth ( ) );
+        mAnalysisConfirmPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+        mAnalysisConfirmPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
         mAnalysisConfirmPanel.disableHeader ( );
     }
 
@@ -160,8 +155,8 @@ void AnalyserMenu::Initialise ( bool HiDpi )
         mAnalysisInsertionQuestionLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
         mAnalysisInsertionReplaceWithNewToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-        mAnalysisInsertionPanel.setPosition ( mLayout.getHiddenPanelPosition ( ) );
-        mAnalysisInsertionPanel.setWidthElements ( mLayout.getAnalyseAnalysisPanelWidth ( ) );
+        mAnalysisInsertionPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+        mAnalysisInsertionPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
         mAnalysisInsertionPanel.disableHeader ( );
     }
 
@@ -189,8 +184,8 @@ void AnalyserMenu::Initialise ( bool HiDpi )
         mConfirmReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
         mCancelReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-        mReductionPanel.setPosition ( mLayout.getHiddenPanelPosition ( ) );
-        mReductionPanel.setWidthElements ( mLayout.getAnalyseReductionPanelWidth ( ) );
+        mReductionPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+        mReductionPanel.setWidthElements ( mLayout->getAnalyseReductionPanelWidth ( ) );
         mReductionPanel.disableHeader ( );
     }
 
@@ -207,7 +202,7 @@ void AnalyserMenu::Show ( )
 // fully resets all values and hides the menu
 void AnalyserMenu::Hide ( )
 {
-    Initialise ( mLayout.isHiDpi ( ) );
+    Initialise ( mLayout->isHiDpi ( ) );
 }
 
 void AnalyserMenu::Draw ( )
@@ -219,31 +214,31 @@ void AnalyserMenu::Draw ( )
         //draw background rectangle around main panel
         ofSetColor ( mColors.interfaceBackgroundColor );
         ofDrawRectangle ( 
-            mMainPanel.getPosition ( ).x - mLayout.getPanelBackgroundMargin ( ),
-            mMainPanel.getPosition ( ).y - mLayout.getPanelBackgroundMargin ( ),
-            mMainPanel.getWidth ( ) + mLayout.getPanelBackgroundMargin ( ) * 2,
-            mMainPanel.getHeight ( ) + mLayout.getPanelBackgroundMargin ( ) * 2 );
+            mMainPanel.getPosition ( ).x - mLayout->getPanelBackgroundMargin ( ),
+            mMainPanel.getPosition ( ).y - mLayout->getPanelBackgroundMargin ( ),
+            mMainPanel.getWidth ( ) + mLayout->getPanelBackgroundMargin ( ) * 2,
+            mMainPanel.getHeight ( ) + mLayout->getPanelBackgroundMargin ( ) * 2 );
         mMainPanel.draw ( );
     }
 
     if ( bDrawAnalysisPanel )
     {
-        int backgroundHeight = mAnalysisPanel.getHeight ( ) + mAnalysisMetadataPanel.getHeight ( ) + mAnalysisConfirmPanel.getHeight ( ) + mLayout.getInterPanelSpacing ( ) * 2;
+        int backgroundHeight = mAnalysisPanel.getHeight ( ) + mAnalysisMetadataPanel.getHeight ( ) + mAnalysisConfirmPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) * 2;
 
-        mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout.getInterPanelSpacing ( ) );
-        mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout.getInterPanelSpacing ( ) );
+        mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+        mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
         if ( bDrawAnalysisInsertionPanel )
         {
-            backgroundHeight += mAnalysisInsertionPanel.getHeight ( ) + mLayout.getInterPanelSpacing ( );
-            mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout.getInterPanelSpacing ( ) );
+            backgroundHeight += mAnalysisInsertionPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( );
+            mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
         }
         
         ofSetColor ( mColors.interfaceBackgroundColor );
         ofDrawRectangle (
-            mAnalysisPanel.getPosition ( ).x - mLayout.getPanelBackgroundMargin ( ),
-            mAnalysisPanel.getPosition ( ).y - mLayout.getPanelBackgroundMargin ( ),
-            mAnalysisPanel.getWidth ( ) + mLayout.getPanelBackgroundMargin ( ) * 2,
-            backgroundHeight + mLayout.getPanelBackgroundMargin ( ) * 2 );
+            mAnalysisPanel.getPosition ( ).x - mLayout->getPanelBackgroundMargin ( ),
+            mAnalysisPanel.getPosition ( ).y - mLayout->getPanelBackgroundMargin ( ),
+            mAnalysisPanel.getWidth ( ) + mLayout->getPanelBackgroundMargin ( ) * 2,
+            backgroundHeight + mLayout->getPanelBackgroundMargin ( ) * 2 );
 
         mAnalysisPanel.draw ( );
         mAnalysisMetadataPanel.draw ( );
@@ -255,10 +250,10 @@ void AnalyserMenu::Draw ( )
     {
         ofSetColor ( mColors.interfaceBackgroundColor );
         ofDrawRectangle (
-            mReductionPanel.getPosition ( ).x - mLayout.getPanelBackgroundMargin ( ),
-            mReductionPanel.getPosition ( ).y - mLayout.getPanelBackgroundMargin ( ),
-            mReductionPanel.getWidth ( ) + mLayout.getPanelBackgroundMargin ( ) * 2,
-            mReductionPanel.getHeight ( ) + mLayout.getPanelBackgroundMargin ( ) * 2 );
+            mReductionPanel.getPosition ( ).x - mLayout->getPanelBackgroundMargin ( ),
+            mReductionPanel.getPosition ( ).y - mLayout->getPanelBackgroundMargin ( ),
+            mReductionPanel.getWidth ( ) + mLayout->getPanelBackgroundMargin ( ) * 2,
+            mReductionPanel.getHeight ( ) + mLayout->getPanelBackgroundMargin ( ) * 2 );
 
         mReductionPanel.draw ( );
     }
@@ -723,38 +718,38 @@ void AnalyserMenu::ToggleAnalysisUILockout ( bool lock )
 
 void AnalyserMenu::ShowMainPanel ( )
 {
-    Initialise ( mLayout.isHiDpi ( ) );
+    Initialise ( mLayout->isHiDpi ( ) );
     bDraw = true;
     bDrawMainPanel = true;
-    mMainPanel.setPosition ( mLayout.getAnalysePanelOriginX ( ), mLayout.getModePanelOriginY ( ) );
+    mMainPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
 }
 
 void AnalyserMenu::ShowAnalysisPanel ( )
 {
-    Initialise ( mLayout.isHiDpi ( ) );
+    Initialise ( mLayout->isHiDpi ( ) );
     bDraw = true;
     bDrawAnalysisPanel = true;
-    mAnalysisPanel.setPosition ( mLayout.getAnalysePanelOriginX ( ), mLayout.getModePanelOriginY ( ) );
-    mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout.getInterPanelSpacing ( ) );
-    mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout.getInterPanelSpacing ( ) );
+    mAnalysisPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
+    mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+    mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
 }
 
 void AnalyserMenu::ShowAnalysisInsertionPanel ( )
 {
     bDrawAnalysisInsertionPanel = true;
-    mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout.getInterPanelSpacing ( ) );
+    mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
 }
 
 void AnalyserMenu::HideAnalysisInsertionPanel ( )
 {
     bDrawAnalysisInsertionPanel = false;
-    mAnalysisInsertionPanel.setPosition ( mLayout.getHiddenPanelPosition ( ) );
+    mAnalysisInsertionPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
 }
 
 void AnalyserMenu::ShowReductionPanel ( )
 {
-    Initialise ( mLayout.isHiDpi ( ) );
+    Initialise ( mLayout->isHiDpi ( ) );
     bDraw = true;
     bDrawReductionPanel = true;
-    mReductionPanel.setPosition ( mLayout.getAnalysePanelOriginX ( ), mLayout.getModePanelOriginY ( ) );
+    mReductionPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
 }
