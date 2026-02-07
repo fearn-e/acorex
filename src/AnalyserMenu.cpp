@@ -20,15 +20,20 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
-void AnalyserMenu::ResetVariables ( )
+AnalyserMenu::AnalyserMenu ( )
 {
-    bDraw = false;
-    bProcessing = false;
-
     bListenersAddedMain = false;
     bListenersAddedAnalysis = false;
     bListenersAddedInsertion = false;
     bListenersAddedReduction = false;
+
+    ResetVariables ( );
+}
+
+void AnalyserMenu::ResetVariables ( )
+{
+    bDraw = false;
+    bProcessing = false;
 
     bDrawMainPanel = false;
     bDrawAnalysisPanel = false;

@@ -27,7 +27,7 @@ namespace Acorex {
 
 class AnalyserMenu {
 public:
-    AnalyserMenu ( ) { ResetVariables ( ); }
+    AnalyserMenu ( );
     ~AnalyserMenu ( ) { };
 
     void Initialise ( );
@@ -79,6 +79,11 @@ private:
     void AddListenersReduction ( );
     void RemoveListenersReduction ( );
 
+    bool bListenersAddedMain;
+    bool bListenersAddedAnalysis;
+    bool bListenersAddedInsertion;
+    bool bListenersAddedReduction;
+
     // Analyse and Reduce --------------------------
 
     void Analyse ( );
@@ -107,11 +112,6 @@ private:
 
     bool bDraw;
     bool bProcessing;
-
-    bool bListenersAddedMain;
-    bool bListenersAddedAnalysis;
-    bool bListenersAddedInsertion;
-    bool bListenersAddedReduction;
 
     bool bDrawMainPanel;
     bool bDrawAnalysisPanel;
