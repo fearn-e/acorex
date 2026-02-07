@@ -220,16 +220,10 @@ void AnalyserMenu::Exit ( )
 
 // UI Management --------------------------------
 
-void AnalyserMenu::RefreshUI ( )
+void AnalyserMenu::ShowMainPanel ( )
 {
-    if ( bDrawMainPanel ) { RefreshMainPanelUI ( ); }
-    if ( bDrawAnalysisPanel ) { RefreshAnalysisPanelUI ( ); }
-    if ( bDrawInsertionPanel ) { RefreshInsertionPanelUI ( ); }
-    if ( bDrawReductionPanel ) { RefreshReductionPanelUI ( ); }
-}
+    Initialise ( );
 
-void AnalyserMenu::InitialiseMainPanelUI ( )
-{
     RemoveListenersMain ( );
 
     mMainPanel.clear ( );
@@ -241,15 +235,20 @@ void AnalyserMenu::InitialiseMainPanelUI ( )
     mCreateCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
     mReduceCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-    mMainPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+    mMainPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
     mMainPanel.setWidthElements ( mLayout->getAnalyseMainPanelWidth ( ) );
     mMainPanel.disableHeader ( );
+
+    bDraw = true;
+    bDrawMainPanel = true;
 
     AddListenersMain ( );
 }
 
-void AnalyserMenu::InitialiseAnalysisPanelUI ( )
+void AnalyserMenu::ShowAnalysisPanel ( )
 {
+    Initialise ( );
+
     RemoveListenersAnalysis ( );
 
     mAnalysisPanel.clear ( );
@@ -265,7 +264,7 @@ void AnalyserMenu::InitialiseAnalysisPanelUI ( )
     mAnalysisPickOutputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
     mAnalysisOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-    mAnalysisPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+    mAnalysisPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
     mAnalysisPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
     mAnalysisPanel.disableHeader ( );
 
@@ -297,7 +296,7 @@ void AnalyserMenu::InitialiseAnalysisPanelUI ( )
     mMinFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
     mMaxFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-    mAnalysisMetadataPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+    mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
     mAnalysisMetadataPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
     mAnalysisMetadataPanel.disableHeader ( );
 
@@ -310,14 +309,17 @@ void AnalyserMenu::InitialiseAnalysisPanelUI ( )
     mConfirmAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
     mCancelAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-    mAnalysisConfirmPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+    mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
     mAnalysisConfirmPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
     mAnalysisConfirmPanel.disableHeader ( );
+
+    bDraw = true;
+    bDrawAnalysisPanel = true;
 
     AddListenersAnalysis ( );
 }
 
-void AnalyserMenu::InitialiseInsertionPanelUI ( )
+void AnalyserMenu::ShowAnalysisInsertionPanel ( )
 {
     RemoveListenersInsertion ( );
 
@@ -330,22 +332,28 @@ void AnalyserMenu::InitialiseInsertionPanelUI ( )
     mAnalysisInsertionQuestionLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
     mAnalysisInsertionReplaceWithNewToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-    mAnalysisInsertionPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+    mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
     mAnalysisInsertionPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
     mAnalysisInsertionPanel.disableHeader ( );
+
+    bDrawInsertionPanel = true;
 
     AddListenersInsertion ( );
 }
 
-void AnalyserMenu::ClearInsertionPanelUI ( )
+void AnalyserMenu::HideAnalysisInsertionPanel ( )
 {
     RemoveListenersInsertion ( );
 
     mAnalysisInsertionPanel.clear ( );
+
+    bDrawInsertionPanel = false;
 }
 
-void AnalyserMenu::InitialiseReductionPanelUI ( )
+void AnalyserMenu::ShowReductionPanel ( )
 {
+    Initialise ( );
+
     RemoveListenersReduction ( );
 
     mReductionPanel.clear ( );
@@ -371,11 +379,22 @@ void AnalyserMenu::InitialiseReductionPanelUI ( )
     mConfirmReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
     mCancelReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-    mReductionPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+    mReductionPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
     mReductionPanel.setWidthElements ( mLayout->getAnalyseReductionPanelWidth ( ) );
     mReductionPanel.disableHeader ( );
 
+    bDraw = true;
+    bDrawReductionPanel = true;
+
     AddListenersReduction ( );
+}
+
+void AnalyserMenu::RefreshUI ( )
+{
+    if ( bDrawMainPanel ) { RefreshMainPanelUI ( ); }
+    if ( bDrawAnalysisPanel ) { RefreshAnalysisPanelUI ( ); }
+    if ( bDrawInsertionPanel ) { RefreshInsertionPanelUI ( ); }
+    if ( bDrawReductionPanel ) { RefreshReductionPanelUI ( ); }
 }
 
 void AnalyserMenu::RefreshMainPanelUI ( )
@@ -440,51 +459,6 @@ void AnalyserMenu::ToggleAnalysisUILockout ( bool lock )
         mWindowFFTField.registerMouseEvents ( );
         mHopFractionField.registerMouseEvents ( );
     }
-}
-
-// Panel Management ---------------------------
-
-void AnalyserMenu::ShowMainPanel ( )
-{
-    Initialise ( );
-    InitialiseMainPanelUI ( );
-    bDraw = true;
-    bDrawMainPanel = true;
-    mMainPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
-}
-
-void AnalyserMenu::ShowAnalysisPanel ( )
-{
-    Initialise ( );
-    InitialiseAnalysisPanelUI ( );
-    bDraw = true;
-    bDrawAnalysisPanel = true;
-    mAnalysisPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
-    mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
-    mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
-}
-
-void AnalyserMenu::ShowAnalysisInsertionPanel ( )
-{
-    InitialiseInsertionPanelUI ( );
-    bDrawInsertionPanel = true;
-    mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
-}
-
-void AnalyserMenu::HideAnalysisInsertionPanel ( )
-{
-    ClearInsertionPanelUI ( );
-    bDrawInsertionPanel = false;
-    mAnalysisInsertionPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
-}
-
-void AnalyserMenu::ShowReductionPanel ( )
-{
-    Initialise ( );
-    InitialiseReductionPanelUI ( );
-    bDraw = true;
-    bDrawReductionPanel = true;
-    mReductionPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
 }
 
 // Listeners ------------------------------------

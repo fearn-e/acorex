@@ -43,11 +43,11 @@ private:
     void ResetVariables ( );
 
     // UI Management ------------------------------
-    void InitialiseMainPanelUI ( );
-    void InitialiseAnalysisPanelUI ( );
-    void InitialiseInsertionPanelUI ( );
-    void ClearInsertionPanelUI ( );
-    void InitialiseReductionPanelUI ( );
+    void ShowMainPanel ( );
+    void ShowAnalysisPanel ( );
+    void ShowAnalysisInsertionPanel ( );
+    void HideAnalysisInsertionPanel ( );
+    void ShowReductionPanel ( );
 
     void RefreshMainPanelUI ( );
     void RefreshAnalysisPanelUI ( );
@@ -55,14 +55,6 @@ private:
     void RefreshReductionPanelUI ( );
 
     void ToggleAnalysisUILockout ( bool lock );
-
-    // Panel Management ---------------------------
-
-    void ShowMainPanel ( );
-    void ShowAnalysisPanel ( );
-    void ShowAnalysisInsertionPanel ( );
-    void HideAnalysisInsertionPanel ( );
-    void ShowReductionPanel ( );
 
     // Listeners ---------------------------------
 
