@@ -45,7 +45,7 @@ void ofApp::setup ( )
     mAnalyserMenu.Initialise ( );
     //mExplorerMenu.Initialise ( );
 
-    mAnalyserMenu.Open ( );
+    //mAnalyserMenu.Open ( );
     //mExplorerMenu.Show ( );
 }
 
