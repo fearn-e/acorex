@@ -25,6 +25,9 @@ ofApp::ofApp ( )
 
 void ofApp::setup ( )
 {   
+    mLayout = std::make_shared<Acorex::Utils::MenuLayout> ( );
+    mAnalyserMenu.SetMenuLayout ( mLayout );
+
     ofSetWindowTitle ( "ACorEx" );
 
     ofSetVerticalSync ( true );
@@ -32,9 +35,6 @@ void ofApp::setup ( )
 
     ofSetWindowShape ( ofGetScreenWidth ( ) * 0.75, ofGetScreenHeight ( ) * 0.75 );
     ofSetWindowPosition ( ofGetScreenWidth ( ) / 2 - ofGetWidth ( ) / 2, ofGetScreenHeight ( ) / 2 - ofGetHeight ( ) / 2 );
-
-    mLayout = std::make_shared<Acorex::Utils::MenuLayout> ( );
-    mAnalyserMenu.SetMenuLayout ( mLayout );
 
     mLayout->toggleHiDpi ( DEFAULT_HI_DPI );
     if ( DEFAULT_HI_DPI ) { ofxGuiEnableHiResDisplay ( ); }
