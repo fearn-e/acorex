@@ -47,6 +47,7 @@ private:
     void InitialiseMainPanelUI ( );
     void InitialiseAnalysisPanelUI ( );
     void InitialiseInsertionPanelUI ( );
+    void ClearInsertionPanelUI ( );
     void InitialiseReductionPanelUI ( );
 
     void RefreshMainPanelUI ( );

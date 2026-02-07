@@ -219,142 +219,169 @@ void AnalyserMenu::RefreshUI ( )
 }
 
 void AnalyserMenu::ClearUI ( )
-    {
+{
     RemoveListenersMain ( );
     RemoveListenersAnalysis ( );
     RemoveListenersInsertion ( );
     RemoveListenersReduction ( );
 
-        mMainPanel.clear ( );
-        mAnalysisPanel.clear ( );
-        mAnalysisMetadataPanel.clear ( );
-        mAnalysisConfirmPanel.clear ( );
-        mReductionPanel.clear ( );
-        mAnalysisInsertionPanel.clear ( );
-    }
+    mMainPanel.clear ( );
+    mAnalysisPanel.clear ( );
+    mAnalysisMetadataPanel.clear ( );
+    mAnalysisConfirmPanel.clear ( );
+    mReductionPanel.clear ( );
+    mAnalysisInsertionPanel.clear ( );
+}
 
 void AnalyserMenu::InitialiseMainPanelUI ( )
-    {
-        mMainPanel.setup ( "Menu" );
+{
+    RemoveListenersMain ( );
 
-        mMainPanel.add ( mCreateCorpusButton.setup ( "Analyse Corpus" ) );
-        mMainPanel.add ( mReduceCorpusButton.setup ( "Reduce Corpus" ) );
+    mMainPanel.clear ( );
+    mMainPanel.setup ( "Menu" );
 
-        mCreateCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mReduceCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mMainPanel.add ( mCreateCorpusButton.setup ( "Analyse Corpus" ) );
+    mMainPanel.add ( mReduceCorpusButton.setup ( "Reduce Corpus" ) );
 
-        mMainPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
-        mMainPanel.setWidthElements ( mLayout->getAnalyseMainPanelWidth ( ) );
-        mMainPanel.disableHeader ( );
-    }
+    mCreateCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mReduceCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    mMainPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+    mMainPanel.setWidthElements ( mLayout->getAnalyseMainPanelWidth ( ) );
+    mMainPanel.disableHeader ( );
+
+    AddListenersMain ( );
+}
 
 void AnalyserMenu::InitialiseAnalysisPanelUI ( )
-    {
-        mAnalysisPanel.setup ( "Analysis" );
+{
+    RemoveListenersAnalysis ( );
 
-        mAnalysisPanel.add ( mAnalysisPickDirectoryButton.setup ( "Pick Audio Directory" ) );
-        mAnalysisPanel.add ( mAnalysisDirectoryLabel.setup ( " ", "?" ) );
-        mAnalysisPanel.add ( mAnalysisPickOutputFileButton.setup ( "Pick Output File" ) );
-        mAnalysisPanel.add ( mAnalysisOutputLabel.setup ( "", "?" ) );
+    mAnalysisPanel.clear ( );
+    mAnalysisPanel.setup ( "Analysis" );
 
-        mAnalysisPickDirectoryButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mAnalysisDirectoryLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mAnalysisPickOutputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mAnalysisOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisPanel.add ( mAnalysisPickDirectoryButton.setup ( "Pick Audio Directory" ) );
+    mAnalysisPanel.add ( mAnalysisDirectoryLabel.setup ( " ", "?" ) );
+    mAnalysisPanel.add ( mAnalysisPickOutputFileButton.setup ( "Pick Output File" ) );
+    mAnalysisPanel.add ( mAnalysisOutputLabel.setup ( "", "?" ) );
 
-        mAnalysisPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
-        mAnalysisPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
-        mAnalysisPanel.disableHeader ( );
+    mAnalysisPickDirectoryButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisDirectoryLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisPickOutputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
+    mAnalysisPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+    mAnalysisPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisPanel.disableHeader ( );
 
-        mAnalysisMetadataPanel.setup ( "Analysis Metadata" );
+    mAnalysisMetadataPanel.clear ( );
+    mAnalysisMetadataPanel.setup ( "Analysis Metadata" );
 
-        mAnalysisMetadataPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", DEFAULT_ANALYSE_PITCH ) );
-        mAnalysisMetadataPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", DEFAULT_ANALYSE_LOUDNESS ) );
-        mAnalysisMetadataPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Spectral Shape", DEFAULT_ANALYSE_SPEC_SHAPE ) );
-        mAnalysisMetadataPanel.add ( mAnalysisMFCCToggle.setup ( "Analyse MFCC", DEFAULT_ANALYSE_MFCC ) );
+    mAnalysisMetadataPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", DEFAULT_ANALYSE_PITCH ) );
+    mAnalysisMetadataPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", DEFAULT_ANALYSE_LOUDNESS ) );
+    mAnalysisMetadataPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Spectral Shape", DEFAULT_ANALYSE_SPEC_SHAPE ) );
+    mAnalysisMetadataPanel.add ( mAnalysisMFCCToggle.setup ( "Analyse MFCC", DEFAULT_ANALYSE_MFCC ) );
 
-        mAnalysisMetadataPanel.add ( mSampleRateField.setup ( "Sample Rate: ", DEFAULT_ANALYSE_SAMPLE_RATE, 8000, 96000 ) );
-        mAnalysisMetadataPanel.add ( mWindowFFTField.setup ( "Window Size: ", DEFAULT_ANALYSE_WINDOW_SIZE, 512, 8192 ) );
-        mAnalysisMetadataPanel.add ( mHopFractionField.setup ( "Hop Size (Fraction of Window):  1 / ", DEFAULT_ANALYSE_HOP_SIZE_FRACTION, 1, 16 ) );
-        mAnalysisMetadataPanel.add ( mNBandsField.setup ( "Bands: ", DEFAULT_ANALYSE_MFCC_BANDS, 1, 100 ) );
-        mAnalysisMetadataPanel.add ( mNCoefsField.setup ( "Coefs: ", DEFAULT_ANALYSE_MFCC_COEFS, 1, 20 ) );
-        mAnalysisMetadataPanel.add ( mMinFreqField.setup ( "Min Freq: ", DEFAULT_ANALYSE_MIN_FREQ, 20, 2000 ) );
-        mAnalysisMetadataPanel.add ( mMaxFreqField.setup ( "Max Freq: ", DEFAULT_ANALYSE_MAX_FREQ, 20, 20000 ) );
+    mAnalysisMetadataPanel.add ( mSampleRateField.setup ( "Sample Rate: ", DEFAULT_ANALYSE_SAMPLE_RATE, 8000, 96000 ) );
+    mAnalysisMetadataPanel.add ( mWindowFFTField.setup ( "Window Size: ", DEFAULT_ANALYSE_WINDOW_SIZE, 512, 8192 ) );
+    mAnalysisMetadataPanel.add ( mHopFractionField.setup ( "Hop Size (Fraction of Window):  1 / ", DEFAULT_ANALYSE_HOP_SIZE_FRACTION, 1, 16 ) );
+    mAnalysisMetadataPanel.add ( mNBandsField.setup ( "Bands: ", DEFAULT_ANALYSE_MFCC_BANDS, 1, 100 ) );
+    mAnalysisMetadataPanel.add ( mNCoefsField.setup ( "Coefs: ", DEFAULT_ANALYSE_MFCC_COEFS, 1, 20 ) );
+    mAnalysisMetadataPanel.add ( mMinFreqField.setup ( "Min Freq: ", DEFAULT_ANALYSE_MIN_FREQ, 20, 2000 ) );
+    mAnalysisMetadataPanel.add ( mMaxFreqField.setup ( "Max Freq: ", DEFAULT_ANALYSE_MAX_FREQ, 20, 20000 ) );
 
-        mAnalysisPitchToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mAnalysisLoudnessToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mAnalysisShapeToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mAnalysisMFCCToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mSampleRateField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mWindowFFTField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mHopFractionField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mNBandsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mNCoefsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mMinFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mMaxFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisPitchToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisLoudnessToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisShapeToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisMFCCToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mSampleRateField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mWindowFFTField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mHopFractionField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mNBandsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mNCoefsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mMinFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mMaxFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-        mAnalysisMetadataPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
-        mAnalysisMetadataPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
-        mAnalysisMetadataPanel.disableHeader ( );
+    mAnalysisMetadataPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+    mAnalysisMetadataPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisMetadataPanel.disableHeader ( );
 
+    mAnalysisConfirmPanel.clear ( );
+    mAnalysisConfirmPanel.setup ( "Confirm Analysis" );
 
-        mAnalysisConfirmPanel.setup ( "Confirm Analysis" );
+    mAnalysisConfirmPanel.add ( mConfirmAnalysisButton.setup ( "Confirm" ) );
+    mAnalysisConfirmPanel.add ( mCancelAnalysisButton.setup ( "Cancel" ) );
 
-        mAnalysisConfirmPanel.add ( mConfirmAnalysisButton.setup ( "Confirm" ) );
-        mAnalysisConfirmPanel.add ( mCancelAnalysisButton.setup ( "Cancel" ) );
+    mConfirmAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mCancelAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
-        mConfirmAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mCancelAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisConfirmPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+    mAnalysisConfirmPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisConfirmPanel.disableHeader ( );
 
-        mAnalysisConfirmPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
-        mAnalysisConfirmPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
-        mAnalysisConfirmPanel.disableHeader ( );
-    }
+    AddListenersAnalysis ( );
+}
 
 void AnalyserMenu::InitialiseInsertionPanelUI ( )
-    {
-        mAnalysisInsertionPanel.setup ( "Insertion Question" );
+{
+    RemoveListenersInsertion ( );
 
-        mAnalysisInsertionPanel.add ( mAnalysisInsertionQuestionLabel.setup ( "For files already existing in the set, which version to use?", "" ) );
-        mAnalysisInsertionPanel.add ( mAnalysisInsertionReplaceWithNewToggle.setup ( "Existing Files", DEFAULT_ANALYSE_INSERT_FILES_REPLACE ) );
+    mAnalysisInsertionPanel.clear ( );
+    mAnalysisInsertionPanel.setup ( "Insertion Question" );
 
-        mAnalysisInsertionQuestionLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mAnalysisInsertionReplaceWithNewToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisInsertionPanel.add ( mAnalysisInsertionQuestionLabel.setup ( "For files already existing in the set, which version to use?", "" ) );
+    mAnalysisInsertionPanel.add ( mAnalysisInsertionReplaceWithNewToggle.setup ( "Existing Files", DEFAULT_ANALYSE_INSERT_FILES_REPLACE ) );
 
-        mAnalysisInsertionPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
-        mAnalysisInsertionPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
-        mAnalysisInsertionPanel.disableHeader ( );
-    }
+    mAnalysisInsertionQuestionLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisInsertionReplaceWithNewToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    mAnalysisInsertionPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+    mAnalysisInsertionPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisInsertionPanel.disableHeader ( );
+
+    AddListenersInsertion ( );
+}
+
+void AnalyserMenu::ClearInsertionPanelUI ( )
+{
+    RemoveListenersInsertion ( );
+
+    mAnalysisInsertionPanel.clear ( );
+}
 
 void AnalyserMenu::InitialiseReductionPanelUI ( )
-    {
-        mReductionPanel.setup ( "Reduction" );
+{
+    RemoveListenersReduction ( );
 
-        mReductionPanel.add ( mReductionPickInputFileButton.setup ( "Pick Input File" ) );
-        mReductionPanel.add ( mReductionInputLabel.setup ( " ", "?" ) );
-        mReductionPanel.add ( mReductionPickOutputFileButton.setup ( "Pick Output File" ) );
-        mReductionPanel.add ( mReductionOutputLabel.setup ( "", "?" ) );
+    mReductionPanel.clear ( );
+    mReductionPanel.setup ( "Reduction" );
 
-        mReductionPanel.add ( mReducedDimensionsField.setup ( "Reduced Dimensions", DEFAULT_REDUCE_DIMENSIONS, 2, 32 ) );
-        mReductionPanel.add ( mMaxIterationsField.setup ( "Max Training Iterations", DEFAULT_MAX_TRAINING_ITERATIONS, 1, 1000 ) );
+    mReductionPanel.add ( mReductionPickInputFileButton.setup ( "Pick Input File" ) );
+    mReductionPanel.add ( mReductionInputLabel.setup ( " ", "?" ) );
+    mReductionPanel.add ( mReductionPickOutputFileButton.setup ( "Pick Output File" ) );
+    mReductionPanel.add ( mReductionOutputLabel.setup ( "", "?" ) );
 
-        mReductionPanel.add ( mConfirmReductionButton.setup ( "Confirm" ) );
-        mReductionPanel.add ( mCancelReductionButton.setup ( "Cancel" ) );
+    mReductionPanel.add ( mReducedDimensionsField.setup ( "Reduced Dimensions", DEFAULT_REDUCE_DIMENSIONS, 2, 32 ) );
+    mReductionPanel.add ( mMaxIterationsField.setup ( "Max Training Iterations", DEFAULT_MAX_TRAINING_ITERATIONS, 1, 1000 ) );
 
-        mReductionPickInputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mReductionInputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mReductionPickOutputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mReductionOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mReducedDimensionsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mMaxIterationsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mConfirmReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-        mCancelReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mReductionPanel.add ( mConfirmReductionButton.setup ( "Confirm" ) );
+    mReductionPanel.add ( mCancelReductionButton.setup ( "Cancel" ) );
 
-        mReductionPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
-        mReductionPanel.setWidthElements ( mLayout->getAnalyseReductionPanelWidth ( ) );
-        mReductionPanel.disableHeader ( );
-    }
+    mReductionPickInputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mReductionInputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mReductionPickOutputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mReductionOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mReducedDimensionsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mMaxIterationsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mConfirmReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mCancelReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    mReductionPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
+    mReductionPanel.setWidthElements ( mLayout->getAnalyseReductionPanelWidth ( ) );
+    mReductionPanel.disableHeader ( );
+
+    AddListenersReduction ( );
+}
 
 void AnalyserMenu::RefreshMainPanelUI ( )
 {
@@ -420,9 +447,12 @@ void AnalyserMenu::ToggleAnalysisUILockout ( bool lock )
     }
 }
 
+// Panel Management ---------------------------
+
 void AnalyserMenu::ShowMainPanel ( )
 {
-    Initialise ( mLayout->isHiDpi ( ) );
+    ClearUI ( );
+    InitialiseMainPanelUI ( );
     bDraw = true;
     bDrawMainPanel = true;
     mMainPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
@@ -430,7 +460,8 @@ void AnalyserMenu::ShowMainPanel ( )
 
 void AnalyserMenu::ShowAnalysisPanel ( )
 {
-    Initialise ( mLayout->isHiDpi ( ) );
+    ClearUI ( );
+    InitialiseAnalysisPanelUI ( );
     bDraw = true;
     bDrawAnalysisPanel = true;
     mAnalysisPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
@@ -440,19 +471,22 @@ void AnalyserMenu::ShowAnalysisPanel ( )
 
 void AnalyserMenu::ShowAnalysisInsertionPanel ( )
 {
+    InitialiseInsertionPanelUI ( );
     bDrawInsertionPanel = true;
     mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
 }
 
 void AnalyserMenu::HideAnalysisInsertionPanel ( )
 {
+    ClearInsertionPanelUI ( );
     bDrawInsertionPanel = false;
     mAnalysisInsertionPanel.setPosition ( mLayout->getHiddenPanelPosition ( ) );
 }
 
 void AnalyserMenu::ShowReductionPanel ( )
 {
-    Initialise ( mLayout->isHiDpi ( ) );
+    ClearUI ( );
+    InitialiseReductionPanelUI ( );
     bDraw = true;
     bDrawReductionPanel = true;
     mReductionPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
@@ -481,7 +515,7 @@ void AnalyserMenu::AddListenersAnalysis ( )
     if ( bListenersAddedAnalysis ) { return; }
     mAnalysisPickDirectoryButton.addListener ( this, &AnalyserMenu::SelectAnalysisDirectory );
     mAnalysisPickOutputFileButton.addListener ( this, &AnalyserMenu::SelectAnalysisOutputFile );
-        mWindowFFTField.addListener ( this, &AnalyserMenu::QuantiseWindowSize );
+    mWindowFFTField.addListener ( this, &AnalyserMenu::QuantiseWindowSize );
     mHopFractionField.addListener ( this, &AnalyserMenu::QuantiseHopFraction );
     mConfirmAnalysisButton.addListener ( this, &AnalyserMenu::Analyse );
     mCancelAnalysisButton.addListener ( this, &AnalyserMenu::ShowMainPanel );
@@ -493,7 +527,7 @@ void AnalyserMenu::RemoveListenersAnalysis ( )
     if ( !bListenersAddedAnalysis ) { return; }
     mAnalysisPickDirectoryButton.removeListener ( this, &AnalyserMenu::SelectAnalysisDirectory );
     mAnalysisPickOutputFileButton.removeListener ( this, &AnalyserMenu::SelectAnalysisOutputFile );
-        mWindowFFTField.removeListener ( this, &AnalyserMenu::QuantiseWindowSize );
+    mWindowFFTField.removeListener ( this, &AnalyserMenu::QuantiseWindowSize );
     mHopFractionField.removeListener ( this, &AnalyserMenu::QuantiseHopFraction );
     mConfirmAnalysisButton.removeListener ( this, &AnalyserMenu::Analyse );
     mCancelAnalysisButton.removeListener ( this, &AnalyserMenu::ShowMainPanel );
@@ -511,7 +545,7 @@ void AnalyserMenu::RemoveListenersInsertion ( )
 {
     if ( !bListenersAddedInsertion ) { return; }
     mAnalysisInsertionReplaceWithNewToggle.removeListener ( this, &AnalyserMenu::AnalysisInsertionToggleChanged );
-bListenersAddedInsertion = false;
+    bListenersAddedInsertion = false;
 }
 
 void AnalyserMenu::AddListenersReduction ( )
