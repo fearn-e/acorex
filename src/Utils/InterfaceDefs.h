@@ -51,8 +51,6 @@ private:
     int modePanelOriginY = topBarHeight + interPanelSpacing;
     const int analysePanelOriginX = 0;
 
-    const glm::vec3 hiddenPanelPosition = { -1000, -1000, 0 };
-
 public:
 
     void toggleHiDpi ( bool hiDpi )
@@ -85,7 +83,6 @@ public:
     unsigned int getPanelBackgroundMargin ( ) const { return panelBackgroundMargin; }
     int getModePanelOriginY ( ) const { return modePanelOriginY; }
     int getAnalysePanelOriginX ( ) const { return analysePanelOriginX; }
-    glm::vec3 getHiddenPanelPosition ( ) const { return hiddenPanelPosition; }
 };
 } // namespace Utils
 } // namespace Acorex
