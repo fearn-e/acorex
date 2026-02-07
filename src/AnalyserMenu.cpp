@@ -61,14 +61,19 @@ void AnalyserMenu::ResetVariables ( )
 // initial state is a blank slate - Open ( ) must be called to actually load anything
 void AnalyserMenu::Initialise ( )
 {
+    ResetVariables ( );
+
     RemoveListenersMain ( );
     RemoveListenersAnalysis ( );
     RemoveListenersInsertion ( );
     RemoveListenersReduction ( );
 
-    ResetVariables ( );
-
-    ClearUI ( );
+    mMainPanel.clear ( );
+    mAnalysisPanel.clear ( );
+    mAnalysisMetadataPanel.clear ( );
+    mAnalysisConfirmPanel.clear ( );
+    mReductionPanel.clear ( );
+    mAnalysisInsertionPanel.clear ( );
 
     ToggleAnalysisUILockout ( false );
 }
@@ -221,21 +226,6 @@ void AnalyserMenu::RefreshUI ( )
     if ( bDrawAnalysisPanel ) { RefreshAnalysisPanelUI ( ); }
     if ( bDrawInsertionPanel ) { RefreshInsertionPanelUI ( ); }
     if ( bDrawReductionPanel ) { RefreshReductionPanelUI ( ); }
-}
-
-void AnalyserMenu::ClearUI ( )
-{
-    RemoveListenersMain ( );
-    RemoveListenersAnalysis ( );
-    RemoveListenersInsertion ( );
-    RemoveListenersReduction ( );
-
-    mMainPanel.clear ( );
-    mAnalysisPanel.clear ( );
-    mAnalysisMetadataPanel.clear ( );
-    mAnalysisConfirmPanel.clear ( );
-    mReductionPanel.clear ( );
-    mAnalysisInsertionPanel.clear ( );
 }
 
 void AnalyserMenu::InitialiseMainPanelUI ( )
@@ -456,7 +446,7 @@ void AnalyserMenu::ToggleAnalysisUILockout ( bool lock )
 
 void AnalyserMenu::ShowMainPanel ( )
 {
-    ClearUI ( );
+    Initialise ( );
     InitialiseMainPanelUI ( );
     bDraw = true;
     bDrawMainPanel = true;
@@ -465,7 +455,7 @@ void AnalyserMenu::ShowMainPanel ( )
 
 void AnalyserMenu::ShowAnalysisPanel ( )
 {
-    ClearUI ( );
+    Initialise ( );
     InitialiseAnalysisPanelUI ( );
     bDraw = true;
     bDrawAnalysisPanel = true;
@@ -490,7 +480,7 @@ void AnalyserMenu::HideAnalysisInsertionPanel ( )
 
 void AnalyserMenu::ShowReductionPanel ( )
 {
-    ClearUI ( );
+    Initialise ( );
     InitialiseReductionPanelUI ( );
     bDraw = true;
     bDrawReductionPanel = true;

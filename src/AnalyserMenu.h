@@ -43,7 +43,6 @@ private:
     void ResetVariables ( );
 
     // UI Management ------------------------------
-    void ClearUI ( );
     void InitialiseMainPanelUI ( );
     void InitialiseAnalysisPanelUI ( );
     void InitialiseInsertionPanelUI ( );
