@@ -42,7 +42,7 @@ void ofApp::setup ( )
 
     InitialiseUI ( );
 
-    //mAnalyserMenu.Initialise ( );
+    mAnalyserMenu.Initialise ( );
     //mExplorerMenu.Initialise ( );
 
     mAnalyserMenu.Open ( );
@@ -56,7 +56,7 @@ void ofApp::update ( )
 
 void ofApp::draw ( )
 {
-    //if ( mAnalyseToggle ) { mAnalyserMenu.Draw ( ); }
+    mAnalyserMenu.Draw ( );
     //if ( mExploreToggle ) { mExplorerMenu.Draw ( ); }
 
     {
@@ -73,7 +73,7 @@ void ofApp::draw ( )
 
 void ofApp::exit ( )
 {
-    //mAnalyserMenu.Exit ( );
+    mAnalyserMenu.Exit ( );
     //mExplorerMenu.Exit ( );
 }
 
@@ -174,5 +174,5 @@ void ofApp::DPIToggled ( bool& value )
 
     RefreshUI ( );
     //mExplorerMenu.RefreshUI ( );
-    //mAnalyserMenu.RefreshUI ( );
+    mAnalyserMenu.RefreshUI ( );
 }
