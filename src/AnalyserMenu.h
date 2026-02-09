@@ -43,11 +43,11 @@ private:
     void ResetVariables ( );
 
     // UI Management ------------------------------
-    void ShowMainPanel ( );
-    void ShowAnalysisPanel ( );
-    void ShowAnalysisInsertionPanel ( );
-    void HideAnalysisInsertionPanel ( );
-    void ShowReductionPanel ( );
+    void OpenMainPanel ( );
+    void OpenAnalysisPanel ( );
+    void OpenAnalysisInsertionPanel ( );
+    void CloseAnalysisInsertionPanel ( );
+    void OpenReductionPanel ( );
 
     void RefreshMainPanelUI ( );
     void RefreshAnalysisPanelUI ( );

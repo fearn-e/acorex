@@ -80,7 +80,7 @@ void AnalyserMenu::Initialise ( )
 
 void AnalyserMenu::Open ( )
 {
-    ShowMainPanel ( );
+    OpenMainPanel ( );
 }
 
 // fully resets all values and hides the menu
@@ -220,7 +220,7 @@ void AnalyserMenu::Exit ( )
 
 // UI Management --------------------------------
 
-void AnalyserMenu::ShowMainPanel ( )
+void AnalyserMenu::OpenMainPanel ( )
 {
     Initialise ( );
 
@@ -245,7 +245,7 @@ void AnalyserMenu::ShowMainPanel ( )
     AddListenersMain ( );
 }
 
-void AnalyserMenu::ShowAnalysisPanel ( )
+void AnalyserMenu::OpenAnalysisPanel ( )
 {
     Initialise ( );
 
@@ -319,7 +319,7 @@ void AnalyserMenu::ShowAnalysisPanel ( )
     AddListenersAnalysis ( );
 }
 
-void AnalyserMenu::ShowAnalysisInsertionPanel ( )
+void AnalyserMenu::OpenAnalysisInsertionPanel ( )
 {
     RemoveListenersInsertion ( );
 
@@ -341,7 +341,7 @@ void AnalyserMenu::ShowAnalysisInsertionPanel ( )
     AddListenersInsertion ( );
 }
 
-void AnalyserMenu::HideAnalysisInsertionPanel ( )
+void AnalyserMenu::CloseAnalysisInsertionPanel ( )
 {
     RemoveListenersInsertion ( );
 
@@ -350,7 +350,7 @@ void AnalyserMenu::HideAnalysisInsertionPanel ( )
     bDrawInsertionPanel = false;
 }
 
-void AnalyserMenu::ShowReductionPanel ( )
+void AnalyserMenu::OpenReductionPanel ( )
 {
     Initialise ( );
 
@@ -495,16 +495,16 @@ void AnalyserMenu::ToggleAnalysisUILockout ( bool lock )
 void AnalyserMenu::AddListenersMain ( )
 {
     if ( bListenersAddedMain ) { return; }
-    mCreateCorpusButton.addListener ( this, &AnalyserMenu::ShowAnalysisPanel );
-    mReduceCorpusButton.addListener ( this, &AnalyserMenu::ShowReductionPanel );
+    mCreateCorpusButton.addListener ( this, &AnalyserMenu::OpenAnalysisPanel );
+    mReduceCorpusButton.addListener ( this, &AnalyserMenu::OpenReductionPanel );
     bListenersAddedMain = true;
 }
 
 void AnalyserMenu::RemoveListenersMain ( )
 {
     if ( !bListenersAddedMain ) { return; }
-    mCreateCorpusButton.removeListener ( this, &AnalyserMenu::ShowAnalysisPanel );
-    mReduceCorpusButton.removeListener ( this, &AnalyserMenu::ShowReductionPanel );
+    mCreateCorpusButton.removeListener ( this, &AnalyserMenu::OpenAnalysisPanel );
+    mReduceCorpusButton.removeListener ( this, &AnalyserMenu::OpenReductionPanel );
     bListenersAddedMain = false;
 }
 
@@ -516,7 +516,7 @@ void AnalyserMenu::AddListenersAnalysis ( )
     mWindowFFTField.addListener ( this, &AnalyserMenu::QuantiseWindowSize );
     mHopFractionField.addListener ( this, &AnalyserMenu::QuantiseHopFraction );
     mConfirmAnalysisButton.addListener ( this, &AnalyserMenu::Analyse );
-    mCancelAnalysisButton.addListener ( this, &AnalyserMenu::ShowMainPanel );
+    mCancelAnalysisButton.addListener ( this, &AnalyserMenu::OpenMainPanel );
     bListenersAddedAnalysis = true;
 }
 
@@ -528,7 +528,7 @@ void AnalyserMenu::RemoveListenersAnalysis ( )
     mWindowFFTField.removeListener ( this, &AnalyserMenu::QuantiseWindowSize );
     mHopFractionField.removeListener ( this, &AnalyserMenu::QuantiseHopFraction );
     mConfirmAnalysisButton.removeListener ( this, &AnalyserMenu::Analyse );
-    mCancelAnalysisButton.removeListener ( this, &AnalyserMenu::ShowMainPanel );
+    mCancelAnalysisButton.removeListener ( this, &AnalyserMenu::OpenMainPanel );
     bListenersAddedAnalysis = false;
 }
 
@@ -552,7 +552,7 @@ void AnalyserMenu::AddListenersReduction ( )
     mReductionPickInputFileButton.addListener ( this, &AnalyserMenu::SelectReductionInputFile );
     mReductionPickOutputFileButton.addListener ( this, &AnalyserMenu::SelectReductionOutputFile );
     mConfirmReductionButton.addListener ( this, &AnalyserMenu::Reduce );
-    mCancelReductionButton.addListener ( this, &AnalyserMenu::ShowMainPanel );
+    mCancelReductionButton.addListener ( this, &AnalyserMenu::OpenMainPanel );
     bListenersAddedReduction = true;
 }
 
@@ -562,7 +562,7 @@ void AnalyserMenu::RemoveListenersReduction ( )
     mReductionPickInputFileButton.removeListener ( this, &AnalyserMenu::SelectReductionInputFile );
     mReductionPickOutputFileButton.removeListener ( this, &AnalyserMenu::SelectReductionOutputFile );
     mConfirmReductionButton.removeListener ( this, &AnalyserMenu::Reduce );
-    mCancelReductionButton.removeListener ( this, &AnalyserMenu::ShowMainPanel );
+    mCancelReductionButton.removeListener ( this, &AnalyserMenu::OpenMainPanel );
     bListenersAddedReduction = false;
 }
 
@@ -604,12 +604,12 @@ void AnalyserMenu::Analyse ( )
 
     if ( !success )
     {
-        ShowMainPanel ( );
+        OpenMainPanel ( );
         return;
     }
 
     // TODO - ask if user wants to reduce the data or view it in the corpus viewer
-    ShowMainPanel ( );
+    OpenMainPanel ( );
     ofLogNotice ( "AnalyserMenu" ) << "Corpus created";
     //------------------------------------------------ TEMPORARY
 }
@@ -643,12 +643,12 @@ void AnalyserMenu::Reduce ( )
 
     if ( !success )
     {
-        ShowMainPanel ( );
+        OpenMainPanel ( );
         return;
     }
 
     // TODO - ask if user wants to open the reduced data in the corpus viewer
-    ShowMainPanel ( );
+    OpenMainPanel ( );
     ofLogNotice ( "AnalyserMenu" ) << "Corpus reduced";
     //------------------------------------------------ TEMPORARY
 }
@@ -697,12 +697,12 @@ void AnalyserMenu::SelectAnalysisOutputFile ( )
     if ( ofFile::doesFileExist ( outputFile.getPath ( ) ) )
     {
         bInsertingIntoCorpus = true;
-        ShowAnalysisInsertionPanel ( );
+        OpenAnalysisInsertionPanel ( );
     }
     else
     {
         bInsertingIntoCorpus = false;
-        HideAnalysisInsertionPanel ( );
+        CloseAnalysisInsertionPanel ( );
     }
 
     if ( bInsertingIntoCorpus )
