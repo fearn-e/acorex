@@ -39,6 +39,8 @@ public:
     void ChangeAudioSettings ( size_t bufferSize, ofSoundDevice outDevice );
     void KillAudio ( );
     void Exit ( );
+
+    void AddListeners ( );
     void RemoveListeners ( );
 
     // Process Functions ---------------------------

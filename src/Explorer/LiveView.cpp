@@ -68,17 +68,7 @@ void Explorer::LiveView::Initialise ( )
     mAudioPlayback.Initialise ( mDimensionBounds.GetBoundsData ( ) );
     mAudioPlayback.SetRawView ( mRawView );
 
-    if ( !listenersAdded )
-    {
-        ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
-        ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
-        ofAddListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
-        ofAddListener ( ofEvents ( ).mouseReleased, this, &Explorer::LiveView::MouseEvent );
-        ofAddListener ( ofEvents ( ).mouseScrolled, this, &Explorer::LiveView::MouseEvent );
-        ofAddListener ( ofEvents ( ).keyPressed, this, &Explorer::LiveView::KeyEvent );
-        ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
-        listenersAdded = true;
-    }
+    AddListeners ( );
 }
 
 void Explorer::LiveView::ChangeAudioSettings ( size_t bufferSize, ofSoundDevice outDevice )
@@ -96,6 +86,19 @@ void Explorer::LiveView::Exit ( )
 {
     RemoveListeners ( );
     mPointPicker->Exit ( );
+}
+
+void Explorer::LiveView::AddListeners ( )
+{
+    if ( listenersAdded ) { return; }
+    ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
+    ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
+    ofAddListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
+    ofAddListener ( ofEvents ( ).mouseReleased, this, &Explorer::LiveView::MouseEvent );
+    ofAddListener ( ofEvents ( ).mouseScrolled, this, &Explorer::LiveView::MouseEvent );
+    ofAddListener ( ofEvents ( ).keyPressed, this, &Explorer::LiveView::KeyEvent );
+    ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
+    listenersAdded = true;
 }
 
 void Explorer::LiveView::RemoveListeners ( )
