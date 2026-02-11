@@ -45,8 +45,8 @@ public:
     bool CreatePlayhead ( size_t fileIndex, size_t sampleIndex );
     bool KillPlayhead ( size_t playheadID );
     std::vector<Utils::VisualPlayhead> GetPlayheadInfo ( );
-    void SetFlagReset ( );
-    void WaitForResetConfirm ( );
+    void SetFlagKill ( );
+    void WaitForKillConfirm ( );
 
     void SetTimeCorpus ( const std::vector<ofMesh>& timeCorpus );
 
@@ -116,7 +116,7 @@ private:
     std::mutex mTimeCorpusMutex;
     std::vector<ofMesh> mTimeCorpus;
 
-    std::atomic<bool> bResetFlag = false;
+    std::atomic<bool> bKillFlag = false;
 };
 
 } // namespace Explorer

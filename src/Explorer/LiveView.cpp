@@ -26,7 +26,7 @@ using namespace Acorex;
 
 void Explorer::LiveView::Initialise ( )
 {
-    mAudioPlayback.SetFlagReset ( );
+    mAudioPlayback.SetFlagKill ( );
 
     if ( !bPointersShared )
     {
@@ -88,8 +88,8 @@ void Explorer::LiveView::ChangeAudioSettings ( size_t bufferSize, ofSoundDevice 
 
 void Explorer::LiveView::KillAudio ( )
 {
-    mAudioPlayback.SetFlagReset ( );
-    mAudioPlayback.WaitForResetConfirm ( );
+    mAudioPlayback.SetFlagKill ( );
+    mAudioPlayback.WaitForKillConfirm ( );
 }
 
 void Explorer::LiveView::Exit ( )
