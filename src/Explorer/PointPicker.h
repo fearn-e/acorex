@@ -31,15 +31,15 @@ namespace Explorer {
 
 class PointPicker {
 public:
-    PointPicker ( ) { }
+    PointPicker ( );
     ~PointPicker ( ) { }
 
     void Initialise ( const Utils::DataSet& dataset, const Utils::DimensionBounds& dimensionBounds );
+    void Clear ( );
 
     void Train ( int dimensionIndex, Utils::Axis axis, bool none );
 
     void Exit ( );
-    void RemoveListeners ( );
 
     void Draw ( );
 
@@ -63,41 +63,49 @@ private:
 
     // Listeners ------------------------------------
 
+    void AddListeners ( );
+    void RemoveListeners ( );
+
+    bool bListenersAdded;
+
+    // Listener Functions ---------------------------
+
     void MouseMoved ( ofMouseEventArgs& args ) { bNearestMouseCheckNeeded = true; }
     void KeyEvent ( ofKeyEventArgs& args );
     void MouseReleased ( ofMouseEventArgs& args );
 
     // States ---------------------------------------
 
-    bool bClicked = false;
-    bool bPicker = false;
-    bool bDebug = false;
-    bool bDraw = false;
-    bool b3D = true;
-    std::atomic<bool> bTrained = false;
-    bool bSkipTraining = true;
-    bool bListenersAdded = false;
-    bool bNearestMouseCheckNeeded = false;
-    bool bDimensionsFilled[3] = { false, false, false };
+    bool bDebug;
+
+    std::atomic<bool> bTrained;
+    bool bSkipTraining;
+
+    bool b3D;
+    bool bPicker;
+    bool bClicked;
+    bool bNearestMouseCheckNeeded;
+
+    bool bDimensionsFilled[3];
 
     // Variables ------------------------------------
 
     std::shared_ptr<ofCamera> mCamera;
 
-    int mDimensionsIndices[3] = { -1, -1, -1 };
+    int mDimensionsIndices[3];
 
-    int mNearestPoint = -1;
-    double mNearestDistance = -1;
+    int mNearestPoint;
+    double mNearestDistance;
 
-    double maxAllowedDistanceFar = 0.05;
-    double maxAllowedDistanceNear = 0.01;
+    double maxAllowedDistanceFar;
+    double maxAllowedDistanceNear;
 
     fluid::algorithm::KDTree mKDTree;
 
     fluid::FluidDataSet<std::string, double, 1> mFullFluidSet;
     fluid::FluidDataSet<std::string, double, 1> mLiveFluidSet;
-    std::vector<int> mCorpusFileLookUp; int mNearestPointFile = -1;
-    std::vector<int> mCorpusTimeLookUp; int mNearestPointTime = -1;
+    std::vector<int> mCorpusFileLookUp; int mNearestPointFile;
+    std::vector<int> mCorpusTimeLookUp; int mNearestPointTime;
     
     Utils::DatasetConversion mDatasetConversion;
 

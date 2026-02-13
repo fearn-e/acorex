@@ -22,22 +22,26 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
+Explorer::PointPicker::PointPicker ( )
+    :   bListenersAdded ( false ), bDebug (false ),
+        bTrained ( false ), bSkipTraining ( true ),
+        b3D ( true ), bPicker ( false ), bClicked ( false ), bNearestMouseCheckNeeded ( false ),
+        bDimensionsFilled { false, false, false }, mDimensionsIndices { -1, -1, -1 },
+        mNearestPoint ( -1 ), mNearestDistance ( -1 ),
+        maxAllowedDistanceFar ( 0.05 ), maxAllowedDistanceNear ( 0.01 ),
+        mNearestPointFile ( -1 ), mNearestPointTime ( -1 )
+{
+
+}
+
 void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Utils::DimensionBounds& dimensionBounds )
 {
+    Clear ( );
+
     std::lock_guard<std::mutex> lock ( mPointPickerMutex );
 
     mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dataset.dimensionNames.size ( ) );
     mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 3 );
-
-    bPicker = false; b3D = true; bSkipTraining = true; bNearestMouseCheckNeeded = false;
-
-    bDimensionsFilled[0] = false; bDimensionsFilled[1] = false; bDimensionsFilled[2] = false;
-    mDimensionsIndices[0] = -1; mDimensionsIndices[1] = -1; mDimensionsIndices[2] = -1;
-
-    mNearestPoint = -1; mNearestDistance = -1; mNearestPointFile = -1; mNearestPointTime = -1;
-
-    if ( mCorpusFileLookUp.size ( ) > 0 ) { mCorpusFileLookUp.clear ( ); }
-    if ( mCorpusTimeLookUp.size ( ) > 0 ) { mCorpusTimeLookUp.clear ( ); }
 
     Utils::DataSet scaledDataset = dataset;
     ScaleDataset ( scaledDataset, dimensionBounds );
@@ -62,13 +66,28 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
     
     mDatasetConversion.CorpusToFluid ( mFullFluidSet, scaledDataset, tempVector );
 
-    if ( !bListenersAdded )
+    AddListeners ( );
+}
+
+void Explorer::PointPicker::Clear ( )
     {
-        ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
-        ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
-        ofAddListener ( ofEvents ( ).mouseReleased, this, &Explorer::PointPicker::MouseReleased );
-        bListenersAdded = true;
-    }
+    std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+
+    mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 0 );
+    mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 0 );
+
+    bTrained = false; bSkipTraining = true;
+    b3D = true; bPicker = false; bClicked = false; bNearestMouseCheckNeeded = false;
+
+    bDimensionsFilled[0] = false; bDimensionsFilled[1] = false; bDimensionsFilled[2] = false;
+    mDimensionsIndices[0] = -1; mDimensionsIndices[1] = -1; mDimensionsIndices[2] = -1;
+
+    mNearestPoint = -1; mNearestDistance = -1; mNearestPointFile = -1; mNearestPointTime = -1;
+
+    if ( mCorpusFileLookUp.size ( ) > 0 ) { mCorpusFileLookUp.clear ( ); }
+    if ( mCorpusTimeLookUp.size ( ) > 0 ) { mCorpusTimeLookUp.clear ( ); }
+
+    RemoveListeners ( );
 }
 
 void Explorer::PointPicker::Train ( int dimensionIndex, Utils::Axis axis, bool none )
@@ -83,6 +102,11 @@ void Explorer::PointPicker::Train ( int dimensionIndex, Utils::Axis axis, bool n
     int dimsFilled = bDimensionsFilled[0] + bDimensionsFilled[1] + bDimensionsFilled[2];
     if ( dimsFilled < 2 ) { bTrained = false; return; }
 
+    // TODO - take a closer look at this later.
+    // it seems like this makes bSkipTraining get set to false once when a corpus is first opened, as it gets 3 Train calls, for the X, Y, and Z dimensions.
+    // but this means it wouldn't work for a corpus that had only 2 dimensions to load to begin with?
+    // and if i ever accidentally set bSkipTraining back to true anywhere other than when loading a new corpus, this could just break training
+    // split this function into Train and SetDimension? - call SetDimension when first loading, then Train only once and then at runtime when changes are applied to the corpus?
     if ( axis == Utils::Axis::Z ) { bSkipTraining = false; }
     if ( bSkipTraining ) { return; }
 
@@ -126,15 +150,22 @@ void Explorer::PointPicker::Exit ( )
     RemoveListeners ( );
 }
 
+void Explorer::PointPicker::AddListeners ( )
+{
+    if ( bListenersAdded ) { return; }
+    ofRemoveListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
+    ofRemoveListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
+    ofRemoveListener ( ofEvents ( ).mouseReleased, this, &Explorer::PointPicker::MouseReleased );
+    bListenersAdded = true;
+}
+
 void Explorer::PointPicker::RemoveListeners ( )
 {
-    if ( bListenersAdded )
-    {
+    if ( !bListenersAdded ) { return; }
         ofRemoveListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
         ofRemoveListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
         ofRemoveListener ( ofEvents ( ).mouseReleased, this, &Explorer::PointPicker::MouseReleased );
         bListenersAdded = false;
-    }
 }
 
 void Explorer::PointPicker::ScaleDataset ( Utils::DataSet& scaledDataset, const Utils::DimensionBounds& dimensionBounds )
