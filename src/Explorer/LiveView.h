@@ -32,12 +32,13 @@ namespace Explorer {
 class LiveView {
 public:
 
-    LiveView ( ) { }
+    LiveView ( );
     ~LiveView ( ) { }
 
     void Initialise ( );
-    void ChangeAudioSettings ( size_t bufferSize, ofSoundDevice outDevice );
-    void KillAudio ( );
+    void Clear ( );
+    bool StartAudio ( std::pair<ofSoundDevice, int> audioSettings );
+    bool RestartAudio ( std::pair<ofSoundDevice, int> audioSettings ) { return StartAudio ( audioSettings ); }
     void Exit ( );
 
     void AddListeners ( );
@@ -95,25 +96,23 @@ public:
     void MouseEvent ( ofMouseEventArgs& args );
 
 private:
-    bool bPointersShared = false;
+    bool bListenersAdded;
 
-    bool listenersAdded = false;
+    bool bDebug;
+    bool bDraw;
+    bool b3D;
+    bool bColorFullSpectrum;
+    bool bLoopAudio;
 
-    bool bDebug = false;
-    bool bDraw = false;
-    bool b3D = true;
-    bool bColorFullSpectrum = false;
-    bool bLoopAudio = false;
+    bool mKeyboardMoveState[10];
+    float mCamMoveSpeedScaleAdjusted;
 
-    bool mKeyboardMoveState[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // W, A, S, D, R, F, Q, E, Z, X
-    float mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed;
+    float deltaTime;
+    float lastUpdateTime;
 
-    float deltaTime = 0.1;
-    float lastUpdateTime = 0;
-
-    Utils::Axis mDisabledAxis = Utils::Axis::NONE;
-    std::string xLabel = "X", yLabel = "Y", zLabel = "Z";
-    int colorDimension = -1;
+    Utils::Axis mDisabledAxis;
+    std::string xLabel, yLabel, zLabel;
+    int colorDimension;
 
     std::shared_ptr<RawView> mRawView; // might need to be weak_ptr?
     std::vector<ofMesh> mTimeCorpus;
@@ -132,8 +131,8 @@ private:
     // Camera ----------------------------------------
 
     std::shared_ptr<ofCamera> mCamera;
-    ofPoint mCamPivot = ofPoint(0, 0, 0);
-    int mLastMouseX = 0, mLastMouseY = 0;
+    ofPoint mCamPivot;
+    int mLastMouseX, mLastMouseY;
 
     // Acorex Objects ------------------------------
 

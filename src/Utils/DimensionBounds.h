@@ -33,8 +33,7 @@ public:
 
     void CalculateBounds ( const DataSet& dataset )
     {
-        bounds.min.clear ( );
-        bounds.max.clear ( );
+        Clear ( );
 
         bounds.min.resize ( dataset.dimensionNames.size ( ) );
         bounds.max.resize ( dataset.dimensionNames.size ( ) );
@@ -69,6 +68,12 @@ public:
                 }
             }
         }
+    }
+
+    void Clear ( )
+    {
+        bounds.min.clear ( );
+        bounds.max.clear ( );
     }
 
     double GetMinBound ( int dimension ) const { return bounds.min[dimension]; }

@@ -32,11 +32,11 @@ namespace Explorer {
 
 class AudioPlayback {
 public:
-    AudioPlayback ( ) { }
+    AudioPlayback ( );
     ~AudioPlayback ( ) { }
 
-    void Initialise ( Utils::DimensionBoundsData dimensionBoundsData );
-    void RestartAudio ( size_t sampleRate, size_t bufferSize, ofSoundDevice outDevice );
+    bool StartRestartAudio ( size_t sampleRate, size_t bufferSize, ofSoundDevice outDevice );
+    void ClearAndKillAudio ( );
 
     void audioOut ( ofSoundBuffer& outBuffer );
 
@@ -45,9 +45,12 @@ public:
     bool CreatePlayhead ( size_t fileIndex, size_t sampleIndex );
     bool KillPlayhead ( size_t playheadID );
     std::vector<Utils::VisualPlayhead> GetPlayheadInfo ( );
-    void SetFlagKill ( );
-    void WaitForKillConfirm ( );
+    void SetFlagMissingOutput ( bool missing );
+    void WaitForMissingOutputConfirm ( );
 
+    void UserInvokedPause ( ) { bUserPauseFlag = !bUserPauseFlag; }
+
+    void SetDimensionBounds ( const Utils::DimensionBoundsData& dimensionBoundsData );
     void SetTimeCorpus ( const std::vector<ofMesh>& timeCorpus );
 
     void SetPointPicker ( std::shared_ptr<PointPicker>& pointPicker ) { mPointPicker = pointPicker; }
@@ -60,63 +63,77 @@ public:
     void SetMaxJumpDistanceSpace ( int distanceX1000 ) { mMaxJumpDistanceSpaceX1000 = distanceX1000; }
     void SetMaxJumpTargets ( int targets ) { mMaxJumpTargets = targets; }
     void SetVolume(int volumeX1000) { mVolumeX1000 = volumeX1000; }
-    void SetDynamicPan ( bool enabled, int dimensionIndex ) {	mDynamicPanEnabled = enabled;
-                                                                mDynamicPanDimensionIndex = dimensionIndex; }
+    void SetDynamicPan ( bool enabled, int dimensionIndex ) { mDynamicPanEnabled = false; mDynamicPanDimensionIndex = dimensionIndex; mDynamicPanEnabled = enabled; }
     void SetPanningStrength ( int panStrengthX1000 ) { mPanningStrengthX1000 = panStrengthX1000; }
 
 private:
-
     void FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utils::AudioPlayhead* playhead, bool outBufferFull );
     void CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, size_t startSample_A, size_t endSample_A, size_t fileIndex_A, Utils::AudioPlayhead* playhead_B, size_t lengthSetting, bool outBufferFull );
 
     void CalculateTriggerPoints ( Utils::AudioPlayhead& playhead );
 
-    std::vector<Utils::AudioPlayhead> mPlayheads;
-
     std::shared_ptr<RawView> mRawView;
     std::shared_ptr<PointPicker> mPointPicker;
 
-    Utils::DimensionBoundsData mDimensionBounds;
-
-    ofSoundStream mSoundStream;
-
-    bool bStreamStarted = false;
-
-    // settings -----------------------------------
-    
-    std::atomic<bool> mLoopPlayheads = false;
-    std::atomic<bool> mJumpSameFileAllowed = false;
-    std::atomic<int> mJumpSameFileMinTimeDiff = 2;
-    std::atomic<int> mCrossoverJumpChanceX1000 = 50;
-    std::atomic<int> mCrossfadeSampleLength = 256;
-    std::atomic<int> mMaxJumpDistanceSpaceX1000 = 50;
-    std::atomic<int> mMaxJumpTargets = 5;
-    std::atomic<int> mVolumeX1000 = 500;
-    std::atomic<bool> mDynamicPanEnabled = false;
-    std::atomic<int> mDynamicPanDimensionIndex = 0;
-    std::atomic<int> mPanningStrengthX1000 = 1000;
+    // TODO - apply a pause/unpause fade over the length of a single buffer
+    //bool audioPauseFadeApplied = false;
+    //bool audioUnpauseFadeApplied = false;
 
     // TODO //implement stereo loading of source files, not just mono
     // TODO //panning bias? to globally statically shift this acorex instance left/right
     // TODO //pan smoothing? average dynamic pan position with the previous and next X segments
+    
+    // audio states ------------------------------
 
+    ofSoundStream mSoundStream;
+    std::atomic<bool> bStreamStarted;
 
-    // thread safety ------------------------------
+    std::mutex mKillAudioOnlyAudioThreadBlockingMutex;
 
-    std::atomic<int> mActivePlayheads = 0;
+    std::mutex mRestartingAudioMutex;
+    std::atomic<bool> bRestartingAudioFlag;
+    std::atomic<bool> bRestartingAudioFlagConfirmed;
+
+    std::mutex mMissingOutputMutex;
+    std::atomic<bool> bMissingOutputFlag;
+    std::atomic<bool> bMissingOutputFlagConfirmed;
+
+    std::atomic<bool> bUserPauseFlag;
+
+    // playhead states ---------------------------
+
+    std::vector<Utils::AudioPlayhead> mPlayheads;
+    std::atomic<int> mActivePlayheads;
 
     std::mutex mNewPlayheadMutex;
     std::queue<Utils::AudioPlayhead> mNewPlayheads;
     std::queue<size_t> mPlayheadsToKill;
-    size_t playheadCounter = 0;
+    size_t playheadCounter;
 
     std::mutex mVisualPlayheadUpdateMutex;
     std::vector<Utils::VisualPlayhead> mVisualPlayheads;
 
+    // audio thread local copies ------------------
+
+    std::mutex mDimensionBoundsMutex;
+    Utils::DimensionBoundsData mDimensionBounds;
+
     std::mutex mTimeCorpusMutex;
     std::vector<ofMesh> mTimeCorpus;
 
-    std::atomic<bool> bKillFlag = false;
+    // settings -----------------------------------
+
+    std::atomic<bool> mLoopPlayheads;
+    std::atomic<bool> mJumpSameFileAllowed;
+    std::atomic<int> mJumpSameFileMinTimeDiff;
+    std::atomic<int> mCrossoverJumpChanceX1000;
+    std::atomic<int> mCrossfadeSampleLength;
+    std::atomic<int> mMaxJumpDistanceSpaceX1000;
+    std::atomic<int> mMaxJumpTargets;
+    std::atomic<int> mVolumeX1000;
+    std::atomic<bool> mDynamicPanEnabled;
+    std::atomic<int> mDynamicPanDimensionIndex;
+    std::atomic<int> mPanningStrengthX1000;
 };
 
 } // namespace Explorer

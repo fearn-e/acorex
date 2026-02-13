@@ -24,62 +24,73 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
-void Explorer::LiveView::Initialise ( )
+Explorer::LiveView::LiveView ( )
+    : bListenersAdded ( false ),
+    bDebug ( false ), bDraw ( false ), b3D ( true ), bColorFullSpectrum ( false ), bLoopAudio ( false ),
+    mKeyboardMoveState { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // W, A, S, D, R, F, Q, E, Z, X
+    mCamMoveSpeedScaleAdjusted ( SpaceDefs::mCamMoveSpeed ),
+    deltaTime ( 0.1f ), lastUpdateTime ( 0 ),
+    mDisabledAxis ( Utils::Axis::NONE ), xLabel ( "X" ), yLabel ( "Y" ), zLabel ( "Z" ), colorDimension ( -1 ),
+    mCamPivot ( ofPoint ( 0, 0, 0 ) ),
+    mLastMouseX ( 0 ), mLastMouseY ( 0 )
 {
-    mAudioPlayback.SetFlagKill ( );
+    mAudioPlayback.SetRawView ( mRawView );
 
-    if ( !bPointersShared )
-    {
         mPointPicker = std::make_shared<Explorer::PointPicker> ( );
         mAudioPlayback.SetPointPicker ( mPointPicker );
-        bPointersShared = true;
+
+    mCamera = std::make_shared<ofCamera> ( );
+    mPointPicker->SetCamera ( mCamera );
     }
 
-    glPointSize ( 3.0f );
+void Explorer::LiveView::Initialise ( )
+{
+    Clear ( );
 
-    mStatsCorpus.clear ( );
+    glPointSize ( 3.0f ); // TODO - might be fine in the constructor instead
+
+    Init3DCam ( );
+
+    mDimensionBounds.CalculateBounds ( *mRawView->GetDataset ( ) );
+
+    mAudioPlayback.SetDimensionBounds ( mDimensionBounds.GetBoundsData ( ) );
+
+    mPointPicker->Initialise ( *mRawView->GetDataset ( ), mDimensionBounds );
+
+    AddListeners ( );
+}
+
+void Explorer::LiveView::Clear ( )
+{
+    RemoveListeners ( );
+
+    mAudioPlayback.ClearAndKillAudio ( );
+
+    mPointPicker->Clear ( );
+
+    mDimensionBounds.Clear ( );
+
     mTimeCorpus.clear ( );
 
+    mPlayheads.clear ( );
+
+    bDraw = false;
     b3D = true;
     bColorFullSpectrum = false;
     bLoopAudio = false;
 
     for ( auto& each : mKeyboardMoveState ) { each = false; }
+    mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed;
 
     mDisabledAxis = Utils::Axis::NONE;
     xLabel = "X"; yLabel = "Y"; zLabel = "Z";
     colorDimension = -1;
-
-    if ( mPlayingFiles.size ( ) > 0 ) { mPlayingFiles.clear ( ); }
-    if ( mPlayingTimeHeads.size ( ) > 0 ) { mPlayingTimeHeads.clear ( ); }
-
-    mCamera = std::make_shared<ofCamera> ( );
-    Init3DCam ( );
-
-    mDimensionBounds.CalculateBounds ( *mRawView->GetDataset ( ) );
-
-    mPointPicker->SetCamera ( mCamera );
-    mPointPicker->Initialise ( *mRawView->GetDataset ( ), mDimensionBounds );
-
-    if ( mSoundPlayers.size ( ) > 0 ) { mSoundPlayers.clear ( ); }
-    if ( mPlayingFiles.size ( ) > 0 ) { mPlayingFiles.clear ( ); }
-    if ( mPlayingTimeHeads.size ( ) > 0 ) { mPlayingTimeHeads.clear ( ); }
-
-    mAudioPlayback.Initialise ( mDimensionBounds.GetBoundsData ( ) );
-    mAudioPlayback.SetRawView ( mRawView );
-
-    AddListeners ( );
 }
 
-void Explorer::LiveView::ChangeAudioSettings ( size_t bufferSize, ofSoundDevice outDevice )
+bool Explorer::LiveView::StartAudio ( std::pair<ofSoundDevice, int> audioSettings )
 {
-    mAudioPlayback.RestartAudio ( mRawView->GetDataset ( )->analysisSettings.sampleRate, bufferSize, outDevice );
-}
-
-void Explorer::LiveView::KillAudio ( )
-{
-    mAudioPlayback.SetFlagKill ( );
-    mAudioPlayback.WaitForKillConfirm ( );
+    bool audioOutputValidated = mAudioPlayback.StartRestartAudio ( mRawView->GetDataset ( )->analysisSettings.sampleRate, audioSettings.second, audioSettings.first );
+    return audioOutputValidated;
 }
 
 void Explorer::LiveView::Exit ( )
@@ -90,7 +101,7 @@ void Explorer::LiveView::Exit ( )
 
 void Explorer::LiveView::AddListeners ( )
 {
-    if ( listenersAdded ) { return; }
+    if ( bListenersAdded ) { return; }
     ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
     ofAddListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
     ofAddListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
@@ -98,12 +109,12 @@ void Explorer::LiveView::AddListeners ( )
     ofAddListener ( ofEvents ( ).mouseScrolled, this, &Explorer::LiveView::MouseEvent );
     ofAddListener ( ofEvents ( ).keyPressed, this, &Explorer::LiveView::KeyEvent );
     ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
-    listenersAdded = true;
+    bListenersAdded = true;
 }
 
 void Explorer::LiveView::RemoveListeners ( )
 {
-    if ( !listenersAdded ) { return; }
+    if ( !bListenersAdded ) { return; }
     ofRemoveListener ( ofEvents ( ).mouseMoved, this, &Explorer::LiveView::MouseEvent );
     ofRemoveListener ( ofEvents ( ).mouseDragged, this, &Explorer::LiveView::MouseEvent );
     ofRemoveListener ( ofEvents ( ).mousePressed, this, &Explorer::LiveView::MouseEvent );
@@ -111,7 +122,7 @@ void Explorer::LiveView::RemoveListeners ( )
     ofRemoveListener ( ofEvents ( ).mouseScrolled, this, &Explorer::LiveView::MouseEvent );
     ofRemoveListener ( ofEvents ( ).keyPressed, this, &Explorer::LiveView::KeyEvent );
     ofRemoveListener ( ofEvents ( ).keyReleased, this, &Explorer::LiveView::KeyEvent );
-    listenersAdded = false;
+    bListenersAdded = false;
 }
 
 // Process Functions ---------------------------

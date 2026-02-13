@@ -117,6 +117,7 @@
     <ClCompile Include="src\ExplorerMenu.cpp" />
     <ClCompile Include="src\Explorer\LiveView.cpp" />
     <ClCompile Include="src\Explorer\RawView.cpp" />
+    <ClCompile Include="src\Utils\AudioSettingsManager.cpp" />
     <ClCompile Include="src\Utils\AudioFileLoader.cpp" />
     <ClCompile Include="src\Utils\DatasetConversion.cpp" />
     <ClCompile Include="src\Utils\JSON.cpp" />
@@ -152,7 +153,7 @@
     <ClInclude Include="src\Utils\DimensionBounds.h" />
     <ClInclude Include="src\Utils\InterfaceDefs.h" />
     <ClInclude Include="src\Utils\JSON.h" />
-    <ClInclude Include="src\Utils\PlatformAudioAPIs.h" />
+    <ClInclude Include="src\Utils\AudioSettingsManager.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\libs\dr_flac.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\libs\dr_mp3.h" />

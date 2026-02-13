@@ -88,6 +88,9 @@
     <ClCompile Include="src\Explorer\AudioPlayback.cpp">
       <Filter>src\Explorer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utils\AudioSettingsManager.cpp">
+      <Filter>src\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -239,7 +242,7 @@
     <ClInclude Include="src\Explorer\AudioPlayback.h">
       <Filter>src\Explorer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\PlatformAudioAPIs.h">
+    <ClInclude Include="src\Utils\AudioSettingsManager.h">
       <Filter>src\Utils</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\TemporaryDefaults.h">

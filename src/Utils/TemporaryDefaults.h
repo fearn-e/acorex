@@ -28,14 +28,15 @@
 #define DEFAULT_PANNING_STRENGTH_X1000 1000 // out of 1000
 
 // default explorer audio device settings - store globally (xml?)
-#ifdef TARGET_LINUX
-    #define DEFAULT_API ofSoundDevice::ALSA
-#elif defined(TARGET_OSX)
-    #define DEFAULT_API ofSoundDevice::OSX_CORE
-#elif defined(TARGET_WIN32)
-    #define DEFAULT_API ofSoundDevice::MS_WASAPI
-#endif
-#define DEFAULT_OUT_DEVICE_NAME ""
+//#ifdef TARGET_LINUX
+//    #define DEFAULT_API ofSoundDevice::ALSA
+//#elif defined(TARGET_OSX)
+//    #define DEFAULT_API ofSoundDevice::OSX_CORE
+//#elif defined(TARGET_WIN32)
+//    #define DEFAULT_API ofSoundDevice::MS_WASAPI
+//#endif
+#define DEFAULT_API 0
+//#define DEFAULT_OUT_DEVICE_NAME ""
 #define DEFAULT_OUT_DEVICE_INDEX 0
 #define DEFAULT_BUFFER_SIZE 512
 
