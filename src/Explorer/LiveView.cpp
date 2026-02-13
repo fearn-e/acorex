@@ -22,6 +22,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofEvents.h>
 #include <random>
 
+#include "utils/TemporaryKeybinds.h"
+
 using namespace Acorex;
 
 Explorer::LiveView::LiveView ( )
@@ -36,12 +38,12 @@ Explorer::LiveView::LiveView ( )
 {
     mAudioPlayback.SetRawView ( mRawView );
 
-        mPointPicker = std::make_shared<Explorer::PointPicker> ( );
-        mAudioPlayback.SetPointPicker ( mPointPicker );
+    mPointPicker = std::make_shared<Explorer::PointPicker> ( );
+    mAudioPlayback.SetPointPicker ( mPointPicker );
 
     mCamera = std::make_shared<ofCamera> ( );
     mPointPicker->SetCamera ( mCamera );
-    }
+}
 
 void Explorer::LiveView::Initialise ( )
 {
@@ -965,43 +967,44 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
 
     if ( args.type == ofKeyEventArgs::Type::Pressed )
     {
-        if ( args.key == 'w' || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = true; }
-        else if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = true; }
-        else if ( args.key == 's' || args.key == OF_KEY_DOWN ) { mKeyboardMoveState[2] = true; }
-        else if ( args.key == 'd' || args.key == OF_KEY_RIGHT ) { mKeyboardMoveState[3] = true; }
-        else if ( args.key == 'r' ) { mKeyboardMoveState[4] = true; }
-        else if ( args.key == 'f' ) { mKeyboardMoveState[5] = true; }
-        else if ( args.key == 'q' ) { mKeyboardMoveState[6] = true; }
-        else if ( args.key == 'e' ) { mKeyboardMoveState[7] = true; }
-        else if ( args.key == 'z' ) { mKeyboardMoveState[8] = true; }
-        else if ( args.key == 'x' ) { mKeyboardMoveState[9] = true; }
-        else if ( args.key == ' ' ) { CreatePlayhead ( ); }
+        if ( args.key == ACOREX_KEYBIND_CAMERA_MOVE_FORWARD || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = true; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_MOVE_LEFT || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = true; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_MOVE_BACKWARD || args.key == OF_KEY_DOWN ) { mKeyboardMoveState[2] = true; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_MOVE_RIGHT || args.key == OF_KEY_RIGHT ) { mKeyboardMoveState[3] = true; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_MOVE_UP ) { mKeyboardMoveState[4] = true; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_MOVE_DOWN ) { mKeyboardMoveState[5] = true; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_ROTATE_LEFT ) { mKeyboardMoveState[6] = true; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_ROTATE_RIGHT ) { mKeyboardMoveState[7] = true; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_ZOOM_IN ) { mKeyboardMoveState[8] = true; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_ZOOM_OUT ) { mKeyboardMoveState[9] = true; }
     }
     else if ( args.type == ofKeyEventArgs::Type::Released )
     {
-        if ( args.key == 'w' || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = false; }
-        else if ( args.key == 'a' || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = false; }
-        else if ( args.key == 's' || args.key == OF_KEY_DOWN ) { mKeyboardMoveState[2] = false; }
-        else if ( args.key == 'd' || args.key == OF_KEY_RIGHT ) { mKeyboardMoveState[3] = false; }
-        else if ( args.key == 'r' ) { mKeyboardMoveState[4] = false; }
-        else if ( args.key == 'f' ) { mKeyboardMoveState[5] = false; }
-        else if ( args.key == 'q' ) { mKeyboardMoveState[6] = false; }
-        else if ( args.key == 'e' ) { mKeyboardMoveState[7] = false; }
-        else if ( args.key == 'z' ) { mKeyboardMoveState[8] = false; }
-        else if ( args.key == 'x' ) { mKeyboardMoveState[9] = false; }
-        else if ( args.key == OF_KEY_F3 ) { bDebug = !bDebug; }
-        else if ( args.key == 'l' ) // TODO - delete, deprecated, tied to old sound system
-        {
-            bLoopAudio = !bLoopAudio;
-            for ( auto& each : mSoundPlayers ) { each.setLoop ( bLoopAudio ); }
-        }
-        else if ( args.key == 'c' ) // TODO - might not need this key either just like the ENTER key below, remove also?
-        { 
-            if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
-            {
-                ofSetClipboardString ( mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )] );
-            }
-        }
+        if ( args.key == ACOREX_KEYBIND_CAMERA_MOVE_FORWARD || args.key == OF_KEY_UP ) { mKeyboardMoveState[0] = false; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_MOVE_LEFT || args.key == OF_KEY_LEFT ) { mKeyboardMoveState[1] = false; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_MOVE_BACKWARD || args.key == OF_KEY_DOWN ) { mKeyboardMoveState[2] = false; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_MOVE_RIGHT || args.key == OF_KEY_RIGHT ) { mKeyboardMoveState[3] = false; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_MOVE_UP ) { mKeyboardMoveState[4] = false; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_MOVE_DOWN ) { mKeyboardMoveState[5] = false; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_ROTATE_LEFT ) { mKeyboardMoveState[6] = false; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_ROTATE_RIGHT ) { mKeyboardMoveState[7] = false; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_ZOOM_IN ) { mKeyboardMoveState[8] = false; }
+        else if ( args.key == ACOREX_KEYBIND_CAMERA_ZOOM_OUT ) { mKeyboardMoveState[9] = false; }
+        else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD ) { CreatePlayhead ( ); }
+        else if ( args.key == ACOREX_KEYBIND_AUDIO_PAUSE ) { mAudioPlayback.UserInvokedPause ( ); }
+        else if ( args.key == ACOREX_KEYBIND_TOGGLE_DEBUG_VIEW ) { bDebug = !bDebug; }
+        // else if ( args.key == 'l' ) // TODO - delete, deprecated, tied to old sound system
+        // {
+        //     bLoopAudio = !bLoopAudio;
+        //     for ( auto& each : mSoundPlayers ) { each.setLoop ( bLoopAudio ); }
+        // }
+        //else if ( args.key == 'c' ) // TODO - might not need this key either just like the ENTER key below, remove also?
+        //{ 
+        //    if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
+        //    {
+        //        ofSetClipboardString ( mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )] );
+        //    }
+        //}
         /*else if ( args.key == OF_KEY_RETURN ) // TODO - decide whether change key or just remove entirely? enter triggers this even when
         *                                       // typing in file dialogs or settings boxes, so it's annoying
         *                                       // -- but might not even need this functionality at all anymore, i don't really use it

@@ -248,6 +248,9 @@
     <ClInclude Include="src\Utils\TemporaryDefaults.h">
       <Filter>src\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\Utils\TemporaryKeybinds.h">
+      <Filter>src\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

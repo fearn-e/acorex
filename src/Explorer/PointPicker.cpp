@@ -20,6 +20,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofGraphics.h>
 #include <of3DGraphics.h>
 
+#include "Utils/TemporaryKeybinds.h"
+
 using namespace Acorex;
 
 Explorer::PointPicker::PointPicker ( )
@@ -70,7 +72,7 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
 }
 
 void Explorer::PointPicker::Clear ( )
-    {
+{
     std::lock_guard<std::mutex> lock ( mPointPickerMutex );
 
     mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 0 );
@@ -162,10 +164,10 @@ void Explorer::PointPicker::AddListeners ( )
 void Explorer::PointPicker::RemoveListeners ( )
 {
     if ( !bListenersAdded ) { return; }
-        ofRemoveListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
-        ofRemoveListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
-        ofRemoveListener ( ofEvents ( ).mouseReleased, this, &Explorer::PointPicker::MouseReleased );
-        bListenersAdded = false;
+    ofRemoveListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
+    ofRemoveListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
+    ofRemoveListener ( ofEvents ( ).mouseReleased, this, &Explorer::PointPicker::MouseReleased );
+    bListenersAdded = false;
 }
 
 void Explorer::PointPicker::ScaleDataset ( Utils::DataSet& scaledDataset, const Utils::DimensionBounds& dimensionBounds )
@@ -464,12 +466,12 @@ void Explorer::PointPicker::KeyEvent ( ofKeyEventArgs& args )
 {
     if ( args.type == ofKeyEventArgs::Type::Released )
     {
-        if ( args.key == OF_KEY_F3 ) { bDebug = !bDebug; }
-        else if ( args.key == OF_KEY_TAB ) { bPicker = !bPicker; }
+        if ( args.key == ACOREX_KEYBIND_TOGGLE_DEBUG_VIEW ) { bDebug = !bDebug; }
+        else if ( args.key == ACOREX_KEYBIND_TOGGLE_POINT_PICKER ) { bPicker = !bPicker; }
     }
 }
 
 void Explorer::PointPicker::MouseReleased ( ofMouseEventArgs& args )
 {
-    if ( args.button == 2 ) { bClicked = true; }
+    if ( args.button == OF_MOUSE_BUTTON_RIGHT ) { bClicked = true; }
 }
