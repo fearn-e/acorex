@@ -80,7 +80,7 @@ public:
 
     // Setters & Getters ----------------------------
 
-    void SetRawView ( std::shared_ptr<RawView>& rawPointer ) { mRawView = rawPointer; }
+    void SetRawView ( std::shared_ptr<RawView>& rawPointer ) { mRawView = rawPointer; mAudioPlayback.SetRawView ( rawPointer ); }
     void Set3D ( bool is3D ) { b3D = is3D; }
     void SetColorFullSpectrum ( bool fullSpectrum ) { bColorFullSpectrum = fullSpectrum; }
 

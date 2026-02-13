@@ -36,8 +36,6 @@ Explorer::LiveView::LiveView ( )
     mCamPivot ( ofPoint ( 0, 0, 0 ) ),
     mLastMouseX ( 0 ), mLastMouseY ( 0 )
 {
-    mAudioPlayback.SetRawView ( mRawView );
-
     mPointPicker = std::make_shared<Explorer::PointPicker> ( );
     mAudioPlayback.SetPointPicker ( mPointPicker );
 
