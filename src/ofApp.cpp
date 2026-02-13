@@ -27,6 +27,7 @@ void ofApp::setup ( )
 {   
     mLayout = std::make_shared<Acorex::Utils::MenuLayout> ( );
     mAnalyserMenu.SetMenuLayout ( mLayout );
+    mExplorerMenu.SetMenuLayout ( mLayout );
 
     ofSetWindowTitle ( "ACorEx" );
 
@@ -43,21 +44,20 @@ void ofApp::setup ( )
     InitialiseUI ( );
 
     mAnalyserMenu.Initialise ( );
-    //mExplorerMenu.Initialise ( );
 
-    //mAnalyserMenu.Open ( );
-    //mExplorerMenu.Show ( );
+    // opens startup panel
+    mExplorerMenu.Initialise ( );
 }
 
 void ofApp::update ( )
 {
-    //if ( mExploreToggle ) { mExplorerMenu.Update ( ); }
+    mExplorerMenu.Update ( );
 }
 
 void ofApp::draw ( )
 {
     mAnalyserMenu.Draw ( );
-    //if ( mExploreToggle ) { mExplorerMenu.Draw ( ); }
+    mExplorerMenu.Draw ( );
 
     {
         ofSetColor ( mColors.interfaceBackgroundColor );
@@ -74,7 +74,7 @@ void ofApp::draw ( )
 void ofApp::exit ( )
 {
     mAnalyserMenu.Exit ( );
-    //mExplorerMenu.Exit ( );
+    mExplorerMenu.Exit ( );
 }
 
 void ofApp::windowResized ( int w, int h )
@@ -83,7 +83,7 @@ void ofApp::windowResized ( int w, int h )
     mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout->getTopBarHeight ( ) / 4 );
     mDPIToggle.setPosition ( ofGetWidth ( ) - mLayout->getTopBarButtonWidth ( ) - 5, mLayout->getTopBarHeight ( ) / 4 );
 
-    //mExplorerMenu.WindowResized ( );
+    mExplorerMenu.WindowResized ( );
 }
 
 void ofApp::AddListeners ( )
@@ -157,12 +157,12 @@ void ofApp::ExploreToggled ( bool& value )
 {
     if ( value )
     {
-        //mExplorerMenu.Show ( );
+        mExplorerMenu.Open ( );
         mAnalyseToggle = false;
     }
     else
     {
-        //mExplorerMenu.Hide ( );
+        mExplorerMenu.Close ( );
     }
 }
 
@@ -173,6 +173,6 @@ void ofApp::DPIToggled ( bool& value )
     else { ofxGuiDisableHiResDisplay ( ); }
 
     RefreshUI ( );
-    //mExplorerMenu.RefreshUI ( );
+    mExplorerMenu.RefreshUI ( );
     mAnalyserMenu.RefreshUI ( );
 }

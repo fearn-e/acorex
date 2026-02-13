@@ -18,32 +18,68 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Explorer/RawView.h"
 #include "Explorer/LiveView.h"
+#include "Utils/AudioSettingsManager.h"
 #include "Utils/InterfaceDefs.h"
 #include <ofxGui.h>
 #include <ofxDropdown.h>
 
-#define ACOREX_OFX_DROPDOWN_SCROLL_SPEED 32 // TODO - move to separate header?
+// TODO - split mMainPanel into 3 panels, Header, Corpus Controls, an Audio Manager
+// TODO(cont) - to match the implementation in AnalyserMenu
 
 namespace Acorex {
 
 class ExplorerMenu {
 public:
-    ExplorerMenu ( ) { }
+    ExplorerMenu ( );
     ~ExplorerMenu ( ) { }
 
-    void Initialise ( bool HiDpi );
-    void Show ( );
-    void Hide ( );
+    void Initialise ( );
+    void Clear ( );
+
+    void Open ( ) { Initialise ( ); }
+    void Close ( ) { Clear ( ); }
+
     void Draw ( );
     void Update ( );
     void Exit ( );
 
+    void RefreshUI ( );
     void WindowResized ( );
+
+    void SetMenuLayout ( std::shared_ptr<Utils::MenuLayout>& menuLayout ) { mLayout = menuLayout; }
 
 private:
     void SlowUpdate ( );
-    void AddListeners ( );
+
+    // UI Management -------------------------------
+
+    void OpenStartupPanel ( );
+    void OpenFullPanel ( const std::vector<std::string>& corpusDimensionDefaults );
+
+    void SetupPanelSectionHeader ( std::string corpusNameLabel );
+    // TODO - pass in default values for all the controls
+    void SetupPanelSectionCorpusControls ( std::vector<std::string> corpusDimensionDefaults );
+    void SetupPanelSectionAudioManager ( );
+
+    void RefreshStartupPanelUI ( );
+    void RefreshFullPanelUI ( );
+
+    // Listeners -----------------------------------
+
     void RemoveListeners ( );
+
+    void AddListenersHeader ( );
+    void RemoveListenersHeader ( );
+    
+    void AddListenersCorpusControls ( );
+    void RemoveListenersCorpusControls ( );
+
+    void AddListenersAudioManager ( );
+    void RemoveListenersAudioManager ( );
+
+    bool bListenersAddedHeader;
+    bool bListenersAddedCorpusControls;
+    bool bListenersAddedAudioManager;
 
     // Main Functions ------------------------------
 
@@ -73,33 +109,34 @@ private:
 
     void MouseReleased ( ofMouseEventArgs& args );
 
-    void SetBufferSize ( int& bufferSize );
-    void SetOutDevice ( string& outDevice );
+    void RescanDevices ( );
 
-    std::vector<ofSoundDevice> outDevices;
-    ofSoundDevice currentOutDevice;
-    int currentBufferSize;
+    void SetApi ( string& api );
+    void SetOutDevice ( string& outDevice );
+    void SetBufferSize ( int& bufferSize );
+
+    void AudioOutputFailed ( );
+
+    void WriteDeviceDropdownNames ( );
+    void WriteApiDropdownDeviceCounts ( );
 
     // States --------------------------------------
 
-    bool bDraw = false;
+    bool bDraw;
+    bool bOpenCorpusWarningDraw;
 
-    bool bIsCorpusOpen = false; bool bBlockDimensionFilling = false;
-    bool bOpenCorpusDrawWarning = false;
-    bool bInitialiseShouldLoad = false;
-    bool bListenersAdded = false;
+    bool bIsCorpusOpen;
+    bool bBlockDimensionFilling;
     
-    bool bViewPointerShared = false;
-
-    Utils::Axis mDisabledAxis = Utils::Axis::NONE;
+    Utils::Axis mDisabledAxis;
 
     // Timing --------------------------------------
 
-    int mLastUpdateTime = 0;
-    const int mSlowUpdateInterval = 100;
+    int mLastUpdateTime;
+    const int mSlowUpdateInterval;
 
-    int mOpenCorpusButtonClickTime = 0;
-    const int mOpenCorpusButtonTimeout = 3000;
+    int mOpenCorpusButtonClickTime;
+    const int mOpenCorpusButtonTimeout;
 
     // Panels --------------------------------------
 
@@ -125,15 +162,17 @@ private:
     unique_ptr<ofxDropdown> mDimensionDropdownDynamicPan;
     ofxFloatSlider mPanningStrengthSlider;
 
-    unique_ptr<ofxIntDropdown> mBufferSizeDropdown;
+    unique_ptr<ofxDropdown> mApiDropdown;
     unique_ptr<ofxDropdown> mOutDeviceDropdown;
+    unique_ptr<ofxIntDropdown> mBufferSizeDropdown;
 
     // Acorex Objects ------------------------------
 
     std::shared_ptr<Explorer::RawView> mRawView;
     Explorer::LiveView mLiveView;
+    Utils::AudioSettingsManager mAudioSettingsManager;
     Utils::Colors mColors;
-    Utils::MenuLayout mLayout;
+    std::shared_ptr<Utils::MenuLayout> mLayout;
 };
 
 } // namespace Acorex

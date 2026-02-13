@@ -42,6 +42,7 @@ private:
     unsigned int topBarHeight               = 40;
     unsigned int topBarButtonWidth          = 100;
     unsigned int panelRowHeight             = 18;
+    unsigned int panelDropdownRowHeight     = 36;
     unsigned int analyseMainPanelWidth      = 200;
     unsigned int analyseAnalysisPanelWidth  = 315;
     unsigned int analyseReductionPanelWidth = 300;
@@ -63,6 +64,7 @@ public:
         topBarHeight                = (hiDpi ? topBarHeight * hiDpiMultiplier               : topBarHeight / hiDpiMultiplier);
         topBarButtonWidth           = (hiDpi ? topBarButtonWidth * hiDpiMultiplier          : topBarButtonWidth / hiDpiMultiplier);
         panelRowHeight              = (hiDpi ? panelRowHeight * hiDpiMultiplier             : panelRowHeight / hiDpiMultiplier);
+        panelDropdownRowHeight      = (hiDpi ? panelDropdownRowHeight * hiDpiMultiplier     : panelDropdownRowHeight / hiDpiMultiplier);
         analyseMainPanelWidth       = (hiDpi ? analyseMainPanelWidth * hiDpiMultiplier      : analyseMainPanelWidth / hiDpiMultiplier);
         analyseAnalysisPanelWidth   = (hiDpi ? analyseAnalysisPanelWidth * hiDpiMultiplier  : analyseAnalysisPanelWidth / hiDpiMultiplier);
         analyseReductionPanelWidth  = (hiDpi ? analyseReductionPanelWidth * hiDpiMultiplier : analyseReductionPanelWidth / hiDpiMultiplier);
@@ -78,6 +80,7 @@ public:
     unsigned int getTopBarHeight ( ) const { return topBarHeight; }
     unsigned int getTopBarButtonWidth ( ) const { return topBarButtonWidth; }
     unsigned int getPanelRowHeight ( ) const { return panelRowHeight; }
+    unsigned int getPanelDropdownRowHeight ( ) const { return panelDropdownRowHeight; }
     unsigned int getAnalyseMainPanelWidth ( ) const { return analyseMainPanelWidth; }
     unsigned int getAnalyseAnalysisPanelWidth ( ) const { return analyseAnalysisPanelWidth; }
     unsigned int getAnalyseReductionPanelWidth ( ) const { return analyseReductionPanelWidth; }
