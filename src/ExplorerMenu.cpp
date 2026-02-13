@@ -373,7 +373,7 @@ void ExplorerMenu::SetupPanelSectionAudioManager ( )
     mOutDeviceDropdown->enableCollapseOnSelection ( );
     mOutDeviceDropdown->setDropDownPosition ( ofxDropdown::DD_LEFT );
     mOutDeviceDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
-    mOutDeviceDropdown->setSelectedValueByName ( std::to_string ( outDeviceIndex ), false );
+    mOutDeviceDropdown->setSelectedValueByIndex ( outDeviceIndex, false );
     mMainPanel.add ( mOutDeviceDropdown.get ( ) );
 
     mBufferSizeDropdown.reset ( );
