@@ -18,14 +18,16 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Utils/TemporaryDefaults.h"
 
-ofApp::ofApp ( ) : bListenersAdded ( false ) { }
-
-void ofApp::setup ( )
-{   
+ofApp::ofApp ( ) :
+    bListenersAdded ( false )
+{
     mLayout = std::make_shared<Acorex::Utils::MenuLayout> ( );
     mAnalyserMenu.SetMenuLayout ( mLayout );
     mExplorerMenu.SetMenuLayout ( mLayout );
+}
 
+void ofApp::setup ( )
+{   
     ofSetWindowTitle ( "ACorEx" );
 
     ofSetVerticalSync ( true );
