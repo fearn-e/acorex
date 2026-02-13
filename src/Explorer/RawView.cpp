@@ -22,6 +22,11 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
+Explorer::RawView::RawView ( ) : mHopSize ( 512 ), mCorpusName ( "" )
+{
+    ClearCorpus ( );
+}
+
 bool Explorer::RawView::LoadCorpus ( )
 {
     ofFileDialogResult corpusFile = ofSystemLoadDialog ( "Select corpus file" );
@@ -38,6 +43,8 @@ bool Explorer::RawView::LoadCorpus ( )
 
 bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string& name )
 {
+    ClearCorpus ( );
+
     if ( name.find ( ".json" ) == std::string::npos )
     {
         ofLogError ( "RawView" ) << "Invalid file type";
@@ -53,13 +60,25 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
 
     if ( !success ) { return success; }
 
-    mCorpusName = name.substr ( 0, name.size ( ) - 5 );
-
     success = LoadAudioSet ( mDataset );
     
-    if ( success ) { mHopSize = mDataset.analysisSettings.windowFFTSize / mDataset.analysisSettings.hopFraction; }
+    if ( success )
+    {
+        mHopSize = mDataset.analysisSettings.windowFFTSize / mDataset.analysisSettings.hopFraction;
+        mCorpusName = name.substr ( 0, name.size ( ) - 5 );
+    }
+    else
+    {
+        ClearCorpus ( );
+    }
 
     return success;
+}
+
+void Explorer::RawView::ClearCorpus ( )
+{
+    mCorpusName = "";
+    mDataset = { };
 }
 
 bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
@@ -103,6 +122,11 @@ bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
     }
 
     return true;
+}
+
+bool Explorer::RawView::IsLoaded ( ) const
+{
+    return !mCorpusName.empty ( ) && mDataset.fileList.size ( ) > 0;
 }
 
 bool Explorer::RawView::IsTimeAnalysis ( ) const

@@ -25,12 +25,15 @@ namespace Explorer {
 
 class RawView {
 public:
-    RawView ( ) { }
+    RawView ( );
     ~RawView ( ) { }
 
     bool LoadCorpus ( ); // asks user for file path, calls function below
     bool LoadCorpus ( const std::string& path, const std::string& name ); // load corpus from file path
 
+    void ClearCorpus ( );
+
+    bool IsLoaded ( ) const; // check if dataset is loaded
     bool IsTimeAnalysis ( ) const; // check if dataset is time analysis
     bool IsReduction ( ) const; // check if dataset is a reduced corpus
     std::vector<std::string> GetDimensions ( ) const; // get dimensions from dataset
@@ -45,7 +48,7 @@ public:
 private:
     bool LoadAudioSet ( Utils::DataSet& dataset ); // load all audio files in dataset into memory
 
-    size_t mHopSize = 512;
+    size_t mHopSize;
 
     std::string mCorpusName;
     Utils::DataSet mDataset;
