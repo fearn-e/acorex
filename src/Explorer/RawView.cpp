@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2024 Elowyn Fearne
+Copyright (c) 2024-2026 Elowyn Fearne
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -22,135 +22,159 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
+Explorer::RawView::RawView ( ) : mHopSize ( 512 ), mCorpusName ( "" )
+{
+    ClearCorpus ( );
+}
+
 bool Explorer::RawView::LoadCorpus ( )
 {
-	ofFileDialogResult corpusFile = ofSystemLoadDialog ( "Select corpus file" );
-	if ( !corpusFile.bSuccess )
-	{
-		ofLogError ( "RawView" ) << "Invalid load query";
-		return false;
-	}
-	
-	bool success = LoadCorpus ( corpusFile.getPath ( ), corpusFile.getName ( ) );
-	
-	return success;
+    ofFileDialogResult corpusFile = ofSystemLoadDialog ( "Select corpus file" );
+    if ( !corpusFile.bSuccess )
+    {
+        ofLogError ( "RawView" ) << "Invalid load query";
+        return false;
+    }
+    
+    bool success = LoadCorpus ( corpusFile.getPath ( ), corpusFile.getName ( ) );
+    
+    return success;
 }
 
 bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string& name )
 {
-	if ( name.find ( ".json" ) == std::string::npos )
-	{
-		ofLogError ( "RawView" ) << "Invalid file type";
-		return false;
-	}
-	if ( !ofFile::doesFileExist ( path ) )
-	{
-		ofLogError ( "RawView" ) << "File does not exist";
-		return false;
-	}
+    ClearCorpus ( );
 
-	bool success = mJSON.Read ( path, mDataset );
+    if ( name.find ( ".json" ) == std::string::npos )
+    {
+        ofLogError ( "RawView" ) << "Invalid file type";
+        return false;
+    }
+    if ( !ofFile::doesFileExist ( path ) )
+    {
+        ofLogError ( "RawView" ) << "File does not exist";
+        return false;
+    }
 
-	if ( !success ) { return success; }
+    bool success = mJSON.Read ( path, mDataset );
 
-	mCorpusName = name.substr ( 0, name.size ( ) - 5 );
+    if ( !success ) { return success; }
 
-	success = LoadAudioSet ( mDataset );
-	
-	if ( success ) { mHopSize = mDataset.analysisSettings.windowFFTSize / mDataset.analysisSettings.hopFraction; }
+    success = LoadAudioSet ( mDataset );
+    
+    if ( success )
+    {
+        mHopSize = mDataset.analysisSettings.windowFFTSize / mDataset.analysisSettings.hopFraction;
+        mCorpusName = name.substr ( 0, name.size ( ) - 5 );
+    }
+    else
+    {
+        ClearCorpus ( );
+    }
 
-	return success;
+    return success;
+}
+
+void Explorer::RawView::ClearCorpus ( )
+{
+    mCorpusName = "";
+    mDataset = { };
 }
 
 bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
 {
-	dataset.audio.loaded.clear ( );
-	dataset.audio.raw.clear ( );
+    dataset.audio.loaded.clear ( );
+    dataset.audio.raw.clear ( );
 
-	for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
-	{
-		fluid::RealVector fileData;
+    for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
+    {
+        fluid::RealVector fileData;
 
-		if ( !mAudioLoader.ReadAudioFile ( dataset.fileList[fileIndex], fileData, dataset.analysisSettings.sampleRate ) )
-		{
-			ofLogError ( "RawView" ) << "Failed to load audio file: " << dataset.fileList[fileIndex];
-			dataset.audio.loaded.push_back ( false );
-			dataset.audio.raw.push_back ( ofSoundBuffer ( ) );
-			continue;
-		}
+        if ( !mAudioLoader.ReadAudioFile ( dataset.fileList[fileIndex], fileData, dataset.analysisSettings.sampleRate ) )
+        {
+            ofLogError ( "RawView" ) << "Failed to load audio file: " << dataset.fileList[fileIndex];
+            dataset.audio.loaded.push_back ( false );
+            dataset.audio.raw.push_back ( ofSoundBuffer ( ) );
+            continue;
+        }
 
-		ofSoundBuffer audioData;
-		audioData.copyFrom ( std::vector<float> ( fileData.begin ( ), fileData.end ( ) ), 1, dataset.analysisSettings.sampleRate );
+        ofSoundBuffer audioData;
+        audioData.copyFrom ( std::vector<float> ( fileData.begin ( ), fileData.end ( ) ), 1, dataset.analysisSettings.sampleRate );
 
-		dataset.audio.raw.push_back ( audioData );
-		dataset.audio.loaded.push_back ( true );
-	}
-	
-	bool failedToLoad = true;
-	for ( int i = 0; i < dataset.audio.loaded.size ( ); i++ )
-	{
-		if ( dataset.audio.loaded[i] )
-		{
-			failedToLoad = false;
-			break;
-		}
-	}
+        dataset.audio.raw.push_back ( audioData );
+        dataset.audio.loaded.push_back ( true );
+    }
+    
+    bool failedToLoad = true;
+    for ( int i = 0; i < dataset.audio.loaded.size ( ); i++ )
+    {
+        if ( dataset.audio.loaded[i] )
+        {
+            failedToLoad = false;
+            break;
+        }
+    }
 
-	if ( failedToLoad )
-	{
-		ofLogError ( "RawView" ) << "Failed to load any audio files";
-		return false;
-	}
+    if ( failedToLoad )
+    {
+        ofLogError ( "RawView" ) << "Failed to load any audio files";
+        return false;
+    }
 
-	return true;
+    return true;
+}
+
+bool Explorer::RawView::IsLoaded ( ) const
+{
+    return !mCorpusName.empty ( ) && mDataset.fileList.size ( ) > 0;
 }
 
 bool Explorer::RawView::IsTimeAnalysis ( ) const
 {
-	return mDataset.analysisSettings.bTime;
+    return mDataset.analysisSettings.bTime;
 }
 
 bool Explorer::RawView::IsReduction ( ) const
 {
-	return mDataset.analysisSettings.hasBeenReduced;
+    return mDataset.analysisSettings.hasBeenReduced;
 }
 
 std::vector<std::string> Explorer::RawView::GetDimensions ( ) const
 {
-	return mDataset.dimensionNames;
+    return mDataset.dimensionNames;
 }
 
 std::vector<std::string> Explorer::RawView::GetStatistics ( ) const
 {
-	return mDataset.statisticNames;
+    return mDataset.statisticNames;
 }
 
 std::string Explorer::RawView::GetCorpusName ( ) const
 {
-	return mCorpusName;
+    return mCorpusName;
 }
 
 Utils::AudioData* Explorer::RawView::GetAudioData ( )
 {
-	return &mDataset.audio;
+    return &mDataset.audio;
 }
 
 Utils::TimeData* Explorer::RawView::GetTimeData ( )
 {
-	return &mDataset.time;
+    return &mDataset.time;
 }
 
 Utils::StatsData* Explorer::RawView::GetStatsData ( )
 {
-	return &mDataset.stats;
+    return &mDataset.stats;
 }
 
 Utils::DataSet* Explorer::RawView::GetDataset ( )
 {
-	return &mDataset;
+    return &mDataset;
 }
 
 size_t Explorer::RawView::GetHopSize ( ) const
 {
-	return mHopSize;
+    return mHopSize;
 }

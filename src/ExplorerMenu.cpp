@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2024 Elowyn Fearne
+Copyright (c) 2024-2026 Elowyn Fearne
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -15,663 +15,934 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 */
 
 #include "./ExplorerMenu.h"
+#include "Utils/InterfaceDefs.h"
 #include <ofUtils.h>
 #include <of3dGraphics.h>
 
+#include "Utils/TemporaryDefaults.h"
+
 using namespace Acorex;
 
-void ExplorerMenu::Initialise ( bool HiDpi )
+ExplorerMenu::ExplorerMenu ( ) :    mSlowUpdateInterval ( 100 ), mOpenCorpusButtonTimeout ( 3000 ),
+                                    bListenersAddedHeader ( false ), bListenersAddedCorpusControls ( false ), 
+                                    bListenersAddedAudioManager ( false )
 {
-	// DPI -----------------------------------------
-    {
-		if ( HiDpi ) { mLayout.enableHiDpi ( ); }
-		else { mLayout.disableHiDpi ( ); }
-	}
-	
-	// Pointer Sharing -----------------------------
-	{
-		if ( !bViewPointerShared )
-		{
-			mRawView = std::make_shared<Explorer::RawView> ( );
-			mLiveView.SetRawView ( mRawView );
-			bViewPointerShared = true;
-		}
-	}
+    mRawView = std::make_shared<Explorer::RawView> ( );
+    mLiveView.SetRawView ( mRawView );
 
-	// Clear --------------------------------------
-	{
-		RemoveListeners ( );
+    bDraw = false;
+    bOpenCorpusWarningDraw = false;
 
-		mMainPanel.clear ( );
+    bIsCorpusOpen = false;
+    bBlockDimensionFilling = false;
 
-		mLiveView.Initialise ( );
-	}
+    mDisabledAxis = Utils::Axis::NONE;
 
-	// Variables ----------------------------------
-	{
-		mLastUpdateTime = 0;
-		mSlowUpdateInterval = 100;
-
-		mOpenCorpusButtonClickTime = 0;
-		mOpenCorpusButtonTimeout = 3000;
-	}
-
-	// States ------------------------------------
-	{
-		bIsCorpusOpen = false;
-		bOpenCorpusDrawWarning = false;
-	}
-
-	int dropdownScrollSpeed = 32;
-
-	// Find Audio Devices --------------------------
-	{
-		outDevices.clear ( );
-		ofSoundStream temp;
-		for ( int i = 1; i < ofSoundDevice::Api::NUM_APIS; i++ )
-		{
-			std::vector<ofSoundDevice> devices = temp.getDeviceList ( (ofSoundDevice::Api)i );
-			for ( auto& device : devices )
-			{
-				if ( device.outputChannels == 0 ) { continue; }
-				outDevices.push_back ( device );
-			}
-		}
-	}
-
-	// Main Panel --------------------------------
-	{
-		mMainPanel.setup ( );
-
-		mMainPanel.add ( mCorpusNameLabel.setup ( "", bInitialiseShouldLoad ? mRawView->GetCorpusName ( ) : "No Corpus Loaded" ) );
-		mMainPanel.add ( mOpenCorpusButton.setup ( "Open Corpus" ) );
-
-		mCorpusNameLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mOpenCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-
-		mDimensionDropdownX.reset ( );
-		mDimensionDropdownY.reset ( );
-		mDimensionDropdownZ.reset ( );
-		mDimensionDropdownColor.reset ( );
-		mDimensionDropdownDynamicPan.reset ( );
-
-		mDimensionDropdownX = make_unique<ofxDropdown> ( (string)"X Dimension", dropdownScrollSpeed );
-		mDimensionDropdownY = make_unique<ofxDropdown>( (string)"Y Dimension", dropdownScrollSpeed);
-		mDimensionDropdownZ = make_unique<ofxDropdown>( (string)"Z Dimension", dropdownScrollSpeed);
-		mDimensionDropdownColor = make_unique<ofxDropdown>( (string)"Color Dimension", dropdownScrollSpeed);
-		mDimensionDropdownDynamicPan = make_unique<ofxDropdown> ( (string)"Dynamic Panning Dimension", dropdownScrollSpeed );
-
-		if ( bInitialiseShouldLoad )
-		{
-			mDimensionDropdownX->add ( "None" );
-			mDimensionDropdownY->add ( "None" );
-			mDimensionDropdownZ->add ( "None" );
-			mDimensionDropdownColor->add ( "None" );
-			mDimensionDropdownDynamicPan->add ( "None" );
-
-			for ( auto& dimension : mRawView->GetDimensions ( ) )
-			{
-				mDimensionDropdownX->add ( dimension );
-				mDimensionDropdownY->add ( dimension );
-				mDimensionDropdownZ->add ( dimension );
-				mDimensionDropdownColor->add ( dimension );
-				mDimensionDropdownDynamicPan->add ( dimension );
-			}
-
-			mMainPanel.add ( mDimensionDropdownX.get ( ) );
-			mMainPanel.add ( mDimensionDropdownY.get ( ) );
-			mMainPanel.add ( mDimensionDropdownZ.get ( ) );
-			mMainPanel.add ( mDimensionDropdownColor.get ( ) );
-			mMainPanel.add ( mDimensionDropdownDynamicPan.get ( ) ); // TODO - move this down in the UI with the other pan controls
-		}
-
-		mDimensionDropdownX->disableMultipleSelection ( );
-		mDimensionDropdownY->disableMultipleSelection ( );
-		mDimensionDropdownZ->disableMultipleSelection ( );
-		mDimensionDropdownColor->disableMultipleSelection ( );
-		mDimensionDropdownDynamicPan->disableMultipleSelection ( );
-
-		mDimensionDropdownX->enableCollapseOnSelection ( );
-		mDimensionDropdownY->enableCollapseOnSelection ( );
-		mDimensionDropdownZ->enableCollapseOnSelection ( );
-		mDimensionDropdownColor->enableCollapseOnSelection ( );
-		mDimensionDropdownDynamicPan->enableCollapseOnSelection ( );
-
-		mDimensionDropdownX->setDropDownPosition ( ofxDropdown::DD_LEFT );
-		mDimensionDropdownY->setDropDownPosition ( ofxDropdown::DD_LEFT );
-		mDimensionDropdownZ->setDropDownPosition ( ofxDropdown::DD_LEFT );
-		mDimensionDropdownColor->setDropDownPosition ( ofxDropdown::DD_LEFT );
-		mDimensionDropdownDynamicPan->setDropDownPosition ( ofxDropdown::DD_LEFT );
-
-		mDimensionDropdownX->setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mDimensionDropdownY->setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mDimensionDropdownZ->setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mDimensionDropdownColor->setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mDimensionDropdownDynamicPan->setBackgroundColor ( mColors.interfaceBackgroundColor );
-
-		if ( bInitialiseShouldLoad )
-		{
-			mMainPanel.add ( mColorSpectrumSwitcher.setup ( "Color Spectrum: Red<->Blue", false ) );
-			mColorSpectrumSwitcher.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mLiveView.SetColorFullSpectrum ( false );
-
-			mMainPanel.add ( mLoopPlayheadsToggle.setup ( "Loop when reaching end of a file", true ) );
-			mLoopPlayheadsToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mLiveView.GetAudioPlayback ( )->SetLoopPlayheads ( true );
-
-			mMainPanel.add ( mJumpSameFileAllowedToggle.setup ( "Jump to same file allowed", true ) );
-			mJumpSameFileAllowedToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mLiveView.GetAudioPlayback ( )->SetJumpSameFileAllowed ( true );
-
-			mMainPanel.add ( mJumpSameFileMinTimeDiffSlider.setup ( "Same file jump min point difference", 2, 1, 30 ) );
-			mJumpSameFileMinTimeDiffSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mLiveView.GetAudioPlayback ( )->SetJumpSameFileMinTimeDiff ( 2 );
-
-			mMainPanel.add ( mCrossoverJumpChanceSlider.setup ( "Crossover Jump Chance", 0.95, 0.0, 1.0 ) );
-			mCrossoverJumpChanceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mLiveView.GetAudioPlayback ( )->SetCrossoverJumpChance ( 950 );
-
-			size_t maxCrossfadeLength = mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction;
-			mMainPanel.add ( mCrossfadeMaxSampleLengthSlider.setup ( "Crossfade Max Sample Length", maxCrossfadeLength, 1, maxCrossfadeLength ) );
-			mCrossfadeMaxSampleLengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mLiveView.GetAudioPlayback ( )->SetCrossfadeSampleLength ( maxCrossfadeLength );
-
-			mMainPanel.add ( mMaxJumpDistanceSpaceSlider.setup ( "Max Jump Distance Space", 0.05, 0.0, 1.0 ) );
-			mMaxJumpDistanceSpaceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mLiveView.GetAudioPlayback ( )->SetMaxJumpDistanceSpace ( 50 );
-
-			mMainPanel.add ( mMaxJumpTargetsSlider.setup ( "Max Jump Targets", 5, 1, 10 ) );
-			mMaxJumpTargetsSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mLiveView.GetAudioPlayback ( )->SetMaxJumpTargets ( 5 );
-
-			mMainPanel.add(mVolumeSlider.setup("Volume", 0.5, 0.0, 1.0));
-			mVolumeSlider.setBackgroundColor(mColors.interfaceBackgroundColor);
-			mLiveView.GetAudioPlayback()->SetVolume(500);
-			
-			mMainPanel.add ( mPanningStrengthSlider.setup ( "Panning Width", 1.0, 0.0, 1.0) );
-			mPanningStrengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mLiveView.GetAudioPlayback ( )->SetPanningStrength ( 1000 );
-		}
-
-		mBufferSizeDropdown.reset ( );
-		mOutDeviceDropdown.reset ( );
-
-		mBufferSizeDropdown = make_unique<ofxIntDropdown>( (string)"Buffer Size", dropdownScrollSpeed);
-		mOutDeviceDropdown = make_unique<ofxDropdown>( (string)"Output Device", dropdownScrollSpeed);
-
-		for ( int i = 0; i < outDevices.size ( ); i++ )
-		{
-			std::string deviceName = (std::to_string ( i + 1 ) + ". " + outDevices[i].name);
-			mOutDeviceDropdown->add ( deviceName );
-		}
-
-		{
-			mBufferSizeDropdown->add ( 64 );
-			mBufferSizeDropdown->add ( 128 );
-			mBufferSizeDropdown->add ( 256 );
-			mBufferSizeDropdown->add ( 512 );
-			mBufferSizeDropdown->add ( 1024 );
-			mBufferSizeDropdown->add ( 2048 );
-			mBufferSizeDropdown->add ( 4096 );
-			mBufferSizeDropdown->add ( 8192 );
-		}
-
-		mBufferSizeDropdown->disableMultipleSelection ( );
-		mOutDeviceDropdown->disableMultipleSelection ( );
-
-		mBufferSizeDropdown->enableCollapseOnSelection ( );
-		mOutDeviceDropdown->enableCollapseOnSelection ( );
-
-		mBufferSizeDropdown->setDropDownPosition ( ofxIntDropdown::DD_LEFT );
-		mOutDeviceDropdown->setDropDownPosition ( ofxDropdown::DD_LEFT );
-
-		mBufferSizeDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mOutDeviceDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
-
-		mBufferSizeDropdown->setSelectedValueByIndex ( 3, true ); currentBufferSize = 512;
-		//find the device named "Default Device"
-		size_t defaultDevice = 0;
-		for ( size_t i = 0; i < outDevices.size ( ); i++ )
-		{
-			if ( outDevices[i].name == "Default Device" ) { defaultDevice = i; break; }
-		}
-		mOutDeviceDropdown->setSelectedValueByIndex(defaultDevice, true); currentOutDevice = outDevices[defaultDevice];
-
-		mMainPanel.add ( mBufferSizeDropdown.get ( ) );
-		mMainPanel.add ( mOutDeviceDropdown.get ( ) );
-
-		mMainPanel.setPosition ( ofGetWidth ( ) - mLayout.explorePanelWidth, mLayout.explorePanelOriginY );
-		mMainPanel.setWidthElements ( mLayout.explorePanelWidth );
-		mMainPanel.disableHeader ( );
-	}
-
-	// Listeners --------------------------------
-	{
-		mOpenCorpusButton.addListener ( this, &ExplorerMenu::OpenCorpus );
-		mDimensionDropdownX->addListener ( this, &ExplorerMenu::SwapDimensionX );
-		mDimensionDropdownY->addListener ( this, &ExplorerMenu::SwapDimensionY );
-		mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SwapDimensionZ );
-		mDimensionDropdownColor->addListener ( this, &ExplorerMenu::SwapDimensionColor );
-		mColorSpectrumSwitcher.addListener ( this, &ExplorerMenu::SwitchColorSpectrum );
-		mLoopPlayheadsToggle.addListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
-		mJumpSameFileAllowedToggle.addListener ( this, &ExplorerMenu::ToggleJumpSameFileAllowed );
-		mJumpSameFileMinTimeDiffSlider.addListener ( this, &ExplorerMenu::SetJumpSameFileMinTimeDiff );
-		mCrossoverJumpChanceSlider.addListener ( this, &ExplorerMenu::SetCrossoverJumpChance );
-		mCrossfadeMaxSampleLengthSlider.addListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
-		mMaxJumpDistanceSpaceSlider.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
-		mMaxJumpTargetsSlider.addListener ( this, &ExplorerMenu::SetMaxJumpTargets );
-		mVolumeSlider.addListener ( this, &ExplorerMenu::SetVolume );
-
-		mDimensionDropdownDynamicPan->addListener ( this, &ExplorerMenu::SwapDimensionDynamicPan );
-		mPanningStrengthSlider.addListener ( this, &ExplorerMenu::SetPanningStrength );
-
-		mBufferSizeDropdown->addListener ( this, &ExplorerMenu::SetBufferSize );
-		mOutDeviceDropdown->addListener ( this, &ExplorerMenu::SetOutDevice );
-
-		ofAddListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
-		bListenersAdded = true;
-	}
-
-	bInitialiseShouldLoad = false;
+    mLastUpdateTime = 0;
+    mOpenCorpusButtonClickTime = 0;
 }
 
-void ExplorerMenu::Show ( )
+void ExplorerMenu::Initialise ( )
 {
-	bDraw = true;
+    Clear ( );
+
+    OpenStartupPanel ( );
 }
 
-// hides menu without resetting
-void ExplorerMenu::Hide ( )
+void ExplorerMenu::Clear ( )
 {
-	bDraw = false;
+    bDraw = false;
+    bOpenCorpusWarningDraw = false;
+
+    bIsCorpusOpen = false;
+    bBlockDimensionFilling = false;
+
+    mDisabledAxis = Utils::Axis::NONE;
+
+    mLiveView.Clear ( );
+
+    mRawView->ClearCorpus ( );
+
+    RemoveListeners ( );
+
+    mMainPanel.clear ( );
 }
 
 void ExplorerMenu::Draw ( )
 {
-	if ( !bDraw ) { return; }
+    if ( !bDraw ) { return; }
 
-	mLiveView.Draw ( );
+    mLiveView.Draw ( );
 
-	// call pointpicker draw
+    // call pointpicker draw
 
-	mMainPanel.draw ( );
+    mMainPanel.draw ( );
 
-	// draw playhead panels
+    // draw playhead panels
 
-	{
-		for ( auto& playhead : mLiveView.GetPlayheads ( ) )
-		{
-			// highlight the playhead position if panel is hovered
-			if ( playhead.panelRect.inside ( ofGetMouseX ( ), ofGetMouseY ( ) ) )
-				playhead.highlight = true;
-			else
-				playhead.highlight = false;
+    {
+        for ( auto& playhead : mLiveView.GetPlayheads ( ) )
+        {
+            // highlight the playhead position if panel is hovered
+            if ( playhead.panelRect.inside ( ofGetMouseX ( ), ofGetMouseY ( ) ) )
+                playhead.highlight = true;
+            else
+                playhead.highlight = false;
 
-			// draw panel
-			ofSetColor ( playhead.color );
-			ofDrawRectangle ( playhead.panelRect );
-			ofSetColor ( 200, 200, 200, 255 );
-			ofDrawRectangle ( playhead.panelRect.x, playhead.panelRect.y, playhead.panelRect.width, playhead.panelRect.height / 2 );
-			// draw playhead id in the top left
-			ofSetColor ( 0, 0, 0, 255 );
-			ofDrawBitmapString ( "ID:" + ofToString ( playhead.playheadID ), playhead.panelRect.x + 5, playhead.panelRect.y + 15 );
-			// draw file index in the top left
-			std::string fileName = mRawView->GetDataset ( )->fileList[playhead.fileIndex];
-			fileName = fileName.substr ( fileName.find_last_of ( "/" ) + 1 );
-			fileName = fileName.substr ( fileName.find_last_of ( "\\" ) + 1 );
-			int maxLength = playhead.panelRect.width / 10 - 7;
-			if ( fileName.length ( ) > maxLength )
-			{
-				fileName = fileName.substr ( 0, maxLength );
-				fileName += "...";
-			}
-			ofDrawBitmapString ( "File: " + fileName, playhead.panelRect.x + 5, playhead.panelRect.y + 30 );
-			// draw sample index in the top left
-			ofDrawBitmapString ( "Samp: " + ofToString ( playhead.sampleIndex ), playhead.panelRect.x + 5, playhead.panelRect.y + 45 );
+            // draw panel
+            ofSetColor ( playhead.color );
+            ofDrawRectangle ( playhead.panelRect );
+            ofSetColor ( 200, 200, 200, 255 );
+            ofDrawRectangle ( playhead.panelRect.x, playhead.panelRect.y, playhead.panelRect.width, playhead.panelRect.height / 2 );
+            // draw playhead id in the top left
+            ofSetColor ( 0, 0, 0, 255 );
+            ofDrawBitmapString ( "ID:" + ofToString ( playhead.playheadID ), playhead.panelRect.x + 5, playhead.panelRect.y + 15 );
+            // draw file index in the top left
+            std::string fileName = mRawView->GetDataset ( )->fileList[playhead.fileIndex];
+            fileName = fileName.substr ( fileName.find_last_of ( "/" ) + 1 );
+            fileName = fileName.substr ( fileName.find_last_of ( "\\" ) + 1 );
+            int maxLength = playhead.panelRect.width / 10 - 7;
+            if ( fileName.length ( ) > maxLength )
+            {
+                fileName = fileName.substr ( 0, maxLength );
+                fileName += "...";
+            }
+            ofDrawBitmapString ( "File: " + fileName, playhead.panelRect.x + 5, playhead.panelRect.y + 30 );
+            // draw sample index in the top left
+            ofDrawBitmapString ( "Samp: " + ofToString ( playhead.sampleIndex ), playhead.panelRect.x + 5, playhead.panelRect.y + 45 );
 
-			// draw another smaller rectangle in the top right corner of the panel
-			int smallRectSize = ( playhead.panelRect.width + playhead.panelRect.height ) / 10;
-			ofSetColor ( mColors.interfaceBackgroundColor );
-			ofDrawRectangle ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, smallRectSize, smallRectSize );
-			// draw an X in the top right corner of the panel
-			ofSetColor ( 255, 0, 0, 255 );
-			ofSetLineWidth ( 2 );
-			ofDrawLine ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, playhead.panelRect.x + playhead.panelRect.width, playhead.panelRect.y + smallRectSize );
-			ofDrawLine ( playhead.panelRect.x + playhead.panelRect.width, playhead.panelRect.y, playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y + smallRectSize );
-		}
-	}
+            // draw another smaller rectangle in the top right corner of the panel
+            int smallRectSize = ( playhead.panelRect.width + playhead.panelRect.height ) / 10;
+            ofSetColor ( mColors.interfaceBackgroundColor );
+            ofDrawRectangle ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, smallRectSize, smallRectSize );
+            // draw an X in the top right corner of the panel
+            ofSetColor ( 255, 0, 0, 255 );
+            ofSetLineWidth ( 2 );
+            ofDrawLine ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, playhead.panelRect.x + playhead.panelRect.width, playhead.panelRect.y + smallRectSize );
+            ofDrawLine ( playhead.panelRect.x + playhead.panelRect.width, playhead.panelRect.y, playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y + smallRectSize );
+        }
+    }
 }
 
 void ExplorerMenu::Update ( )
 {
-	mLiveView.Update ( );
+    mLiveView.Update ( );
 
-	if ( ofGetElapsedTimeMillis ( ) - mLastUpdateTime > mSlowUpdateInterval )
-	{
-		mLastUpdateTime = ofGetElapsedTimeMillis ( );
-		SlowUpdate ( );
-	}
+    if ( ofGetElapsedTimeMillis ( ) - mLastUpdateTime > mSlowUpdateInterval )
+    {
+        mLastUpdateTime = ofGetElapsedTimeMillis ( );
+        SlowUpdate ( );
+    }
 }
 
 void ExplorerMenu::SlowUpdate ( )
 {
-	if ( bOpenCorpusDrawWarning && ofGetElapsedTimeMillis ( ) - mOpenCorpusButtonClickTime > mOpenCorpusButtonTimeout )
-	{
-		bOpenCorpusDrawWarning = false;
-		mOpenCorpusButton.setName ( "Open Corpus" );
-	}
+    mLiveView.SlowUpdate ( );
 
-	mLiveView.SlowUpdate ( );
+    if ( bOpenCorpusWarningDraw && ofGetElapsedTimeMillis ( ) - mOpenCorpusButtonClickTime > mOpenCorpusButtonTimeout )
+    {
+        bOpenCorpusWarningDraw = false;
+        mOpenCorpusButton.setName ( "Open Corpus" );
+    }
 }
 
 void ExplorerMenu::Exit ( )
 {
-	RemoveListeners ( );
-	mLiveView.Exit ( );
+    RemoveListenersHeader ( );
+    RemoveListenersCorpusControls ( );
+    RemoveListenersAudioManager ( );
+    mLiveView.Exit ( );
 }
+
+// UI Management -------------------------------
+
+void ExplorerMenu::OpenStartupPanel ( )
+{
+    mAudioSettingsManager.RefreshDeviceListChanged ( );
+
+    RemoveListeners ( );
+
+    mMainPanel.clear ( );
+
+    mMainPanel.setup ( );
+
+    SetupPanelSectionHeader ( "No Corpus Loaded" );
+
+    SetupPanelSectionAudioManager ( );
+
+    mMainPanel.setPosition ( ofGetWidth ( ) - mLayout->getExplorePanelWidth ( ), mLayout->getModePanelOriginY ( ) );
+    mMainPanel.setWidthElements ( mLayout->getExplorePanelWidth ( ) );
+    mMainPanel.disableHeader ( );
+
+    AddListenersHeader ( );
+    AddListenersAudioManager ( );
+
+    bDraw = true;
+}
+
+void ExplorerMenu::OpenFullPanel ( const Utils::ExploreSettings& settings )
+{
+    mAudioSettingsManager.RefreshDeviceListChanged ( );
+
+    RemoveListeners ( );
+
+    mMainPanel.clear ( );
+
+    mMainPanel.setup ( );
+
+    SetupPanelSectionHeader ( mRawView->GetCorpusName ( ) );
+
+    SetupPanelSectionCorpusControls ( settings );
+
+    SetupPanelSectionAudioManager ( );
+
+    mMainPanel.setPosition ( ofGetWidth ( ) - mLayout->getExplorePanelWidth ( ), mLayout->getModePanelOriginY ( ) );
+    mMainPanel.setWidthElements ( mLayout->getExplorePanelWidth ( ) );
+    mMainPanel.disableHeader ( );
+
+    AddListenersHeader ( );
+    AddListenersCorpusControls ( );
+    AddListenersAudioManager ( );
+
+    bDraw = true;
+}
+
+void ExplorerMenu::SetupPanelSectionHeader ( std::string corpusNameLabel )
+{
+    mMainPanel.add ( mCorpusNameLabel.setup ( "", corpusNameLabel ) );
+    mCorpusNameLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    mMainPanel.add ( mOpenCorpusButton.setup ( "Open Corpus" ) );
+    mOpenCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+}
+
+void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utils::ExploreSettings& settings )
+{
+    // X Dimension Dropdown
+    mDimensionDropdownX.reset ( );
+    mDimensionDropdownX = make_unique<ofxDropdown> ( static_cast<std::string>("X Dimension"), Utils::ofxDropdownScrollSpeed );
+    mDimensionDropdownX->add ( "None" );
+    for ( auto& dimension : mRawView->GetDimensions ( ) ) { mDimensionDropdownX->add ( dimension ); }
+    mMainPanel.add ( mDimensionDropdownX.get ( ) );
+    mDimensionDropdownX->disableMultipleSelection ( );
+    mDimensionDropdownX->enableCollapseOnSelection ( );
+    mDimensionDropdownX->setDropDownPosition ( ofxDropdown::DD_LEFT );
+    mDimensionDropdownX->setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mDimensionDropdownX->setSelectedValueByName ( settings.GetDimensionX ( ), false );
+
+    // Y Dimension Dropdown
+    mDimensionDropdownY.reset ( );
+    mDimensionDropdownY = make_unique<ofxDropdown> ( static_cast<std::string>("Y Dimension"), Utils::ofxDropdownScrollSpeed );
+    mDimensionDropdownY->add ( "None" );
+    for ( auto& dimension : mRawView->GetDimensions ( ) ) { mDimensionDropdownY->add ( dimension ); }
+    mMainPanel.add ( mDimensionDropdownY.get ( ) );
+    mDimensionDropdownY->disableMultipleSelection ( );
+    mDimensionDropdownY->enableCollapseOnSelection ( );
+    mDimensionDropdownY->setDropDownPosition ( ofxDropdown::DD_LEFT );
+    mDimensionDropdownY->setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mDimensionDropdownY->setSelectedValueByName ( settings.GetDimensionY ( ), false );
+
+    // Z Dimension Dropdown
+    mDimensionDropdownZ.reset ( );
+    mDimensionDropdownZ = make_unique<ofxDropdown> ( static_cast<std::string>("Z Dimension"), Utils::ofxDropdownScrollSpeed );
+    mDimensionDropdownZ->add ( "None" );
+    for ( auto& dimension : mRawView->GetDimensions ( ) ) { mDimensionDropdownZ->add ( dimension ); }
+    mMainPanel.add ( mDimensionDropdownZ.get ( ) );
+    mDimensionDropdownZ->disableMultipleSelection ( );
+    mDimensionDropdownZ->enableCollapseOnSelection ( );
+    mDimensionDropdownZ->setDropDownPosition ( ofxDropdown::DD_LEFT );
+    mDimensionDropdownZ->setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mDimensionDropdownZ->setSelectedValueByName ( settings.GetDimensionZ ( ), false );
+
+    // TODO - move color settings to the top of this panel section
+
+    // Colour Dimension Dropdown
+    mDimensionDropdownColor.reset ( );
+    mDimensionDropdownColor = make_unique<ofxDropdown> ( static_cast<std::string>("Color Dimension"), Utils::ofxDropdownScrollSpeed );
+    mDimensionDropdownColor->add ( "None" );
+    for ( auto& dimension : mRawView->GetDimensions ( ) ) { mDimensionDropdownColor->add ( dimension ); }
+    mMainPanel.add ( mDimensionDropdownColor.get ( ) );
+    mDimensionDropdownColor->disableMultipleSelection ( );
+    mDimensionDropdownColor->enableCollapseOnSelection ( );
+    mDimensionDropdownColor->setDropDownPosition ( ofxDropdown::DD_LEFT );
+    mDimensionDropdownColor->setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mDimensionDropdownColor->setSelectedValueByName ( settings.GetDimensionColor ( ), false );
+
+    // Color Spectrum Toggle
+    mMainPanel.add ( mColorSpectrumSwitcher.setup ( "Color Spectrum: Red<->Blue", settings.GetColorSpectrum ( ) ) );
+    mColorSpectrumSwitcher.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    //
+
+    // EOF Loop Playheads Toggle
+    mMainPanel.add ( mLoopPlayheadsToggle.setup ( "Loop when reaching end of a file", settings.GetLoopPlayheads ( ) ) );
+    mLoopPlayheadsToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    // Playheads Jump Same File Toggle
+    mMainPanel.add ( mJumpSameFileAllowedToggle.setup ( "Jump to same file allowed", settings.GetJumpSameFileAllowed ( ) ) );
+    mJumpSameFileAllowedToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    // Playheads Same File Jump Minimum Distance Slider
+    mMainPanel.add ( mJumpSameFileMinTimeDiffSlider.setup ( "Same file jump min point difference", settings.GetJumpSameFileMinTimeDiff ( ), 1, 30 ) );
+    mJumpSameFileMinTimeDiffSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    // Jump Chance Slider
+    mMainPanel.add ( mCrossoverJumpChanceSlider.setup ( "Crossover Jump Chance", settings.GetCrossoverJumpChance ( ), 0.0, 1.0 ) );
+    mCrossoverJumpChanceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    // Crossfade Max Length Slider
+    mMainPanel.add ( mCrossfadeSampleLengthSlider.setup ( "Crossfade Sample Length", settings.GetCrossfadeSampleLengthLimitedByHopSize ( ), 1, settings.GetHopSize ( ) ) );
+    mCrossfadeSampleLengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    // Jump Max Distance Slider
+    mMainPanel.add ( mMaxJumpDistanceSpaceSlider.setup ( "Max Jump Distance Space", settings.GetMaxJumpDistanceSpace ( ), 0.0, 1.0 ) );
+    mMaxJumpDistanceSpaceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    // Jump Max Targets Slider
+    mMainPanel.add ( mMaxJumpTargetsSlider.setup ( "Max Jump Targets", settings.GetMaxJumpTargets ( ), 1, 10 ) );
+    mMaxJumpTargetsSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    
+    // 
+    
+    // Global Volume Slider
+    mMainPanel.add ( mVolumeSlider.setup ( "Volume", settings.GetVolume ( ), 0.0, 1.0 ) );
+    mVolumeSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    // Dynamic Panning Dimension Dropdown
+    mDimensionDropdownDynamicPan.reset ( );
+    mDimensionDropdownDynamicPan = make_unique<ofxDropdown> ( static_cast<std::string>("Dynamic Panning Dimension"), Utils::ofxDropdownScrollSpeed );
+    mDimensionDropdownDynamicPan->add ( "None" );
+    for ( auto& dimension : mRawView->GetDimensions ( ) ) { mDimensionDropdownDynamicPan->add ( dimension ); }
+    mMainPanel.add ( mDimensionDropdownDynamicPan.get ( ) );
+    mDimensionDropdownDynamicPan->disableMultipleSelection ( );
+    mDimensionDropdownDynamicPan->enableCollapseOnSelection ( );
+    mDimensionDropdownDynamicPan->setDropDownPosition ( ofxDropdown::DD_LEFT );
+    mDimensionDropdownDynamicPan->setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mDimensionDropdownDynamicPan->setSelectedValueByName ( settings.GetDimensionDynamicPan ( ), false );
+
+    // Global Panning Strength Slider
+    mMainPanel.add ( mPanningStrengthSlider.setup ( "Panning Width", settings.GetPanningStrength ( ), 0.0, 1.0 ) );
+    mPanningStrengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+}
+
+void ExplorerMenu::SetupPanelSectionAudioManager ( )
+{
+    size_t apiIndex = mAudioSettingsManager.GetCurrentApiIndex ( );
+    size_t outDeviceIndex = mAudioSettingsManager.GetCurrentDeviceIndex ( );
+    int bufferSize = mAudioSettingsManager.GetCurrentBufferSize ( );
+
+    mApiDropdown.reset ( );
+    mApiDropdown = make_unique<ofxDropdown> ( (string)"Audio API", Utils::ofxDropdownScrollSpeed );
+    for ( size_t i = 0; i < mAudioSettingsManager.GetApiCount ( ); i++ )
+    {
+        std::string apiName = std::string ( mAudioSettingsManager.GetApiName ( i ) );
+        std::string descriptiveName = std::string ( mAudioSettingsManager.GetApiName ( i ) ) + " (" + std::to_string ( mAudioSettingsManager.GetOutDeviceCount ( i ) - 1 ) + " devices)";
+        
+        mApiDropdown->add ( apiName, descriptiveName );
+    }
+    mApiDropdown->disableMultipleSelection ( );
+    mApiDropdown->enableCollapseOnSelection ( );
+    mApiDropdown->setDropDownPosition ( ofxDropdown::DD_LEFT );
+    mApiDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mApiDropdown->setSelectedValueByIndex ( apiIndex, false );
+    mMainPanel.add ( mApiDropdown.get ( ) );
+
+    mOutDeviceDropdown.reset ( );
+    mOutDeviceDropdown = make_unique<ofxDropdown> ( (string)"Output Device", Utils::ofxDropdownScrollSpeed );
+    for ( size_t i = 0; i < mAudioSettingsManager.GetCurrentApiDevicesOut ( ).size ( ); i++ )
+    {
+        std::string deviceName = mAudioSettingsManager.GetCurrentApiDevicesOut ( )[i].name;
+        mOutDeviceDropdown->add ( deviceName );
+    }
+    mOutDeviceDropdown->disableMultipleSelection ( );
+    mOutDeviceDropdown->enableCollapseOnSelection ( );
+    mOutDeviceDropdown->setDropDownPosition ( ofxDropdown::DD_LEFT );
+    mOutDeviceDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mOutDeviceDropdown->setSelectedValueByIndex ( outDeviceIndex, false );
+    mMainPanel.add ( mOutDeviceDropdown.get ( ) );
+
+    mBufferSizeDropdown.reset ( );
+    mBufferSizeDropdown = make_unique<ofxIntDropdown> ( (string)"Buffer Size", Utils::ofxDropdownScrollSpeed );
+    for ( auto& each : mAudioSettingsManager.GetBufferSizes ( ) ) { mBufferSizeDropdown->add ( each ); }
+    mBufferSizeDropdown->disableMultipleSelection ( );
+    mBufferSizeDropdown->enableCollapseOnSelection ( );
+    mBufferSizeDropdown->setDropDownPosition ( ofxIntDropdown::DD_LEFT );
+    mBufferSizeDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mBufferSizeDropdown->setSelectedValueByName ( std::to_string ( bufferSize ), false );
+    mMainPanel.add ( mBufferSizeDropdown.get ( ) );
+}
+
+void ExplorerMenu::RefreshUI ( )
+{
+    if ( !bIsCorpusOpen )
+        RefreshStartupPanelUI ( );
+    else
+        RefreshFullPanelUI ( );
+}
+
+void ExplorerMenu::WindowResized ( )
+{
+    mMainPanel.setPosition ( ofGetWidth ( ) - mLayout->getExplorePanelWidth ( ), mLayout->getModePanelOriginY ( ) );
+
+    if ( !bIsCorpusOpen ) { return; }
+
+    int rectWidth = ofGetWidth ( ) / 10; int rectSpacing = ofGetWidth ( ) / 100; int rectHeight = ofGetHeight ( ) / 10;
+    for ( auto& playhead : mLiveView.GetPlayheads ( ) ) // TODO - fix playhead visual stacking when window resizing bug, easy fix
+    {
+        playhead.panelRect = ofRectangle ( rectSpacing * mLiveView.GetPlayheads ( ).size ( ) + rectWidth * (mLiveView.GetPlayheads ( ).size ( ) - 1),
+                                            ofGetHeight ( ) - rectHeight - 5,
+                                            rectWidth,
+                                            rectHeight );
+    }
+}
+
+void ExplorerMenu::RefreshStartupPanelUI ( )
+{
+    mMainPanel.setPosition ( ofGetWidth ( ) - mLayout->getExplorePanelWidth ( ), mLayout->getModePanelOriginY ( ) );
+
+    // for split later: header panel
+    mCorpusNameLabel.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mOpenCorpusButton.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+
+    // for split later: audio manager panel
+    mApiDropdown->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
+    mOutDeviceDropdown->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
+    mBufferSizeDropdown->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
+
+    mMainPanel.setWidthElements ( mLayout->getExplorePanelWidth ( ) );
+    mMainPanel.sizeChangedCB ( );
+}
+
+void ExplorerMenu::RefreshFullPanelUI ( )
+{
+    mMainPanel.setPosition ( ofGetWidth ( ) - mLayout->getExplorePanelWidth ( ), mLayout->getModePanelOriginY ( ) );
+
+    // for split later: header panel
+    mCorpusNameLabel.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mOpenCorpusButton.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+
+    // for split later: corpus controls panel
+    mDimensionDropdownX->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
+    mDimensionDropdownY->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
+    mDimensionDropdownZ->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
+    
+    mDimensionDropdownColor->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
+    mColorSpectrumSwitcher.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    
+    mLoopPlayheadsToggle.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mJumpSameFileAllowedToggle.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mJumpSameFileMinTimeDiffSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mCrossoverJumpChanceSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mCrossfadeSampleLengthSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mMaxJumpDistanceSpaceSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mMaxJumpTargetsSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    
+    mVolumeSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mDimensionDropdownDynamicPan->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
+    mPanningStrengthSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+
+    // for split later: audio manager panel
+    mApiDropdown->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
+    mOutDeviceDropdown->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
+    mBufferSizeDropdown->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
+
+    mMainPanel.setWidthElements ( mLayout->getExplorePanelWidth ( ) );
+    mMainPanel.sizeChangedCB ( );
+}
+
+// Listeners -----------------------------------
 
 void ExplorerMenu::RemoveListeners ( )
 {
-	if ( !bListenersAdded ) { return; }
-	mOpenCorpusButton.removeListener ( this, &ExplorerMenu::OpenCorpus );
-	mDimensionDropdownX->removeListener ( this, &ExplorerMenu::SwapDimensionX );
-	mDimensionDropdownY->removeListener ( this, &ExplorerMenu::SwapDimensionY );
-	mDimensionDropdownZ->removeListener ( this, &ExplorerMenu::SwapDimensionZ );
-	mDimensionDropdownColor->removeListener ( this, &ExplorerMenu::SwapDimensionColor );
-	mColorSpectrumSwitcher.removeListener ( this, &ExplorerMenu::SwitchColorSpectrum );
-	mLoopPlayheadsToggle.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
-	mJumpSameFileAllowedToggle.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
-	mJumpSameFileMinTimeDiffSlider.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
-	mCrossoverJumpChanceSlider.removeListener ( this, &ExplorerMenu::SetCrossoverJumpChance );
-	mCrossfadeMaxSampleLengthSlider.removeListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
-	mMaxJumpDistanceSpaceSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
-	mMaxJumpTargetsSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpTargets );
-	mVolumeSlider.removeListener(this, &ExplorerMenu::SetVolume);
+    RemoveListenersHeader ( );
+    RemoveListenersCorpusControls ( );
+    RemoveListenersAudioManager ( );
+}
 
-	mDimensionDropdownDynamicPan->removeListener ( this, &ExplorerMenu::SwapDimensionDynamicPan );
-	mPanningStrengthSlider.removeListener ( this, &ExplorerMenu::SetPanningStrength );
+void ExplorerMenu::AddListenersHeader ( )
+{
+    if ( bListenersAddedHeader ) { return; }
 
-	ofRemoveListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
-	bListenersAdded = false;
+    mOpenCorpusButton.addListener ( this, &ExplorerMenu::OpenCorpus );
+
+    bListenersAddedHeader = true;
+}
+
+void ExplorerMenu::RemoveListenersHeader ( )
+{
+    if ( !bListenersAddedHeader ) { return; }
+
+    mOpenCorpusButton.removeListener ( this, &ExplorerMenu::OpenCorpus );
+
+    bListenersAddedHeader = false;
+}
+
+void ExplorerMenu::AddListenersCorpusControls ( )
+{
+    if ( bListenersAddedCorpusControls ) { return; }
+
+    mDimensionDropdownX->addListener ( this, &ExplorerMenu::SwapDimensionXListener );
+    mDimensionDropdownY->addListener ( this, &ExplorerMenu::SwapDimensionYListener );
+    mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SwapDimensionZListener );
+
+    mDimensionDropdownColor->addListener ( this, &ExplorerMenu::SwapDimensionColorListener );
+    mColorSpectrumSwitcher.addListener ( this, &ExplorerMenu::SwitchColorSpectrumListener );
+
+    mLoopPlayheadsToggle.addListener ( this, &ExplorerMenu::ToggleLoopPlayheadsListener );
+    mJumpSameFileAllowedToggle.addListener ( this, &ExplorerMenu::ToggleJumpSameFileAllowedListener );
+    mJumpSameFileMinTimeDiffSlider.addListener ( this, &ExplorerMenu::SetJumpSameFileMinTimeDiffListener );
+    mCrossoverJumpChanceSlider.addListener ( this, &ExplorerMenu::SetCrossoverJumpChanceListener );
+    mCrossfadeSampleLengthSlider.addListener ( this, &ExplorerMenu::SetCrossfadeSampleLengthListener );
+    mMaxJumpDistanceSpaceSlider.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpaceListener );
+    mMaxJumpTargetsSlider.addListener ( this, &ExplorerMenu::SetMaxJumpTargetsListener );
+
+    mVolumeSlider.addListener ( this, &ExplorerMenu::SetVolumeListener );
+
+    mDimensionDropdownDynamicPan->addListener ( this, &ExplorerMenu::SwapDimensionDynamicPanListener );
+    mPanningStrengthSlider.addListener ( this, &ExplorerMenu::SetPanningStrengthListener );
+
+    ofAddListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
+
+    bListenersAddedCorpusControls = true;
+}
+
+void ExplorerMenu::RemoveListenersCorpusControls ( )
+{
+    if ( !bListenersAddedCorpusControls ) { return; }
+
+    mDimensionDropdownX->removeListener ( this, &ExplorerMenu::SwapDimensionXListener );
+    mDimensionDropdownY->removeListener ( this, &ExplorerMenu::SwapDimensionYListener );
+    mDimensionDropdownZ->removeListener ( this, &ExplorerMenu::SwapDimensionZListener );
+
+    mDimensionDropdownColor->removeListener ( this, &ExplorerMenu::SwapDimensionColorListener );
+    mColorSpectrumSwitcher.removeListener ( this, &ExplorerMenu::SwitchColorSpectrumListener );
+
+    mLoopPlayheadsToggle.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheadsListener );
+    mJumpSameFileAllowedToggle.removeListener ( this, &ExplorerMenu::ToggleJumpSameFileAllowedListener );
+    mJumpSameFileMinTimeDiffSlider.removeListener ( this, &ExplorerMenu::SetJumpSameFileMinTimeDiffListener );
+    mCrossoverJumpChanceSlider.removeListener ( this, &ExplorerMenu::SetCrossoverJumpChanceListener );
+    mCrossfadeSampleLengthSlider.removeListener ( this, &ExplorerMenu::SetCrossfadeSampleLengthListener );
+    mMaxJumpDistanceSpaceSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpaceListener );
+    mMaxJumpTargetsSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpTargetsListener );
+
+    mVolumeSlider.removeListener ( this, &ExplorerMenu::SetVolumeListener );
+
+    mDimensionDropdownDynamicPan->removeListener ( this, &ExplorerMenu::SwapDimensionDynamicPanListener );
+    mPanningStrengthSlider.removeListener ( this, &ExplorerMenu::SetPanningStrengthListener );
+
+    ofRemoveListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
+
+    bListenersAddedCorpusControls = false;
+}
+
+void ExplorerMenu::AddListenersAudioManager ( )
+{
+    if ( bListenersAddedAudioManager ) { return; }
+
+    ofAddListener ( mApiDropdown->dropdownHidden_E, this, &ExplorerMenu::SetApi );
+    ofAddListener ( mOutDeviceDropdown->dropdownHidden_E, this, &ExplorerMenu::SetOutDevice );
+    ofAddListener ( mBufferSizeDropdown->dropdownHidden_E, this, &ExplorerMenu::SetBufferSize );
+
+    ofAddListener ( mApiDropdown->dropdownWillShow_E, this, &ExplorerMenu::RescanDevices );
+    ofAddListener ( mOutDeviceDropdown->dropdownWillShow_E, this, &ExplorerMenu::RescanDevices );
+
+    bListenersAddedAudioManager = true;
+}
+
+void ExplorerMenu::RemoveListenersAudioManager ( )
+{
+    if ( !bListenersAddedAudioManager ) { return; }
+
+    ofRemoveListener ( mApiDropdown->dropdownHidden_E, this, &ExplorerMenu::SetApi );
+    ofRemoveListener ( mOutDeviceDropdown->dropdownHidden_E, this, &ExplorerMenu::SetOutDevice );
+    ofRemoveListener ( mBufferSizeDropdown->dropdownHidden_E, this, &ExplorerMenu::SetBufferSize );
+
+    ofRemoveListener ( mApiDropdown->dropdownWillShow_E, this, &ExplorerMenu::RescanDevices );
+    ofRemoveListener ( mOutDeviceDropdown->dropdownWillShow_E, this, &ExplorerMenu::RescanDevices );
+
+    bListenersAddedAudioManager = false;
 }
 
 // Main Functions ------------------------------
 
 void ExplorerMenu::OpenCorpus ( )
 {
-	bBlockDimensionFilling = true;
+    // TODO - is this flag still needed now that OpenFullPanel has all value sets set to bNotify = false?
+    bBlockDimensionFilling = true;
+    
+    if ( bIsCorpusOpen && !bOpenCorpusWarningDraw )
+    {
+        bOpenCorpusWarningDraw = true;
+        mOpenCorpusButtonClickTime = ofGetElapsedTimeMillis ( );
+        mOpenCorpusButton.setName ( "!! Close Current? !!" );
+        return;
+    }
+    bOpenCorpusWarningDraw = false;
 
-	if ( bIsCorpusOpen && !bOpenCorpusDrawWarning )
-	{
-		bOpenCorpusDrawWarning = true;
-		mOpenCorpusButtonClickTime = ofGetElapsedTimeMillis ( );
-		mOpenCorpusButton.setName ( "!! Close Current? !!" );
-		return;
-	}
+    // clear stuff
+    mLiveView.Clear ( );
 
-	bOpenCorpusDrawWarning = false;
-	mOpenCorpusButton.setName ( "Open Corpus" );
+    bIsCorpusOpen = false;
+    mRawView->ClearCorpus ( );
 
-	mLiveView.KillAudio ( ); // waits for confirmation
+    // load new corpus, return to startup panel if fails
+    if ( !mRawView->LoadCorpus ( ) )
+    {
+        Initialise ( );
+        return;
+    }
 
-	bool success = mRawView->LoadCorpus ( );
-	if ( !success ) { return; }
-	
-	bInitialiseShouldLoad = true;
-	Initialise ( mLayout.HiDpi );
+    Utils::ExploreSettings initialSettings { };
+    {
+        initialSettings.SetHopSize ( mRawView->GetHopSize ( ) );
 
-	mLiveView.CreatePoints ( );
+        initialSettings.SetDimensionX ( mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : "None" );
+        initialSettings.SetDimensionY ( mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : "None" );
+        initialSettings.SetDimensionZ ( mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : "None" );
 
-	// set default dropdown values
-	std::string xDimension = "None", yDimension = "None", zDimension = "None", colorDimension = "None", dynamicPanDimension = "None";
-	{
-		int dimensionCount = mRawView->GetDimensions ( ).size ( );
-		if ( mRawView->IsTimeAnalysis ( ) || mRawView->IsReduction ( ) )
-		{
-			xDimension = mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : "None";
-			yDimension = mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : "None";
-			zDimension = mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : "None";
-			colorDimension = mRawView->GetDimensions ( )[0];
-			dynamicPanDimension = "None";
-			// could be better served to immediately load one of the dimensions here?
-			//dynamicPanDimension = mRawView->GetDimensions ( ).size ( ) > 4 ? mRawView->GetDimensions ( )[4] : "None";
-		}
-		else // TODO - i think this is old stats code, remove?
-		{
-			xDimension = mRawView->GetDimensions ( ).size ( ) > 0 ? mRawView->GetDimensions ( )[0] : "None";
-			yDimension = mRawView->GetDimensions ( ).size ( ) > 7 ? mRawView->GetDimensions ( )[7] : "None";
-			zDimension = mRawView->GetDimensions ( ).size ( ) > 14 ? mRawView->GetDimensions ( )[14] : "None";
-			colorDimension = mRawView->GetDimensions ( ).size ( ) > 21 ? mRawView->GetDimensions ( )[21] : "None";
-			dynamicPanDimension = mRawView->GetDimensions ( ).size ( ) > 28 ? mRawView->GetDimensions ( )[28] : "None";
-		}
-		
-	}
+        initialSettings.SetDimensionColor ( mRawView->GetDimensions ( ).size ( ) > 4 ? mRawView->GetDimensions ( )[4] : "None" );
+        initialSettings.SetColorSpectrum ( DEFAULT_COLOR_SPECTRUM );
 
-	mDimensionDropdownX->setSelectedValueByName ( xDimension, true );
-	mDimensionDropdownY->setSelectedValueByName ( yDimension, true );
-	mDimensionDropdownZ->setSelectedValueByName ( zDimension, true );
-	mDimensionDropdownColor->setSelectedValueByName ( colorDimension, true );
-	mDimensionDropdownDynamicPan->setSelectedValueByName ( dynamicPanDimension, true );
+        initialSettings.SetLoopPlayheads ( DEFAULT_LOOP_PLAYHEADS );
+        initialSettings.SetJumpSameFileAllowed ( DEFAULT_JUMP_SAME_FILE_ALLOWED );
+        initialSettings.SetJumpSameFileMinTimeDiff ( DEFAULT_JUMP_SAME_FILE_MIN_DIFF );
+        initialSettings.SetCrossoverJumpChanceX1000 ( DEFAULT_CROSSOVER_JUMP_CHANCE_X1000 );
+        initialSettings.SetCrossfadeSampleLength ( DEFAULT_CROSSFADE_SAMPLE_LENGTH );
+        initialSettings.SetMaxJumpDistanceSpaceX1000 ( DEFAULT_MAX_JUMP_DISTANCE_SPACE_X1000 );
+        initialSettings.SetMaxJumpTargets ( DEFAULT_MAX_JUMP_TARGETS );
 
-	bBlockDimensionFilling = false;
+        initialSettings.SetVolumeX1000 ( DEFAULT_VOLUME_X1000 );
+        int randomPanDimensionIndex = mRawView->GetDimensions ( ).size ( ) > 1 ? ofRandom ( 1, mRawView->GetDimensions ( ).size ( ) - 1 ) : -1;
+        initialSettings.SetDimensionDynamicPan ( randomPanDimensionIndex != -1 ? mRawView->GetDimensions ( )[randomPanDimensionIndex] : "None" );
+        initialSettings.SetPanningStrengthX1000 ( DEFAULT_PANNING_STRENGTH_X1000 );
+    }
 
-	SwapDimension ( xDimension, Utils::Axis::X );
-	SwapDimension ( yDimension, Utils::Axis::Y );
-	SwapDimension ( zDimension, Utils::Axis::Z );
+    mLiveView.Initialise ( );
 
-	bIsCorpusOpen = true;
+    mLiveView.CreatePoints ( ); // TODO - combine with mLiveView.Initialise ( );?
 
-	SwapDimension ( colorDimension, Utils::Axis::COLOR );
-	SwapDimension ( dynamicPanDimension, Utils::Axis::DYNAMIC_PAN );
+    OpenFullPanel ( initialSettings );
 
-	mLiveView.ChangeAudioSettings ( currentBufferSize, currentOutDevice );
+    bBlockDimensionFilling = false;
+
+    PropogateCorpusSettings ( initialSettings );
+
+    CameraSwitcher ( );
+
+    bIsCorpusOpen = true;
+
+    if ( mLiveView.StartAudio ( mAudioSettingsManager.GetCurrentAudioSettings ( ) ) ) { return; }
+
+    AudioOutputFailed ( );
 }
 
+// TODO - change how this and FillDimension and Train (point picker) work, should have a function that triggers training and one that doesn't (for initial filling)
 void ExplorerMenu::SwapDimension ( string dimension, Utils::Axis axis )
 {
-	if ( bBlockDimensionFilling ) { return; }
+    if ( bBlockDimensionFilling ) { return; }
 
-	if ( axis == Utils::Axis::DYNAMIC_PAN )
-	{
-		if ( dimension == "None" )
-		{
-			mLiveView.GetAudioPlayback ( )->SetDynamicPan ( false, 0 );
-		}
-		else
-		{
-			int dimensionIndex = GetDimensionIndex ( dimension );
-			if ( dimensionIndex == -1 ) { return; }
-			mLiveView.GetAudioPlayback ( )->SetDynamicPan ( true, dimensionIndex );
-		}
+    if ( axis == Utils::Axis::DYNAMIC_PAN )
+    {
+        if ( dimension == "None" )
+        {
+            mLiveView.GetAudioPlayback ( )->SetDynamicPan ( false, 0 );
+        }
+        else
+        {
+            int dimensionIndex = GetDimensionIndex ( dimension );
+            if ( dimensionIndex == -1 ) { return; }
+            mLiveView.GetAudioPlayback ( )->SetDynamicPan ( true, dimensionIndex );
+        }
 
-		return;
-	}
+        return;
+    }
 
-	if ( dimension == "None" )					{ mLiveView.FillDimensionNone ( axis ); }
-	else
-	{
-		int dimensionIndex = GetDimensionIndex ( dimension );
-		if ( dimensionIndex == -1 ) { return; }
+    if ( dimension == "None" )					{ mLiveView.FillDimensionNone ( axis ); }
+    else
+    {
+        int dimensionIndex = GetDimensionIndex ( dimension );
+        if ( dimensionIndex == -1 ) { return; }
 
-		if ( mRawView->IsTimeAnalysis ( ) )		{ mLiveView.FillDimensionTime ( dimensionIndex, axis ); }
-		else if ( !mRawView->IsReduction ( ) )	{ mLiveView.FillDimensionStats ( dimensionIndex, axis ); }
-		else									{ mLiveView.FillDimensionStatsReduced ( dimensionIndex, axis ); }
-	}
-	
-	if ( bIsCorpusOpen )
-	{
-		CameraSwitcher ( );
-		// TODO - if axis != COLOR, retrain point picker // is this still needed here? already retraining in liveview
-	}
+        if ( mRawView->IsTimeAnalysis ( ) )		{ mLiveView.FillDimensionTime ( dimensionIndex, axis ); }
+        else if ( !mRawView->IsReduction ( ) )	{ mLiveView.FillDimensionStats ( dimensionIndex, axis ); }
+        else									{ mLiveView.FillDimensionStatsReduced ( dimensionIndex, axis ); }
+    }
+    
+    if ( bIsCorpusOpen )
+    {
+        CameraSwitcher ( );
+        // TODO - if axis != COLOR, retrain point picker // is this still needed here? already retraining in liveview
+    }
 }
 
 int ExplorerMenu::GetDimensionIndex ( std::string& dimension )
 {
-	for ( int i = 0; i < mRawView->GetDimensions ( ).size ( ); i++ )
-	{
-		if ( mRawView->GetDimensions ( )[i] == dimension )
-		{
-			return i;
-		}
-	}
-	ofLogWarning ( "LiveView" ) << "Dimension " << dimension << " not found";
-	return -1;
+    for ( int i = 0; i < mRawView->GetDimensions ( ).size ( ); i++ )
+    {
+        if ( mRawView->GetDimensions ( )[i] == dimension )
+        {
+            return i;
+        }
+    }
+    ofLogWarning ( "LiveView" ) << "Dimension " << dimension << " not found";
+    return -1;
 }
 
 void ExplorerMenu::CameraSwitcher ( )
 {
-	bool isXNone = mDimensionDropdownX->getAllSelected ( )[0] == "None";
-	bool isYNone = mDimensionDropdownY->getAllSelected ( )[0] == "None";
-	bool isZNone = mDimensionDropdownZ->getAllSelected ( )[0] == "None";
-	int numDisabledAxes = isXNone + isYNone + isZNone;
+    bool isXNone = mDimensionDropdownX->getAllSelected ( )[0] == "None";
+    bool isYNone = mDimensionDropdownY->getAllSelected ( )[0] == "None";
+    bool isZNone = mDimensionDropdownZ->getAllSelected ( )[0] == "None";
+    int numDisabledAxes = isXNone + isYNone + isZNone;
 
-	Utils::Axis							  disabledAxis = Utils::Axis::NONE;
-	if		( isXNone )					{ disabledAxis = Utils::Axis::X; }
-	else if ( isYNone )					{ disabledAxis = Utils::Axis::Y; }
-	else if ( isZNone )					{ disabledAxis = Utils::Axis::Z; }
-	else if ( numDisabledAxes > 1 )		{ disabledAxis = Utils::Axis::MULTIPLE; }
+    Utils::Axis							  disabledAxis = Utils::Axis::NONE;
+    if		( isXNone )					{ disabledAxis = Utils::Axis::X; }
+    else if ( isYNone )					{ disabledAxis = Utils::Axis::Y; }
+    else if ( isZNone )					{ disabledAxis = Utils::Axis::Z; }
+    else if ( numDisabledAxes > 1 )		{ disabledAxis = Utils::Axis::MULTIPLE; }
 
-	bool current3D = mLiveView.Is3D ( );
+    bool current3D = mLiveView.Is3D ( );
 
-	if ( disabledAxis == Utils::Axis::NONE || disabledAxis == Utils::Axis::MULTIPLE )
-	{
-		if ( !mLiveView.Is3D ( ) )
-		{
-			mLiveView.Set3D ( true );
-			mLiveView.Init3DCam ( );
-		}
-	}
-	else
-	{
-		if ( mLiveView.Is3D ( ) || disabledAxis != mDisabledAxis )
-		{
-			mLiveView.Set3D ( false );
-			mLiveView.Init2DCam ( disabledAxis );
-			mDisabledAxis = disabledAxis;
-		}
-	}
+    if ( disabledAxis == Utils::Axis::NONE || disabledAxis == Utils::Axis::MULTIPLE )
+    {
+        if ( !mLiveView.Is3D ( ) )
+        {
+            mLiveView.Set3D ( true );
+            mLiveView.Init3DCam ( );
+        }
+    }
+    else
+    {
+        if ( mLiveView.Is3D ( ) || disabledAxis != mDisabledAxis )
+        {
+            mLiveView.Set3D ( false );
+            mLiveView.Init2DCam ( disabledAxis );
+            mDisabledAxis = disabledAxis;
+        }
+    }
+}
+
+void ExplorerMenu::PropogateCorpusSettings ( const Utils::ExploreSettings& settings )
+{
+    // TODO - change these 3 so that only the final call of the 3 triggers point picker Train ( )
+    SwapDimensionX ( settings.GetDimensionX ( ) );
+    SwapDimensionY ( settings.GetDimensionY ( ) );
+    SwapDimensionZ ( settings.GetDimensionZ ( ) ); // the one that actually calls training stuff
+
+    SwapDimensionColor ( settings.GetDimensionColor ( ) );
+    SwitchColorSpectrum ( settings.GetColorSpectrum ( ) );
+
+    ToggleLoopPlayheads ( settings.GetLoopPlayheads ( ) );
+    ToggleJumpSameFileAllowed ( settings.GetJumpSameFileAllowed ( ) );
+    SetJumpSameFileMinTimeDiff ( settings.GetJumpSameFileMinTimeDiff ( ) );
+    SetCrossoverJumpChance ( settings.GetCrossoverJumpChance ( ) );
+    SetCrossfadeSampleLength ( settings.GetCrossfadeSampleLengthLimitedByHopSize ( ) );
+    SetMaxJumpDistanceSpace ( settings.GetMaxJumpDistanceSpace ( ) );
+    SetMaxJumpTargets ( settings.GetMaxJumpTargets ( ) );
+
+    SetVolume ( settings.GetVolume ( ) );
+    SwapDimensionDynamicPan ( settings.GetDimensionDynamicPan ( ) );
+    SetPanningStrength ( settings.GetPanningStrength ( ) );
 }
 
 // Listener Functions --------------------------
-
-void ExplorerMenu::WindowResized ( )
+    // Corpus Controls
+void ExplorerMenu::SwapDimensionX ( const string& dimension )
 {
-	mMainPanel.setPosition ( ofGetWidth ( ) - mLayout.explorePanelWidth, mLayout.explorePanelOriginY );
-
-	int rectWidth = ofGetWidth ( ) / 10; int rectSpacing = ofGetWidth ( ) / 100; int rectHeight = ofGetHeight ( ) / 10;
-	for ( auto& playhead : mLiveView.GetPlayheads ( ) )
-	{
-		playhead.panelRect = ofRectangle (	rectSpacing * mLiveView.GetPlayheads ( ).size ( ) + rectWidth * (mLiveView.GetPlayheads ( ).size ( ) - 1),
-											ofGetHeight ( ) - rectHeight - 5,
-											rectWidth,
-											rectHeight );
-	}
+    SwapDimension ( dimension, Utils::Axis::X );
 }
 
-void ExplorerMenu::SwapDimensionX ( string& dimension )
+void ExplorerMenu::SwapDimensionY ( const string& dimension )
 {
-	SwapDimension ( dimension, Utils::Axis::X );
+    SwapDimension ( dimension, Utils::Axis::Y );
 }
 
-void ExplorerMenu::SwapDimensionY ( string& dimension )
+void ExplorerMenu::SwapDimensionZ ( const string& dimension )
 {
-	SwapDimension ( dimension, Utils::Axis::Y );
+    SwapDimension ( dimension, Utils::Axis::Z );
 }
 
-void ExplorerMenu::SwapDimensionZ ( string& dimension )
+void ExplorerMenu::SwapDimensionColor ( const string& dimension )
 {
-	SwapDimension ( dimension, Utils::Axis::Z );
+    SwapDimension ( dimension, Utils::Axis::COLOR );
 }
 
-void ExplorerMenu::SwapDimensionColor ( string& dimension )
+void ExplorerMenu::SwitchColorSpectrum ( const bool& fullSpectrum )
 {
-	SwapDimension ( dimension, Utils::Axis::COLOR );
+    if ( fullSpectrum ) { mColorSpectrumSwitcher.setName ( "Color Spectrum: Full" ); }
+    else { mColorSpectrumSwitcher.setName ( "Color Spectrum: Red<->Blue" ); }
+    mLiveView.SetColorFullSpectrum ( fullSpectrum );
+    SwapDimension ( mDimensionDropdownColor->getAllSelected ( )[0], Utils::Axis::COLOR );
 }
 
-void ExplorerMenu::SwitchColorSpectrum ( bool& fullSpectrum )
+void ExplorerMenu::ToggleLoopPlayheads ( const bool& loop )
 {
-	if ( fullSpectrum ) { mColorSpectrumSwitcher.setName ( "Color Spectrum: Full" ); }
-	else { mColorSpectrumSwitcher.setName ( "Color Spectrum: Red<->Blue" ); }
-	mLiveView.SetColorFullSpectrum ( fullSpectrum );
-	SwapDimension ( mDimensionDropdownColor->getAllSelected ( )[0], Utils::Axis::COLOR );
+    mLiveView.GetAudioPlayback ( )->SetLoopPlayheads ( loop );
 }
 
-void ExplorerMenu::ToggleLoopPlayheads ( bool& loop )
+void ExplorerMenu::ToggleJumpSameFileAllowed ( const bool& allowed )
 {
-	mLiveView.GetAudioPlayback ( )->SetLoopPlayheads ( loop );
+    mLiveView.GetAudioPlayback ( )->SetJumpSameFileAllowed ( allowed );
 }
 
-void ExplorerMenu::ToggleJumpSameFileAllowed ( bool& allowed )
+void ExplorerMenu::SetJumpSameFileMinTimeDiff ( const int& timeDiff )
 {
-	mLiveView.GetAudioPlayback ( )->SetJumpSameFileAllowed ( allowed );
+    mLiveView.GetAudioPlayback ( )->SetJumpSameFileMinTimeDiff ( timeDiff );
 }
 
-void ExplorerMenu::SetJumpSameFileMinTimeDiff ( int& timeDiff )
+void ExplorerMenu::SetCrossoverJumpChance ( const float& jumpChance )
 {
-	mLiveView.GetAudioPlayback ( )->SetJumpSameFileMinTimeDiff ( timeDiff );
+    mLiveView.GetAudioPlayback ( )->SetCrossoverJumpChance ( (int)(jumpChance * 1000) );
 }
 
-void ExplorerMenu::SetCrossoverJumpChance ( float& jumpChance )
+void ExplorerMenu::SetCrossfadeSampleLength ( const int& length )
 {
-	mLiveView.GetAudioPlayback ( )->SetCrossoverJumpChance ( (int)(jumpChance * 1000) );
+    mLiveView.GetAudioPlayback ( )->SetCrossfadeSampleLength ( length );
 }
 
-void ExplorerMenu::SetCrossfadeMaxSampleLength ( int& length )
+void ExplorerMenu::SetMaxJumpDistanceSpace ( const float& distance )
 {
-	mLiveView.GetAudioPlayback ( )->SetCrossfadeSampleLength ( length );
+    mLiveView.GetAudioPlayback ( )->SetMaxJumpDistanceSpace ( (int)(distance * 1000) );
 }
 
-void ExplorerMenu::SetMaxJumpDistanceSpace ( float& distance )
+void ExplorerMenu::SetMaxJumpTargets ( const int& targets )
 {
-	mLiveView.GetAudioPlayback ( )->SetMaxJumpDistanceSpace ( (int)(distance * 1000) );
+    mLiveView.GetAudioPlayback ( )->SetMaxJumpTargets ( targets );
 }
 
-void ExplorerMenu::SetMaxJumpTargets ( int& targets )
+void ExplorerMenu::SetVolume( const float& volume)
 {
-	mLiveView.GetAudioPlayback ( )->SetMaxJumpTargets ( targets );
+    mLiveView.GetAudioPlayback ( )->SetVolume ( (int)(volume * 1000) );
 }
 
-void ExplorerMenu::SetVolume(float & volume) {
-	mLiveView.GetAudioPlayback ( )->SetVolume ( (int)(volume * 1000) );
+void ExplorerMenu::SwapDimensionDynamicPan ( const string& dimension )
+{
+    SwapDimension ( dimension, Utils::Axis::DYNAMIC_PAN );
 }
 
-void ExplorerMenu::SwapDimensionDynamicPan ( string& dimension )
+void ExplorerMenu::SetPanningStrength ( const float& strength )
 {
-	SwapDimension ( dimension, Utils::Axis::DYNAMIC_PAN );
-}
-
-void ExplorerMenu::SetPanningStrength ( float& strength )
-{
-	mLiveView.GetAudioPlayback ( )->SetPanningStrength ( (int)(strength * 1000) );
+    mLiveView.GetAudioPlayback ( )->SetPanningStrength ( (int)(strength * 1000) );
 }
 
 void ExplorerMenu::MouseReleased ( ofMouseEventArgs& args )
 {
-	for ( auto& playhead : mLiveView.GetPlayheads ( ) )
-	{
-		int smallRectSize = ( playhead.panelRect.width + playhead.panelRect.height ) / 10;
-		ofRectangle smallRect = ofRectangle ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, smallRectSize, smallRectSize );
+    for ( auto& playhead : mLiveView.GetPlayheads ( ) )
+    {
+        int smallRectSize = ( playhead.panelRect.width + playhead.panelRect.height ) / 10;
+        ofRectangle smallRect = ofRectangle ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, smallRectSize, smallRectSize );
 
-		if ( smallRect.inside ( args.x, args.y ) )
-		{
-			mLiveView.GetAudioPlayback ( )->KillPlayhead ( playhead.playheadID );
-			return;
-		}
-	}
+        if ( smallRect.inside ( args.x, args.y ) )
+        {
+            mLiveView.GetAudioPlayback ( )->KillPlayhead ( playhead.playheadID );
+            return;
+        }
+    }
+}
+    // Audio Manager
+void ExplorerMenu::RescanDevices ( )
+{
+    // TODO TEST - could have some edge cases depending on how ofxDropdown works
+    //          - this gets called when the dropdown is about to be shown - does it actually update the dropdown correctly if there's a change?
+    //          - or does the dropdown then have to be closed and opened again to show this change
+
+    bool modified = mAudioSettingsManager.RefreshDeviceListChanged ( );
+
+    if ( !modified ) { return; }
+
+    WriteApiDropdownDeviceCounts ( );
+
+    ResetDeviceDropdown ( );
+
+    if ( !bIsCorpusOpen ) { return; }
+
+    if ( mLiveView.RestartAudio ( mAudioSettingsManager.GetCurrentAudioSettings ( ) ) ) { return; }
+
+    AudioOutputFailed ( );
 }
 
-void ExplorerMenu::SetBufferSize ( int& bufferSize )
+void Acorex::ExplorerMenu::SetApi ( string& dropdownName )
 {
-	currentBufferSize = bufferSize;
-	mLiveView.ChangeAudioSettings ( currentBufferSize, currentOutDevice );
+    if ( mAudioSettingsManager.GetCurrentApiIndex ( ) == mApiDropdown->getSelectedOptionIndex ( ) ) { return; }
+
+    bool success = mAudioSettingsManager.ChangeSelectedApi ( mApiDropdown->getSelectedOptionIndex ( ) );
+
+    if ( !success )
+    {
+        ofLogError ( "ExplorerMenu" ) << "Failed to change audio API to selected API."
+            << ". Selecting API: " << mAudioSettingsManager.GetCurrentApiName ( )
+            << ", Selecting Device: " << mAudioSettingsManager.GetOutDevices ( mAudioSettingsManager.GetCurrentApiIndex ( ) )[mAudioSettingsManager.GetCurrentDeviceIndex ( )].name;
+        mApiDropdown->setSelectedValueByIndex ( mAudioSettingsManager.GetCurrentApiIndex ( ), false );
+    }
+
+    ResetDeviceDropdown ( );
+
+    if ( !bIsCorpusOpen ) { return; }
+
+    if ( mLiveView.RestartAudio ( mAudioSettingsManager.GetCurrentAudioSettings ( ) ) ) { return; }
+
+    AudioOutputFailed ( );
 }
 
-void ExplorerMenu::SetOutDevice ( string& outDevice )
+void ExplorerMenu::SetOutDevice ( string& dropdownName )
 {
-	outDevice = outDevice.substr ( 0, outDevice.find_first_of ( "." ) );
-	int deviceIndex = std::stoi ( outDevice ) - 1;
+    //if ( bBlockAudioSettingsUIListenersTemporaryFix ) { return; }
 
-	currentOutDevice = outDevices[deviceIndex];
+    if ( mAudioSettingsManager.GetCurrentDeviceIndex ( ) == mOutDeviceDropdown->getSelectedOptionIndex ( ) ) { return; }
 
-	mLiveView.ChangeAudioSettings ( currentBufferSize, currentOutDevice );
+    bool success = mAudioSettingsManager.ChangeSelectedDevice ( mOutDeviceDropdown->getSelectedOptionIndex ( ) );
+
+    if ( !success )
+    {
+        ofLogError ( "ExplorerMenu" ) << "Failed to change output device to selected device.";
+        mOutDeviceDropdown->setSelectedValueByIndex ( mAudioSettingsManager.GetCurrentDeviceIndex ( ), false );
+    }
+
+    if ( !bIsCorpusOpen ) { return; }
+
+    if ( mLiveView.RestartAudio ( mAudioSettingsManager.GetCurrentAudioSettings ( ) ) ) { return; }
+
+    AudioOutputFailed ( );
+}
+
+void ExplorerMenu::SetBufferSize ( string& dropdownName )
+{
+    if ( mAudioSettingsManager.GetCurrentBufferSize ( ) == mBufferSizeDropdown->getAllSelected ( )[0] ) { return; }
+
+    mAudioSettingsManager.SetBufferSize ( mBufferSizeDropdown->getAllSelected ( )[0] );
+
+    if ( !bIsCorpusOpen ) { return; }
+
+    if ( mLiveView.RestartAudio ( mAudioSettingsManager.GetCurrentAudioSettings ( ) ) ) { return; }
+
+    AudioOutputFailed ( );
+}
+
+void ExplorerMenu::AudioOutputFailed ( )
+{
+    // TODO - more error handling here? also more user feedback? - e.g. set Device/Api/Buffer dropdowns to red bg colour?
+
+    ofLogError ( "ExplorerMenu" ) << "Audio output failed to restart with current settings. This likely means the selected output device is currently unavailable. Please check your audio output device and try again.";
+}
+
+void ExplorerMenu::ResetDeviceDropdown ( )
+{
+    mOutDeviceDropdown->clear ( );
+
+    for ( size_t i = 0; i < mAudioSettingsManager.GetCurrentApiDevicesOut ( ).size ( ); i++ )
+    {
+        std::string deviceName = mAudioSettingsManager.GetCurrentApiDevicesOut ( )[i].name;
+        mOutDeviceDropdown->add ( deviceName );
+    }
+
+    mOutDeviceDropdown->setSelectedValueByIndex ( mAudioSettingsManager.GetCurrentDeviceIndex ( ), false );
+}
+
+void ExplorerMenu::WriteApiDropdownDeviceCounts ( )
+{
+    for ( size_t i = 0; i < mAudioSettingsManager.GetApiCount ( ); i++ )
+    {
+        std::string descriptiveName = std::string ( mAudioSettingsManager.GetApiName ( i ) ) + " (" + std::to_string ( mAudioSettingsManager.GetOutDeviceCount ( i ) - 1 ) + " devices)";
+        mApiDropdown->updateOptionName ( mApiDropdown->getOptionAt ( i ), descriptiveName );
+    }
 }

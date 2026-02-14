@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2024 Elowyn Fearne
+Copyright (c) 2024-2026 Elowyn Fearne
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -18,85 +18,77 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include <ofxGui.h>
 
-#define TOP_BAR_HEIGHT					40
-#define TOP_BAR_BUTTON_WIDTH			100
-#define ANALYSE_MAIN_PANEL_WIDTH		200
-#define ANALYSE_ANALYSIS_PANEL_WIDTH	315
-#define ANALYSE_REDUCTION_PANEL_WIDTH	300
-#define EXPLORE_PANEL_WIDTH				315
-#define INTER_PANEL_SPACING				5
-#define PANEL_BACKGROUND_MARGIN			5
-
 namespace Acorex {
 namespace Utils {
 
-	struct Colors {
-		// normal and locked text colour
-		ofColor normalTextColor = 255;
-		ofColor lockedTextColor = 130;
+inline constexpr unsigned int ofxDropdownScrollSpeed = 32;
 
-		// interface background colour
-		ofColor interfaceBackgroundColor = { 0, 0, 0, 150 };
-		ofColor transparent = { 0, 0, 0, 0 };
-	};
+struct Colors {
+    // normal and locked text colour
+    const ofColor normalTextColor = 255;
+    const ofColor lockedTextColor = 130;
 
-	struct MenuLayout {
-		bool HiDpi = false;
+    // interface background colour
+    const ofColor interfaceBackgroundColor = { 0, 0, 0, 150 };
+    const ofColor transparent = { 0, 0, 0, 0 };
+};
 
-		int topBarHeight = TOP_BAR_HEIGHT;
-		int topBarButtonWidth = TOP_BAR_BUTTON_WIDTH;
+struct MenuLayout {
+private:
+    bool bHiDpi = false;
+    const unsigned int hiDpiMultiplier = 2;
 
-		int analyseMainPanelWidth = ANALYSE_MAIN_PANEL_WIDTH;
-		int analyseAnalysisPanelWidth = ANALYSE_ANALYSIS_PANEL_WIDTH;
-		int analyseReductionPanelWidth = ANALYSE_REDUCTION_PANEL_WIDTH;
+    // default values when bHiDpi = false
+    unsigned int topBarHeight               = 40;
+    unsigned int topBarButtonWidth          = 100;
+    unsigned int panelRowHeight             = 18;
+    unsigned int panelDropdownRowHeight     = 36;
+    unsigned int analyseMainPanelWidth      = 200;
+    unsigned int analyseAnalysisPanelWidth  = 315;
+    unsigned int analyseReductionPanelWidth = 300;
+    unsigned int explorePanelWidth          = 315;
+    unsigned int interPanelSpacing          = 5;
+    unsigned int panelBackgroundMargin      = 5;
 
-		int explorePanelWidth = EXPLORE_PANEL_WIDTH;
+    int modePanelOriginY = topBarHeight + interPanelSpacing;
+    const int analysePanelOriginX = 0;
 
-		int interPanelSpacing = INTER_PANEL_SPACING;
-		int panelBackgroundMargin = PANEL_BACKGROUND_MARGIN;
+public:
 
-		int analysePanelOriginX = 0; int analysePanelOriginY = topBarHeight + interPanelSpacing;
-		int explorePanelOriginY = topBarHeight + interPanelSpacing;
-		glm::vec3 hiddenPanelPosition = { -1000, -1000, 0 };
+    void toggleHiDpi ( bool hiDpi )
+    {
+        if ( hiDpi == bHiDpi ) { return; }
 
-		void disableHiDpi ( )
-		{
-			HiDpi = false;
-			topBarHeight = TOP_BAR_HEIGHT;
-			topBarButtonWidth = TOP_BAR_BUTTON_WIDTH;
-			analyseMainPanelWidth = ANALYSE_MAIN_PANEL_WIDTH;
-			analyseAnalysisPanelWidth = ANALYSE_ANALYSIS_PANEL_WIDTH;
-			analyseReductionPanelWidth = ANALYSE_REDUCTION_PANEL_WIDTH;
-			explorePanelWidth = EXPLORE_PANEL_WIDTH;
-			interPanelSpacing = INTER_PANEL_SPACING;
-			panelBackgroundMargin = PANEL_BACKGROUND_MARGIN;
-			analysePanelOriginX = 0; analysePanelOriginY = topBarHeight + interPanelSpacing;
-			explorePanelOriginY = topBarHeight + interPanelSpacing;
-		}
+        bHiDpi = hiDpi;
 
-		void enableHiDpi ( )
-		{
-			HiDpi = true;
-			topBarHeight = TOP_BAR_HEIGHT * 2;
-			topBarButtonWidth = TOP_BAR_BUTTON_WIDTH * 2;
-			analyseMainPanelWidth = ANALYSE_MAIN_PANEL_WIDTH * 2;
-			analyseAnalysisPanelWidth = ANALYSE_ANALYSIS_PANEL_WIDTH * 2;
-			analyseReductionPanelWidth = ANALYSE_REDUCTION_PANEL_WIDTH * 2;
-			explorePanelWidth = EXPLORE_PANEL_WIDTH * 2;
-			interPanelSpacing = INTER_PANEL_SPACING * 2;
-			panelBackgroundMargin = PANEL_BACKGROUND_MARGIN * 2;
-			analysePanelOriginX = 0; analysePanelOriginY = topBarHeight + interPanelSpacing;
-			explorePanelOriginY = topBarHeight + interPanelSpacing;
-		}
-	};
+        topBarHeight                = (hiDpi ? topBarHeight * hiDpiMultiplier               : topBarHeight / hiDpiMultiplier);
+        topBarButtonWidth           = (hiDpi ? topBarButtonWidth * hiDpiMultiplier          : topBarButtonWidth / hiDpiMultiplier);
+        panelRowHeight              = (hiDpi ? panelRowHeight * hiDpiMultiplier             : panelRowHeight / hiDpiMultiplier);
+        panelDropdownRowHeight      = (hiDpi ? panelDropdownRowHeight * hiDpiMultiplier     : panelDropdownRowHeight / hiDpiMultiplier);
+        analyseMainPanelWidth       = (hiDpi ? analyseMainPanelWidth * hiDpiMultiplier      : analyseMainPanelWidth / hiDpiMultiplier);
+        analyseAnalysisPanelWidth   = (hiDpi ? analyseAnalysisPanelWidth * hiDpiMultiplier  : analyseAnalysisPanelWidth / hiDpiMultiplier);
+        analyseReductionPanelWidth  = (hiDpi ? analyseReductionPanelWidth * hiDpiMultiplier : analyseReductionPanelWidth / hiDpiMultiplier);
+        explorePanelWidth           = (hiDpi ? explorePanelWidth * hiDpiMultiplier          : explorePanelWidth / hiDpiMultiplier);
+        interPanelSpacing           = (hiDpi ? interPanelSpacing * hiDpiMultiplier          : interPanelSpacing / hiDpiMultiplier);
+        panelBackgroundMargin       = (hiDpi ? panelBackgroundMargin * hiDpiMultiplier      : panelBackgroundMargin / hiDpiMultiplier);
+
+        modePanelOriginY = topBarHeight + interPanelSpacing;
+    }
+    
+    bool isHiDpi ( ) const { return bHiDpi; }
+
+    unsigned int getTopBarHeight ( ) const { return topBarHeight; }
+    unsigned int getTopBarButtonWidth ( ) const { return topBarButtonWidth; }
+    unsigned int getPanelRowHeight ( ) const { return panelRowHeight; }
+    unsigned int getPanelDropdownRowHeight ( ) const { return panelDropdownRowHeight; }
+    unsigned int getAnalyseMainPanelWidth ( ) const { return analyseMainPanelWidth; }
+    unsigned int getAnalyseAnalysisPanelWidth ( ) const { return analyseAnalysisPanelWidth; }
+    unsigned int getAnalyseReductionPanelWidth ( ) const { return analyseReductionPanelWidth; }
+    unsigned int getExplorePanelWidth ( ) const { return explorePanelWidth; }
+    unsigned int getInterPanelSpacing ( ) const { return interPanelSpacing; }
+    unsigned int getPanelBackgroundMargin ( ) const { return panelBackgroundMargin; }
+    int getModePanelOriginY ( ) const { return modePanelOriginY; }
+    int getAnalysePanelOriginX ( ) const { return analysePanelOriginX; }
+};
 } // namespace Utils
 } // namespace Acorex
-
-#undef TOP_BAR_HEIGHT
-#undef TOP_BAR_BUTTON_WIDTH
-#undef ANALYSE_MAIN_PANEL_WIDTH
-#undef ANALYSE_ANALYSIS_PANEL_WIDTH
-#undef ANALYSE_REDUCTION_PANEL_WIDTH
-#undef EXPLORE_PANEL_WIDTH
-#undef INTER_PANEL_SPACING
-#undef PANEL_BACKGROUND_MARGIN

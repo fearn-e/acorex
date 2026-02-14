@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2024 Elowyn Fearne
+Copyright (c) 2024-2026 Elowyn Fearne
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -27,136 +27,161 @@ namespace Acorex {
 
 class AnalyserMenu {
 public:
-	AnalyserMenu ( );
-	~AnalyserMenu ( ) { };
+    AnalyserMenu ( );
+    ~AnalyserMenu ( ) { };
 
-	void Initialise ( bool HiDpi );
-	void Show ( );
-	void Hide ( );
-	void Draw ( );
-	void Exit ( );
+    void Initialise ( );
+    void Open ( );
+    void Close ( );
+    void Draw ( );
+    void Exit ( );
+
+    void RefreshUI ( );
+    void SetMenuLayout ( std::shared_ptr<Utils::MenuLayout>& menuLayout ) { mLayout = menuLayout; }
 
 private:
-	void RemoveListeners ( );
+    void ResetVariables ( );
 
-	// Analyse and Reduce --------------------------
+    // UI Management ------------------------------
+    void OpenMainPanel ( );
+    void OpenAnalysisPanel ( );
+    void OpenAnalysisInsertionPanel ( );
+    void CloseAnalysisInsertionPanel ( );
+    void OpenReductionPanel ( );
 
-	void Analyse ( );
-	void Reduce ( );
+    void RefreshMainPanelUI ( );
+    void RefreshAnalysisPanelUI ( );
+    void RefreshInsertionPanelUI ( );
+    void RefreshReductionPanelUI ( );
 
-	// File Dialog Button Callbacks ----------------
+    void ToggleAnalysisUILockout ( bool lock );
 
-	void SelectAnalysisDirectory ( );
-	void SelectAnalysisOutputFile ( );
-	void SelectReductionInputFile ( );
-	void SelectReductionOutputFile ( );
+    // Listeners ---------------------------------
 
-	// Load and Save Settings ----------------------
+    void AddListenersMain ( );
+    void RemoveListenersMain ( );
 
-	void UnpackSettingsFromFile ( const Utils::AnalysisSettings& settings );
-	void PackSettingsFromUser ( Utils::AnalysisSettings& settings);
-	void PackSettingsFromUser ( Utils::ReductionSettings& settings );
+    void AddListenersAnalysis ( );
+    void RemoveListenersAnalysis ( );
 
-	// UI Value Management -------------------------
+    void AddListenersInsertion ( );
+    void RemoveListenersInsertion ( );
 
-	void QuantiseWindowSize ( int& value );
-	void QuantiseHopFraction ( int& value );
-	void AnalysisInsertionToggleChanged ( bool& value );
+    void AddListenersReduction ( );
+    void RemoveListenersReduction ( );
 
-	// Panel Management ----------------------------
+    bool bListenersAddedMain;
+    bool bListenersAddedAnalysis;
+    bool bListenersAddedInsertion;
+    bool bListenersAddedReduction;
 
-	void ToggleAnalysisUILockout ( bool lock );
-	void ShowMainPanel ( );
-	void ShowAnalysisPanel ( );
-	void ShowAnalysisInsertionPanel ( );
-	void HideAnalysisInsertionPanel ( );
-	void ShowReductionPanel ( );
+    // Analyse and Reduce --------------------------
 
-	// State --------------------------------------
+    void Analyse ( );
+    void Reduce ( );
 
-	bool bDraw;
-	bool bProcessing;
+    // File Dialog Button Callbacks ----------------
 
-	bool bDrawMainPanel;
-	bool bDrawAnalysisPanel;
-	bool bDrawAnalysisInsertionPanel;
-	bool bDrawReductionPanel;
-	
-	bool bInsertingIntoCorpus;
+    void SelectAnalysisDirectory ( );
+    void SelectAnalysisOutputFile ( );
+    void SelectReductionInputFile ( );
+    void SelectReductionOutputFile ( );
 
-	bool bAnalysisDirectorySelected;
-	bool bAnalysisOutputSelected;
-	bool bReductionInputSelected;
-	bool bReductionOutputSelected;
-	
-	bool bFlashingInvalidFileSelects;
-	bool bFlashingInvalidAnalysisToggles;
-	bool bFlashingInvalidReductionDimensions;
-	int flashColour;
+    // Load and Save Settings ----------------------
 
-	// Metadata -----------------------------------
+    void UnpackSettingsFromFile ( const Utils::AnalysisSettings& settings );
+    void PackSettingsFromUser ( Utils::AnalysisSettings& settings);
+    void PackSettingsFromUser ( Utils::ReductionSettings& settings );
 
-	//stats - mean, standard deviation, skewness, kurtosis, low percentile, middle (median default), high percentile
-	//int maxSamplingRate = 22050;
+    // UI Value Management -------------------------
 
-	bool mHasBeenReduced;
-	ofxToggle mAnalysisPitchToggle;
-	ofxToggle mAnalysisLoudnessToggle;
-	ofxToggle mAnalysisShapeToggle;
-	ofxToggle mAnalysisMFCCToggle;
-	ofxIntField mSampleRateField;
-	ofxIntField mWindowFFTField;
-	ofxIntField mHopFractionField;
-	ofxIntField mNBandsField;
-	ofxIntField mNCoefsField;
-	ofxIntField mMinFreqField;
-	ofxIntField mMaxFreqField;
+    void QuantiseWindowSize ( int& value );
+    void QuantiseHopFraction ( int& value );
+    void AnalysisInsertionToggleChanged ( bool& value );
 
-	int mCurrentDimensionCount;
+    // State --------------------------------------
 
-	ofxIntField mReducedDimensionsField;
-	ofxIntField mMaxIterationsField;
+    bool bDraw;
+    bool bProcessing;
 
-	// File Paths ---------------------------------
+    bool bDrawMainPanel;
+    bool bDrawAnalysisPanel;
+    bool bDrawInsertionPanel;
+    bool bDrawReductionPanel;
 
-	std::string inputPath;
-	std::string outputPath;
+    bool bInsertingIntoCorpus;
 
-	// Panels -------------------------------------
+    bool bAnalysisDirectorySelected;
+    bool bAnalysisOutputSelected;
+    bool bReductionInputSelected;
+    bool bReductionOutputSelected;
 
-	ofxPanel mMainPanel;
-	ofxButton mCreateCorpusButton;
-	ofxButton mReduceCorpusButton;
+    bool bInvalidPulseFileSelects;
+    bool bInvalidPulseAnalysisToggles;
+    bool bInvalidPulseReductionDimensions;
+    int mInvalidPulseColour;
 
-	ofxPanel mAnalysisPanel;
-	ofxPanel mAnalysisMetadataPanel;
-	ofxPanel mAnalysisConfirmPanel;
-	ofxButton mAnalysisPickDirectoryButton;
-	ofxTextField mAnalysisDirectoryLabel;
-	ofxButton mAnalysisPickOutputFileButton;
-	ofxTextField mAnalysisOutputLabel;
-	ofxButton mConfirmAnalysisButton;
-	ofxButton mCancelAnalysisButton;
+    // Metadata -----------------------------------
 
-	ofxPanel mAnalysisInsertionPanel;
-	ofxLabel mAnalysisInsertionQuestionLabel;
-	ofxToggle mAnalysisInsertionReplaceWithNewToggle;
+    //stats - mean, standard deviation, skewness, kurtosis, low percentile, middle (median default), high percentile
+    //int maxSamplingRate = 22050;
 
+    ofxToggle mAnalysisPitchToggle;
+    ofxToggle mAnalysisLoudnessToggle;
+    ofxToggle mAnalysisShapeToggle;
+    ofxToggle mAnalysisMFCCToggle;
+    ofxIntField mSampleRateField;
+    ofxIntField mWindowFFTField;
+    ofxIntField mHopFractionField;
+    ofxIntField mNBandsField;
+    ofxIntField mNCoefsField;
+    ofxIntField mMinFreqField;
+    ofxIntField mMaxFreqField;
 
-	ofxPanel mReductionPanel;
-	ofxButton mReductionPickInputFileButton;
-	ofxTextField mReductionInputLabel;
-	ofxButton mReductionPickOutputFileButton;
-	ofxTextField mReductionOutputLabel;
-	ofxButton mConfirmReductionButton;
-	ofxButton mCancelReductionButton;
+    int mCurrentDimensionCount;
 
-	// Acorex Objects ------------------------------
+    ofxIntField mReducedDimensionsField;
+    ofxIntField mMaxIterationsField;
 
-	Analyser::Controller mController;
-	Utils::JSON mJSON;
-	Utils::Colors mColors;
-	Utils::MenuLayout mLayout;
+    // File Paths ---------------------------------
+
+    std::string inputPath;
+    std::string outputPath;
+
+    // Panels -------------------------------------
+
+    ofxPanel mMainPanel;
+    ofxButton mCreateCorpusButton;
+    ofxButton mReduceCorpusButton;
+
+    ofxPanel mAnalysisPanel;
+    ofxPanel mAnalysisMetadataPanel;
+    ofxPanel mAnalysisConfirmPanel;
+    ofxButton mAnalysisPickDirectoryButton;
+    ofxTextField mAnalysisDirectoryLabel;
+    ofxButton mAnalysisPickOutputFileButton;
+    ofxTextField mAnalysisOutputLabel;
+    ofxButton mConfirmAnalysisButton;
+    ofxButton mCancelAnalysisButton;
+
+    ofxPanel mAnalysisInsertionPanel;
+    ofxLabel mAnalysisInsertionQuestionLabel;
+    ofxToggle mAnalysisInsertionReplaceWithNewToggle;
+
+    ofxPanel mReductionPanel;
+    ofxButton mReductionPickInputFileButton;
+    ofxTextField mReductionInputLabel;
+    ofxButton mReductionPickOutputFileButton;
+    ofxTextField mReductionOutputLabel;
+    ofxButton mConfirmReductionButton;
+    ofxButton mCancelReductionButton;
+
+    // Acorex Objects ------------------------------
+
+    Analyser::Controller mController;
+    Utils::JSON mJSON;
+    Utils::Colors mColors;
+    std::shared_ptr<Utils::MenuLayout> mLayout;
 };
 
 } // namespace Acorex

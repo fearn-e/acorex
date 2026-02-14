@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2024 Elowyn Fearne
+Copyright (c) 2024-2026 Elowyn Fearne
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -18,119 +18,167 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Explorer/RawView.h"
 #include "Explorer/LiveView.h"
+#include "Utils/AudioSettingsManager.h"
+#include "Utils/Data.h"
 #include "Utils/InterfaceDefs.h"
 #include <ofxGui.h>
 #include <ofxDropdown.h>
+
+// TODO - split mMainPanel into 3 panels, Header, Corpus Controls, an Audio Manager
+// TODO(cont) - to match the implementation in AnalyserMenu
 
 namespace Acorex {
 
 class ExplorerMenu {
 public:
-	ExplorerMenu ( ) { }
-	~ExplorerMenu ( ) { }
+    ExplorerMenu ( );
+    ~ExplorerMenu ( ) { }
 
-	void Initialise ( bool HiDpi );
-	void Show ( );
-	void Hide ( );
-	void Draw ( );
-	void Update ( );
-	void Exit ( );
+    void Initialise ( );
+    void Clear ( );
 
-	void WindowResized ( );
+    void Open ( ) { Initialise ( ); }
+    void Close ( ) { Clear ( ); }
+
+    void Draw ( );
+    void Update ( );
+    void Exit ( );
+
+    void RefreshUI ( );
+    void WindowResized ( );
+
+    void SetMenuLayout ( std::shared_ptr<Utils::MenuLayout>& menuLayout ) { mLayout = menuLayout; mLiveView.SetMenuLayout ( menuLayout ); }
 
 private:
-	void SlowUpdate ( );
-	void RemoveListeners ( );
+    void SlowUpdate ( );
 
-	// Main Functions ------------------------------
+    // UI Management -------------------------------
 
-	void OpenCorpus ( );
-	void SwapDimension ( string dimension, Utils::Axis axis );
-	int GetDimensionIndex ( std::string& dimension );
-	void CameraSwitcher ( );
+    void OpenStartupPanel ( );
+    void OpenFullPanel ( const Utils::ExploreSettings& settings );
 
-	// Listener Functions --------------------------
+    void SetupPanelSectionHeader ( std::string corpusNameLabel );
+    // TODO - pass in default values for all the controls
+    void SetupPanelSectionCorpusControls ( const Utils::ExploreSettings& settings );
+    void SetupPanelSectionAudioManager ( );
 
-	void SwapDimensionX ( string& dimension );
-	void SwapDimensionY ( string& dimension );
-	void SwapDimensionZ ( string& dimension );
-	void SwapDimensionColor ( string& dimension );
-	void SwitchColorSpectrum ( bool& fullSpectrum );
-	void ToggleLoopPlayheads ( bool& loop );
-	void ToggleJumpSameFileAllowed ( bool& allowed );
-	void SetJumpSameFileMinTimeDiff ( int& timeDiff );
-	void SetCrossoverJumpChance ( float& jumpChance );
-	void SetCrossfadeMaxSampleLength ( int& length );
-	void SetMaxJumpDistanceSpace ( float& distance );
-	void SetMaxJumpTargets ( int& targets );
-	void SetVolume(float & volume);
+    void RefreshStartupPanelUI ( );
+    void RefreshFullPanelUI ( );
 
-	void SwapDimensionDynamicPan ( string& dimension );
-	void SetPanningStrength ( float& strength );
+    // Listeners -----------------------------------
 
-	void MouseReleased ( ofMouseEventArgs& args );
+    void RemoveListeners ( );
 
-	void SetBufferSize ( int& bufferSize );
-	void SetOutDevice ( string& outDevice );
+    void AddListenersHeader ( );
+    void RemoveListenersHeader ( );
+    
+    void AddListenersCorpusControls ( );
+    void RemoveListenersCorpusControls ( );
 
-	std::vector<ofSoundDevice> outDevices;
-	ofSoundDevice currentOutDevice;
-	int currentBufferSize;
+    void AddListenersAudioManager ( );
+    void RemoveListenersAudioManager ( );
 
-	// States --------------------------------------
+    bool bListenersAddedHeader;
+    bool bListenersAddedCorpusControls;
+    bool bListenersAddedAudioManager;
 
-	bool bDraw = false;
+    // Main Functions ------------------------------
 
-	bool bIsCorpusOpen = false; bool bBlockDimensionFilling = false;
-	bool bOpenCorpusDrawWarning = false;
-	bool bInitialiseShouldLoad = false;
-	bool bListenersAdded = false;
-	
-	bool bViewPointerShared = false;
+    void OpenCorpus ( );
+    void SwapDimension ( string dimension, Utils::Axis axis );
+    int GetDimensionIndex ( std::string& dimension );
+    void CameraSwitcher ( );
 
-	Utils::Axis mDisabledAxis = Utils::Axis::NONE;
+    /// Triggers all listeners that update corpus related settings.
+    void PropogateCorpusSettings ( const Utils::ExploreSettings& settings );
 
-	// Timing --------------------------------------
+    // Listener Functions --------------------------
 
-	int mLastUpdateTime = 0;
-	int mSlowUpdateInterval = 100;
+    void SwapDimensionX ( const string& dimension );            void SwapDimensionXListener ( string& dimension ) { SwapDimensionX ( dimension ); }
+    void SwapDimensionY ( const string& dimension );            void SwapDimensionYListener ( string& dimension ) { SwapDimensionY ( dimension ); }
+    void SwapDimensionZ ( const string& dimension );            void SwapDimensionZListener ( string& dimension ) { SwapDimensionZ ( dimension ); }
 
-	int mOpenCorpusButtonClickTime = 0;
-	int mOpenCorpusButtonTimeout = 3000;
+    void SwapDimensionColor ( const string& dimension );        void SwapDimensionColorListener ( string& dimension ) { SwapDimensionColor ( dimension ); }
+    void SwitchColorSpectrum ( const bool& fullSpectrum );      void SwitchColorSpectrumListener ( bool& fullSpectrum ) { SwitchColorSpectrum ( fullSpectrum ); }
 
-	// Panels --------------------------------------
+    void ToggleLoopPlayheads ( const bool& loop );              void ToggleLoopPlayheadsListener ( bool& loop ) { ToggleLoopPlayheads ( loop ); }
+    void ToggleJumpSameFileAllowed ( const bool& allowed );     void ToggleJumpSameFileAllowedListener ( bool& allowed ) { ToggleJumpSameFileAllowed ( allowed ); }
+    void SetJumpSameFileMinTimeDiff ( const int& timeDiff );    void SetJumpSameFileMinTimeDiffListener ( int& timeDiff ) { SetJumpSameFileMinTimeDiff ( timeDiff ); }
+    void SetCrossoverJumpChance ( const float& jumpChance );    void SetCrossoverJumpChanceListener ( float& jumpChance ) { SetCrossoverJumpChance ( jumpChance ); }
+    void SetCrossfadeSampleLength ( const int& length );        void SetCrossfadeSampleLengthListener ( int& length ) { SetCrossfadeSampleLength ( length ); }
+    void SetMaxJumpDistanceSpace ( const float& distance );     void SetMaxJumpDistanceSpaceListener ( float& distance ) { SetMaxJumpDistanceSpace ( distance ); }
+    void SetMaxJumpTargets ( const int& targets );              void SetMaxJumpTargetsListener ( int& targets ) { SetMaxJumpTargets ( targets ); }
 
-	ofxPanel mMainPanel;
-	ofxLabel mCorpusNameLabel;
-	ofxButton mOpenCorpusButton;
-	unique_ptr<ofxDropdown> mDimensionDropdownX;
-	unique_ptr<ofxDropdown> mDimensionDropdownY;
-	unique_ptr<ofxDropdown> mDimensionDropdownZ;
-	unique_ptr<ofxDropdown> mDimensionDropdownColor;
-	ofxToggle mColorSpectrumSwitcher;
+    void SetVolume( const float& volume );                      void SetVolumeListener ( float& volume ) { SetVolume ( volume ); }
+    void SwapDimensionDynamicPan ( const string& dimension );   void SwapDimensionDynamicPanListener ( string& dimension ) { SwapDimensionDynamicPan ( dimension ); }
+    void SetPanningStrength ( const float& strength );          void SetPanningStrengthListener ( float& strength ) { SetPanningStrength ( strength ); }
 
-	ofxToggle mLoopPlayheadsToggle;
-	ofxToggle mJumpSameFileAllowedToggle;
-	ofxIntSlider mJumpSameFileMinTimeDiffSlider;
-	ofxFloatSlider mCrossoverJumpChanceSlider;
-	ofxIntSlider mCrossfadeMaxSampleLengthSlider;
-	ofxFloatSlider mMaxJumpDistanceSpaceSlider;
-	ofxIntSlider mMaxJumpTargetsSlider;
+    void MouseReleased ( ofMouseEventArgs& args );
 
-	ofxFloatSlider mVolumeSlider;
+    void RescanDevices ( );
 
-	unique_ptr<ofxDropdown> mDimensionDropdownDynamicPan;
-	ofxFloatSlider mPanningStrengthSlider;
+    void SetApi ( string& dropdownName );
+    void SetOutDevice ( string& dropdownName );
+    void SetBufferSize ( string& dropdownName );
 
-	unique_ptr<ofxIntDropdown> mBufferSizeDropdown;
-	unique_ptr<ofxDropdown> mOutDeviceDropdown;
+    void AudioOutputFailed ( );
 
-	// Acorex Objects ------------------------------
+    void ResetDeviceDropdown ( );
+    void WriteApiDropdownDeviceCounts ( );
 
-	std::shared_ptr<Explorer::RawView> mRawView;
-	Explorer::LiveView mLiveView;
-	Utils::Colors mColors;
-	Utils::MenuLayout mLayout;
+    // States --------------------------------------
+
+    bool bDraw;
+    bool bOpenCorpusWarningDraw;
+
+    bool bIsCorpusOpen;
+    bool bBlockDimensionFilling;
+    
+    Utils::Axis mDisabledAxis;
+
+    // Timing --------------------------------------
+
+    int mLastUpdateTime;
+    const int mSlowUpdateInterval;
+
+    int mOpenCorpusButtonClickTime;
+    const int mOpenCorpusButtonTimeout;
+
+    // Panels --------------------------------------
+
+    ofxPanel mMainPanel;
+    ofxLabel mCorpusNameLabel;
+    ofxButton mOpenCorpusButton;
+    unique_ptr<ofxDropdown> mDimensionDropdownX;
+    unique_ptr<ofxDropdown> mDimensionDropdownY;
+    unique_ptr<ofxDropdown> mDimensionDropdownZ;
+    unique_ptr<ofxDropdown> mDimensionDropdownColor;
+    ofxToggle mColorSpectrumSwitcher;
+
+    ofxToggle mLoopPlayheadsToggle;
+    ofxToggle mJumpSameFileAllowedToggle;
+    ofxIntSlider mJumpSameFileMinTimeDiffSlider;
+    ofxFloatSlider mCrossoverJumpChanceSlider;
+    ofxIntSlider mCrossfadeSampleLengthSlider;
+    ofxFloatSlider mMaxJumpDistanceSpaceSlider;
+    ofxIntSlider mMaxJumpTargetsSlider;
+
+    ofxFloatSlider mVolumeSlider;
+
+    unique_ptr<ofxDropdown> mDimensionDropdownDynamicPan;
+    ofxFloatSlider mPanningStrengthSlider;
+
+    unique_ptr<ofxDropdown> mApiDropdown;
+    unique_ptr<ofxDropdown> mOutDeviceDropdown;
+    unique_ptr<ofxIntDropdown> mBufferSizeDropdown;
+
+    // Acorex Objects ------------------------------
+
+    std::shared_ptr<Explorer::RawView> mRawView;
+    Explorer::LiveView mLiveView;
+    Utils::AudioSettingsManager mAudioSettingsManager;
+    Utils::Colors mColors;
+    std::shared_ptr<Utils::MenuLayout> mLayout;
 };
 
 } // namespace Acorex

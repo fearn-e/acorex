@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -117,6 +117,7 @@
     <ClCompile Include="src\ExplorerMenu.cpp" />
     <ClCompile Include="src\Explorer\LiveView.cpp" />
     <ClCompile Include="src\Explorer\RawView.cpp" />
+    <ClCompile Include="src\Utils\AudioSettingsManager.cpp" />
     <ClCompile Include="src\Utils\AudioFileLoader.cpp" />
     <ClCompile Include="src\Utils\DatasetConversion.cpp" />
     <ClCompile Include="src\Utils\JSON.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="src\Utils\DimensionBounds.h" />
     <ClInclude Include="src\Utils\InterfaceDefs.h" />
     <ClInclude Include="src\Utils\JSON.h" />
+    <ClInclude Include="src\Utils\AudioSettingsManager.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\libs\dr_flac.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\libs\dr_mp3.h" />
@@ -171,6 +173,8 @@
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h" />
+    <ClInclude Include="src\Utils\TemporaryDefaults.h" />
+    <ClInclude Include="src\Utils\TemporaryKeybinds.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2024 Elowyn Fearne
+Copyright (c) 2024-2026 Elowyn Fearne
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -25,33 +25,36 @@ namespace Explorer {
 
 class RawView {
 public:
-	RawView ( ) { }
-	~RawView ( ) { }
+    RawView ( );
+    ~RawView ( ) { }
 
-	bool LoadCorpus ( ); // asks user for file path, calls function below
-	bool LoadCorpus ( const std::string& path, const std::string& name ); // load corpus from file path
+    bool LoadCorpus ( ); // asks user for file path, calls function below
+    bool LoadCorpus ( const std::string& path, const std::string& name ); // load corpus from file path
 
-	bool IsTimeAnalysis ( ) const; // check if dataset is time analysis
-	bool IsReduction ( ) const; // check if dataset is a reduced corpus
-	std::vector<std::string> GetDimensions ( ) const; // get dimensions from dataset
-	std::vector<std::string> GetStatistics ( ) const; // get statistics from dataset
-	std::string GetCorpusName ( ) const; // get corpus name
-	Utils::AudioData* GetAudioData ( ); // get audio data from dataset
-	Utils::TimeData* GetTimeData ( ); // get time data from dataset
-	Utils::StatsData* GetStatsData ( ); // get stats data from dataset
-	Utils::DataSet* GetDataset ( ); // get dataset
-	size_t GetHopSize ( ) const; // get hop size used in analysis
+    void ClearCorpus ( );
+
+    bool IsLoaded ( ) const; // check if dataset is loaded
+    bool IsTimeAnalysis ( ) const; // check if dataset is time analysis
+    bool IsReduction ( ) const; // check if dataset is a reduced corpus
+    std::vector<std::string> GetDimensions ( ) const; // get dimensions from dataset
+    std::vector<std::string> GetStatistics ( ) const; // get statistics from dataset
+    std::string GetCorpusName ( ) const; // get corpus name
+    Utils::AudioData* GetAudioData ( ); // get audio data from dataset
+    Utils::TimeData* GetTimeData ( ); // get time data from dataset
+    Utils::StatsData* GetStatsData ( ); // get stats data from dataset
+    Utils::DataSet* GetDataset ( ); // get dataset
+    size_t GetHopSize ( ) const; // get hop size used in analysis
 
 private:
-	bool LoadAudioSet ( Utils::DataSet& dataset ); // load all audio files in dataset into memory
+    bool LoadAudioSet ( Utils::DataSet& dataset ); // load all audio files in dataset into memory
 
-	size_t mHopSize = 512;
+    size_t mHopSize;
 
-	std::string mCorpusName;
-	Utils::DataSet mDataset;
+    std::string mCorpusName;
+    Utils::DataSet mDataset;
 
-	Utils::JSON mJSON;
-	Utils::AudioFileLoader mAudioLoader;
+    Utils::JSON mJSON;
+    Utils::AudioFileLoader mAudioLoader;
 };
 
 } // namespace Explorer

@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2024 Elowyn Fearne
+Copyright (c) 2024-2026 Elowyn Fearne
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -16,597 +16,787 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "./AnalyserMenu.h"
 
+#include "Utils/TemporaryDefaults.h"
+
 using namespace Acorex;
 
-AnalyserMenu::AnalyserMenu ( )
+AnalyserMenu::AnalyserMenu ( ) :    bListenersAddedMain ( false ), bListenersAddedAnalysis ( false ),
+                                    bListenersAddedInsertion ( false ), bListenersAddedReduction ( false )
 {
-	Initialise ( false );
+    ResetVariables ( );
 }
 
-void AnalyserMenu::Initialise ( bool HiDpi )
+void AnalyserMenu::ResetVariables ( )
 {
-	// DPI ----------------------------------------
-	{
-		if ( HiDpi ) { mLayout.enableHiDpi ( ); }
-		else { mLayout.disableHiDpi ( ); }
-	}
+    bDraw = false;
+    bProcessing = false;
 
-	// Clear --------------------------------------
-	{
-		RemoveListeners ( );
+    bDrawMainPanel = false;
+    bDrawAnalysisPanel = false;
+    bDrawInsertionPanel = false;
+    bDrawReductionPanel = false;
 
-		mMainPanel.clear ( );
-		mAnalysisPanel.clear ( );
-		mAnalysisMetadataPanel.clear ( );
-		mAnalysisConfirmPanel.clear ( );
-		mReductionPanel.clear ( );
-		mAnalysisInsertionPanel.clear ( );
-	}
+    bInsertingIntoCorpus = false;
 
-	// Variables ----------------------------------
-	{
-		mHasBeenReduced = false;
-		inputPath = "";
-		outputPath = "";
-	}
+    bAnalysisDirectorySelected = false;
+    bAnalysisOutputSelected = false;
+    bReductionInputSelected = false;
+    bReductionOutputSelected = false;
 
-	// States -------------------------------------
-	{
-		bDraw = false;
-		bProcessing = false;
+    bInvalidPulseFileSelects = false;
+    bInvalidPulseAnalysisToggles = false;
+    bInvalidPulseReductionDimensions = false;
+    mInvalidPulseColour = 255;
 
-		bDrawMainPanel = false;
-		bDrawAnalysisPanel = false;
-		bDrawReductionPanel = false;
-		bDrawAnalysisInsertionPanel = false;
+    mCurrentDimensionCount = 0;
 
-		bInsertingIntoCorpus = false;
-
-		bAnalysisDirectorySelected = false;
-		bAnalysisOutputSelected = false;
-		bReductionInputSelected = false;
-		bReductionOutputSelected = false;
-
-		bFlashingInvalidFileSelects = false;
-		bFlashingInvalidAnalysisToggles = false;
-		bFlashingInvalidReductionDimensions = false;
-
-		flashColour = 255;
-	}
-
-	// Main Panel ---------------------------------
-	{
-
-		mMainPanel.setup ( "Menu" );
-
-		mMainPanel.add ( mCreateCorpusButton.setup ( "Analyse Corpus" ) );
-		mMainPanel.add ( mReduceCorpusButton.setup ( "Reduce Corpus" ) );
-
-		mCreateCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mReduceCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-
-		mMainPanel.setPosition ( mLayout.hiddenPanelPosition );
-		mMainPanel.setWidthElements ( mLayout.analyseMainPanelWidth );
-		mMainPanel.disableHeader ( );
-	}
-
-	// Analysis Panel -----------------------------
-	{
-		mAnalysisPanel.setup ( "Analysis" );
-
-		mAnalysisPanel.add ( mAnalysisPickDirectoryButton.setup ( "Pick Audio Directory" ) );
-		mAnalysisPanel.add ( mAnalysisDirectoryLabel.setup ( " ", "?" ) );
-		mAnalysisPanel.add ( mAnalysisPickOutputFileButton.setup ( "Pick Output File" ) );
-		mAnalysisPanel.add ( mAnalysisOutputLabel.setup ( "", "?" ) );
-
-		mAnalysisPickDirectoryButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mAnalysisDirectoryLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mAnalysisPickOutputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mAnalysisOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-
-		mAnalysisPanel.setPosition ( mLayout.hiddenPanelPosition );
-		mAnalysisPanel.setWidthElements ( mLayout.analyseAnalysisPanelWidth );
-		mAnalysisPanel.disableHeader ( );
-
-
-		mAnalysisMetadataPanel.setup ( "Analysis Metadata" );
-
-		mAnalysisMetadataPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", true ) );
-		mAnalysisMetadataPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", true ) );
-		mAnalysisMetadataPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Spectral Shape", false ) );
-		mAnalysisMetadataPanel.add ( mAnalysisMFCCToggle.setup ( "Analyse MFCC", false ) );
-
-		mAnalysisMetadataPanel.add ( mSampleRateField.setup ( "Sample Rate: ", 44100, 8000, 96000 ) );
-		mAnalysisMetadataPanel.add ( mWindowFFTField.setup ( "Window Size: ", 1024, 512, 8192 ) );
-		mAnalysisMetadataPanel.add ( mHopFractionField.setup ( "Hop Size (Fraction of Window):  1 / ", 2, 1, 16 ) );
-		mAnalysisMetadataPanel.add ( mNBandsField.setup ( "Bands: ", 40, 1, 100 ) );
-		mAnalysisMetadataPanel.add ( mNCoefsField.setup ( "Coefs: ", 13, 1, 20 ) );
-		mAnalysisMetadataPanel.add ( mMinFreqField.setup ( "Min Freq: ", 20, 20, 2000 ) );
-		mAnalysisMetadataPanel.add ( mMaxFreqField.setup ( "Max Freq: ", 5000, 20, 20000 ) );
-
-		mAnalysisPitchToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mAnalysisLoudnessToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mAnalysisShapeToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mAnalysisMFCCToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mSampleRateField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mWindowFFTField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mHopFractionField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mNBandsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mNCoefsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mMinFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mMaxFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-
-		mAnalysisMetadataPanel.setPosition ( mLayout.hiddenPanelPosition );
-		mAnalysisMetadataPanel.setWidthElements ( mLayout.analyseAnalysisPanelWidth );
-		mAnalysisMetadataPanel.disableHeader ( );
-
-
-		mAnalysisConfirmPanel.setup ( "Confirm Analysis" );
-
-		mAnalysisConfirmPanel.add ( mConfirmAnalysisButton.setup ( "Confirm" ) );
-		mAnalysisConfirmPanel.add ( mCancelAnalysisButton.setup ( "Cancel" ) );
-
-		mConfirmAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mCancelAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-
-		mAnalysisConfirmPanel.setPosition ( mLayout.hiddenPanelPosition );
-		mAnalysisConfirmPanel.setWidthElements ( mLayout.analyseAnalysisPanelWidth );
-		mAnalysisConfirmPanel.disableHeader ( );
-	}
-
-	// Insertion Duplicate Question Panel ---------
-	{
-		mAnalysisInsertionPanel.setup ( "Insertion Question" );
-
-		mAnalysisInsertionPanel.add ( mAnalysisInsertionQuestionLabel.setup ( "For files already existing in the set, which version to use?", "" ) );
-		mAnalysisInsertionPanel.add ( mAnalysisInsertionReplaceWithNewToggle.setup ( "Existing Files", false ) );
-
-		mAnalysisInsertionQuestionLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mAnalysisInsertionReplaceWithNewToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-
-		mAnalysisInsertionPanel.setPosition ( mLayout.hiddenPanelPosition );
-		mAnalysisInsertionPanel.setWidthElements ( mLayout.analyseAnalysisPanelWidth );
-		mAnalysisInsertionPanel.disableHeader ( );
-	}
-
-	// Reduction Panel ----------------------------
-	{
-		mReductionPanel.setup ( "Reduction" );
-
-		mReductionPanel.add ( mReductionPickInputFileButton.setup ( "Pick Input File" ) );
-		mReductionPanel.add ( mReductionInputLabel.setup ( " ", "?" ) );
-		mReductionPanel.add ( mReductionPickOutputFileButton.setup ( "Pick Output File" ) );
-		mReductionPanel.add ( mReductionOutputLabel.setup ( "", "?" ) );
-
-		mReductionPanel.add ( mReducedDimensionsField.setup ( "Reduced Dimensions", 4, 2, 32 ) );
-		mReductionPanel.add ( mMaxIterationsField.setup ( "Max Training Iterations", 200, 1, 1000 ) );
-
-		mReductionPanel.add ( mConfirmReductionButton.setup ( "Confirm" ) );
-		mReductionPanel.add ( mCancelReductionButton.setup ( "Cancel" ) );
-
-		mReductionPickInputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mReductionInputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mReductionPickOutputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mReductionOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mReducedDimensionsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mMaxIterationsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mConfirmReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		mCancelReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
-
-		mReductionPanel.setPosition ( mLayout.hiddenPanelPosition );
-		mReductionPanel.setWidthElements ( mLayout.analyseReductionPanelWidth );
-		mReductionPanel.disableHeader ( );
-	}
-
-	// Listeners ----------------------------------
-	{
-		mCreateCorpusButton.addListener ( this, &AnalyserMenu::ShowAnalysisPanel );
-		mReduceCorpusButton.addListener ( this, &AnalyserMenu::ShowReductionPanel );
-		mCancelAnalysisButton.addListener ( this, &AnalyserMenu::ShowMainPanel );
-		mCancelReductionButton.addListener ( this, &AnalyserMenu::ShowMainPanel );
-		mAnalysisPickDirectoryButton.addListener ( this, &AnalyserMenu::SelectAnalysisDirectory );
-		mAnalysisPickOutputFileButton.addListener ( this, &AnalyserMenu::SelectAnalysisOutputFile );
-		mReductionPickInputFileButton.addListener ( this, &AnalyserMenu::SelectReductionInputFile );
-		mReductionPickOutputFileButton.addListener ( this, &AnalyserMenu::SelectReductionOutputFile );
-		mWindowFFTField.addListener ( this, &AnalyserMenu::QuantiseWindowSize );
-		mHopFractionField.addListener ( this, &AnalyserMenu::QuantiseHopFraction );
-		mConfirmAnalysisButton.addListener ( this, &AnalyserMenu::Analyse );
-		mConfirmReductionButton.addListener ( this, &AnalyserMenu::Reduce );
-		mAnalysisInsertionReplaceWithNewToggle.addListener ( this, &AnalyserMenu::AnalysisInsertionToggleChanged );
-	}
-
-	ToggleAnalysisUILockout ( false );
+    inputPath = "";
+    outputPath = "";
 }
 
-void AnalyserMenu::Show ( )
+// initial state is a blank slate - Open ( ) must be called to actually load anything
+void AnalyserMenu::Initialise ( )
 {
-	ShowMainPanel ( );
+    ResetVariables ( );
+
+    RemoveListenersMain ( );
+    RemoveListenersAnalysis ( );
+    RemoveListenersInsertion ( );
+    RemoveListenersReduction ( );
+
+    mMainPanel.clear ( );
+    mAnalysisPanel.clear ( );
+    mAnalysisMetadataPanel.clear ( );
+    mAnalysisConfirmPanel.clear ( );
+    mReductionPanel.clear ( );
+    mAnalysisInsertionPanel.clear ( );
+
+    ToggleAnalysisUILockout ( false );
+}
+
+void AnalyserMenu::Open ( )
+{
+    OpenMainPanel ( );
 }
 
 // fully resets all values and hides the menu
-void AnalyserMenu::Hide ( )
+void AnalyserMenu::Close ( )
 {
-	Initialise ( mLayout.HiDpi );
+    Initialise ( );
 }
 
 void AnalyserMenu::Draw ( )
 {
-	if ( !bDraw ) { return; }
+    if ( !bDraw ) { return; }
 
-	if ( bDrawMainPanel )
-	{
-		//draw background rectangle around main panel
-		ofSetColor ( mColors.interfaceBackgroundColor );
-		ofDrawRectangle ( 
-			mMainPanel.getPosition ( ).x - mLayout.panelBackgroundMargin, 
-			mMainPanel.getPosition ( ).y - mLayout.panelBackgroundMargin, 
-			mMainPanel.getWidth ( ) + mLayout.panelBackgroundMargin * 2,
-			mMainPanel.getHeight ( ) + mLayout.panelBackgroundMargin * 2 );
-		mMainPanel.draw ( );
-	}
+    if ( bDrawMainPanel )
+    {
+        //draw background rectangle around main panel
+        ofSetColor ( mColors.interfaceBackgroundColor );
+        ofDrawRectangle ( 
+            mMainPanel.getPosition ( ).x - mLayout->getPanelBackgroundMargin ( ),
+            mMainPanel.getPosition ( ).y - mLayout->getPanelBackgroundMargin ( ),
+            mMainPanel.getWidth ( ) + mLayout->getPanelBackgroundMargin ( ) * 2,
+            mMainPanel.getHeight ( ) + mLayout->getPanelBackgroundMargin ( ) * 2 );
+        mMainPanel.draw ( );
+    }
 
-	if ( bDrawAnalysisPanel )
-	{
-		int backgroundHeight = mAnalysisPanel.getHeight ( ) + mAnalysisMetadataPanel.getHeight ( ) + mAnalysisConfirmPanel.getHeight ( ) + mLayout.interPanelSpacing * 2;
+    if ( bDrawAnalysisPanel )
+    {
+        int backgroundHeight = mAnalysisPanel.getHeight ( ) + mAnalysisMetadataPanel.getHeight ( ) + mAnalysisConfirmPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) * 2;
 
-		mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout.interPanelSpacing );
-		mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout.interPanelSpacing );
-		if ( bDrawAnalysisInsertionPanel )
-		{
-			backgroundHeight += mAnalysisInsertionPanel.getHeight ( ) + mLayout.interPanelSpacing;
-			mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout.interPanelSpacing );
-		}
-		
-		ofSetColor ( mColors.interfaceBackgroundColor );
-		ofDrawRectangle (
-			mAnalysisPanel.getPosition ( ).x - mLayout.panelBackgroundMargin, 
-			mAnalysisPanel.getPosition ( ).y - mLayout.panelBackgroundMargin, 
-			mAnalysisPanel.getWidth ( ) + mLayout.panelBackgroundMargin * 2,
-			backgroundHeight + mLayout.panelBackgroundMargin * 2 );
+        mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+        mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+        if ( bDrawInsertionPanel )
+        {
+            backgroundHeight += mAnalysisInsertionPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( );
+            mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+        }
+        
+        ofSetColor ( mColors.interfaceBackgroundColor );
+        ofDrawRectangle (
+            mAnalysisPanel.getPosition ( ).x - mLayout->getPanelBackgroundMargin ( ),
+            mAnalysisPanel.getPosition ( ).y - mLayout->getPanelBackgroundMargin ( ),
+            mAnalysisPanel.getWidth ( ) + mLayout->getPanelBackgroundMargin ( ) * 2,
+            backgroundHeight + mLayout->getPanelBackgroundMargin ( ) * 2 );
 
-		mAnalysisPanel.draw ( );
-		mAnalysisMetadataPanel.draw ( );
-		mAnalysisConfirmPanel.draw ( );
-		if ( bDrawAnalysisInsertionPanel ) { mAnalysisInsertionPanel.draw ( ); }
-	}
+        mAnalysisPanel.draw ( );
+        mAnalysisMetadataPanel.draw ( );
+        mAnalysisConfirmPanel.draw ( );
+        if ( bDrawInsertionPanel ) { mAnalysisInsertionPanel.draw ( ); }
+    }
 
-	if ( bDrawReductionPanel ) 
-	{
-		ofSetColor ( mColors.interfaceBackgroundColor );
-		ofDrawRectangle (
-			mReductionPanel.getPosition ( ).x - mLayout.panelBackgroundMargin,
-			mReductionPanel.getPosition ( ).y - mLayout.panelBackgroundMargin,
-			mReductionPanel.getWidth ( ) + mLayout.panelBackgroundMargin * 2,
-			mReductionPanel.getHeight ( ) + mLayout.panelBackgroundMargin * 2 );
+    if ( bDrawReductionPanel ) 
+    {
+        ofSetColor ( mColors.interfaceBackgroundColor );
+        ofDrawRectangle (
+            mReductionPanel.getPosition ( ).x - mLayout->getPanelBackgroundMargin ( ),
+            mReductionPanel.getPosition ( ).y - mLayout->getPanelBackgroundMargin ( ),
+            mReductionPanel.getWidth ( ) + mLayout->getPanelBackgroundMargin ( ) * 2,
+            mReductionPanel.getHeight ( ) + mLayout->getPanelBackgroundMargin ( ) * 2 );
 
-		mReductionPanel.draw ( );
-	}
+        mReductionPanel.draw ( );
+    }
 
-	if ( bFlashingInvalidFileSelects )
-	{
-		if ( bDrawAnalysisPanel && !bAnalysisDirectorySelected )
-		{
-			mAnalysisDirectoryLabel.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
-		}
-		if ( bDrawAnalysisPanel && !bAnalysisOutputSelected )
-		{
-			mAnalysisOutputLabel.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
-		}
-		if ( bDrawReductionPanel && !bReductionInputSelected )
-		{
-			mReductionInputLabel.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
-		}
-		if ( bDrawReductionPanel && !bReductionOutputSelected )
-		{
-			mReductionOutputLabel.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
-		}
+    if ( bInvalidPulseFileSelects )
+    {
+        if ( bDrawAnalysisPanel && !bAnalysisDirectorySelected )
+        {
+            mAnalysisDirectoryLabel.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
+        }
+        if ( bDrawAnalysisPanel && !bAnalysisOutputSelected )
+        {
+            mAnalysisOutputLabel.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
+        }
+        if ( bDrawReductionPanel && !bReductionInputSelected )
+        {
+            mReductionInputLabel.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
+        }
+        if ( bDrawReductionPanel && !bReductionOutputSelected )
+        {
+            mReductionOutputLabel.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
+        }
 
-		if ( flashColour <= 0 )
-		{
-			flashColour = 255;
-			bFlashingInvalidFileSelects = false;
-			mAnalysisDirectoryLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mAnalysisOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mReductionInputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mReductionOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		}
-	}
+        if ( mInvalidPulseColour <= 0 )
+        {
+            mInvalidPulseColour = 255;
+            bInvalidPulseFileSelects = false;
+            mAnalysisDirectoryLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+            mAnalysisOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+            mReductionInputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+            mReductionOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+        }
+    }
 
-	if ( bFlashingInvalidAnalysisToggles )
-	{
-		mAnalysisLoudnessToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
-		mAnalysisPitchToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
-		mAnalysisShapeToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
-		mAnalysisMFCCToggle.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+    if ( bInvalidPulseAnalysisToggles )
+    {
+        mAnalysisLoudnessToggle.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
+        mAnalysisPitchToggle.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
+        mAnalysisShapeToggle.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
+        mAnalysisMFCCToggle.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
 
-		if ( flashColour <= 0 )
-		{
-			flashColour = 255;
-			bFlashingInvalidAnalysisToggles = false;
-			mAnalysisLoudnessToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mAnalysisPitchToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mAnalysisShapeToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-			mAnalysisMFCCToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		}
-	}
+        if ( mInvalidPulseColour <= 0 )
+        {
+            mInvalidPulseColour = 255;
+            bInvalidPulseAnalysisToggles = false;
+            mAnalysisLoudnessToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+            mAnalysisPitchToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+            mAnalysisShapeToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+            mAnalysisMFCCToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+        }
+    }
 
-	if ( bFlashingInvalidReductionDimensions )
-	{
-		mReducedDimensionsField.setBackgroundColor ( ofColor ( flashColour, 0, 0 ) );
+    if ( bInvalidPulseReductionDimensions )
+    {
+        mReducedDimensionsField.setBackgroundColor ( ofColor ( mInvalidPulseColour, 0, 0 ) );
 
-		if ( flashColour <= 0 )
-		{
-			flashColour = 255;
-			bFlashingInvalidReductionDimensions = false;
-			mReducedDimensionsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
-		}
-	
-	}
+        if ( mInvalidPulseColour <= 0 )
+        {
+            mInvalidPulseColour = 255;
+            bInvalidPulseReductionDimensions = false;
+            mReducedDimensionsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+        }
+    
+    }
 
-	if ( bFlashingInvalidAnalysisToggles || bFlashingInvalidFileSelects || bFlashingInvalidReductionDimensions )
-	{
-		flashColour -= 2;
-		if ( flashColour < 0 ) { flashColour = 0; }
-	}
+    if ( bInvalidPulseAnalysisToggles || bInvalidPulseFileSelects || bInvalidPulseReductionDimensions )
+    {
+        mInvalidPulseColour -= 2;
+        if ( mInvalidPulseColour < 0 ) { mInvalidPulseColour = 0; }
+    }
 }
 
 void AnalyserMenu::Exit ( )
 {
-	RemoveListeners ( );
+    RemoveListenersMain ( );
+    RemoveListenersAnalysis ( );
+    RemoveListenersInsertion ( );
+    RemoveListenersReduction ( );
 }
 
-void AnalyserMenu::RemoveListeners ( )
+// UI Management --------------------------------
+
+void AnalyserMenu::OpenMainPanel ( )
 {
-	mCreateCorpusButton.removeListener ( this, &AnalyserMenu::ShowAnalysisPanel );
-	mReduceCorpusButton.removeListener ( this, &AnalyserMenu::ShowReductionPanel );
-	mCancelAnalysisButton.removeListener ( this, &AnalyserMenu::ShowMainPanel );
-	mCancelReductionButton.removeListener ( this, &AnalyserMenu::ShowMainPanel );
-	mAnalysisPickDirectoryButton.removeListener ( this, &AnalyserMenu::SelectAnalysisDirectory );
-	mAnalysisPickOutputFileButton.removeListener ( this, &AnalyserMenu::SelectAnalysisOutputFile );
-	mReductionPickInputFileButton.removeListener ( this, &AnalyserMenu::SelectReductionInputFile );
-	mReductionPickOutputFileButton.removeListener ( this, &AnalyserMenu::SelectReductionOutputFile );
-	mWindowFFTField.removeListener ( this, &AnalyserMenu::QuantiseWindowSize );
-	mHopFractionField.removeListener ( this, &AnalyserMenu::QuantiseHopFraction );
-	mConfirmAnalysisButton.removeListener ( this, &AnalyserMenu::Analyse );
-	mConfirmReductionButton.removeListener ( this, &AnalyserMenu::Reduce );
-	mAnalysisInsertionReplaceWithNewToggle.removeListener ( this, &AnalyserMenu::AnalysisInsertionToggleChanged );
+    Initialise ( );
+
+    RemoveListenersMain ( );
+
+    mMainPanel.clear ( );
+    mMainPanel.setup ( "Menu" );
+
+    mMainPanel.add ( mCreateCorpusButton.setup ( "Analyse Corpus" , mLayout->getAnalyseMainPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mMainPanel.add ( mReduceCorpusButton.setup ( "Reduce Corpus" , mLayout->getAnalyseMainPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+
+    mCreateCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mReduceCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    mMainPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
+    mMainPanel.setWidthElements ( mLayout->getAnalyseMainPanelWidth ( ) );
+    mMainPanel.disableHeader ( );
+
+    bDraw = true;
+    bDrawMainPanel = true;
+
+    AddListenersMain ( );
+}
+
+void AnalyserMenu::OpenAnalysisPanel ( )
+{
+    Initialise ( );
+
+    RemoveListenersAnalysis ( );
+
+    mAnalysisPanel.clear ( );
+    mAnalysisPanel.setup ( "Analysis" );
+
+    mAnalysisPanel.add ( mAnalysisPickDirectoryButton.setup ( "Pick Audio Directory", mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisPanel.add ( mAnalysisDirectoryLabel.setup ( " ", "?", "", "", mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisPanel.add ( mAnalysisPickOutputFileButton.setup ( "Pick Output File" , mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisPanel.add ( mAnalysisOutputLabel.setup ( "", "?", "", "", mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+
+    mAnalysisPickDirectoryButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisDirectoryLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisPickOutputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    mAnalysisPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
+    mAnalysisPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisPanel.disableHeader ( );
+
+    mAnalysisMetadataPanel.clear ( );
+    mAnalysisMetadataPanel.setup ( "Analysis Metadata" );
+
+    mAnalysisMetadataPanel.add ( mAnalysisPitchToggle.setup ( "Analyse Pitch", DEFAULT_ANALYSE_PITCH, mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisMetadataPanel.add ( mAnalysisLoudnessToggle.setup ( "Analyse Loudness", DEFAULT_ANALYSE_LOUDNESS, mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisMetadataPanel.add ( mAnalysisShapeToggle.setup ( "Analyse Spectral Shape", DEFAULT_ANALYSE_SPEC_SHAPE, mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisMetadataPanel.add ( mAnalysisMFCCToggle.setup ( "Analyse MFCC", DEFAULT_ANALYSE_MFCC, mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+
+    mAnalysisMetadataPanel.add ( mSampleRateField.setup ( "Sample Rate: ", DEFAULT_ANALYSE_SAMPLE_RATE, 8000, 96000, mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisMetadataPanel.add ( mWindowFFTField.setup ( "Window Size: ", DEFAULT_ANALYSE_WINDOW_SIZE, 512, 8192, mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisMetadataPanel.add ( mHopFractionField.setup ( "Hop Size (Fraction of Window):  1 / ", DEFAULT_ANALYSE_HOP_SIZE_FRACTION, 1, 16, mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisMetadataPanel.add ( mNBandsField.setup ( "Bands: ", DEFAULT_ANALYSE_MFCC_BANDS, 1, 100, mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisMetadataPanel.add ( mNCoefsField.setup ( "Coefs: ", DEFAULT_ANALYSE_MFCC_COEFS, 1, 20, mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisMetadataPanel.add ( mMinFreqField.setup ( "Min Freq: ", DEFAULT_ANALYSE_MIN_FREQ, 20, 2000, mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisMetadataPanel.add ( mMaxFreqField.setup ( "Max Freq: ", DEFAULT_ANALYSE_MAX_FREQ, 20, 20000, mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+
+    mAnalysisPitchToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisLoudnessToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisShapeToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisMFCCToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mSampleRateField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mWindowFFTField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mHopFractionField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mNBandsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mNCoefsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mMinFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mMaxFreqField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+    mAnalysisMetadataPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisMetadataPanel.disableHeader ( );
+
+    mAnalysisConfirmPanel.clear ( );
+    mAnalysisConfirmPanel.setup ( "Confirm Analysis" );
+
+    mAnalysisConfirmPanel.add ( mConfirmAnalysisButton.setup ( "Confirm", mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisConfirmPanel.add ( mCancelAnalysisButton.setup ( "Cancel", mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+
+    mConfirmAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mCancelAnalysisButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+    mAnalysisConfirmPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisConfirmPanel.disableHeader ( );
+
+    bDraw = true;
+    bDrawAnalysisPanel = true;
+
+    AddListenersAnalysis ( );
+}
+
+void AnalyserMenu::OpenAnalysisInsertionPanel ( )
+{
+    RemoveListenersInsertion ( );
+
+    mAnalysisInsertionPanel.clear ( );
+    mAnalysisInsertionPanel.setup ( "Insertion Question" );
+
+    mAnalysisInsertionPanel.add ( mAnalysisInsertionQuestionLabel.setup ( "For duplicate files, keep", "", mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mAnalysisInsertionPanel.add ( mAnalysisInsertionReplaceWithNewToggle.setup ( "Existing Files", DEFAULT_ANALYSE_INSERT_FILES_REPLACE, mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+
+    mAnalysisInsertionQuestionLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalysisInsertionReplaceWithNewToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+    mAnalysisInsertionPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisInsertionPanel.disableHeader ( );
+
+    bDrawInsertionPanel = true;
+
+    AddListenersInsertion ( );
+}
+
+void AnalyserMenu::CloseAnalysisInsertionPanel ( )
+{
+    RemoveListenersInsertion ( );
+
+    mAnalysisInsertionPanel.clear ( );
+
+    bDrawInsertionPanel = false;
+}
+
+void AnalyserMenu::OpenReductionPanel ( )
+{
+    Initialise ( );
+
+    RemoveListenersReduction ( );
+
+    mReductionPanel.clear ( );
+    mReductionPanel.setup ( "Reduction" );
+
+    mReductionPanel.add ( mReductionPickInputFileButton.setup ( "Pick Input File", mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mReductionPanel.add ( mReductionInputLabel.setup ( " ", "?", "", "", mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mReductionPanel.add ( mReductionPickOutputFileButton.setup ( "Pick Output File", mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mReductionPanel.add ( mReductionOutputLabel.setup ( "", "?", "", "", mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+
+    mReductionPanel.add ( mReducedDimensionsField.setup ( "Reduced Dimensions", DEFAULT_REDUCE_DIMENSIONS, 2, 32, mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mReductionPanel.add ( mMaxIterationsField.setup ( "Max Training Iterations", DEFAULT_MAX_TRAINING_ITERATIONS, 1, 1000, mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+
+    mReductionPanel.add ( mConfirmReductionButton.setup ( "Confirm", mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+    mReductionPanel.add ( mCancelReductionButton.setup ( "Cancel", mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) ) );
+
+    mReductionPickInputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mReductionInputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mReductionPickOutputFileButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mReductionOutputLabel.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mReducedDimensionsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mMaxIterationsField.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mConfirmReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mCancelReductionButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
+    mReductionPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
+    mReductionPanel.setWidthElements ( mLayout->getAnalyseReductionPanelWidth ( ) );
+    mReductionPanel.disableHeader ( );
+
+    bDraw = true;
+    bDrawReductionPanel = true;
+
+    AddListenersReduction ( );
+}
+
+void AnalyserMenu::RefreshUI ( )
+{
+    if ( bDrawMainPanel ) { RefreshMainPanelUI ( ); }
+    if ( bDrawAnalysisPanel ) { RefreshAnalysisPanelUI ( ); }
+    if ( bDrawInsertionPanel ) { RefreshInsertionPanelUI ( ); }
+    if ( bDrawReductionPanel ) { RefreshReductionPanelUI ( ); }
+}
+
+void AnalyserMenu::RefreshMainPanelUI ( )
+{
+    mMainPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
+    mCreateCorpusButton.setSize ( mLayout->getAnalyseMainPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mReduceCorpusButton.setSize ( mLayout->getAnalyseMainPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mMainPanel.setWidthElements ( mLayout->getAnalyseMainPanelWidth ( ) );
+    mMainPanel.sizeChangedCB ( );
+}
+
+void AnalyserMenu::RefreshAnalysisPanelUI ( )
+{
+    mAnalysisPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
+    mAnalysisPickDirectoryButton.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mAnalysisDirectoryLabel.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mAnalysisPickOutputFileButton.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mAnalysisOutputLabel.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mAnalysisPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisPanel.sizeChangedCB ( );
+
+    mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+    mAnalysisPitchToggle.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mAnalysisLoudnessToggle.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mAnalysisShapeToggle.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mAnalysisMFCCToggle.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mSampleRateField.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mWindowFFTField.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mHopFractionField.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mNBandsField.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mNCoefsField.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mMinFreqField.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mMaxFreqField.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mAnalysisMetadataPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisMetadataPanel.sizeChangedCB ( );
+
+    mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+    mConfirmAnalysisButton.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mCancelAnalysisButton.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mAnalysisConfirmPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisConfirmPanel.sizeChangedCB ( );
+}
+
+void AnalyserMenu::RefreshInsertionPanelUI ( )
+{
+    mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout->getInterPanelSpacing ( ) );
+    mAnalysisInsertionQuestionLabel.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mAnalysisInsertionReplaceWithNewToggle.setSize ( mLayout->getAnalyseAnalysisPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mAnalysisInsertionPanel.setWidthElements ( mLayout->getAnalyseAnalysisPanelWidth ( ) );
+    mAnalysisInsertionPanel.sizeChangedCB ( );
+}
+
+void AnalyserMenu::RefreshReductionPanelUI ( )
+{
+    mReductionPanel.setPosition ( mLayout->getAnalysePanelOriginX ( ), mLayout->getModePanelOriginY ( ) );
+    mReductionPickInputFileButton.setSize ( mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mReductionInputLabel.setSize ( mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mReductionPickOutputFileButton.setSize ( mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mReductionOutputLabel.setSize ( mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mReducedDimensionsField.setSize ( mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mMaxIterationsField.setSize ( mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mConfirmReductionButton.setSize ( mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mCancelReductionButton.setSize ( mLayout->getAnalyseReductionPanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mReductionPanel.setWidthElements ( mLayout->getAnalyseReductionPanelWidth ( ) );
+    mReductionPanel.sizeChangedCB ( );
+}
+
+void AnalyserMenu::ToggleAnalysisUILockout ( bool lock )
+{
+    mAnalysisPitchToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
+    mAnalysisLoudnessToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
+    mAnalysisShapeToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
+    mAnalysisMFCCToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
+    mSampleRateField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
+    mWindowFFTField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
+    mHopFractionField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
+    mNBandsField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
+    mNCoefsField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
+    mMinFreqField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
+    mMaxFreqField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
+
+    if ( lock )
+    {
+        mAnalysisMetadataPanel.unregisterMouseEvents ( );
+        mWindowFFTField.unregisterMouseEvents ( );
+        mHopFractionField.unregisterMouseEvents ( );
+    }
+    else
+    {
+        mAnalysisMetadataPanel.registerMouseEvents ( );
+        mWindowFFTField.registerMouseEvents ( );
+        mHopFractionField.registerMouseEvents ( );
+    }
+}
+
+// Listeners ------------------------------------
+
+void AnalyserMenu::AddListenersMain ( )
+{
+    if ( bListenersAddedMain ) { return; }
+    mCreateCorpusButton.addListener ( this, &AnalyserMenu::OpenAnalysisPanel );
+    mReduceCorpusButton.addListener ( this, &AnalyserMenu::OpenReductionPanel );
+    bListenersAddedMain = true;
+}
+
+void AnalyserMenu::RemoveListenersMain ( )
+{
+    if ( !bListenersAddedMain ) { return; }
+    mCreateCorpusButton.removeListener ( this, &AnalyserMenu::OpenAnalysisPanel );
+    mReduceCorpusButton.removeListener ( this, &AnalyserMenu::OpenReductionPanel );
+    bListenersAddedMain = false;
+}
+
+void AnalyserMenu::AddListenersAnalysis ( )
+{
+    if ( bListenersAddedAnalysis ) { return; }
+    mAnalysisPickDirectoryButton.addListener ( this, &AnalyserMenu::SelectAnalysisDirectory );
+    mAnalysisPickOutputFileButton.addListener ( this, &AnalyserMenu::SelectAnalysisOutputFile );
+    mWindowFFTField.addListener ( this, &AnalyserMenu::QuantiseWindowSize );
+    mHopFractionField.addListener ( this, &AnalyserMenu::QuantiseHopFraction );
+    mConfirmAnalysisButton.addListener ( this, &AnalyserMenu::Analyse );
+    mCancelAnalysisButton.addListener ( this, &AnalyserMenu::OpenMainPanel );
+    bListenersAddedAnalysis = true;
+}
+
+void AnalyserMenu::RemoveListenersAnalysis ( )
+{
+    if ( !bListenersAddedAnalysis ) { return; }
+    mAnalysisPickDirectoryButton.removeListener ( this, &AnalyserMenu::SelectAnalysisDirectory );
+    mAnalysisPickOutputFileButton.removeListener ( this, &AnalyserMenu::SelectAnalysisOutputFile );
+    mWindowFFTField.removeListener ( this, &AnalyserMenu::QuantiseWindowSize );
+    mHopFractionField.removeListener ( this, &AnalyserMenu::QuantiseHopFraction );
+    mConfirmAnalysisButton.removeListener ( this, &AnalyserMenu::Analyse );
+    mCancelAnalysisButton.removeListener ( this, &AnalyserMenu::OpenMainPanel );
+    bListenersAddedAnalysis = false;
+}
+
+void AnalyserMenu::AddListenersInsertion ( )
+{
+    if ( bListenersAddedInsertion ) { return; }
+    mAnalysisInsertionReplaceWithNewToggle.addListener ( this, &AnalyserMenu::AnalysisInsertionToggleChanged );
+    bListenersAddedInsertion = true;
+}
+
+void AnalyserMenu::RemoveListenersInsertion ( )
+{
+    if ( !bListenersAddedInsertion ) { return; }
+    mAnalysisInsertionReplaceWithNewToggle.removeListener ( this, &AnalyserMenu::AnalysisInsertionToggleChanged );
+    bListenersAddedInsertion = false;
+}
+
+void AnalyserMenu::AddListenersReduction ( )
+{
+    if ( bListenersAddedReduction ) { return; }
+    mReductionPickInputFileButton.addListener ( this, &AnalyserMenu::SelectReductionInputFile );
+    mReductionPickOutputFileButton.addListener ( this, &AnalyserMenu::SelectReductionOutputFile );
+    mConfirmReductionButton.addListener ( this, &AnalyserMenu::Reduce );
+    mCancelReductionButton.addListener ( this, &AnalyserMenu::OpenMainPanel );
+    bListenersAddedReduction = true;
+}
+
+void AnalyserMenu::RemoveListenersReduction ( )
+{
+    if ( !bListenersAddedReduction ) { return; }
+    mReductionPickInputFileButton.removeListener ( this, &AnalyserMenu::SelectReductionInputFile );
+    mReductionPickOutputFileButton.removeListener ( this, &AnalyserMenu::SelectReductionOutputFile );
+    mConfirmReductionButton.removeListener ( this, &AnalyserMenu::Reduce );
+    mCancelReductionButton.removeListener ( this, &AnalyserMenu::OpenMainPanel );
+    bListenersAddedReduction = false;
 }
 
 // Analyse and Reduce ---------------------------
 
 void AnalyserMenu::Analyse ( )
 {
-	if ( !bAnalysisDirectorySelected || !bAnalysisOutputSelected )
-	{
-		flashColour = 255;
-		bFlashingInvalidFileSelects = true;
-		ofLogError ( "AnalyserMenu" ) << "Analysis directory or output file not selected";
-		return;
-	}
+    if ( !bAnalysisDirectorySelected || !bAnalysisOutputSelected )
+    {
+        mInvalidPulseColour = 255;
+        bInvalidPulseFileSelects = true;
+        ofLogError ( "AnalyserMenu" ) << "Analysis directory or output file not selected";
+        return;
+    }
 
-	if ( !mAnalysisLoudnessToggle && !mAnalysisPitchToggle && !mAnalysisShapeToggle && !mAnalysisMFCCToggle )
-	{
-		flashColour = 255;
-		bFlashingInvalidAnalysisToggles = true;
-		ofLogError ( "AnalyserMenu" ) << "No analysis types selected";
-		return;
-	}
+    if ( !mAnalysisLoudnessToggle && !mAnalysisPitchToggle && !mAnalysisShapeToggle && !mAnalysisMFCCToggle )
+    {
+        mInvalidPulseColour = 255;
+        bInvalidPulseAnalysisToggles = true;
+        ofLogError ( "AnalyserMenu" ) << "No analysis types selected";
+        return;
+    }
 
-	bProcessing = true;
+    bProcessing = true;
 
-	bool success = false;
-	if ( !bInsertingIntoCorpus )
-	{
-		Utils::AnalysisSettings settings;
-		PackSettingsFromUser ( settings );
-		success = mController.CreateCorpus ( inputPath, outputPath, settings );
-	}
-	else
-	{
-		success = mController.InsertIntoCorpus ( inputPath, outputPath, mAnalysisInsertionReplaceWithNewToggle );
-	}
+    bool success = false;
+    if ( !bInsertingIntoCorpus )
+    {
+        Utils::AnalysisSettings settings;
+        PackSettingsFromUser ( settings );
+        success = mController.CreateCorpus ( inputPath, outputPath, settings );
+    }
+    else
+    {
+        success = mController.InsertIntoCorpus ( inputPath, outputPath, mAnalysisInsertionReplaceWithNewToggle );
+    }
 
-	bProcessing = false;
+    bProcessing = false;
 
-	if ( !success )
-	{
-		ShowMainPanel ( );
-		return;
-	}
+    if ( !success )
+    {
+        OpenMainPanel ( );
+        return;
+    }
 
-	// TODO - ask if user wants to reduce the data or view it in the corpus viewer
-	ShowMainPanel ( );
-	ofLogNotice ( "AnalyserMenu" ) << "Corpus created";
-	//------------------------------------------------ TEMPORARY
+    // TODO - ask if user wants to reduce the data or view it in the corpus viewer
+    OpenMainPanel ( );
+    ofLogNotice ( "AnalyserMenu" ) << "Corpus created";
+    //------------------------------------------------ TEMPORARY
 }
 
 void AnalyserMenu::Reduce ( )
 {
-	if ( !bReductionInputSelected || !bReductionOutputSelected )
-	{
-		flashColour = 255;
-		bFlashingInvalidFileSelects = true;
-		ofLogError ( "AnalyserMenu" ) << "Reduction input or output file not selected";
-		return;
-	}
+    if ( !bReductionInputSelected || !bReductionOutputSelected )
+    {
+        mInvalidPulseColour = 255;
+        bInvalidPulseFileSelects = true;
+        ofLogError ( "AnalyserMenu" ) << "Reduction input or output file not selected";
+        return;
+    }
 
-	if ( mReducedDimensionsField >= mCurrentDimensionCount )
-	{
-		flashColour = 255;
-		bFlashingInvalidReductionDimensions = true;
-		ofLogError ( "AnalyserMenu" ) << "Can't reduce to more dimensions than currently exist";
-		return;
-	}
+    if ( mReducedDimensionsField >= mCurrentDimensionCount )
+    {
+        mInvalidPulseColour = 255;
+        bInvalidPulseReductionDimensions = true;
+        ofLogError ( "AnalyserMenu" ) << "Can't reduce to more dimensions than currently exist";
+        return;
+    }
 
-	bProcessing = true;
+    bProcessing = true;
 
-	bool success = false;
-	Utils::ReductionSettings settings;
-	PackSettingsFromUser ( settings );
-	success = mController.ReduceCorpus ( inputPath, outputPath, settings );
+    bool success = false;
+    Utils::ReductionSettings settings;
+    PackSettingsFromUser ( settings );
+    success = mController.ReduceCorpus ( inputPath, outputPath, settings );
 
-	bProcessing = false;
+    bProcessing = false;
 
-	if ( !success )
-	{
-		ShowMainPanel ( );
-		return;
-	}
+    if ( !success )
+    {
+        OpenMainPanel ( );
+        return;
+    }
 
-	// TODO - ask if user wants to open the reduced data in the corpus viewer
-	ShowMainPanel ( );
-	ofLogNotice ( "AnalyserMenu" ) << "Corpus reduced";
-	//------------------------------------------------ TEMPORARY
+    // TODO - ask if user wants to open the reduced data in the corpus viewer
+    OpenMainPanel ( );
+    ofLogNotice ( "AnalyserMenu" ) << "Corpus reduced";
+    //------------------------------------------------ TEMPORARY
 }
 
 // File Dialog Button Callbacks -----------------
 
 void AnalyserMenu::SelectAnalysisDirectory ( )
 {
-	ofFileDialogResult audioDirectory = ofSystemLoadDialog ( "Select folder containing audio files...", true, ofFilePath::getCurrentWorkingDirectory ( ) );
-	if ( !audioDirectory.bSuccess )
-	{
-		ofLogError ( "AnalyserMenu" ) << "No folder selected";
-		return;
-	}
-	if ( !ofDirectory::doesDirectoryExist ( audioDirectory.getPath ( ) ) )
-	{
-		ofLogError ( "AnalyserMenu" ) << "Invalid directory";
-		return;
-	}
+    ofFileDialogResult audioDirectory = ofSystemLoadDialog ( "Select folder containing audio files...", true, ofFilePath::getCurrentWorkingDirectory ( ) );
+    if ( !audioDirectory.bSuccess )
+    {
+        ofLogError ( "AnalyserMenu" ) << "No folder selected";
+        return;
+    }
+    if ( !ofDirectory::doesDirectoryExist ( audioDirectory.getPath ( ) ) )
+    {
+        ofLogError ( "AnalyserMenu" ) << "Invalid directory";
+        return;
+    }
 
-	inputPath = audioDirectory.getPath ( );
-	mAnalysisDirectoryLabel = audioDirectory.getName ( );
-	bAnalysisDirectorySelected = true;
+    inputPath = audioDirectory.getPath ( );
+    mAnalysisDirectoryLabel = audioDirectory.getName ( );
+    bAnalysisDirectorySelected = true;
 }
 
 //TODO - fix windows save dialog defaults
-	//#ifdef _WIN32
-	//auto resultOut = pfd::save_file::save_file("Saving reduced analysis as...", "reduced_corpus.json", { "JSON Files", "*.json" });
-	//std::string resultOutPath = resultOut.result();
-	//#endif
+    //#ifdef _WIN32
+    //auto resultOut = pfd::save_file::save_file("Saving reduced analysis as...", "reduced_corpus.json", { "JSON Files", "*.json" });
+    //std::string resultOutPath = resultOut.result();
+    //#endif
 void AnalyserMenu::SelectAnalysisOutputFile ( )
 {
-	ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus.json", "Save analysed corpus as..." );
-	if ( !outputFile.bSuccess )
-	{
-		ofLogError ( "AnalyserMenu" ) << "Invalid save query";
-		return;
-	}
-	if ( outputFile.getName ( ).find ( ".json" ) == std::string::npos )
-	{
-		ofLogNotice ( "AnalyserMenu" ) << "Added missing .json extension";
-		outputFile.filePath += ".json";
-		outputFile.fileName += ".json";
-	}
+    ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus.json", "Save analysed corpus as..." );
+    if ( !outputFile.bSuccess )
+    {
+        ofLogError ( "AnalyserMenu" ) << "Invalid save query";
+        return;
+    }
+    if ( outputFile.getName ( ).find ( ".json" ) == std::string::npos )
+    {
+        ofLogNotice ( "AnalyserMenu" ) << "Added missing .json extension";
+        outputFile.filePath += ".json";
+        outputFile.fileName += ".json";
+    }
 
-	if ( ofFile::doesFileExist ( outputFile.getPath ( ) ) )
-	{
-		bInsertingIntoCorpus = true;
-		ShowAnalysisInsertionPanel ( );
-	}
-	else
-	{
-		bInsertingIntoCorpus = false;
-		HideAnalysisInsertionPanel ( );
-	}
+    if ( ofFile::doesFileExist ( outputFile.getPath ( ) ) )
+    {
+        bInsertingIntoCorpus = true;
+        OpenAnalysisInsertionPanel ( );
+    }
+    else
+    {
+        bInsertingIntoCorpus = false;
+        CloseAnalysisInsertionPanel ( );
+    }
 
-	if ( bInsertingIntoCorpus )
-	{
-		Utils::AnalysisSettings settings;
-		bool success = mJSON.Read ( outputFile.getPath ( ), settings );
-		if ( !success ) { return; }
+    if ( bInsertingIntoCorpus )
+    {
+        Utils::AnalysisSettings settings;
+        bool success = mJSON.Read ( outputFile.getPath ( ), settings );
+        if ( !success ) { return; }
 
-		if ( settings.hasBeenReduced )
-		{
-			ofLogError ( "AnalyserMenu" ) << "Can't insert into an already reduced dataset";
-			return;
-		}
+        if ( settings.hasBeenReduced )
+        {
+            ofLogError ( "AnalyserMenu" ) << "Can't insert into an already reduced dataset";
+            return;
+        }
 
-		UnpackSettingsFromFile ( settings );
-	}
+        UnpackSettingsFromFile ( settings );
+    }
 
-	ToggleAnalysisUILockout ( bInsertingIntoCorpus );
-	outputPath = outputFile.getPath ( );
-	mAnalysisOutputLabel = outputFile.getName ( );
-	bAnalysisOutputSelected = true;
+    ToggleAnalysisUILockout ( bInsertingIntoCorpus );
+    outputPath = outputFile.getPath ( );
+    mAnalysisOutputLabel = outputFile.getName ( );
+    bAnalysisOutputSelected = true;
 }
 
 void AnalyserMenu::SelectReductionInputFile ( )
 {
-	ofFileDialogResult inputFile = ofSystemLoadDialog ( "Select a corpus file...", false, ofFilePath::getCurrentWorkingDirectory ( ) );
-	if ( !inputFile.bSuccess )
-	{
-		ofLogError ( "AnalyserMenu" ) << "No file selected";
-		return;
-	}
-	if ( !ofFile::doesFileExist ( inputFile.getPath ( ) ) )
-	{
-		ofLogError ( "AnalyserMenu" ) << "Invalid file";
-		return;
-	}
-	if ( inputFile.getName ( ).find ( ".json" ) == std::string::npos )
-	{
-		ofLogError ( "AnalyserMenu" ) << "Invalid file extension";
-		return;
-	}
+    ofFileDialogResult inputFile = ofSystemLoadDialog ( "Select a corpus file...", false, ofFilePath::getCurrentWorkingDirectory ( ) );
+    if ( !inputFile.bSuccess )
+    {
+        ofLogError ( "AnalyserMenu" ) << "No file selected";
+        return;
+    }
+    if ( !ofFile::doesFileExist ( inputFile.getPath ( ) ) )
+    {
+        ofLogError ( "AnalyserMenu" ) << "Invalid file";
+        return;
+    }
+    if ( inputFile.getName ( ).find ( ".json" ) == std::string::npos )
+    {
+        ofLogError ( "AnalyserMenu" ) << "Invalid file extension";
+        return;
+    }
 
-	Utils::AnalysisSettings settings;
-	bool success = mJSON.Read ( inputFile.getPath ( ), settings );
-	if ( !success ) { return; }
-	if ( settings.currentDimensionCount <= 2 )
-	{
-		ofLogError ( "AnalyserMenu" ) << "Analysis already contains the minimum number of dimensions";
-		return;
-	}
+    Utils::AnalysisSettings settings;
+    bool success = mJSON.Read ( inputFile.getPath ( ), settings );
+    if ( !success ) { return; }
+    if ( settings.currentDimensionCount <= 2 )
+    {
+        ofLogError ( "AnalyserMenu" ) << "Analysis already contains the minimum number of dimensions";
+        return;
+    }
 
-	UnpackSettingsFromFile ( settings );
-	inputPath = inputFile.getPath ( );
-	mReductionInputLabel = inputFile.getName ( );
-	bReductionInputSelected = true;
+    UnpackSettingsFromFile ( settings );
+    inputPath = inputFile.getPath ( );
+    mReductionInputLabel = inputFile.getName ( );
+    bReductionInputSelected = true;
 }
 
 //TODO - fix windows save dialog defaults
-	//#ifdef _WIN32
-	//auto resultOut = pfd::save_file::save_file("Saving reduced analysis as...", "reduced_corpus.json", { "JSON Files", "*.json" });
-	//std::string resultOutPath = resultOut.result();
-	//#endif
+    //#ifdef _WIN32
+    //auto resultOut = pfd::save_file::save_file("Saving reduced analysis as...", "reduced_corpus.json", { "JSON Files", "*.json" });
+    //std::string resultOutPath = resultOut.result();
+    //#endif
 void AnalyserMenu::SelectReductionOutputFile ( )
 {
-	ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus_reduced.json", "Save reduced corpus as..." );
-	if ( !outputFile.bSuccess )
-	{
-		ofLogError ( "AnalyserMenu" ) << "Invalid save query";
-		return;
-	}
-	if ( outputFile.getName ( ).find ( ".json" ) == std::string::npos )
-	{
-		ofLogNotice ( "AnalyserMenu" ) << "Added missing .json extension";
-		outputFile.filePath += ".json";
-		outputFile.fileName += ".json";
-	}
+    ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus_reduced.json", "Save reduced corpus as..." );
+    if ( !outputFile.bSuccess )
+    {
+        ofLogError ( "AnalyserMenu" ) << "Invalid save query";
+        return;
+    }
+    if ( outputFile.getName ( ).find ( ".json" ) == std::string::npos )
+    {
+        ofLogNotice ( "AnalyserMenu" ) << "Added missing .json extension";
+        outputFile.filePath += ".json";
+        outputFile.fileName += ".json";
+    }
 
-	outputPath = outputFile.getPath ( );
-	mReductionOutputLabel = outputFile.getName ( );
-	bReductionOutputSelected = true;
+    outputPath = outputFile.getPath ( );
+    mReductionOutputLabel = outputFile.getName ( );
+    bReductionOutputSelected = true;
 }
 
 // Load and Save Settings -----------------------
 
 void AnalyserMenu::UnpackSettingsFromFile ( const Utils::AnalysisSettings& settings )
 {
-	mAnalysisPitchToggle = settings.bPitch;
-	mAnalysisLoudnessToggle = settings.bLoudness;
-	mAnalysisShapeToggle = settings.bShape;
-	mAnalysisMFCCToggle = settings.bMFCC;
-	mSampleRateField = settings.sampleRate;
-	mWindowFFTField = settings.windowFFTSize;
-	mHopFractionField = settings.hopFraction;
-	mNBandsField = settings.nBands;
-	mNCoefsField = settings.nCoefs;
-	mMinFreqField = settings.minFreq;
-	mMaxFreqField = settings.maxFreq;
-	mCurrentDimensionCount = settings.currentDimensionCount;
+    mAnalysisPitchToggle = settings.bPitch;
+    mAnalysisLoudnessToggle = settings.bLoudness;
+    mAnalysisShapeToggle = settings.bShape;
+    mAnalysisMFCCToggle = settings.bMFCC;
+    mSampleRateField = settings.sampleRate;
+    mWindowFFTField = settings.windowFFTSize;
+    mHopFractionField = settings.hopFraction;
+    mNBandsField = settings.nBands;
+    mNCoefsField = settings.nCoefs;
+    mMinFreqField = settings.minFreq;
+    mMaxFreqField = settings.maxFreq;
+    mCurrentDimensionCount = settings.currentDimensionCount;
 
 #ifndef DATA_CHANGE_CHECK_1
 #error "check if this implementation is still valid for the data struct"
@@ -615,18 +805,18 @@ void AnalyserMenu::UnpackSettingsFromFile ( const Utils::AnalysisSettings& setti
 
 void AnalyserMenu::PackSettingsFromUser ( Utils::AnalysisSettings& settings )
 {
-	settings.bTime = true;
-	settings.bPitch = mAnalysisPitchToggle;
-	settings.bLoudness = mAnalysisLoudnessToggle;
-	settings.bShape = mAnalysisShapeToggle;
-	settings.bMFCC = mAnalysisMFCCToggle;
-	settings.sampleRate = mSampleRateField;
-	settings.windowFFTSize = mWindowFFTField;
-	settings.hopFraction = mHopFractionField;
-	settings.nBands = mNBandsField;
-	settings.nCoefs = mNCoefsField;
-	settings.minFreq = mMinFreqField;
-	settings.maxFreq = mMaxFreqField;
+    settings.bTime = true;
+    settings.bPitch = mAnalysisPitchToggle;
+    settings.bLoudness = mAnalysisLoudnessToggle;
+    settings.bShape = mAnalysisShapeToggle;
+    settings.bMFCC = mAnalysisMFCCToggle;
+    settings.sampleRate = mSampleRateField;
+    settings.windowFFTSize = mWindowFFTField;
+    settings.hopFraction = mHopFractionField;
+    settings.nBands = mNBandsField;
+    settings.nCoefs = mNCoefsField;
+    settings.minFreq = mMinFreqField;
+    settings.maxFreq = mMaxFreqField;
 
 
 #ifndef DATA_CHANGE_CHECK_1
@@ -636,125 +826,56 @@ void AnalyserMenu::PackSettingsFromUser ( Utils::AnalysisSettings& settings )
 
 void AnalyserMenu::PackSettingsFromUser ( Utils::ReductionSettings& settings )
 {
-	settings.dimensionReductionTarget = mReducedDimensionsField;
-	settings.maxIterations = mMaxIterationsField;
+    settings.dimensionReductionTarget = mReducedDimensionsField;
+    settings.maxIterations = mMaxIterationsField;
 
 #ifndef DATA_CHANGE_CHECK_1
 #error "check if this implementation is still valid for the data struct"
 #endif // !DATA_CHANGE_CHECK_1
 }
 
-
 // UI Value Management -------------------------------
 
 void AnalyserMenu::QuantiseWindowSize ( int& value )
 {
-	//find closest power of 2 between 512 and 8192
-	int closest = 512;
-	int diff = abs ( value - 512 );
-	for ( int i = 1024; i <= 8192; i *= 2 )
-	{
-		int newdiff = abs ( value - i );
-		if ( newdiff < diff )
-		{
-			closest = i;
-			diff = newdiff;
-		}
-	}
-	mWindowFFTField.setup ( mWindowFFTField.getName(), closest, mWindowFFTField.getMin(), mWindowFFTField.getMax() );
-	mAnalysisMetadataPanel.setWidthElements ( mAnalysisMetadataPanel.getWidth ( ) );
-	mAnalysisMetadataPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ) );
+    //find closest power of 2 between 512 and 8192
+    int closest = 512;
+    int diff = abs ( value - 512 );
+    for ( int i = 1024; i <= 8192; i *= 2 )
+    {
+        int newdiff = abs ( value - i );
+        if ( newdiff < diff )
+        {
+            closest = i;
+            diff = newdiff;
+        }
+    }
+    mWindowFFTField.setup ( mWindowFFTField.getName(), closest, mWindowFFTField.getMin(), mWindowFFTField.getMax() );
+    mAnalysisMetadataPanel.setWidthElements ( mAnalysisMetadataPanel.getWidth ( ) );
+    mAnalysisMetadataPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ) );
 }
 
 void AnalyserMenu::QuantiseHopFraction ( int& value )
 {
-	//find closest power of 2 between 1 and 16
-	int closest = 1;
-	int diff = abs ( value - 1 );
-	for ( int i = 2; i <= 16; i *= 2 )
-	{
-		int newdiff = abs ( value - i );
-		if ( newdiff < diff )
-		{
-			closest = i;
-			diff = newdiff;
-		}
-	}
-	mHopFractionField.setup ( mHopFractionField.getName ( ), closest, mHopFractionField.getMin ( ), mHopFractionField.getMax ( ) );
-	mAnalysisMetadataPanel.setWidthElements ( mAnalysisMetadataPanel.getWidth ( ) );
-	mAnalysisMetadataPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ) );
+    //find closest power of 2 between 1 and 16
+    int closest = 1;
+    int diff = abs ( value - 1 );
+    for ( int i = 2; i <= 16; i *= 2 )
+    {
+        int newdiff = abs ( value - i );
+        if ( newdiff < diff )
+        {
+            closest = i;
+            diff = newdiff;
+        }
+    }
+    mHopFractionField.setup ( mHopFractionField.getName ( ), closest, mHopFractionField.getMin ( ), mHopFractionField.getMax ( ) );
+    mAnalysisMetadataPanel.setWidthElements ( mAnalysisMetadataPanel.getWidth ( ) );
+    mAnalysisMetadataPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ) );
 }
 
 void AnalyserMenu::AnalysisInsertionToggleChanged ( bool& value )
 {
-	if ( value ) { mAnalysisInsertionReplaceWithNewToggle.setName ( "New Files" ); }
-	else { mAnalysisInsertionReplaceWithNewToggle.setName ( "Existing Files" ); }
-}
-
-// Panel Management ------------------------------
-
-void AnalyserMenu::ToggleAnalysisUILockout ( bool lock )
-{
-	mAnalysisPitchToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
-	mAnalysisLoudnessToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
-	mAnalysisShapeToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
-	mAnalysisMFCCToggle.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
-	mSampleRateField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
-	mWindowFFTField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
-	mHopFractionField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
-	mNBandsField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
-	mNCoefsField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
-	mMinFreqField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
-	mMaxFreqField.setTextColor ( lock ? mColors.lockedTextColor : mColors.normalTextColor );
-
-	if ( lock )
-	{
-		mAnalysisMetadataPanel.unregisterMouseEvents ( );
-		mWindowFFTField.unregisterMouseEvents ( );
-		mHopFractionField.unregisterMouseEvents ( );
-	}
-	else
-	{
-		mAnalysisMetadataPanel.registerMouseEvents ( );
-		mWindowFFTField.registerMouseEvents ( );
-		mHopFractionField.registerMouseEvents ( );
-	}
-}
-
-void AnalyserMenu::ShowMainPanel ( )
-{
-	Initialise ( mLayout.HiDpi );
-	bDraw = true;
-	bDrawMainPanel = true;
-	mMainPanel.setPosition ( mLayout.analysePanelOriginX, mLayout.analysePanelOriginY );
-}
-
-void AnalyserMenu::ShowAnalysisPanel ( )
-{
-	Initialise ( mLayout.HiDpi );
-	bDraw = true;
-	bDrawAnalysisPanel = true;
-	mAnalysisPanel.setPosition ( mLayout.analysePanelOriginX, mLayout.analysePanelOriginY );
-	mAnalysisMetadataPanel.setPosition ( mAnalysisPanel.getPosition ( ).x, mAnalysisPanel.getPosition ( ).y + mAnalysisPanel.getHeight ( ) + mLayout.interPanelSpacing );
-	mAnalysisConfirmPanel.setPosition ( mAnalysisMetadataPanel.getPosition ( ).x, mAnalysisMetadataPanel.getPosition ( ).y + mAnalysisMetadataPanel.getHeight ( ) + mLayout.interPanelSpacing );
-}
-
-void AnalyserMenu::ShowAnalysisInsertionPanel ( )
-{
-	bDrawAnalysisInsertionPanel = true;
-	mAnalysisInsertionPanel.setPosition ( mAnalysisConfirmPanel.getPosition ( ).x, mAnalysisConfirmPanel.getPosition ( ).y + mAnalysisConfirmPanel.getHeight ( ) + mLayout.interPanelSpacing );
-}
-
-void AnalyserMenu::HideAnalysisInsertionPanel ( )
-{
-	bDrawAnalysisInsertionPanel = false;
-	mAnalysisInsertionPanel.setPosition ( mLayout.hiddenPanelPosition );
-}
-
-void AnalyserMenu::ShowReductionPanel ( )
-{
-	Initialise ( mLayout.HiDpi );
-	bDraw = true;
-	bDrawReductionPanel = true;
-	mReductionPanel.setPosition ( mLayout.analysePanelOriginX, mLayout.analysePanelOriginY );
+    if ( value ) { mAnalysisInsertionReplaceWithNewToggle.setName ( "New Files" ); }
+    else { mAnalysisInsertionReplaceWithNewToggle.setName ( "Existing Files" ); }
 }

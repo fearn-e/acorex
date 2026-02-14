@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2024 Elowyn Fearne
+Copyright (c) 2024-2026 Elowyn Fearne
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -18,39 +18,42 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "AnalyserMenu.h"
 #include "ExplorerMenu.h"
+#include "Utils/InterfaceDefs.h"
 #include <ofMain.h>
 #include <ofxGui.h>
 
 class ofApp : public ofBaseApp {
 
 public:
-	ofApp ( ) { }
-	~ofApp ( ) { }
+    ofApp ( );
+    ~ofApp ( ) { }
 
-	void setup ( );
-	void update ( );
-	void draw ( );
-	void exit ( );
-	
-	void windowResized ( int w, int h );
-	//void dragEvent ( ofDragInfo dragInfo );
-	//void gotMessage ( ofMessage msg );
+    void setup ( );
+    void update ( );
+    void draw ( );
+    void exit ( );
+    
+    void windowResized ( int w, int h );
+    //void dragEvent ( ofDragInfo dragInfo );
+    //void gotMessage ( ofMessage msg );
 
 private:
-	void RemoveListeners ( );
-	void SetupUI ( bool keepValues );
-	void AnalyseToggled ( bool& value );
-	void ExploreToggled ( bool& value );
-	void DPIToggled ( bool& value );
+    void AddListeners ( );
+    void RemoveListeners ( );
+    void InitialiseUI ( );
+    void RefreshUI ( );
+    void AnalyseToggled ( bool& value );
+    void ExploreToggled ( bool& value );
+    void DPIToggled ( bool& value );
 
-	Acorex::AnalyserMenu mAnalyserMenu;
-	Acorex::ExplorerMenu mExplorerMenu;
-	Acorex::Utils::MenuLayout mLayout;
-	Acorex::Utils::Colors mColors;
+    Acorex::AnalyserMenu mAnalyserMenu;
+    Acorex::ExplorerMenu mExplorerMenu;
+    std::shared_ptr<Acorex::Utils::MenuLayout> mLayout;
+    Acorex::Utils::Colors mColors;
 
-	ofxToggle mAnalyseToggle;
-	ofxToggle mExploreToggle;
-	ofxToggle mDPIToggle;
+    ofxToggle mAnalyseToggle;
+    ofxToggle mExploreToggle;
+    ofxToggle mDPIToggle;
 
-	bool bListenersAdded = false;
+    bool bListenersAdded;
 };
