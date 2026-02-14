@@ -72,7 +72,7 @@ bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t buff
 
     {
         std::lock_guard<std::mutex> lock ( mMissingOutputMutex );
-        bMissingOutputFlag = success; bMissingOutputFlagConfirmed = false;
+        bMissingOutputFlag = !success; bMissingOutputFlagConfirmed = false;
     }
     {
         std::lock_guard<std::mutex> lock ( mRestartingAudioMutex );
