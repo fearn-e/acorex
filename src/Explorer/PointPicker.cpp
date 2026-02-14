@@ -155,9 +155,9 @@ void Explorer::PointPicker::Exit ( )
 void Explorer::PointPicker::AddListeners ( )
 {
     if ( bListenersAdded ) { return; }
-    ofRemoveListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
-    ofRemoveListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
-    ofRemoveListener ( ofEvents ( ).mouseReleased, this, &Explorer::PointPicker::MouseReleased );
+    ofAddListener ( ofEvents ( ).mouseMoved, this, &Explorer::PointPicker::MouseMoved );
+    ofAddListener ( ofEvents ( ).keyReleased, this, &Explorer::PointPicker::KeyEvent );
+    ofAddListener ( ofEvents ( ).mouseReleased, this, &Explorer::PointPicker::MouseReleased );
     bListenersAdded = true;
 }
 
