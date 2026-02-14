@@ -436,6 +436,22 @@ void Explorer::LiveView::Draw ( )
         }
     }
 
+    // Paused overlay ---------------------------
+    if ( bUserPaused )
+    {
+        ofEnableAlphaBlending ( );
+
+        //ofColor color = ofColor::fromHsb ( fmod ( ofGetElapsedTimef ( ) * 5, 255 ), 60, 120 );
+        //ofSetColor ( color.r, color.g, color.b, 50 );
+        ofSetColor ( 0, 0, 0, 150 );
+        ofDrawRectangle ( 0, 0, ofGetWidth ( ), ofGetHeight ( ) );
+
+        ofSetColor ( 255, 0, 0, 150 );
+        ofDrawBitmapStringHighlight ( "PAUSED", ofGetWidth ( ) - 100, ofGetHeight ( ) - 40 );
+
+        ofDisableAlphaBlending ( );
+    }
+
     if ( bDebug )
     {
         ofDrawBitmapStringHighlight ( "UPS: " + std::to_string ( 1 / deltaTime ), 20, ofGetHeight ( ) - 220 );
@@ -989,7 +1005,7 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
         else if ( args.key == ACOREX_KEYBIND_CAMERA_ZOOM_IN ) { mKeyboardMoveState[8] = false; }
         else if ( args.key == ACOREX_KEYBIND_CAMERA_ZOOM_OUT ) { mKeyboardMoveState[9] = false; }
         else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD ) { CreatePlayhead ( ); }
-        else if ( args.key == ACOREX_KEYBIND_AUDIO_PAUSE ) { mAudioPlayback.UserInvokedPause ( ); }
+        else if ( args.key == ACOREX_KEYBIND_AUDIO_PAUSE ) { bUserPaused = !bUserPaused; mAudioPlayback.UserInvokedPause ( bUserPaused ); }
         else if ( args.key == ACOREX_KEYBIND_TOGGLE_DEBUG_VIEW ) { bDebug = !bDebug; }
         // else if ( args.key == 'l' ) // TODO - delete, deprecated, tied to old sound system
         // {

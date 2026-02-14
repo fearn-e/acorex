@@ -101,6 +101,7 @@ private:
     bool bListenersAdded;
 
     bool bDebug;
+    bool bUserPaused;
     bool bDraw;
     bool b3D;
     bool bColorFullSpectrum;

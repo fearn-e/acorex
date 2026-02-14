@@ -48,7 +48,7 @@ public:
     void SetFlagMissingOutput ( bool missing );
     void WaitForMissingOutputConfirm ( );
 
-    void UserInvokedPause ( ) { bUserPauseFlag = !bUserPauseFlag; }
+    void UserInvokedPause ( bool pause ) { bUserPauseFlag = pause; }
 
     void SetDimensionBounds ( const Utils::DimensionBoundsData& dimensionBoundsData );
     void SetTimeCorpus ( const std::vector<ofMesh>& timeCorpus );
