@@ -25,6 +25,10 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofRectangle.h>
 #include <algorithm>
 
+#include <ofMath.h>
+#include <ofGraphics.h>
+#include <of3dGraphics.h>
+
 #include "Utils/TemporaryDefaults.h"
 
 #define DATA_CHANGE_CHECK_1
@@ -211,6 +215,45 @@ struct VisualPlayhead {
 
     ofColor color = ofColor ( 255, 255, 255, 255 );
     ofRectangle panelRect = ofRectangle ( 0, 0, 0, 0 );
+};
+
+struct VisualPlayheadTrail {
+private:
+    size_t maxTrailSize;
+    
+    bool dying;
+    int currentFadeStep;
+    int lastFadeUpdateTime;
+    int fadeUpdateInterval; // millis
+
+    std::deque<size_t> fileIndex; // [trailPoint]
+    std::deque<size_t> timePointIndex; // [trailPoint]
+
+    std::deque<glm::vec3> position; // [trailPoint]
+    std::deque<ofColor> color; // [trailPoint]
+
+    std::deque<ofColor> displayedColor; // [trailPoint]
+
+    ofColor playheadColor;
+    
+    void UpdateTrail ( );
+
+public:
+    VisualPlayheadTrail ( size_t ID, ofColor playheadColor, size_t maxTrailLength = 10, int fadeUpdateIntervalMillis = 50 );
+
+    size_t playheadID;
+
+    void Kill ( ) { dying = true; currentFadeStep = 0; lastFadeUpdateTime = ofGetElapsedTimeMillis ( ); }
+
+    void Draw ( ) const;
+
+    /// Returns true when this trail can be removed.
+    bool Update ( int currentTime );
+
+    void AddTrailPoint ( size_t file, size_t timePoint, const glm::vec3& pos, const ofColor& col );
+
+    glm::vec3 GetPosition ( size_t trailPointIndex ) const { return position[trailPointIndex]; }
+    ofColor GetColor ( size_t trailPointIndex ) const { return color[trailPointIndex]; }
 };
 
 } // namespace Utils

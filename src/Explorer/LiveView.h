@@ -98,6 +98,14 @@ public:
     void MouseEvent ( ofMouseEventArgs& args );
 
 private:
+    //temp while testing new playhead drawing
+
+    bool bDrawPlayheadColorTrails = true;
+
+    std::vector<Utils::VisualPlayheadTrail> mPlayheadTrails;
+
+    //end temp
+
     bool bListenersAdded;
 
     bool bDebug;

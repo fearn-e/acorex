@@ -1,0 +1,105 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2024-2026 Elowyn Fearne
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+#pragma once
+
+#include <Utils/Data.h>
+
+using namespace Acorex;
+
+Utils::VisualPlayheadTrail::VisualPlayheadTrail ( size_t ID, ofColor playheadColor, size_t maxTrailLength, int fadeUpdateIntervalMillis )
+    : playheadID ( ID ), playheadColor ( playheadColor ), maxTrailSize ( maxTrailLength ), dying ( false ),
+    currentFadeStep ( 0 ), lastFadeUpdateTime ( 0 ), fadeUpdateInterval ( fadeUpdateIntervalMillis )
+{ }
+
+void Utils::VisualPlayheadTrail::UpdateTrail ( )
+{
+    for ( int i = 0; i < color.size ( ); i++ )
+    {
+        // trail points fade out - and the colour is initally 100% playhead colour, but then slowly shifts to the actual colour of the point as it fades out
+        float fadeFactor = ofMap ( i, 1, maxTrailSize, 1.0f, 0.0f, true );
+        ofColor blendedColor = playheadColor.getLerped ( color[i], 1.0f - fadeFactor );
+        displayedColor[i] = ofColor ( blendedColor.r, blendedColor.g, blendedColor.b, 255 * fadeFactor );
+    }
+}
+
+void Utils::VisualPlayheadTrail::Draw ( ) const
+{
+    for ( int i = 0; i < position.size ( ); i++ )
+    {
+        ofSetColor ( displayedColor[i] );
+        ofDrawSphere ( position[i], 20 );
+        if ( i < position.size ( ) - 1 )
+        {
+            // if i+1 to i is a jump, draw a dashed line
+            if ( fileIndex[i] != fileIndex[i + 1] || timePointIndex[i] != timePointIndex[i + 1] + 1 )
+            {
+                ofSetColor ( displayedColor[i].r, displayedColor[i].g, displayedColor[i].b, displayedColor[i].a / 2 );
+                for ( float t = 0; t < 1; t += 0.1 )
+                {
+                    glm::vec3 pointOnLine = position[i] + t * ( position[i + 1] - position[i] );
+                    ofDrawSphere ( pointOnLine, 5 );
+                }
+            }
+            else
+            {
+                ofSetColor ( displayedColor[i].r, displayedColor[i].g, displayedColor[i].b, displayedColor[i].a / 4 );
+                ofDrawLine ( position[i], position[i + 1] );
+            }
+        }
+    }
+}
+
+bool Utils::VisualPlayheadTrail::Update ( int currentTime )
+{
+    if ( !dying ) { return false; }
+
+    if ( currentTime - lastFadeUpdateTime < fadeUpdateInterval ) { return false; }
+
+    currentFadeStep++;
+
+    for ( int i = 0; i < color.size ( ); i++ )
+    {
+        displayedColor[i] = ofColor ( color[i].r, color[i].g, color[i].b, 
+                                ofMap ( i, 1 + currentFadeStep, maxTrailSize + currentFadeStep, 255, 0, true ) );
+    }
+
+    lastFadeUpdateTime = currentTime;
+
+    return currentFadeStep >= maxTrailSize;
+}
+
+void Utils::VisualPlayheadTrail::AddTrailPoint ( size_t file, size_t timePoint, const glm::vec3& pos, const ofColor& col ) {
+    if ( dying ) { return; }
+
+    if ( fileIndex.size ( ) > 0 && file == fileIndex.front ( ) && timePoint == timePointIndex.front ( ) ) { return; }
+        
+    fileIndex.push_front ( file );
+    timePointIndex.push_front ( timePoint );
+    position.push_front ( pos );
+    color.push_front ( col );
+    displayedColor.push_front ( playheadColor );
+
+    if ( position.size ( ) > maxTrailSize ) {
+        fileIndex.pop_back ( );
+        timePointIndex.pop_back ( );
+        position.pop_back ( );
+        color.pop_back ( );
+        displayedColor.pop_back ( );
+    }
+
+    UpdateTrail ( );
+}
