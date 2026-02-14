@@ -66,7 +66,12 @@ bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t buff
         settings.setOutDevice ( outDevice );
     }
 
-    bool success = mSoundStream.setup ( settings );
+    bool success = false;
+
+    if ( outDevice.deviceID != -1 ) // outDevice.name != "No output selected." - TODO - maybe use an extra bool parameter instead of piggy backing on the deviceID?
+    {
+        success = mSoundStream.setup ( settings );
+    }
 
     bStreamStarted = success;
 
