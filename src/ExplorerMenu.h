@@ -111,13 +111,13 @@ private:
 
     void RescanDevices ( );
 
-    void SetApi ( string& api );
-    void SetOutDevice ( string& outDevice );
-    void SetBufferSize ( int& bufferSize );
+    void SetApi ( string& dropdownName );
+    void SetOutDevice ( string& dropdownName );
+    void SetBufferSize ( string& dropdownName );
 
     void AudioOutputFailed ( );
 
-    void WriteDeviceDropdownNames ( );
+    void ResetDeviceDropdown ( );
     void WriteApiDropdownDeviceCounts ( );
 
     // States --------------------------------------

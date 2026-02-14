@@ -554,9 +554,9 @@ void ExplorerMenu::AddListenersAudioManager ( )
 {
     if ( bListenersAddedAudioManager ) { return; }
 
-    mApiDropdown->addListener ( this, &ExplorerMenu::SetApi );
-    mOutDeviceDropdown->addListener ( this, &ExplorerMenu::SetOutDevice );
-    mBufferSizeDropdown->addListener ( this, &ExplorerMenu::SetBufferSize );
+    ofAddListener ( mApiDropdown->dropdownHidden_E, this, &ExplorerMenu::SetApi );
+    ofAddListener ( mOutDeviceDropdown->dropdownHidden_E, this, &ExplorerMenu::SetOutDevice );
+    ofAddListener ( mBufferSizeDropdown->dropdownHidden_E, this, &ExplorerMenu::SetBufferSize );
 
     ofAddListener ( mApiDropdown->dropdownWillShow_E, this, &ExplorerMenu::RescanDevices );
     ofAddListener ( mOutDeviceDropdown->dropdownWillShow_E, this, &ExplorerMenu::RescanDevices );
@@ -568,9 +568,9 @@ void ExplorerMenu::RemoveListenersAudioManager ( )
 {
     if ( !bListenersAddedAudioManager ) { return; }
 
-    mApiDropdown->removeListener ( this, &ExplorerMenu::SetApi );
-    mOutDeviceDropdown->removeListener ( this, &ExplorerMenu::SetOutDevice );
-    mBufferSizeDropdown->removeListener ( this, &ExplorerMenu::SetBufferSize );
+    ofRemoveListener ( mApiDropdown->dropdownHidden_E, this, &ExplorerMenu::SetApi );
+    ofRemoveListener ( mOutDeviceDropdown->dropdownHidden_E, this, &ExplorerMenu::SetOutDevice );
+    ofRemoveListener ( mBufferSizeDropdown->dropdownHidden_E, this, &ExplorerMenu::SetBufferSize );
 
     ofRemoveListener ( mApiDropdown->dropdownWillShow_E, this, &ExplorerMenu::RescanDevices );
     ofRemoveListener ( mOutDeviceDropdown->dropdownWillShow_E, this, &ExplorerMenu::RescanDevices );
@@ -833,9 +833,7 @@ void ExplorerMenu::RescanDevices ( )
 
     WriteApiDropdownDeviceCounts ( );
 
-    WriteDeviceDropdownNames ( );
-
-    mOutDeviceDropdown->setSelectedValueByIndex ( mAudioSettingsManager.GetCurrentDeviceIndex ( ), false );
+    ResetDeviceDropdown ( );
 
     if ( !bIsCorpusOpen ) { return; }
 
@@ -844,23 +842,21 @@ void ExplorerMenu::RescanDevices ( )
     AudioOutputFailed ( );
 }
 
-void Acorex::ExplorerMenu::SetApi ( string& api )
+void Acorex::ExplorerMenu::SetApi ( string& dropdownName )
 {
     if ( mAudioSettingsManager.GetCurrentApiIndex ( ) == mApiDropdown->getSelectedOptionIndex ( ) ) { return; }
 
     bool success = mAudioSettingsManager.ChangeSelectedApi ( mApiDropdown->getSelectedOptionIndex ( ) );
 
-    WriteDeviceDropdownNames ( );
-
     if ( !success )
     {
-        ofLogError ( "ExplorerMenu" ) << "Failed to change audio API to " << api
-                                    << ". Selected API: " << mAudioSettingsManager.GetCurrentApiName ( )
-                                    << ", Selected Device: " << mAudioSettingsManager.GetOutDevices ( mAudioSettingsManager.GetCurrentApiIndex ( ) )[mAudioSettingsManager.GetCurrentDeviceIndex ( )].name;
+        ofLogError ( "ExplorerMenu" ) << "Failed to change audio API to selected API."
+            << ". Selecting API: " << mAudioSettingsManager.GetCurrentApiName ( )
+            << ", Selecting Device: " << mAudioSettingsManager.GetOutDevices ( mAudioSettingsManager.GetCurrentApiIndex ( ) )[mAudioSettingsManager.GetCurrentDeviceIndex ( )].name;
         mApiDropdown->setSelectedValueByIndex ( mAudioSettingsManager.GetCurrentApiIndex ( ), false );
     }
 
-    mOutDeviceDropdown->setSelectedValueByIndex ( mAudioSettingsManager.GetCurrentDeviceIndex ( ), false );
+    ResetDeviceDropdown ( );
 
     if ( !bIsCorpusOpen ) { return; }
 
@@ -869,15 +865,17 @@ void Acorex::ExplorerMenu::SetApi ( string& api )
     AudioOutputFailed ( );
 }
 
-void ExplorerMenu::SetOutDevice ( string& outDevice )
+void ExplorerMenu::SetOutDevice ( string& dropdownName )
 {
+    //if ( bBlockAudioSettingsUIListenersTemporaryFix ) { return; }
+
     if ( mAudioSettingsManager.GetCurrentDeviceIndex ( ) == mOutDeviceDropdown->getSelectedOptionIndex ( ) ) { return; }
 
     bool success = mAudioSettingsManager.ChangeSelectedDevice ( mOutDeviceDropdown->getSelectedOptionIndex ( ) );
 
     if ( !success )
     {
-        ofLogError ( "ExplorerMenu" ) << "Failed to change output device to " << outDevice;
+        ofLogError ( "ExplorerMenu" ) << "Failed to change output device to selected device.";
         mOutDeviceDropdown->setSelectedValueByIndex ( mAudioSettingsManager.GetCurrentDeviceIndex ( ), false );
     }
 
@@ -888,11 +886,11 @@ void ExplorerMenu::SetOutDevice ( string& outDevice )
     AudioOutputFailed ( );
 }
 
-void ExplorerMenu::SetBufferSize ( int& bufferSize )
+void ExplorerMenu::SetBufferSize ( string& dropdownName )
 {
-    if ( mAudioSettingsManager.GetCurrentBufferSize ( ) == bufferSize ) { return; }
+    if ( mAudioSettingsManager.GetCurrentBufferSize ( ) == mBufferSizeDropdown->getAllSelected ( )[0] ) { return; }
 
-    mAudioSettingsManager.SetBufferSize ( bufferSize );
+    mAudioSettingsManager.SetBufferSize ( mBufferSizeDropdown->getAllSelected ( )[0] );
 
     if ( !bIsCorpusOpen ) { return; }
 
@@ -908,21 +906,17 @@ void ExplorerMenu::AudioOutputFailed ( )
     ofLogError ( "ExplorerMenu" ) << "Audio output failed to restart with current settings. This likely means the selected output device is currently unavailable. Please check your audio output device and try again.";
 }
 
-void ExplorerMenu::WriteDeviceDropdownNames ( )
+void ExplorerMenu::ResetDeviceDropdown ( )
 {
-    mOutDeviceDropdown->clear ( ); // TODO URGENT - does this remove my manually added listeners?
-    { // TEST - adding/removing listeners to see what the above ->clear ( ); does
-        mApiDropdown->removeListener ( this, &ExplorerMenu::SetApi );
-        mOutDeviceDropdown->addListener ( this, &ExplorerMenu::SetOutDevice );
-        ofRemoveListener ( mApiDropdown->dropdownWillShow_E, this, &ExplorerMenu::RescanDevices );
-        ofAddListener ( mOutDeviceDropdown->dropdownWillShow_E, this, &ExplorerMenu::RescanDevices );
-    }
+    mOutDeviceDropdown->clear ( );
 
     for ( size_t i = 0; i < mAudioSettingsManager.GetCurrentApiDevicesOut ( ).size ( ); i++ )
     {
         std::string deviceName = mAudioSettingsManager.GetCurrentApiDevicesOut ( )[i].name;
         mOutDeviceDropdown->add ( deviceName );
     }
+
+    mOutDeviceDropdown->setSelectedValueByIndex ( mAudioSettingsManager.GetCurrentDeviceIndex ( ), false );
 }
 
 void ExplorerMenu::WriteApiDropdownDeviceCounts ( )
