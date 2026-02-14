@@ -31,7 +31,7 @@ ExplorerMenu::ExplorerMenu ( ) :    mSlowUpdateInterval ( 100 ), mOpenCorpusButt
     mLiveView.SetRawView ( mRawView );
 
     bDraw = false;
-    bOpenCorpusWarningDraw = false;
+    bDrawOpenCorpusWarning = false;
 
     bIsCorpusOpen = false;
     bBlockDimensionFilling = false;
@@ -52,7 +52,7 @@ void ExplorerMenu::Initialise ( )
 void ExplorerMenu::Clear ( )
 {
     bDraw = false;
-    bOpenCorpusWarningDraw = false;
+    bDrawOpenCorpusWarning = false;
 
     bIsCorpusOpen = false;
     bBlockDimensionFilling = false;
@@ -139,9 +139,9 @@ void ExplorerMenu::SlowUpdate ( )
 {
     mLiveView.SlowUpdate ( );
 
-    if ( bOpenCorpusWarningDraw && ofGetElapsedTimeMillis ( ) - mOpenCorpusButtonClickTime > mOpenCorpusButtonTimeout )
+    if ( bDrawOpenCorpusWarning && ofGetElapsedTimeMillis ( ) - mOpenCorpusButtonClickTime > mOpenCorpusButtonTimeout )
     {
-        bOpenCorpusWarningDraw = false;
+        bDrawOpenCorpusWarning = false;
         mOpenCorpusButton.setName ( "Open Corpus" );
     }
 }
@@ -570,14 +570,14 @@ void ExplorerMenu::OpenCorpus ( )
     // TODO - is this flag still needed now that OpenFullPanel has all value sets set to bNotify = false?
     bBlockDimensionFilling = true;
     
-    if ( bIsCorpusOpen && !bOpenCorpusWarningDraw )
+    if ( bIsCorpusOpen && !bDrawOpenCorpusWarning )
     {
-        bOpenCorpusWarningDraw = true;
+        bDrawOpenCorpusWarning = true;
         mOpenCorpusButtonClickTime = ofGetElapsedTimeMillis ( );
         mOpenCorpusButton.setName ( "!! Close Current? !!" );
         return;
     }
-    bOpenCorpusWarningDraw = false;
+    bDrawOpenCorpusWarning = false;
 
     // clear stuff
     mLiveView.Clear ( );

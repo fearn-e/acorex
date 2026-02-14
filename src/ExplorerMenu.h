@@ -129,7 +129,7 @@ private:
     // States --------------------------------------
 
     bool bDraw;
-    bool bOpenCorpusWarningDraw;
+    bool bDrawOpenCorpusWarning;
 
     bool bIsCorpusOpen;
     bool bBlockDimensionFilling;
