@@ -17,6 +17,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #pragma once
 
 #include "Utils/DimensionBounds.h"
+#include "Utils/InterfaceDefs.h"
 #include "./SpaceDefs.h"
 #include "./PointPicker.h"
 #include "./RawView.h"
@@ -81,6 +82,7 @@ public:
     // Setters & Getters ----------------------------
 
     void SetRawView ( std::shared_ptr<RawView>& rawPointer ) { mRawView = rawPointer; mAudioPlayback.SetRawView ( rawPointer ); }
+    void SetMenuLayout ( std::shared_ptr<Utils::MenuLayout>& layout ) { mLayout = layout; }
     void Set3D ( bool is3D ) { b3D = is3D; }
     void SetColorFullSpectrum ( bool fullSpectrum ) { bColorFullSpectrum = fullSpectrum; }
 
@@ -139,6 +141,7 @@ private:
     Utils::DimensionBounds mDimensionBounds;
     std::shared_ptr<PointPicker> mPointPicker;
     AudioPlayback mAudioPlayback;
+    std::shared_ptr<Utils::MenuLayout> mLayout;
 };
 
 } // namespace Explorer

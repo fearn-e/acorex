@@ -47,7 +47,7 @@ public:
     void RefreshUI ( );
     void WindowResized ( );
 
-    void SetMenuLayout ( std::shared_ptr<Utils::MenuLayout>& menuLayout ) { mLayout = menuLayout; }
+    void SetMenuLayout ( std::shared_ptr<Utils::MenuLayout>& menuLayout ) { mLayout = menuLayout; mLiveView.SetMenuLayout ( menuLayout ); }
 
 private:
     void SlowUpdate ( );
