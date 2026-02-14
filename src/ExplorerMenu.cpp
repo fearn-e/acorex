@@ -387,12 +387,12 @@ void ExplorerMenu::WindowResized ( )
     if ( !bIsCorpusOpen ) { return; }
 
     int rectWidth = ofGetWidth ( ) / 10; int rectSpacing = ofGetWidth ( ) / 100; int rectHeight = ofGetHeight ( ) / 10;
-    for ( auto& playhead : mLiveView.GetPlayheads ( ) ) // TODO - fix playhead visual stacking when window resizing bug, easy fix
+    for ( size_t i = 0; i < mLiveView.GetPlayheads ( ).size ( ); i++ ) // TODO - fix playhead visual stacking when window resizing bug, easy fix
     {
-        playhead.panelRect = ofRectangle ( rectSpacing * mLiveView.GetPlayheads ( ).size ( ) + rectWidth * (mLiveView.GetPlayheads ( ).size ( ) - 1),
-                                            ofGetHeight ( ) - rectHeight - 5,
-                                            rectWidth,
-                                            rectHeight );
+        mLiveView.GetPlayheads ( )[i].panelRect = ofRectangle ( rectSpacing * i + rectWidth * i,
+                                                                ofGetHeight ( ) - rectHeight - 5,
+                                                                rectWidth,
+                                                                rectHeight );
     }
 }
 
