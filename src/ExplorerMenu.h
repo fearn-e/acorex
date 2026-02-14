@@ -19,6 +19,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Explorer/RawView.h"
 #include "Explorer/LiveView.h"
 #include "Utils/AudioSettingsManager.h"
+#include "Utils/Data.h"
 #include "Utils/InterfaceDefs.h"
 #include <ofxGui.h>
 #include <ofxDropdown.h>
@@ -54,11 +55,11 @@ private:
     // UI Management -------------------------------
 
     void OpenStartupPanel ( );
-    void OpenFullPanel ( const std::vector<std::string>& corpusDimensionDefaults );
+    void OpenFullPanel ( const Utils::ExploreSettings& settings );
 
     void SetupPanelSectionHeader ( std::string corpusNameLabel );
     // TODO - pass in default values for all the controls
-    void SetupPanelSectionCorpusControls ( std::vector<std::string> corpusDimensionDefaults );
+    void SetupPanelSectionCorpusControls ( const Utils::ExploreSettings& settings );
     void SetupPanelSectionAudioManager ( );
 
     void RefreshStartupPanelUI ( );
@@ -88,24 +89,29 @@ private:
     int GetDimensionIndex ( std::string& dimension );
     void CameraSwitcher ( );
 
+    /// Triggers all listeners that update corpus related settings.
+    void PropogateCorpusSettings ( const Utils::ExploreSettings& settings );
+
     // Listener Functions --------------------------
 
-    void SwapDimensionX ( string& dimension );
-    void SwapDimensionY ( string& dimension );
-    void SwapDimensionZ ( string& dimension );
-    void SwapDimensionColor ( string& dimension );
-    void SwitchColorSpectrum ( bool& fullSpectrum );
-    void ToggleLoopPlayheads ( bool& loop );
-    void ToggleJumpSameFileAllowed ( bool& allowed );
-    void SetJumpSameFileMinTimeDiff ( int& timeDiff );
-    void SetCrossoverJumpChance ( float& jumpChance );
-    void SetCrossfadeMaxSampleLength ( int& length );
-    void SetMaxJumpDistanceSpace ( float& distance );
-    void SetMaxJumpTargets ( int& targets );
-    void SetVolume(float & volume);
+    void SwapDimensionX ( const string& dimension );            void SwapDimensionXListener ( string& dimension ) { SwapDimensionX ( dimension ); }
+    void SwapDimensionY ( const string& dimension );            void SwapDimensionYListener ( string& dimension ) { SwapDimensionY ( dimension ); }
+    void SwapDimensionZ ( const string& dimension );            void SwapDimensionZListener ( string& dimension ) { SwapDimensionZ ( dimension ); }
 
-    void SwapDimensionDynamicPan ( string& dimension );
-    void SetPanningStrength ( float& strength );
+    void SwapDimensionColor ( const string& dimension );        void SwapDimensionColorListener ( string& dimension ) { SwapDimensionColor ( dimension ); }
+    void SwitchColorSpectrum ( const bool& fullSpectrum );      void SwitchColorSpectrumListener ( bool& fullSpectrum ) { SwitchColorSpectrum ( fullSpectrum ); }
+
+    void ToggleLoopPlayheads ( const bool& loop );              void ToggleLoopPlayheadsListener ( bool& loop ) { ToggleLoopPlayheads ( loop ); }
+    void ToggleJumpSameFileAllowed ( const bool& allowed );     void ToggleJumpSameFileAllowedListener ( bool& allowed ) { ToggleJumpSameFileAllowed ( allowed ); }
+    void SetJumpSameFileMinTimeDiff ( const int& timeDiff );    void SetJumpSameFileMinTimeDiffListener ( int& timeDiff ) { SetJumpSameFileMinTimeDiff ( timeDiff ); }
+    void SetCrossoverJumpChance ( const float& jumpChance );    void SetCrossoverJumpChanceListener ( float& jumpChance ) { SetCrossoverJumpChance ( jumpChance ); }
+    void SetCrossfadeSampleLength ( const int& length );        void SetCrossfadeSampleLengthListener ( int& length ) { SetCrossfadeSampleLength ( length ); }
+    void SetMaxJumpDistanceSpace ( const float& distance );     void SetMaxJumpDistanceSpaceListener ( float& distance ) { SetMaxJumpDistanceSpace ( distance ); }
+    void SetMaxJumpTargets ( const int& targets );              void SetMaxJumpTargetsListener ( int& targets ) { SetMaxJumpTargets ( targets ); }
+
+    void SetVolume( const float& volume );                      void SetVolumeListener ( float& volume ) { SetVolume ( volume ); }
+    void SwapDimensionDynamicPan ( const string& dimension );   void SwapDimensionDynamicPanListener ( string& dimension ) { SwapDimensionDynamicPan ( dimension ); }
+    void SetPanningStrength ( const float& strength );          void SetPanningStrengthListener ( float& strength ) { SetPanningStrength ( strength ); }
 
     void MouseReleased ( ofMouseEventArgs& args );
 
@@ -153,7 +159,7 @@ private:
     ofxToggle mJumpSameFileAllowedToggle;
     ofxIntSlider mJumpSameFileMinTimeDiffSlider;
     ofxFloatSlider mCrossoverJumpChanceSlider;
-    ofxIntSlider mCrossfadeMaxSampleLengthSlider;
+    ofxIntSlider mCrossfadeSampleLengthSlider;
     ofxFloatSlider mMaxJumpDistanceSpaceSlider;
     ofxIntSlider mMaxJumpTargetsSlider;
 

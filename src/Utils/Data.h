@@ -23,6 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <nlohmann/json.hpp>
 #include <ofColor.h>
 #include <ofRectangle.h>
+#include <algorithm>
 
 #include "Utils/TemporaryDefaults.h"
 
@@ -60,6 +61,79 @@ struct TimeData {
 struct StatsData {
     std::vector<std::vector<std::vector<double>>> raw; // [file][dimension][statistic] (mean, stdDev, skewness, kurtosis, loPercent, midPercent, hiPercent)
     std::vector<std::vector<double>> reduced; // [file][dimension]
+};
+
+struct ExploreSettings {
+private:
+    int maxHopSize = 32;
+
+    std::string dimensionX = "None";
+    std::string dimensionY = "None";
+    std::string dimensionZ = "None";
+
+    std::string dimensionColor = "None";
+    bool colorSpectrum = DEFAULT_COLOR_SPECTRUM;
+
+    bool loopPlayheads = DEFAULT_LOOP_PLAYHEADS;
+    bool jumpSameFileAllowed = DEFAULT_JUMP_SAME_FILE_ALLOWED;
+    int jumpSameFileMinTimeDiff = DEFAULT_JUMP_SAME_FILE_MIN_DIFF;
+    int crossoverJumpChanceX1000 = DEFAULT_CROSSOVER_JUMP_CHANCE_X1000;
+    int crossfadeSampleLength = DEFAULT_CROSSFADE_SAMPLE_LENGTH;
+    int maxJumpDistanceSpaceX1000 = DEFAULT_MAX_JUMP_DISTANCE_SPACE_X1000;
+    int maxJumpTargets = DEFAULT_MAX_JUMP_TARGETS;
+
+    int volumeX1000 = DEFAULT_VOLUME_X1000;
+    std::string dimensionDynamicPan = "None";
+    int panningStrengthX1000 = DEFAULT_PANNING_STRENGTH_X1000;
+
+public:
+    //setters
+    void SetHopSize ( int hopSize ) { maxHopSize = hopSize; }
+
+    void SetDimensionX ( const std::string& dimension ) { dimensionX = dimension; }
+    void SetDimensionY ( const std::string& dimension ) { dimensionY = dimension; }
+    void SetDimensionZ ( const std::string& dimension ) { dimensionZ = dimension; }
+
+    void SetDimensionColor ( const std::string& dimension ) { dimensionColor = dimension; }
+    void SetColorSpectrum ( bool colorVariant ) { colorSpectrum = colorVariant; }
+
+    void SetLoopPlayheads ( bool loop ) { loopPlayheads = loop; }
+    void SetJumpSameFileAllowed ( bool allowed ) { jumpSameFileAllowed = allowed; }
+    void SetJumpSameFileMinTimeDiff ( int timeDiff ) { jumpSameFileMinTimeDiff = timeDiff; }
+    void SetCrossoverJumpChanceX1000 ( int jumpsInAThousand ) { crossoverJumpChanceX1000 = jumpsInAThousand; }
+    void SetCrossfadeSampleLength ( int length ) { crossfadeSampleLength = length; }
+    void SetMaxJumpDistanceSpaceX1000 ( int distanceX1000 ) { maxJumpDistanceSpaceX1000 = distanceX1000; }
+    void SetMaxJumpTargets ( int targets ) { maxJumpTargets = targets; }
+
+    void SetVolumeX1000 ( int volumeX1000 ) { this->volumeX1000 = volumeX1000; }
+    void SetDimensionDynamicPan ( const std::string& dimension ) { dimensionDynamicPan = dimension; }
+    void SetPanningStrengthX1000 ( int panStrengthX1000 ) { panningStrengthX1000 = panStrengthX1000; }
+    
+    //getters
+    int GetHopSize ( ) const { return maxHopSize; }
+
+    const std::string& GetDimensionX ( ) const { return dimensionX; }
+    const std::string& GetDimensionY ( ) const { return dimensionY; }
+    const std::string& GetDimensionZ ( ) const { return dimensionZ; }
+
+    const std::string& GetDimensionColor ( ) const { return dimensionColor; }
+    bool GetColorSpectrum ( ) const { return colorSpectrum; }
+
+    bool GetLoopPlayheads ( ) const { return loopPlayheads; }
+    bool GetJumpSameFileAllowed ( ) const { return jumpSameFileAllowed; }
+    int GetJumpSameFileMinTimeDiff ( ) const { return jumpSameFileMinTimeDiff; }
+    int GetCrossoverJumpChanceX1000 ( ) const { return crossoverJumpChanceX1000; }
+        float GetCrossoverJumpChance ( ) const { return static_cast<float>(crossoverJumpChanceX1000) / 1000.0; }
+    int GetCrossfadeSampleLengthLimitedByHopSize ( ) const { return std::min( crossfadeSampleLength, maxHopSize ); }
+    int GetMaxJumpDistanceSpaceX1000 ( ) const { return maxJumpDistanceSpaceX1000; }
+        float GetMaxJumpDistanceSpace ( ) const { return static_cast<float>(maxJumpDistanceSpaceX1000) / 1000.0; }
+    int GetMaxJumpTargets ( ) const { return maxJumpTargets; }
+
+    int GetVolumeX1000 ( ) const { return volumeX1000; }
+        float GetVolume ( ) const { return static_cast<float>(volumeX1000) / 1000.0; }
+    const std::string& GetDimensionDynamicPan ( ) const { return dimensionDynamicPan; }
+    int GetPanningStrengthX1000 ( ) const { return panningStrengthX1000; }
+        float GetPanningStrength ( ) const { return static_cast<float>(panningStrengthX1000) / 1000.0; }
 };
 
 struct AnalysisSettings {

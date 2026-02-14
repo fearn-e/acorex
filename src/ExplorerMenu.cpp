@@ -180,7 +180,7 @@ void ExplorerMenu::OpenStartupPanel ( )
     bDraw = true;
 }
 
-void ExplorerMenu::OpenFullPanel ( const std::vector<std::string>& corpusDimensionDefaults )
+void ExplorerMenu::OpenFullPanel ( const Utils::ExploreSettings& settings )
 {
     mAudioSettingsManager.RefreshDeviceListChanged ( );
 
@@ -192,7 +192,7 @@ void ExplorerMenu::OpenFullPanel ( const std::vector<std::string>& corpusDimensi
 
     SetupPanelSectionHeader ( mRawView->GetCorpusName ( ) );
 
-    SetupPanelSectionCorpusControls ( corpusDimensionDefaults );
+    SetupPanelSectionCorpusControls ( settings );
 
     SetupPanelSectionAudioManager ( );
 
@@ -216,17 +216,8 @@ void ExplorerMenu::SetupPanelSectionHeader ( std::string corpusNameLabel )
     mOpenCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
 }
 
-void ExplorerMenu::SetupPanelSectionCorpusControls ( std::vector<std::string> corpusDimensionDefaults )
+void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utils::ExploreSettings& settings )
 {
-    if ( corpusDimensionDefaults.size ( ) < 5 )
-    {
-        ofLogWarning ( "ExplorerMenu::SetupPanelSectionCorpusControls" ) << "Expected 5 corpus dimension defaults, only received " << corpusDimensionDefaults.size ( ) << ".";
-        for ( int i = corpusDimensionDefaults.size ( ); i < 5; i++ )
-        {
-            corpusDimensionDefaults.push_back ( "None" );
-        }
-    }
-
     // X Dimension Dropdown
     mDimensionDropdownX.reset ( );
     mDimensionDropdownX = make_unique<ofxDropdown> ( static_cast<std::string>("X Dimension"), Utils::ofxDropdownScrollSpeed );
@@ -237,7 +228,7 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( std::vector<std::string> co
     mDimensionDropdownX->enableCollapseOnSelection ( );
     mDimensionDropdownX->setDropDownPosition ( ofxDropdown::DD_LEFT );
     mDimensionDropdownX->setBackgroundColor ( mColors.interfaceBackgroundColor );
-    mDimensionDropdownX->setSelectedValueByName ( corpusDimensionDefaults[0], false );
+    mDimensionDropdownX->setSelectedValueByName ( settings.GetDimensionX ( ), false );
 
     // Y Dimension Dropdown
     mDimensionDropdownY.reset ( );
@@ -249,7 +240,7 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( std::vector<std::string> co
     mDimensionDropdownY->enableCollapseOnSelection ( );
     mDimensionDropdownY->setDropDownPosition ( ofxDropdown::DD_LEFT );
     mDimensionDropdownY->setBackgroundColor ( mColors.interfaceBackgroundColor );
-    mDimensionDropdownY->setSelectedValueByName ( corpusDimensionDefaults[1], false );
+    mDimensionDropdownY->setSelectedValueByName ( settings.GetDimensionY ( ), false );
 
     // Z Dimension Dropdown
     mDimensionDropdownZ.reset ( );
@@ -261,7 +252,7 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( std::vector<std::string> co
     mDimensionDropdownZ->enableCollapseOnSelection ( );
     mDimensionDropdownZ->setDropDownPosition ( ofxDropdown::DD_LEFT );
     mDimensionDropdownZ->setBackgroundColor ( mColors.interfaceBackgroundColor );
-    mDimensionDropdownZ->setSelectedValueByName ( corpusDimensionDefaults[2], false );
+    mDimensionDropdownZ->setSelectedValueByName ( settings.GetDimensionZ ( ), false );
 
     // TODO - move color settings to the top of this panel section
 
@@ -275,51 +266,46 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( std::vector<std::string> co
     mDimensionDropdownColor->enableCollapseOnSelection ( );
     mDimensionDropdownColor->setDropDownPosition ( ofxDropdown::DD_LEFT );
     mDimensionDropdownColor->setBackgroundColor ( mColors.interfaceBackgroundColor );
-    mDimensionDropdownColor->setSelectedValueByName ( corpusDimensionDefaults[3], false );
+    mDimensionDropdownColor->setSelectedValueByName ( settings.GetDimensionColor ( ), false );
 
     // Color Spectrum Toggle
-    mMainPanel.add ( mColorSpectrumSwitcher.setup ( "Color Spectrum: Red<->Blue", DEFAULT_COLOR_SPECTRUM ) );
+    mMainPanel.add ( mColorSpectrumSwitcher.setup ( "Color Spectrum: Red<->Blue", settings.GetColorSpectrum ( ) ) );
     mColorSpectrumSwitcher.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     //
 
     // EOF Loop Playheads Toggle
-    mMainPanel.add ( mLoopPlayheadsToggle.setup ( "Loop when reaching end of a file", DEFAULT_LOOP_PLAYHEADS ) );
+    mMainPanel.add ( mLoopPlayheadsToggle.setup ( "Loop when reaching end of a file", settings.GetLoopPlayheads ( ) ) );
     mLoopPlayheadsToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Playheads Jump Same File Toggle
-    mMainPanel.add ( mJumpSameFileAllowedToggle.setup ( "Jump to same file allowed", DEFAULT_JUMP_SAME_FILE_ALLOWED ) );
+    mMainPanel.add ( mJumpSameFileAllowedToggle.setup ( "Jump to same file allowed", settings.GetJumpSameFileAllowed ( ) ) );
     mJumpSameFileAllowedToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Playheads Same File Jump Minimum Distance Slider
-    mMainPanel.add ( mJumpSameFileMinTimeDiffSlider.setup ( "Same file jump min point difference", DEFAULT_JUMP_SAME_FILE_MIN_DIFF, 1, 30 ) );
+    mMainPanel.add ( mJumpSameFileMinTimeDiffSlider.setup ( "Same file jump min point difference", settings.GetJumpSameFileMinTimeDiff ( ), 1, 30 ) );
     mJumpSameFileMinTimeDiffSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Jump Chance Slider
-    float crossoverJumpChance = static_cast<float>(DEFAULT_CROSSOVER_JUMP_CHANCE_X1000) / 1000.0;
-    mMainPanel.add ( mCrossoverJumpChanceSlider.setup ( "Crossover Jump Chance", crossoverJumpChance, 0.0, 1.0 ) );
+    mMainPanel.add ( mCrossoverJumpChanceSlider.setup ( "Crossover Jump Chance", settings.GetCrossoverJumpChance ( ), 0.0, 1.0 ) );
     mCrossoverJumpChanceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Crossfade Max Length Slider
-    size_t maxCrossfadeLength = mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction;
-    size_t defaultCrossfadeLength = min ( static_cast<size_t>(DEFAULT_CROSSFADE_MAX_SAMPLE_LENGTH), maxCrossfadeLength );
-    mMainPanel.add ( mCrossfadeMaxSampleLengthSlider.setup ( "Crossfade Max Sample Length", defaultCrossfadeLength, 1, maxCrossfadeLength ) );
-    mCrossfadeMaxSampleLengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mMainPanel.add ( mCrossfadeSampleLengthSlider.setup ( "Crossfade Sample Length", settings.GetCrossfadeSampleLengthLimitedByHopSize ( ), 1, settings.GetHopSize ( ) ) );
+    mCrossfadeSampleLengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Jump Max Distance Slider
-    float maxJumpDistance = static_cast<float>(DEFAULT_MAX_JUMP_DISTANCE_SPACE_X1000) / 1000.0;
-    mMainPanel.add ( mMaxJumpDistanceSpaceSlider.setup ( "Max Jump Distance Space", maxJumpDistance, 0.0, 1.0 ) );
+    mMainPanel.add ( mMaxJumpDistanceSpaceSlider.setup ( "Max Jump Distance Space", settings.GetMaxJumpDistanceSpace ( ), 0.0, 1.0 ) );
     mMaxJumpDistanceSpaceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Jump Max Targets Slider
-    mMainPanel.add ( mMaxJumpTargetsSlider.setup ( "Max Jump Targets", DEFAULT_MAX_JUMP_TARGETS, 1, 10 ) );
+    mMainPanel.add ( mMaxJumpTargetsSlider.setup ( "Max Jump Targets", settings.GetMaxJumpTargets ( ), 1, 10 ) );
     mMaxJumpTargetsSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
     
     // 
     
     // Global Volume Slider
-    float volume = static_cast<float>(DEFAULT_VOLUME_X1000) / 1000.0;
-    mMainPanel.add ( mVolumeSlider.setup ( "Volume", volume, 0.0, 1.0 ) );
+    mMainPanel.add ( mVolumeSlider.setup ( "Volume", settings.GetVolume ( ), 0.0, 1.0 ) );
     mVolumeSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Dynamic Panning Dimension Dropdown
@@ -332,11 +318,10 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( std::vector<std::string> co
     mDimensionDropdownDynamicPan->enableCollapseOnSelection ( );
     mDimensionDropdownDynamicPan->setDropDownPosition ( ofxDropdown::DD_LEFT );
     mDimensionDropdownDynamicPan->setBackgroundColor ( mColors.interfaceBackgroundColor );
-    mDimensionDropdownDynamicPan->setSelectedValueByName ( corpusDimensionDefaults[4], false );
+    mDimensionDropdownDynamicPan->setSelectedValueByName ( settings.GetDimensionDynamicPan ( ), false );
 
     // Global Panning Strength Slider
-    float panningStrength = static_cast<float>(DEFAULT_PANNING_STRENGTH_X1000) / 1000.0;
-    mMainPanel.add ( mPanningStrengthSlider.setup ( "Panning Width", panningStrength, 0.0, 1.0 ) );
+    mMainPanel.add ( mPanningStrengthSlider.setup ( "Panning Width", settings.GetPanningStrength ( ), 0.0, 1.0 ) );
     mPanningStrengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 }
 
@@ -448,7 +433,7 @@ void ExplorerMenu::RefreshFullPanelUI ( )
     mJumpSameFileAllowedToggle.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     mJumpSameFileMinTimeDiffSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     mCrossoverJumpChanceSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
-    mCrossfadeMaxSampleLengthSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mCrossfadeSampleLengthSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     mMaxJumpDistanceSpaceSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     mMaxJumpTargetsSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     
@@ -496,25 +481,25 @@ void ExplorerMenu::AddListenersCorpusControls ( )
 {
     if ( bListenersAddedCorpusControls ) { return; }
 
-    mDimensionDropdownX->addListener ( this, &ExplorerMenu::SwapDimensionX );
-    mDimensionDropdownY->addListener ( this, &ExplorerMenu::SwapDimensionY );
-    mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SwapDimensionZ );
+    mDimensionDropdownX->addListener ( this, &ExplorerMenu::SwapDimensionXListener );
+    mDimensionDropdownY->addListener ( this, &ExplorerMenu::SwapDimensionYListener );
+    mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SwapDimensionZListener );
 
-    mDimensionDropdownColor->addListener ( this, &ExplorerMenu::SwapDimensionColor );
-    mColorSpectrumSwitcher.addListener ( this, &ExplorerMenu::SwitchColorSpectrum );
+    mDimensionDropdownColor->addListener ( this, &ExplorerMenu::SwapDimensionColorListener );
+    mColorSpectrumSwitcher.addListener ( this, &ExplorerMenu::SwitchColorSpectrumListener );
 
-    mLoopPlayheadsToggle.addListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
-    mJumpSameFileAllowedToggle.addListener ( this, &ExplorerMenu::ToggleJumpSameFileAllowed );
-    mJumpSameFileMinTimeDiffSlider.addListener ( this, &ExplorerMenu::SetJumpSameFileMinTimeDiff );
-    mCrossoverJumpChanceSlider.addListener ( this, &ExplorerMenu::SetCrossoverJumpChance );
-    mCrossfadeMaxSampleLengthSlider.addListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
-    mMaxJumpDistanceSpaceSlider.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
-    mMaxJumpTargetsSlider.addListener ( this, &ExplorerMenu::SetMaxJumpTargets );
+    mLoopPlayheadsToggle.addListener ( this, &ExplorerMenu::ToggleLoopPlayheadsListener );
+    mJumpSameFileAllowedToggle.addListener ( this, &ExplorerMenu::ToggleJumpSameFileAllowedListener );
+    mJumpSameFileMinTimeDiffSlider.addListener ( this, &ExplorerMenu::SetJumpSameFileMinTimeDiffListener );
+    mCrossoverJumpChanceSlider.addListener ( this, &ExplorerMenu::SetCrossoverJumpChanceListener );
+    mCrossfadeSampleLengthSlider.addListener ( this, &ExplorerMenu::SetCrossfadeSampleLengthListener );
+    mMaxJumpDistanceSpaceSlider.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpaceListener );
+    mMaxJumpTargetsSlider.addListener ( this, &ExplorerMenu::SetMaxJumpTargetsListener );
 
-    mVolumeSlider.addListener ( this, &ExplorerMenu::SetVolume );
+    mVolumeSlider.addListener ( this, &ExplorerMenu::SetVolumeListener );
 
-    mDimensionDropdownDynamicPan->addListener ( this, &ExplorerMenu::SwapDimensionDynamicPan );
-    mPanningStrengthSlider.addListener ( this, &ExplorerMenu::SetPanningStrength );
+    mDimensionDropdownDynamicPan->addListener ( this, &ExplorerMenu::SwapDimensionDynamicPanListener );
+    mPanningStrengthSlider.addListener ( this, &ExplorerMenu::SetPanningStrengthListener );
 
     ofAddListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
 
@@ -525,25 +510,25 @@ void ExplorerMenu::RemoveListenersCorpusControls ( )
 {
     if ( !bListenersAddedCorpusControls ) { return; }
 
-    mDimensionDropdownX->removeListener ( this, &ExplorerMenu::SwapDimensionX );
-    mDimensionDropdownY->removeListener ( this, &ExplorerMenu::SwapDimensionY );
-    mDimensionDropdownZ->removeListener ( this, &ExplorerMenu::SwapDimensionZ );
+    mDimensionDropdownX->removeListener ( this, &ExplorerMenu::SwapDimensionXListener );
+    mDimensionDropdownY->removeListener ( this, &ExplorerMenu::SwapDimensionYListener );
+    mDimensionDropdownZ->removeListener ( this, &ExplorerMenu::SwapDimensionZListener );
 
-    mDimensionDropdownColor->removeListener ( this, &ExplorerMenu::SwapDimensionColor );
-    mColorSpectrumSwitcher.removeListener ( this, &ExplorerMenu::SwitchColorSpectrum );
+    mDimensionDropdownColor->removeListener ( this, &ExplorerMenu::SwapDimensionColorListener );
+    mColorSpectrumSwitcher.removeListener ( this, &ExplorerMenu::SwitchColorSpectrumListener );
 
-    mLoopPlayheadsToggle.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
-    mJumpSameFileAllowedToggle.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
-    mJumpSameFileMinTimeDiffSlider.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheads );
-    mCrossoverJumpChanceSlider.removeListener ( this, &ExplorerMenu::SetCrossoverJumpChance );
-    mCrossfadeMaxSampleLengthSlider.removeListener ( this, &ExplorerMenu::SetCrossfadeMaxSampleLength );
-    mMaxJumpDistanceSpaceSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpace );
-    mMaxJumpTargetsSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpTargets );
+    mLoopPlayheadsToggle.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheadsListener );
+    mJumpSameFileAllowedToggle.removeListener ( this, &ExplorerMenu::ToggleJumpSameFileAllowedListener );
+    mJumpSameFileMinTimeDiffSlider.removeListener ( this, &ExplorerMenu::SetJumpSameFileMinTimeDiffListener );
+    mCrossoverJumpChanceSlider.removeListener ( this, &ExplorerMenu::SetCrossoverJumpChanceListener );
+    mCrossfadeSampleLengthSlider.removeListener ( this, &ExplorerMenu::SetCrossfadeSampleLengthListener );
+    mMaxJumpDistanceSpaceSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpaceListener );
+    mMaxJumpTargetsSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpTargetsListener );
 
-    mVolumeSlider.removeListener ( this, &ExplorerMenu::SetVolume );
+    mVolumeSlider.removeListener ( this, &ExplorerMenu::SetVolumeListener );
 
-    mDimensionDropdownDynamicPan->removeListener ( this, &ExplorerMenu::SwapDimensionDynamicPan );
-    mPanningStrengthSlider.removeListener ( this, &ExplorerMenu::SetPanningStrength );
+    mDimensionDropdownDynamicPan->removeListener ( this, &ExplorerMenu::SwapDimensionDynamicPanListener );
+    mPanningStrengthSlider.removeListener ( this, &ExplorerMenu::SetPanningStrengthListener );
 
     ofRemoveListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
 
@@ -607,29 +592,40 @@ void ExplorerMenu::OpenCorpus ( )
         return;
     }
 
+    Utils::ExploreSettings initialSettings { };
+    {
+        initialSettings.SetHopSize ( mRawView->GetHopSize ( ) );
+
+        initialSettings.SetDimensionX ( mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : "None" );
+        initialSettings.SetDimensionY ( mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : "None" );
+        initialSettings.SetDimensionZ ( mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : "None" );
+
+        initialSettings.SetDimensionColor ( mRawView->GetDimensions ( ).size ( ) > 4 ? mRawView->GetDimensions ( )[4] : "None" );
+        initialSettings.SetColorSpectrum ( DEFAULT_COLOR_SPECTRUM );
+
+        initialSettings.SetLoopPlayheads ( DEFAULT_LOOP_PLAYHEADS );
+        initialSettings.SetJumpSameFileAllowed ( DEFAULT_JUMP_SAME_FILE_ALLOWED );
+        initialSettings.SetJumpSameFileMinTimeDiff ( DEFAULT_JUMP_SAME_FILE_MIN_DIFF );
+        initialSettings.SetCrossoverJumpChanceX1000 ( DEFAULT_CROSSOVER_JUMP_CHANCE_X1000 );
+        initialSettings.SetCrossfadeSampleLength ( DEFAULT_CROSSFADE_SAMPLE_LENGTH );
+        initialSettings.SetMaxJumpDistanceSpaceX1000 ( DEFAULT_MAX_JUMP_DISTANCE_SPACE_X1000 );
+        initialSettings.SetMaxJumpTargets ( DEFAULT_MAX_JUMP_TARGETS );
+
+        initialSettings.SetVolumeX1000 ( DEFAULT_VOLUME_X1000 );
+        int randomPanDimensionIndex = mRawView->GetDimensions ( ).size ( ) > 1 ? ofRandom ( 1, mRawView->GetDimensions ( ).size ( ) - 1 ) : -1;
+        initialSettings.SetDimensionDynamicPan ( randomPanDimensionIndex != -1 ? mRawView->GetDimensions ( )[randomPanDimensionIndex] : "None" );
+        initialSettings.SetPanningStrengthX1000 ( DEFAULT_PANNING_STRENGTH_X1000 );
+    }
+
     mLiveView.Initialise ( );
 
     mLiveView.CreatePoints ( ); // TODO - combine with mLiveView.Initialise ( );?
 
-    std::string xDimensionName          = mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : "None";
-    std::string yDimensionName          = mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : "None";
-    std::string zDimensionName          = mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : "None";
-
-    std::string colorDimensionName      = mRawView->GetDimensions ( )[0];
-
-    size_t randomPanDimensionIndex      = mRawView->GetDimensions ( ).size ( ) > 1 ? ofRandom ( 1, mRawView->GetDimensions ( ).size ( ) - 1 ) : 0;
-    std::string dynamicPanDimensionName = mRawView->GetDimensions ( )[randomPanDimensionIndex];
-
-    OpenFullPanel ( std::vector<std::string> { xDimensionName, yDimensionName, zDimensionName, colorDimensionName, dynamicPanDimensionName } );
+    OpenFullPanel ( initialSettings );
 
     bBlockDimensionFilling = false;
 
-    // TODO - change these so that only the final call of the 3 triggers point picker Train ( )
-    SwapDimension ( xDimensionName, Utils::Axis::X );
-    SwapDimension ( yDimensionName, Utils::Axis::Y );
-    SwapDimension ( zDimensionName, Utils::Axis::Z );
-    SwapDimension ( colorDimensionName, Utils::Axis::COLOR );
-    SwapDimension ( dynamicPanDimensionName, Utils::Axis::DYNAMIC_PAN );
+    PropogateCorpusSettings ( initialSettings );
 
     CameraSwitcher ( );
 
@@ -726,29 +722,52 @@ void ExplorerMenu::CameraSwitcher ( )
     }
 }
 
-// Listener Functions --------------------------
+void ExplorerMenu::PropogateCorpusSettings ( const Utils::ExploreSettings& settings )
+{
+    // TODO - change these 3 so that only the final call of the 3 triggers point picker Train ( )
+    SwapDimensionX ( settings.GetDimensionX ( ) );
+    SwapDimensionY ( settings.GetDimensionY ( ) );
+    SwapDimensionZ ( settings.GetDimensionZ ( ) ); // the one that actually calls training stuff
 
-void ExplorerMenu::SwapDimensionX ( string& dimension )
+    SwapDimensionColor ( settings.GetDimensionColor ( ) );
+    SwitchColorSpectrum ( settings.GetColorSpectrum ( ) );
+
+    ToggleLoopPlayheads ( settings.GetLoopPlayheads ( ) );
+    ToggleJumpSameFileAllowed ( settings.GetJumpSameFileAllowed ( ) );
+    SetJumpSameFileMinTimeDiff ( settings.GetJumpSameFileMinTimeDiff ( ) );
+    SetCrossoverJumpChance ( settings.GetCrossoverJumpChance ( ) );
+    SetCrossfadeSampleLength ( settings.GetCrossfadeSampleLengthLimitedByHopSize ( ) );
+    SetMaxJumpDistanceSpace ( settings.GetMaxJumpDistanceSpace ( ) );
+    SetMaxJumpTargets ( settings.GetMaxJumpTargets ( ) );
+
+    SetVolume ( settings.GetVolume ( ) );
+    SwapDimensionDynamicPan ( settings.GetDimensionDynamicPan ( ) );
+    SetPanningStrength ( settings.GetPanningStrength ( ) );
+}
+
+// Listener Functions --------------------------
+    // Corpus Controls
+void ExplorerMenu::SwapDimensionX ( const string& dimension )
 {
     SwapDimension ( dimension, Utils::Axis::X );
 }
 
-void ExplorerMenu::SwapDimensionY ( string& dimension )
+void ExplorerMenu::SwapDimensionY ( const string& dimension )
 {
     SwapDimension ( dimension, Utils::Axis::Y );
 }
 
-void ExplorerMenu::SwapDimensionZ ( string& dimension )
+void ExplorerMenu::SwapDimensionZ ( const string& dimension )
 {
     SwapDimension ( dimension, Utils::Axis::Z );
 }
 
-void ExplorerMenu::SwapDimensionColor ( string& dimension )
+void ExplorerMenu::SwapDimensionColor ( const string& dimension )
 {
     SwapDimension ( dimension, Utils::Axis::COLOR );
 }
 
-void ExplorerMenu::SwitchColorSpectrum ( bool& fullSpectrum )
+void ExplorerMenu::SwitchColorSpectrum ( const bool& fullSpectrum )
 {
     if ( fullSpectrum ) { mColorSpectrumSwitcher.setName ( "Color Spectrum: Full" ); }
     else { mColorSpectrumSwitcher.setName ( "Color Spectrum: Red<->Blue" ); }
@@ -756,52 +775,52 @@ void ExplorerMenu::SwitchColorSpectrum ( bool& fullSpectrum )
     SwapDimension ( mDimensionDropdownColor->getAllSelected ( )[0], Utils::Axis::COLOR );
 }
 
-void ExplorerMenu::ToggleLoopPlayheads ( bool& loop )
+void ExplorerMenu::ToggleLoopPlayheads ( const bool& loop )
 {
     mLiveView.GetAudioPlayback ( )->SetLoopPlayheads ( loop );
 }
 
-void ExplorerMenu::ToggleJumpSameFileAllowed ( bool& allowed )
+void ExplorerMenu::ToggleJumpSameFileAllowed ( const bool& allowed )
 {
     mLiveView.GetAudioPlayback ( )->SetJumpSameFileAllowed ( allowed );
 }
 
-void ExplorerMenu::SetJumpSameFileMinTimeDiff ( int& timeDiff )
+void ExplorerMenu::SetJumpSameFileMinTimeDiff ( const int& timeDiff )
 {
     mLiveView.GetAudioPlayback ( )->SetJumpSameFileMinTimeDiff ( timeDiff );
 }
 
-void ExplorerMenu::SetCrossoverJumpChance ( float& jumpChance )
+void ExplorerMenu::SetCrossoverJumpChance ( const float& jumpChance )
 {
     mLiveView.GetAudioPlayback ( )->SetCrossoverJumpChance ( (int)(jumpChance * 1000) );
 }
 
-void ExplorerMenu::SetCrossfadeMaxSampleLength ( int& length )
+void ExplorerMenu::SetCrossfadeSampleLength ( const int& length )
 {
     mLiveView.GetAudioPlayback ( )->SetCrossfadeSampleLength ( length );
 }
 
-void ExplorerMenu::SetMaxJumpDistanceSpace ( float& distance )
+void ExplorerMenu::SetMaxJumpDistanceSpace ( const float& distance )
 {
     mLiveView.GetAudioPlayback ( )->SetMaxJumpDistanceSpace ( (int)(distance * 1000) );
 }
 
-void ExplorerMenu::SetMaxJumpTargets ( int& targets )
+void ExplorerMenu::SetMaxJumpTargets ( const int& targets )
 {
     mLiveView.GetAudioPlayback ( )->SetMaxJumpTargets ( targets );
 }
 
-void ExplorerMenu::SetVolume(float & volume)
+void ExplorerMenu::SetVolume( const float& volume)
 {
     mLiveView.GetAudioPlayback ( )->SetVolume ( (int)(volume * 1000) );
 }
 
-void ExplorerMenu::SwapDimensionDynamicPan ( string& dimension )
+void ExplorerMenu::SwapDimensionDynamicPan ( const string& dimension )
 {
     SwapDimension ( dimension, Utils::Axis::DYNAMIC_PAN );
 }
 
-void ExplorerMenu::SetPanningStrength ( float& strength )
+void ExplorerMenu::SetPanningStrength ( const float& strength )
 {
     mLiveView.GetAudioPlayback ( )->SetPanningStrength ( (int)(strength * 1000) );
 }
@@ -820,7 +839,7 @@ void ExplorerMenu::MouseReleased ( ofMouseEventArgs& args )
         }
     }
 }
-
+    // Audio Manager
 void ExplorerMenu::RescanDevices ( )
 {
     // TODO TEST - could have some edge cases depending on how ofxDropdown works
