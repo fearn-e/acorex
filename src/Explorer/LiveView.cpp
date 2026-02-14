@@ -235,7 +235,7 @@ void Explorer::LiveView::UpdatePlayheads ( )
     // calculate the 3D positions of the playheads
     for ( auto& playhead : mPlayheads )
     {
-        size_t timeIndex = playhead.sampleIndex / ( mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction );
+        size_t timeIndex = playhead.sampleIndex / mRawView->GetHopSize ( );
         playhead.position[0] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).x;
         playhead.position[1] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).y;
         playhead.position[2] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).z;
@@ -430,7 +430,7 @@ void Explorer::LiveView::Draw ( )
         ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )], 20, ofGetHeight ( ) - 60 );
         if ( mRawView->IsTimeAnalysis ( ) )
         {
-            std::string hopInfoSamps = std::to_string ( mPointPicker->GetNearestMousePointTime ( ) * mRawView->GetDataset ( )->analysisSettings.windowFFTSize / mRawView->GetDataset ( )->analysisSettings.hopFraction );
+            std::string hopInfoSamps = std::to_string ( mPointPicker->GetNearestMousePointTime ( ) * mRawView->GetHopSize ( ) );
             std::string hopInfoSecs = std::to_string ( mRawView->GetTimeData ( )->raw[mPointPicker->GetNearestMousePointFile ( )][mPointPicker->GetNearestMousePointTime ( )][0] );
             ofDrawBitmapStringHighlight ( "Nearest Timepoint: " + hopInfoSamps + " samples, " + hopInfoSecs + "s", 20, ofGetHeight ( ) - 40 );
         }
