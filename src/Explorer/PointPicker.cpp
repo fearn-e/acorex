@@ -79,8 +79,8 @@ void Explorer::PointPicker::Clear ( )
 
     mNearestPoint = -1; mNearestDistance = -1; mNearestPointFile = -1; mNearestPointTime = -1;
 
-    if ( mCorpusFileLookUp.size ( ) > 0 ) { mCorpusFileLookUp.clear ( ); }
-    if ( mCorpusTimeLookUp.size ( ) > 0 ) { mCorpusTimeLookUp.clear ( ); }
+    mCorpusFileLookUp.clear ( );
+    mCorpusTimeLookUp.clear ( );
 
     RemoveListeners ( );
 }
@@ -277,10 +277,10 @@ void Explorer::PointPicker::FindNearestToMouse ( )
     rayDirection = glm::normalize ( rayDirection - mCamera->getPosition ( ) );
     double depth = 0.0f;
 
-    if ( testPoints.size ( ) > 0 ) { testPoints.clear ( ); }
-    if ( testRadii.size ( ) > 0 ) { testRadii.clear ( ); }
-    if ( testPointsOutOfRange.size ( ) > 0 ) { testPointsOutOfRange.clear ( ); }
-    if ( testRadiiOutOfRange.size ( ) > 0 ) { testRadiiOutOfRange.clear ( ); }
+    testPoints.clear ( );
+    testRadii.clear ( );
+    testPointsOutOfRange.clear ( );
+    testRadiiOutOfRange.clear ( );
 
     for ( int rayPoint = 1; rayPoint < rayPointSpacing.size ( ); rayPoint++ )
     {

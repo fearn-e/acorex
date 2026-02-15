@@ -441,7 +441,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
         {
             std::lock_guard<std::mutex> lock ( mVisualPlayheadUpdateMutex, std::adopt_lock );
 
-            if ( mVisualPlayheads.size ( ) > 0 ) { mVisualPlayheads.clear ( ); }
+            mVisualPlayheads.clear ( );
 
             for ( size_t i = 0; i < mPlayheads.size ( ); i++ )
             {
