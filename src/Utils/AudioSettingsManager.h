@@ -1,12 +1,12 @@
 #pragma once
 
+#include "Utils/TemporaryDefaults.h"
+
 #include <ofConstants.h>
 #include <ofSoundBaseTypes.h>
 #include <ofSoundStream.h>
 #include <array>
 #include <string_view>
-
-#include "./TemporaryDefaults.h"
 
 // TODO - function to find a device in the list of devices marked as "default"
 

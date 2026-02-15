@@ -16,10 +16,11 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
+#include "Analyser/Controller.h"
 #include "Utils/Data.h"
 #include "Utils/JSON.h"
-#include "Analyser/Controller.h"
 #include "Utils/InterfaceDefs.h"
+
 #include <ofxGui.h>
 #include <ofSystemUtils.h>
 

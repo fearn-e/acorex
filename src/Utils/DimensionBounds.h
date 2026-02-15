@@ -16,7 +16,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "./Data.h"
+#include "Utils/Data.h"
+
 #include <vector>
 
 #if __has_include(<omp.h>)

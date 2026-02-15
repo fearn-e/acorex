@@ -16,6 +16,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
+#include "Utils/TemporaryDefaults.h"
+
 #include <ofSoundBuffer.h>
 #include <string>
 #include <vector>
@@ -24,8 +26,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofColor.h>
 #include <ofRectangle.h>
 #include <algorithm>
-
-#include "Utils/TemporaryDefaults.h"
 
 #define DATA_CHANGE_CHECK_1
 

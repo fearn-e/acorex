@@ -16,10 +16,11 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "./RawView.h"
-#include "./PointPicker.h"
+#include "Explorer/RawView.h"
+#include "Explorer/PointPicker.h"
 #include "Utils/Data.h"
 #include "Utils/DimensionBounds.h"
+
 #include <ofSoundBuffer.h>
 #include <ofSoundStream.h>
 #include <ofMesh.h>

@@ -14,15 +14,16 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "./LiveView.h"
+#include "Explorer/LiveView.h"
+
+#include "Utils/TemporaryKeybinds.h"
+
 #include <ofLog.h>
 #include <of3dGraphics.h>
 #include <ofGraphics.h>
 #include <of3dUtils.h>
 #include <ofEvents.h>
 #include <random>
-
-#include "utils/TemporaryKeybinds.h"
 
 using namespace Acorex;
 

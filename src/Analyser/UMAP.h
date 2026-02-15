@@ -18,6 +18,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Utils/Data.h"
 #include "Utils/DatasetConversion.h"
+
 #include <flucoma/algorithms/public/UMAP.hpp>
 #include <Eigen/Core>
 #include <flucoma/data/FluidDataSet.hpp>

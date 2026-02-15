@@ -14,12 +14,13 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "./ExplorerMenu.h"
+#include "ExplorerMenu.h"
+
 #include "Utils/InterfaceDefs.h"
+#include "Utils/TemporaryDefaults.h"
+
 #include <ofUtils.h>
 #include <of3dGraphics.h>
-
-#include "Utils/TemporaryDefaults.h"
 
 using namespace Acorex;
 
