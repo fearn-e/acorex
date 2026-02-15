@@ -481,11 +481,11 @@ void ExplorerMenu::AddListenersCorpusControls ( )
 {
     if ( bListenersAddedCorpusControls ) { return; }
 
-    mDimensionDropdownX->addListener ( this, &ExplorerMenu::SwapDimensionXListener );
-    mDimensionDropdownY->addListener ( this, &ExplorerMenu::SwapDimensionYListener );
-    mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SwapDimensionZListener );
+    mDimensionDropdownX->addListener ( this, &ExplorerMenu::SetDimensionXListener );
+    mDimensionDropdownY->addListener ( this, &ExplorerMenu::SetDimensionYListener );
+    mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SetDimensionZListener );
 
-    mDimensionDropdownColor->addListener ( this, &ExplorerMenu::SwapDimensionColorListener );
+    mDimensionDropdownColor->addListener ( this, &ExplorerMenu::SetDimensionColorListener );
     mColorSpectrumSwitcher.addListener ( this, &ExplorerMenu::SwitchColorSpectrumListener );
 
     mLoopPlayheadsToggle.addListener ( this, &ExplorerMenu::ToggleLoopPlayheadsListener );
@@ -498,7 +498,7 @@ void ExplorerMenu::AddListenersCorpusControls ( )
 
     mVolumeSlider.addListener ( this, &ExplorerMenu::SetVolumeListener );
 
-    mDimensionDropdownDynamicPan->addListener ( this, &ExplorerMenu::SwapDimensionDynamicPanListener );
+    mDimensionDropdownDynamicPan->addListener ( this, &ExplorerMenu::SetDimensionDynamicPanListener );
     mPanningStrengthSlider.addListener ( this, &ExplorerMenu::SetPanningStrengthListener );
 
     ofAddListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
@@ -510,11 +510,11 @@ void ExplorerMenu::RemoveListenersCorpusControls ( )
 {
     if ( !bListenersAddedCorpusControls ) { return; }
 
-    mDimensionDropdownX->removeListener ( this, &ExplorerMenu::SwapDimensionXListener );
-    mDimensionDropdownY->removeListener ( this, &ExplorerMenu::SwapDimensionYListener );
-    mDimensionDropdownZ->removeListener ( this, &ExplorerMenu::SwapDimensionZListener );
+    mDimensionDropdownX->removeListener ( this, &ExplorerMenu::SetDimensionXListener );
+    mDimensionDropdownY->removeListener ( this, &ExplorerMenu::SetDimensionYListener );
+    mDimensionDropdownZ->removeListener ( this, &ExplorerMenu::SetDimensionZListener );
 
-    mDimensionDropdownColor->removeListener ( this, &ExplorerMenu::SwapDimensionColorListener );
+    mDimensionDropdownColor->removeListener ( this, &ExplorerMenu::SetDimensionColorListener );
     mColorSpectrumSwitcher.removeListener ( this, &ExplorerMenu::SwitchColorSpectrumListener );
 
     mLoopPlayheadsToggle.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheadsListener );
@@ -527,7 +527,7 @@ void ExplorerMenu::RemoveListenersCorpusControls ( )
 
     mVolumeSlider.removeListener ( this, &ExplorerMenu::SetVolumeListener );
 
-    mDimensionDropdownDynamicPan->removeListener ( this, &ExplorerMenu::SwapDimensionDynamicPanListener );
+    mDimensionDropdownDynamicPan->removeListener ( this, &ExplorerMenu::SetDimensionDynamicPanListener );
     mPanningStrengthSlider.removeListener ( this, &ExplorerMenu::SetPanningStrengthListener );
 
     ofRemoveListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
@@ -637,7 +637,7 @@ void ExplorerMenu::OpenCorpus ( )
 }
 
 // TODO - change how this and FillDimension and Train (point picker) work, should have a function that triggers training and one that doesn't (for initial filling)
-void ExplorerMenu::SwapDimension ( string dimension, Utils::Axis axis )
+void ExplorerMenu::SetDimension ( string dimension, Utils::Axis axis )
 {
     if ( bBlockDimensionFilling ) { return; }
 
@@ -723,11 +723,11 @@ void ExplorerMenu::CameraSwitcher ( )
 void ExplorerMenu::PropogateCorpusSettings ( const Utils::ExploreSettings& settings )
 {
     // TODO - change these 3 so that only the final call of the 3 triggers point picker Train ( )
-    SwapDimensionX ( settings.GetDimensionX ( ) );
-    SwapDimensionY ( settings.GetDimensionY ( ) );
-    SwapDimensionZ ( settings.GetDimensionZ ( ) ); // the one that actually calls training stuff
+    SetDimensionX ( settings.GetDimensionX ( ) );
+    SetDimensionY ( settings.GetDimensionY ( ) );
+    SetDimensionZ ( settings.GetDimensionZ ( ) ); // the one that actually calls training stuff
 
-    SwapDimensionColor ( settings.GetDimensionColor ( ) );
+    SetDimensionColor ( settings.GetDimensionColor ( ) );
     SwitchColorSpectrum ( settings.GetColorSpectrum ( ) );
 
     ToggleLoopPlayheads ( settings.GetLoopPlayheads ( ) );
@@ -739,30 +739,30 @@ void ExplorerMenu::PropogateCorpusSettings ( const Utils::ExploreSettings& setti
     SetMaxJumpTargets ( settings.GetMaxJumpTargets ( ) );
 
     SetVolume ( settings.GetVolume ( ) );
-    SwapDimensionDynamicPan ( settings.GetDimensionDynamicPan ( ) );
+    SetDimensionDynamicPan ( settings.GetDimensionDynamicPan ( ) );
     SetPanningStrength ( settings.GetPanningStrength ( ) );
 }
 
 // Listener Functions --------------------------
     // Corpus Controls
-void ExplorerMenu::SwapDimensionX ( const string& dimension )
+void ExplorerMenu::SetDimensionX ( const string& dimension )
 {
-    SwapDimension ( dimension, Utils::Axis::X );
+    SetDimension ( dimension, Utils::Axis::X );
 }
 
-void ExplorerMenu::SwapDimensionY ( const string& dimension )
+void ExplorerMenu::SetDimensionY ( const string& dimension )
 {
-    SwapDimension ( dimension, Utils::Axis::Y );
+    SetDimension ( dimension, Utils::Axis::Y );
 }
 
-void ExplorerMenu::SwapDimensionZ ( const string& dimension )
+void ExplorerMenu::SetDimensionZ ( const string& dimension )
 {
-    SwapDimension ( dimension, Utils::Axis::Z );
+    SetDimension ( dimension, Utils::Axis::Z );
 }
 
-void ExplorerMenu::SwapDimensionColor ( const string& dimension )
+void ExplorerMenu::SetDimensionColor ( const string& dimension )
 {
-    SwapDimension ( dimension, Utils::Axis::COLOR );
+    SetDimension ( dimension, Utils::Axis::COLOR );
 }
 
 void ExplorerMenu::SwitchColorSpectrum ( const bool& fullSpectrum )
@@ -770,7 +770,7 @@ void ExplorerMenu::SwitchColorSpectrum ( const bool& fullSpectrum )
     if ( fullSpectrum ) { mColorSpectrumSwitcher.setName ( "Color Spectrum: Full" ); }
     else { mColorSpectrumSwitcher.setName ( "Color Spectrum: Red<->Blue" ); }
     mLiveView.SetColorFullSpectrum ( fullSpectrum );
-    SwapDimension ( mDimensionDropdownColor->getAllSelected ( )[0], Utils::Axis::COLOR );
+    SetDimension ( mDimensionDropdownColor->getAllSelected ( )[0], Utils::Axis::COLOR );
 }
 
 void ExplorerMenu::ToggleLoopPlayheads ( const bool& loop )
@@ -813,9 +813,9 @@ void ExplorerMenu::SetVolume( const float& volume)
     mLiveView.GetAudioPlayback ( )->SetVolume ( (int)(volume * 1000) );
 }
 
-void ExplorerMenu::SwapDimensionDynamicPan ( const string& dimension )
+void ExplorerMenu::SetDimensionDynamicPan ( const string& dimension )
 {
-    SwapDimension ( dimension, Utils::Axis::DYNAMIC_PAN );
+    SetDimension ( dimension, Utils::Axis::DYNAMIC_PAN );
 }
 
 void ExplorerMenu::SetPanningStrength ( const float& strength )

@@ -85,7 +85,7 @@ private:
     // Main Functions ------------------------------
 
     void OpenCorpus ( );
-    void SwapDimension ( string dimension, Utils::Axis axis );
+    void SetDimension ( string dimension, Utils::Axis axis );
     int GetDimensionIndex ( std::string& dimension );
     void CameraSwitcher ( );
 
@@ -94,11 +94,11 @@ private:
 
     // Listener Functions --------------------------
 
-    void SwapDimensionX ( const string& dimension );            void SwapDimensionXListener ( string& dimension ) { SwapDimensionX ( dimension ); }
-    void SwapDimensionY ( const string& dimension );            void SwapDimensionYListener ( string& dimension ) { SwapDimensionY ( dimension ); }
-    void SwapDimensionZ ( const string& dimension );            void SwapDimensionZListener ( string& dimension ) { SwapDimensionZ ( dimension ); }
+    void SetDimensionX ( const string& dimension );             void SetDimensionXListener ( string& dimension ) { SetDimensionX ( dimension ); }
+    void SetDimensionY ( const string& dimension );             void SetDimensionYListener ( string& dimension ) { SetDimensionY ( dimension ); }
+    void SetDimensionZ ( const string& dimension );             void SetDimensionZListener ( string& dimension ) { SetDimensionZ ( dimension ); }
 
-    void SwapDimensionColor ( const string& dimension );        void SwapDimensionColorListener ( string& dimension ) { SwapDimensionColor ( dimension ); }
+    void SetDimensionColor ( const string& dimension );         void SetDimensionColorListener ( string& dimension ) { SetDimensionColor ( dimension ); }
     void SwitchColorSpectrum ( const bool& fullSpectrum );      void SwitchColorSpectrumListener ( bool& fullSpectrum ) { SwitchColorSpectrum ( fullSpectrum ); }
 
     void ToggleLoopPlayheads ( const bool& loop );              void ToggleLoopPlayheadsListener ( bool& loop ) { ToggleLoopPlayheads ( loop ); }
@@ -110,7 +110,7 @@ private:
     void SetMaxJumpTargets ( const int& targets );              void SetMaxJumpTargetsListener ( int& targets ) { SetMaxJumpTargets ( targets ); }
 
     void SetVolume( const float& volume );                      void SetVolumeListener ( float& volume ) { SetVolume ( volume ); }
-    void SwapDimensionDynamicPan ( const string& dimension );   void SwapDimensionDynamicPanListener ( string& dimension ) { SwapDimensionDynamicPan ( dimension ); }
+    void SetDimensionDynamicPan ( const string& dimension );    void SetDimensionDynamicPanListener ( string& dimension ) { SetDimensionDynamicPan ( dimension ); }
     void SetPanningStrength ( const float& strength );          void SetPanningStrengthListener ( float& strength ) { SetPanningStrength ( strength ); }
 
     void MouseReleased ( ofMouseEventArgs& args );
