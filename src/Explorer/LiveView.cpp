@@ -338,7 +338,7 @@ void Explorer::LiveView::Draw ( )
 
         //ofColor color = ofColor::fromHsb ( fmod ( ofGetElapsedTimef ( ) * 5, 255 ), 60, 120 );
         //ofSetColor ( color.r, color.g, color.b, 50 );
-        ofSetColor ( 0, 0, 0, 150 );
+        ofSetColor ( 0, 0, 0, 75 );
         ofDrawRectangle ( 0, 0, ofGetWidth ( ), ofGetHeight ( ) );
 
         ofSetColor ( 255, 0, 0, 150 );
