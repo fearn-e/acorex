@@ -16,7 +16,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Explorer/LiveView.h"
 
-#include "Utils/TemporaryKeybinds.h"
+#include "Utilities/TemporaryKeybinds.h"
 
 #include <ofLog.h>
 #include <of3dGraphics.h>
@@ -33,7 +33,7 @@ Explorer::LiveView::LiveView ( )
     mKeyboardMoveState { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // W, A, S, D, R, F, Q, E, Z, X
     mCamMoveSpeedScaleAdjusted ( SpaceDefs::mCamMoveSpeed ),
     deltaTime ( 0.1f ), lastUpdateTime ( 0 ),
-    mDisabledAxis ( Utils::Axis::NONE ), xLabel ( "X" ), yLabel ( "Y" ), zLabel ( "Z" ), colorDimension ( -1 ),
+    mDisabledAxis ( Utilities::Axis::NONE ), xLabel ( "X" ), yLabel ( "Y" ), zLabel ( "Z" ), colorDimension ( -1 ),
     mCamPivot ( ofPoint ( 0, 0, 0 ) ),
     mLastMouseX ( 0 ), mLastMouseY ( 0 )
 {
@@ -82,7 +82,7 @@ void Explorer::LiveView::Clear ( )
     for ( auto& each : mKeyboardMoveState ) { each = false; }
     mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed;
 
-    mDisabledAxis = Utils::Axis::NONE;
+    mDisabledAxis = Utilities::Axis::NONE;
     xLabel = "X"; yLabel = "Y"; zLabel = "Z";
     colorDimension = -1;
 }
@@ -179,12 +179,12 @@ void Explorer::LiveView::Update ( )
 
 void Explorer::LiveView::UpdatePlayheads ( )
 {
-    std::vector<Utils::VisualPlayhead> playheadUpdates = mAudioPlayback.GetPlayheadInfo ( );
+    std::vector<Utilities::VisualPlayhead> playheadUpdates = mAudioPlayback.GetPlayheadInfo ( );
 
     // remove playheads that aren't in the update list
     for ( int i = 0; i < mPlayheads.size ( ); i++ )
     {
-        if ( std::find_if ( playheadUpdates.begin ( ), playheadUpdates.end ( ), [this, i]( Utils::VisualPlayhead& playhead ) { return playhead.playheadID == mPlayheads[i].playheadID; } ) == playheadUpdates.end ( ) )
+        if ( std::find_if ( playheadUpdates.begin ( ), playheadUpdates.end ( ), [this, i]( Utilities::VisualPlayhead& playhead ) { return playhead.playheadID == mPlayheads[i].playheadID; } ) == playheadUpdates.end ( ) )
         {
             ofLogNotice ( "LiveView" ) << "Playhead " << mPlayheads[i].playheadID << " deleted";
 
@@ -204,7 +204,7 @@ void Explorer::LiveView::UpdatePlayheads ( )
     // go through playheadUpdates and update the respective playheads or add new ones if the ID isn't found
     for ( int i = 0; i < playheadUpdates.size ( ); i++ )
     {
-        auto it = std::find_if ( mPlayheads.begin ( ), mPlayheads.end ( ), [this, i, &playheadUpdates] ( Utils::VisualPlayhead& playhead ) { return playhead.playheadID == playheadUpdates[i].playheadID; } );
+        auto it = std::find_if ( mPlayheads.begin ( ), mPlayheads.end ( ), [this, i, &playheadUpdates] ( Utilities::VisualPlayhead& playhead ) { return playhead.playheadID == playheadUpdates[i].playheadID; } );
         if ( it != mPlayheads.end ( ) )
         {
             ofColor color = it->color;
@@ -258,14 +258,13 @@ void Explorer::LiveView::Draw ( )
     // Draw Axis ------------------------------
     {
         ofSetColor ( 255, 255, 255 );
+        if ( mDisabledAxis != Utilities::Axis::X ) { ofDrawLine ( { SpaceDefs::mSpaceMin, 0, 0 }, { SpaceDefs::mSpaceMax, 0, 0 } ); }
+        if ( mDisabledAxis != Utilities::Axis::Y ) { ofDrawLine ( { 0, SpaceDefs::mSpaceMin, 0 }, { 0, SpaceDefs::mSpaceMax, 0 } ); }
+        if ( mDisabledAxis != Utilities::Axis::Z ) { ofDrawLine ( { 0, 0, SpaceDefs::mSpaceMin }, { 0, 0, SpaceDefs::mSpaceMax } ); }
 
-        if ( mDisabledAxis != Utils::Axis::X ) { ofDrawLine ( { SpaceDefs::mSpaceMin, 0, 0 }, { SpaceDefs::mSpaceMax, 0, 0 } ); }
-        if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawLine ( { 0, SpaceDefs::mSpaceMin, 0 }, { 0, SpaceDefs::mSpaceMax, 0 } ); }
-        if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawLine ( { 0, 0, SpaceDefs::mSpaceMin }, { 0, 0, SpaceDefs::mSpaceMax } ); }
-
-        if ( mDisabledAxis != Utils::Axis::X ) { ofDrawBitmapString ( xLabel , { SpaceDefs::mSpaceMax, 0, 0 } ); }
-        if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawBitmapString ( yLabel , { 0, SpaceDefs::mSpaceMax, 0 } ); }
-        if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawBitmapString ( zLabel , { 0, 0, SpaceDefs::mSpaceMax } ); }
+        if ( mDisabledAxis != Utilities::Axis::X ) { ofDrawBitmapString ( xLabel, { SpaceDefs::mSpaceMax, 0, 0 } ); }
+        if ( mDisabledAxis != Utilities::Axis::Y ) { ofDrawBitmapString ( yLabel, { 0, SpaceDefs::mSpaceMax, 0 } ); }
+        if ( mDisabledAxis != Utilities::Axis::Z ) { ofDrawBitmapString ( zLabel, { 0, 0, SpaceDefs::mSpaceMax } ); }
     }
 
     // Draw points ------------------------------
@@ -374,7 +373,7 @@ void Explorer::LiveView::KillPlayhead ( size_t playheadID )
 
 void Explorer::LiveView::CreatePoints ( )
 {
-    Utils::TrailData* trails = mRawView->GetTrailData ( );
+    Utilities::TrailData* trails = mRawView->GetTrailData ( );
 
     for ( int file = 0; file < trails->raw.size ( ); file++ )
     {
@@ -393,15 +392,15 @@ void Explorer::LiveView::CreatePoints ( )
     bDraw = true;
 }
 
-void Explorer::LiveView::FillDimension ( int dimensionIndex, Utils::Axis axis )
+void Explorer::LiveView::FillDimension ( int dimensionIndex, Utilities::Axis axis )
 {
     std::string dimensionName = mRawView->GetDimensions ( )[dimensionIndex];
-    if ( axis == Utils::Axis::X ) { xLabel = dimensionName; }
-    else if ( axis == Utils::Axis::Y ) { yLabel = dimensionName; }
-    else if ( axis == Utils::Axis::Z ) { zLabel = dimensionName; }
-    else if ( axis == Utils::Axis::COLOR ) { colorDimension = dimensionIndex; }
+    if ( axis == Utilities::Axis::X ) { xLabel = dimensionName; }
+    else if ( axis == Utilities::Axis::Y ) { yLabel = dimensionName; }
+    else if ( axis == Utilities::Axis::Z ) { zLabel = dimensionName; }
+    else if ( axis == Utilities::Axis::COLOR ) { colorDimension = dimensionIndex; }
 
-    Utils::TrailData* trails = mRawView->GetTrailData ( );
+    Utilities::TrailData* trails = mRawView->GetTrailData ( );
 
     double min = mDimensionBounds.GetMinBound ( dimensionIndex );
     double max = mDimensionBounds.GetMaxBound ( dimensionIndex );
@@ -413,7 +412,7 @@ void Explorer::LiveView::FillDimension ( int dimensionIndex, Utils::Axis axis )
             double value = trails->raw[file][timepoint][dimensionIndex];
 
             //colors
-            if ( axis == Utils::Axis::COLOR )
+            if ( axis == Utilities::Axis::COLOR )
             {
                 if ( bColorFullSpectrum ) { value = ofMap ( value, min, max, SpaceDefs::mColorMin, SpaceDefs::mColorMax ); }
                 else { value = ofMap ( value, min, max, SpaceDefs::mColorBlue, SpaceDefs::mColorRed ); }
@@ -438,19 +437,19 @@ void Explorer::LiveView::FillDimension ( int dimensionIndex, Utils::Axis axis )
     mPointPicker->Train ( dimensionIndex, axis, false );
 }
 
-void Explorer::LiveView::ClearDimension ( Utils::Axis axis )
+void Explorer::LiveView::ClearDimension ( Utilities::Axis axis )
 {
-    if ( axis == Utils::Axis::X ) { xLabel = ""; }
-    else if ( axis == Utils::Axis::Y ) { yLabel = ""; }
-    else if ( axis == Utils::Axis::Z ) { zLabel = ""; }
-    else if ( axis == Utils::Axis::COLOR ) { colorDimension = -1; }
+    if ( axis == Utilities::Axis::X ) { xLabel = ""; }
+    else if ( axis == Utilities::Axis::Y ) { yLabel = ""; }
+    else if ( axis == Utilities::Axis::Z ) { zLabel = ""; }
+    else if ( axis == Utilities::Axis::COLOR ) { colorDimension = -1; }
 
     for ( int file = 0; file < mCorpusMesh.size ( ); file++ )
     {
         for ( int timepoint = 0; timepoint < mCorpusMesh[file].getNumVertices ( ); timepoint++ )
         {
             //colors
-            if ( axis == Utils::Axis::COLOR )
+            if ( axis == Utilities::Axis::COLOR )
             {
                 ofColor currentColor = ofColor::fromHsb ( 35, 255, 255 );
                 mCorpusMesh[file].setColor ( timepoint, currentColor );
@@ -479,7 +478,7 @@ void Explorer::LiveView::RefreshFileColors ( int fileIndex )
     double outputMin = bColorFullSpectrum ? SpaceDefs::mColorMin : SpaceDefs::mColorBlue;
     double outputMax = bColorFullSpectrum ? SpaceDefs::mColorMax : SpaceDefs::mColorRed;
 
-    Utils::TrailData* trails = mRawView->GetTrailData ( );
+    Utilities::TrailData* trails = mRawView->GetTrailData ( );
 
     for ( int timepoint = 0; timepoint < trails->raw[fileIndex].size ( ); timepoint++ )
     {
@@ -504,14 +503,14 @@ void Explorer::LiveView::Init3DCam ( )
     mCamera->setScale ( 1 );
 }
 
-void Explorer::LiveView::Init2DCam ( Utils::Axis disabledAxis )
+void Explorer::LiveView::Init2DCam ( Utilities::Axis disabledAxis )
 { 
     double midSpacePoint = (SpaceDefs::mSpaceMax + SpaceDefs::mSpaceMin ) / 2;
-    if ( disabledAxis == Utils::Axis::X ) { mCamera->setPosition ( -midSpacePoint, midSpacePoint, midSpacePoint ); }
-    else if ( disabledAxis == Utils::Axis::Y ) { mCamera->setPosition ( midSpacePoint, -midSpacePoint, midSpacePoint ); }
+    if ( disabledAxis == Utilities::Axis::X ) { mCamera->setPosition ( -midSpacePoint, midSpacePoint, midSpacePoint ); }
+    else if ( disabledAxis == Utilities::Axis::Y ) { mCamera->setPosition ( midSpacePoint, -midSpacePoint, midSpacePoint ); }
     else { mCamera->setPosition ( midSpacePoint, midSpacePoint, midSpacePoint ); }
-    if ( disabledAxis == Utils::Axis::X ) { mCamera->lookAt ( { 0, midSpacePoint, midSpacePoint } ); }
-    else if ( disabledAxis == Utils::Axis::Y ) { mCamera->lookAt ( { midSpacePoint, 0, midSpacePoint } ); }
+    if ( disabledAxis == Utilities::Axis::X ) { mCamera->lookAt ( { 0, midSpacePoint, midSpacePoint } ); }
+    else if ( disabledAxis == Utilities::Axis::Y ) { mCamera->lookAt ( { midSpacePoint, 0, midSpacePoint } ); }
     else { mCamera->lookAt ( { midSpacePoint, midSpacePoint, 0 } ); }
     mCamera->setNearClip ( 0.01 ); 
     mCamera->setFarClip ( 99999 );

@@ -16,7 +16,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "Utils/TemporaryDefaults.h"
+#include "Utilities/TemporaryDefaults.h"
 
 #include <ofSoundBuffer.h>
 #include <string>
@@ -30,7 +30,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #define DATA_CHANGE_CHECK_1
 
 namespace Acorex {
-namespace Utils {
+namespace Utilities {
 
 enum class Axis : int {
     X = 0,
@@ -201,5 +201,5 @@ struct VisualPlayhead {
     ofRectangle panelRect = ofRectangle ( 0, 0, 0, 0 );
 };
 
-} // namespace Utils
+} // namespace Utilities
 } // namespace Acorex

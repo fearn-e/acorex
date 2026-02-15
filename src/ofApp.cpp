@@ -16,12 +16,12 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "ofApp.h"
 
-#include "Utils/TemporaryDefaults.h"
+#include "Utilities/TemporaryDefaults.h"
 
 ofApp::ofApp ( ) :
     bListenersAdded ( false )
 {
-    mLayout = std::make_shared<Acorex::Utils::MenuLayout> ( );
+    mLayout = std::make_shared<Acorex::Utilities::MenuLayout> ( );
     mAnalyserMenu.SetMenuLayout ( mLayout );
     mExplorerMenu.SetMenuLayout ( mLayout );
 }

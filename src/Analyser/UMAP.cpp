@@ -20,7 +20,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
-bool Analyser::UMAP::Fit ( Utils::DataSet& dataset, const Utils::ReductionSettings& settings )
+bool Analyser::UMAP::Fit ( Utilities::DataSet& dataset, const Utilities::ReductionSettings& settings )
 {
     fluid::algorithm::UMAP algorithm;
 
@@ -55,7 +55,7 @@ bool Analyser::UMAP::Fit ( Utils::DataSet& dataset, const Utils::ReductionSettin
     return true;
 }
 
-void Analyser::UMAP::ExtractTimeDimension ( Utils::DataSet& dataset, std::vector<double>& timeDimension )
+void Analyser::UMAP::ExtractTimeDimension ( Utilities::DataSet& dataset, std::vector<double>& timeDimension )
 {
     dataset.dimensionNames.erase ( dataset.dimensionNames.begin ( ) );
     dataset.analysisSettings.currentDimensionCount -= 1;
@@ -70,7 +70,7 @@ void Analyser::UMAP::ExtractTimeDimension ( Utils::DataSet& dataset, std::vector
     }
 }
 
-void Analyser::UMAP::InsertTimeDimension ( Utils::DataSet& dataset, const std::vector<double>& timeDimension )
+void Analyser::UMAP::InsertTimeDimension ( Utilities::DataSet& dataset, const std::vector<double>& timeDimension )
 {
     dataset.dimensionNames.insert ( dataset.dimensionNames.begin ( ), "Time" );
     dataset.analysisSettings.currentDimensionCount += 1;

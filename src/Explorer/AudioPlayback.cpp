@@ -137,7 +137,7 @@ void Explorer::AudioPlayback::ClearAndKillAudio ( )
 
     {
         std::lock_guard<std::mutex> dimensionBoundsLock ( mDimensionBoundsMutex );
-        mDimensionBounds = Utils::DimensionBoundsData ( );
+        mDimensionBounds = Utilities::DimensionBoundsData ( );
     }
 
     {
@@ -246,7 +246,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
             // playhead loop
             for ( size_t playheadIndex = 0; playheadIndex < mPlayheads.size ( ); playheadIndex++ )
             {
-                Utils::AudioPlayhead* currentPlayhead = &mPlayheads[playheadIndex]; // TODO - why is this not used - replace all instances of mPlayheads[playheadIndex] with currentPlayhead?
+                Utilities::AudioPlayhead* currentPlayhead = &mPlayheads[playheadIndex]; // TODO - why is this not used - replace all instances of mPlayheads[playheadIndex] with currentPlayhead?
 
                 ofSoundBuffer playheadBuffer;
                 playheadBuffer.setSampleRate ( mSoundStream.getSampleRate ( ) );
@@ -381,8 +381,8 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
                         size_t timePointIndex = mPlayheads[playheadIndex].sampleIndex / mRawView->GetHopSize ( );
                         glm::vec3 playheadPosition = mCorpusMesh[mPlayheads[playheadIndex].fileIndex].getVertex ( timePointIndex );
-                        Utils::PointFT nearestPoint;
-                        Utils::PointFT currentPoint; currentPoint.file = mPlayheads[playheadIndex].fileIndex; currentPoint.time = timePointIndex;
+                        Utilities::PointFT nearestPoint;
+                        Utilities::PointFT currentPoint; currentPoint.file = mPlayheads[playheadIndex].fileIndex; currentPoint.time = timePointIndex;
 
                         if ( !mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint,
                                                                     mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileAllowed,
@@ -446,7 +446,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
             for ( size_t i = 0; i < mPlayheads.size ( ); i++ )
             {
-                mVisualPlayheads.push_back ( Utils::VisualPlayhead ( mPlayheads[i].playheadID, mPlayheads[i].fileIndex, mPlayheads[i].sampleIndex ) );
+                mVisualPlayheads.push_back ( Utilities::VisualPlayhead ( mPlayheads[i].playheadID, mPlayheads[i].fileIndex, mPlayheads[i].sampleIndex ) );
             }
         }
 
@@ -454,7 +454,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
     }
 }
 
-void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utils::AudioPlayhead* playhead, bool outBufferFull )
+void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utilities::AudioPlayhead* playhead, bool outBufferFull )
 {
     float panGainL = 1.0f, panGainR = 1.0f;
     double panningStrength = (double)mPanningStrengthX1000 / 1000.0;
@@ -495,7 +495,7 @@ void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_
 }
 
 // TODO - i think this function is no longer used - remove?
-void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, size_t startSample_A, size_t endSample_A, size_t fileIndex_A, Utils::AudioPlayhead* playhead_B, size_t lengthSetting, bool outBufferFull )
+void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, size_t startSample_A, size_t endSample_A, size_t fileIndex_A, Utilities::AudioPlayhead* playhead_B, size_t lengthSetting, bool outBufferFull )
 {
     size_t originLength = endSample_A - startSample_A;
     size_t jumpLength = playhead_B->triggerSamplePoints.front ( ) - playhead_B->sampleIndex;
@@ -555,7 +555,7 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t sampleIn
 
     if ( mRawView->GetAudioData ( )->loaded[fileIndex] )
     {
-        Utils::AudioPlayhead newPlayhead ( playheadCounter, fileIndex, sampleIndex );
+        Utilities::AudioPlayhead newPlayhead ( playheadCounter, fileIndex, sampleIndex );
         playheadCounter++;
 
         CalculateTriggerPoints ( newPlayhead );
@@ -584,7 +584,7 @@ bool Explorer::AudioPlayback::KillPlayhead ( size_t playheadID )
     return true;
 }
 
-std::vector<Utils::VisualPlayhead> Explorer::AudioPlayback::GetPlayheadInfo ( )
+std::vector<Utilities::VisualPlayhead> Explorer::AudioPlayback::GetPlayheadInfo ( )
 {
     std::lock_guard<std::mutex> lock ( mVisualPlayheadUpdateMutex );
 
@@ -605,7 +605,7 @@ void Explorer::AudioPlayback::WaitForMissingOutputConfirm ( )
     }
 }
 
-void Explorer::AudioPlayback::SetDimensionBounds ( const Utils::DimensionBoundsData& dimensionBoundsData )
+void Explorer::AudioPlayback::SetDimensionBounds ( const Utilities::DimensionBoundsData& dimensionBoundsData )
 {
     if ( bStreamStarted )
     {
@@ -625,7 +625,7 @@ void Explorer::AudioPlayback::SetCorpusMesh ( const std::vector<ofMesh>& corpusM
     mCorpusMesh = corpusMesh;
 }
 
-void Explorer::AudioPlayback::CalculateTriggerPoints ( Utils::AudioPlayhead& playhead )
+void Explorer::AudioPlayback::CalculateTriggerPoints ( Utilities::AudioPlayhead& playhead )
 {
     while ( !playhead.triggerSamplePoints.empty ( ) )
     {

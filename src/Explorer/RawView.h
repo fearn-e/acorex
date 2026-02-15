@@ -16,9 +16,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "Utils/Data.h"
-#include "Utils/JSON.h"
-#include "Utils/AudioFileLoader.h"
+#include "Utilities/Data.h"
+#include "Utilities/JSON.h"
+#include "Utilities/AudioFileLoader.h"
 
 namespace Acorex {
 namespace Explorer {
@@ -37,21 +37,21 @@ public:
     bool IsReduction ( ) const; // check if dataset is a reduced corpus
     std::vector<std::string> GetDimensions ( ) const; // get dimensions from dataset
     std::string GetCorpusName ( ) const; // get corpus name
-    Utils::AudioData* GetAudioData ( ); // get audio data from dataset
-    Utils::TrailData* GetTrailData ( ); // get trail data from dataset
-    Utils::DataSet* GetDataset ( ); // get dataset
+    Utilities::AudioData* GetAudioData ( ); // get audio data from dataset
+    Utilities::TrailData* GetTrailData ( ); // get trail data from dataset
+    Utilities::DataSet* GetDataset ( ); // get dataset
     size_t GetHopSize ( ) const; // get hop size used in analysis
 
 private:
-    bool LoadAudioSet ( Utils::DataSet& dataset ); // load all audio files in dataset into memory
+    bool LoadAudioSet ( Utilities::DataSet& dataset ); // load all audio files in dataset into memory
 
     size_t mHopSize;
 
     std::string mCorpusName;
-    Utils::DataSet mDataset;
+    Utilities::DataSet mDataset;
 
-    Utils::JSON mJSON;
-    Utils::AudioFileLoader mAudioLoader;
+    Utilities::JSON mJSON;
+    Utilities::AudioFileLoader mAudioLoader;
 };
 
 } // namespace Explorer

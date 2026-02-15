@@ -16,25 +16,36 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include <flucoma/data/TensorTypes.hpp>
-#include <ofxAudioFile.h>
-#include <string>
+#include "Utilities/Data.h"
+
+#include <nlohmann/json.hpp>
 
 namespace Acorex {
-namespace Utils {
+namespace Utilities {
 
-class AudioFileLoader {
+class JSON {
+
+#define TO_J( x ) {#x, a.x}
+#define TO_J_SETTINGS( x ) {#x, a.analysisSettings.x}
+
+#define TO_A( x ) j.at ( #x ).get_to ( a.x )
+#define TO_A_SETTINGS( x ) j.at ( #x ).get_to ( a.analysisSettings.x )
+
 public:
-    AudioFileLoader ( ) { }
-    ~AudioFileLoader ( ) { }
+    JSON ( ) { };
+    ~JSON ( ) { };
 
-    bool ReadAudioFile ( std::string filename, fluid::RealVector& output, double targetSampleRate );
+    bool Write ( const std::string& outputFile, const DataSet& dataset );
 
-private:
-    void ReadToMono ( std::vector<float>& output, ofxAudioFile& file );
-
-    void Resample ( std::vector<float>& audio, double fileRate, double targetRate );
+    bool Read ( const std::string& inputFile, DataSet& dataset );
+    bool Read ( const std::string& inputFile, AnalysisSettings& settings );
 };
 
-} // namespace Utils
+void to_json ( nlohmann::json& j, const DataSet& a );
+void from_json ( const nlohmann::json& j, DataSet& a );
+
+void to_json ( nlohmann::json& j, const AnalysisSettings& a );
+void from_json ( const nlohmann::json& j, AnalysisSettings& a );
+
+} // namespace Utilities
 } // namespace Acorex

@@ -16,36 +16,22 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "Utils/Data.h"
+#include "Utilities/Data.h"
 
-#include <nlohmann/json.hpp>
+#include <flucoma/data/FluidDataSet.hpp>
 
 namespace Acorex {
-namespace Utils {
+namespace Utilities {
 
-class JSON {
-
-#define TO_J( x ) {#x, a.x}
-#define TO_J_SETTINGS( x ) {#x, a.analysisSettings.x}
-
-#define TO_A( x ) j.at ( #x ).get_to ( a.x )
-#define TO_A_SETTINGS( x ) j.at ( #x ).get_to ( a.analysisSettings.x )
-
+class DatasetConversion {
 public:
-    JSON ( ) { };
-    ~JSON ( ) { };
+    DatasetConversion ( ) { }
+    ~DatasetConversion ( ) { }
 
-    bool Write ( const std::string& outputFile, const DataSet& dataset );
+    void CorpusToFluid ( fluid::FluidDataSet<std::string, double, 1>& fluidset, const Utilities::DataSet& dataset, std::vector<int>& filePointLength );
 
-    bool Read ( const std::string& inputFile, DataSet& dataset );
-    bool Read ( const std::string& inputFile, AnalysisSettings& settings );
+    void FluidToCorpus ( Utilities::DataSet& dataset, const fluid::FluidDataSet<std::string, double, 1>& fluidset, const std::vector<int>& filePointLength, const int reducedDimensionCount );
 };
 
-void to_json ( nlohmann::json& j, const DataSet& a );
-void from_json ( const nlohmann::json& j, DataSet& a );
-
-void to_json ( nlohmann::json& j, const AnalysisSettings& a );
-void from_json ( const nlohmann::json& j, AnalysisSettings& a );
-
-} // namespace Utils
-} // namespace Acorex
+} // namespace Utilities
+} // namespace Acorex;

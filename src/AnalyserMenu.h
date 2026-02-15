@@ -17,9 +17,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #pragma once
 
 #include "Analyser/Controller.h"
-#include "Utils/Data.h"
-#include "Utils/JSON.h"
-#include "Utils/InterfaceDefs.h"
+#include "Utilities/Data.h"
+#include "Utilities/JSON.h"
+#include "Utilities/InterfaceDefs.h"
 
 #include <ofxGui.h>
 #include <ofSystemUtils.h>
@@ -38,7 +38,7 @@ public:
     void Exit ( );
 
     void RefreshUI ( );
-    void SetMenuLayout ( std::shared_ptr<Utils::MenuLayout>& menuLayout ) { mLayout = menuLayout; }
+    void SetMenuLayout ( std::shared_ptr<Utilities::MenuLayout>& menuLayout ) { mLayout = menuLayout; }
 
 private:
     void ResetVariables ( );
@@ -90,9 +90,9 @@ private:
 
     // Load and Save Settings ----------------------
 
-    void UnpackSettingsFromFile ( const Utils::AnalysisSettings& settings );
-    void PackSettingsFromUser ( Utils::AnalysisSettings& settings);
-    void PackSettingsFromUser ( Utils::ReductionSettings& settings );
+    void UnpackSettingsFromFile ( const Utilities::AnalysisSettings& settings );
+    void PackSettingsFromUser ( Utilities::AnalysisSettings& settings);
+    void PackSettingsFromUser ( Utilities::ReductionSettings& settings );
 
     // UI Value Management -------------------------
 
@@ -180,9 +180,9 @@ private:
     // Acorex Objects ------------------------------
 
     Analyser::Controller mController;
-    Utils::JSON mJSON;
-    Utils::Colors mColors;
-    std::shared_ptr<Utils::MenuLayout> mLayout;
+    Utilities::JSON mJSON;
+    Utilities::Colors mColors;
+    std::shared_ptr<Utilities::MenuLayout> mLayout;
 };
 
 } // namespace Acorex

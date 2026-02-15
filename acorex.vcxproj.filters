@@ -28,8 +28,8 @@
     <ClCompile Include="src\Explorer\RawView.cpp">
       <Filter>src\Explorer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utils\JSON.cpp">
-      <Filter>src\Utils</Filter>
+    <ClCompile Include="src\Utilities\JSON.cpp">
+      <Filter>src\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
@@ -78,18 +78,18 @@
     </ClCompile>
     <ClCompile Include="src\Explorer\PointPicker.cpp">
       <Filter>src\Explorer</Filter>
+    </ClCompile>    
+    <ClCompile Include="src\Utilities\DatasetConversion.cpp">
+      <Filter>src\Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utils\DatasetConversion.cpp">
-      <Filter>src\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Utils\AudioFileLoader.cpp">
-      <Filter>src\Utils</Filter>
+    <ClCompile Include="src\Utilities\AudioFileLoader.cpp">
+      <Filter>src\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="src\Explorer\AudioPlayback.cpp">
       <Filter>src\Explorer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utils\AudioSettingsManager.cpp">
-      <Filter>src\Utils</Filter>
+    <ClCompile Include="src\Utilities\AudioSettingsManager.cpp">
+      <Filter>src\Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -102,7 +102,7 @@
     <Filter Include="src\Explorer">
       <UniqueIdentifier>{14D6AD5A--010-0-41-0A-B-900-3E00E4948DD8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Utils">
+    <Filter Include="src\Utilities">
       <UniqueIdentifier>{C4C520C2--4A2-F-4F-2B-A-C0D-A63AB18E6DFA}</UniqueIdentifier>
     </Filter>
     <Filter Include="addons">
@@ -155,14 +155,14 @@
     <ClInclude Include="src\Explorer\RawView.h">
       <Filter>src\Explorer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\Data.h">
-      <Filter>src\Utils</Filter>
+    <ClInclude Include="src\Utilities\InterfaceDefs.h">
+      <Filter>src\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\InterfaceDefs.h">
-      <Filter>src\Utils</Filter>
+    <ClInclude Include="src\Utilities\JSON.h">
+      <Filter>src\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\JSON.h">
-      <Filter>src\Utils</Filter>
+    <ClInclude Include="src\Utilities\Data.h">
+      <Filter>src\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="src\ofApp.h">
       <Filter>src</Filter>
@@ -224,32 +224,32 @@
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h">
       <Filter>addons\ofxGui\src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\DatasetConversion.h">
-      <Filter>src\Utils</Filter>
+    <ClInclude Include="src\Utilities\DatasetConversion.h">
+      <Filter>src\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="src\Explorer\PointPicker.h">
       <Filter>src\Explorer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\DimensionBounds.h">
-      <Filter>src\Utils</Filter>
+    <ClInclude Include="src\Utilities\DimensionBounds.h">
+      <Filter>src\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="src\Explorer\SpaceDefs.h">
       <Filter>src\Explorer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\AudioFileLoader.h">
-      <Filter>src\Utils</Filter>
+    <ClInclude Include="src\Utilities\AudioFileLoader.h">
+      <Filter>src\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="src\Explorer\AudioPlayback.h">
       <Filter>src\Explorer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\AudioSettingsManager.h">
-      <Filter>src\Utils</Filter>
+    <ClInclude Include="src\Utilities\AudioSettingsManager.h">
+      <Filter>src\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\TemporaryDefaults.h">
-      <Filter>src\Utils</Filter>
+    <ClInclude Include="src\Utilities\TemporaryDefaults.h">
+      <Filter>src\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\TemporaryKeybinds.h">
-      <Filter>src\Utils</Filter>
+    <ClInclude Include="src\Utilities\TemporaryKeybinds.h">
+      <Filter>src\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

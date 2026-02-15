@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Utils/TemporaryDefaults.h"
+#include "Utilities/TemporaryDefaults.h"
 
 #include <ofConstants.h>
 #include <ofSoundBaseTypes.h>
@@ -31,7 +31,7 @@ CHECK_ENUM_VALUE(ofSoundDevice::Api, MS_DS, 9)
 CHECK_ENUM_VALUE(ofSoundDevice::Api, NUM_APIS, 10)
 
 namespace Acorex {
-namespace Utils {
+namespace Utilities {
 
 class AudioSettingsManager {
 public:
@@ -103,7 +103,7 @@ private:
     const std::vector<int> availableBufferSizes;
 };
 
-} // namespace Utils
+} // namespace Utilities
 } // namespace Acorex
 
 // TODO - find default device in list
@@ -164,7 +164,7 @@ if ( bFirstTimeAPIDeviceLoad )
 
     for ( int i = 0; i < platformAPIs.size ( ); i++ )
     {
-        apiNames.push_back ( std::string ( Utils::AudioAPINames[static_cast<size_t> ( platformAPIs[i] )] ) );
+        apiNames.push_back ( std::string ( Utilities::AudioAPINames[static_cast<size_t> ( platformAPIs[i] )] ) );
     }
 
     currentAPI = defaultApi;

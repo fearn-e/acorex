@@ -40,5 +40,5 @@ namespace SpaceDefs {
 
 } // namespace SpaceDefs
 
-} // namespace Utils
+} // namespace Utilities
 } // namespace Acorex

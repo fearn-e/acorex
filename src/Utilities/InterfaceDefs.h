@@ -19,7 +19,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofxGui.h>
 
 namespace Acorex {
-namespace Utils {
+namespace Utilities {
 
 inline constexpr unsigned int ofxDropdownScrollSpeed = 32;
 
@@ -90,5 +90,5 @@ public:
     int getModePanelOriginY ( ) const { return modePanelOriginY; }
     int getAnalysePanelOriginX ( ) const { return analysePanelOriginX; }
 };
-} // namespace Utils
+} // namespace Utilities
 } // namespace Acorex

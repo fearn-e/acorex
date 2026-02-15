@@ -16,8 +16,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "Utils/Data.h"
-#include "Utils/AudioFileLoader.h"
+#include "Utilities/Data.h"
+#include "Utilities/AudioFileLoader.h"
 
 #include <Eigen/Core>
 #include <flucoma/algorithms/public/DCT.hpp>
@@ -44,10 +44,10 @@ public:
     GenAnalysis ( ) { };
     ~GenAnalysis ( ) { };
 
-    int ProcessFiles ( Utils::DataSet& dataset );
+    int ProcessFiles ( Utilities::DataSet& dataset );
 
 private:
-    Utils::AudioFileLoader mAudioLoader;
+    Utilities::AudioFileLoader mAudioLoader;
 };
 
 } // namespace Analyser

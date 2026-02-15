@@ -17,7 +17,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Explorer/PointPicker.h"
 
 #include "Explorer/SpaceDefs.h"
-#include "Utils/TemporaryKeybinds.h"
+#include "Utilities/TemporaryKeybinds.h"
 
 #include <ofGraphics.h>
 #include <of3DGraphics.h>
@@ -36,7 +36,7 @@ Explorer::PointPicker::PointPicker ( )
 
 }
 
-void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Utils::DimensionBounds& dimensionBounds )
+void Explorer::PointPicker::Initialise ( const Utilities::DataSet& dataset, const Utilities::DimensionBounds& dimensionBounds )
 {
     Clear ( );
 
@@ -45,7 +45,7 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
     mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dataset.dimensionNames.size ( ) );
     mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 3 );
 
-    Utils::DataSet scaledDataset = dataset;
+    Utilities::DataSet scaledDataset = dataset;
     ScaleDataset ( scaledDataset, dimensionBounds );
 
     for ( int file = 0; file < dataset.fileList.size ( ); file++ )
@@ -85,13 +85,13 @@ void Explorer::PointPicker::Clear ( )
     RemoveListeners ( );
 }
 
-void Explorer::PointPicker::Train ( int dimensionIndex, Utils::Axis axis, bool none )
+void Explorer::PointPicker::Train ( int dimensionIndex, Utilities::Axis axis, bool none )
 {
     std::lock_guard<std::mutex> lock ( mPointPickerMutex );
 
-    if ( axis == Utils::Axis::X ) { bDimensionsFilled[0] = !none; mDimensionsIndices[0] = dimensionIndex; }
-    else if ( axis == Utils::Axis::Y ) { bDimensionsFilled[1] = !none; mDimensionsIndices[1] = dimensionIndex; }
-    else if ( axis == Utils::Axis::Z ) { bDimensionsFilled[2] = !none; mDimensionsIndices[2] = dimensionIndex; }
+    if ( axis == Utilities::Axis::X ) { bDimensionsFilled[0] = !none; mDimensionsIndices[0] = dimensionIndex; }
+    else if ( axis == Utilities::Axis::Y ) { bDimensionsFilled[1] = !none; mDimensionsIndices[1] = dimensionIndex; }
+    else if ( axis == Utilities::Axis::Z ) { bDimensionsFilled[2] = !none; mDimensionsIndices[2] = dimensionIndex; }
     else { return; }
 
     int dimsFilled = bDimensionsFilled[0] + bDimensionsFilled[1] + bDimensionsFilled[2];
@@ -102,7 +102,7 @@ void Explorer::PointPicker::Train ( int dimensionIndex, Utils::Axis axis, bool n
     // but this means it wouldn't work for a corpus that had only 2 dimensions to load to begin with?
     // and if i ever accidentally set bSkipTraining back to true anywhere other than when loading a new corpus, this could just break training
     // split this function into Train and SetDimension? - call SetDimension when first loading, then Train only once and then at runtime when changes are applied to the corpus?
-    if ( axis == Utils::Axis::Z ) { bSkipTraining = false; }
+    if ( axis == Utilities::Axis::Z ) { bSkipTraining = false; }
     if ( bSkipTraining ) { return; }
 
     mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dimsFilled );
@@ -163,7 +163,7 @@ void Explorer::PointPicker::RemoveListeners ( )
     bListenersAdded = false;
 }
 
-void Explorer::PointPicker::ScaleDataset ( Utils::DataSet& scaledDataset, const Utils::DimensionBounds& dimensionBounds )
+void Explorer::PointPicker::ScaleDataset ( Utilities::DataSet& scaledDataset, const Utilities::DimensionBounds& dimensionBounds )
 {
     for ( int file = 0; file < scaledDataset.trails.raw.size ( ); file++ )
     {
@@ -329,9 +329,9 @@ void Explorer::PointPicker::FindNearestToMouse ( )
 }
 
 // TODO - revisit this function for any performance improvements
-bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, 
+bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utilities::PointFT& nearestPoint, Utilities::PointFT currentPoint, 
                                                     int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed,
-                                                    int minTimeDiffSameFile, int remainingSamplesRequired, const Utils::AudioData& audioSet, size_t hopSize )
+                                                    int minTimeDiffSameFile, int remainingSamplesRequired, const Utilities::AudioData& audioSet, size_t hopSize )
 {
     if ( maxAllowedDistanceSpaceX1000 == 0 ) { return false; }
 

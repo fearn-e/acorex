@@ -16,8 +16,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "ExplorerMenu.h"
 
-#include "Utils/InterfaceDefs.h"
-#include "Utils/TemporaryDefaults.h"
+#include "Utilities/InterfaceDefs.h"
+#include "Utilities/TemporaryDefaults.h"
 
 #include <ofUtils.h>
 #include <of3dGraphics.h>
@@ -37,7 +37,7 @@ ExplorerMenu::ExplorerMenu ( ) :    mSlowUpdateInterval ( 100 ), mOpenCorpusButt
     bIsCorpusOpen = false;
     bBlockDimensionFilling = false;
 
-    mDisabledAxis = Utils::Axis::NONE;
+    mDisabledAxis = Utilities::Axis::NONE;
 
     mLastUpdateTime = 0;
     mOpenCorpusButtonClickTime = 0;
@@ -58,7 +58,7 @@ void ExplorerMenu::Clear ( )
     bIsCorpusOpen = false;
     bBlockDimensionFilling = false;
 
-    mDisabledAxis = Utils::Axis::NONE;
+    mDisabledAxis = Utilities::Axis::NONE;
 
     mLiveView.Clear ( );
 
@@ -181,7 +181,7 @@ void ExplorerMenu::OpenStartupPanel ( )
     bDraw = true;
 }
 
-void ExplorerMenu::OpenFullPanel ( const Utils::ExploreSettings& settings )
+void ExplorerMenu::OpenFullPanel ( const Utilities::ExploreSettings& settings )
 {
     mAudioSettingsManager.RefreshDeviceListChanged ( );
 
@@ -217,11 +217,11 @@ void ExplorerMenu::SetupPanelSectionHeader ( std::string corpusNameLabel )
     mOpenCorpusButton.setBackgroundColor ( mColors.interfaceBackgroundColor );
 }
 
-void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utils::ExploreSettings& settings )
+void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utilities::ExploreSettings& settings )
 {
     // X Dimension Dropdown
     mDimensionDropdownX.reset ( );
-    mDimensionDropdownX = make_unique<ofxDropdown> ( static_cast<std::string>("X Dimension"), Utils::ofxDropdownScrollSpeed );
+    mDimensionDropdownX = make_unique<ofxDropdown> ( static_cast<std::string>("X Dimension"), Utilities::ofxDropdownScrollSpeed );
     mDimensionDropdownX->add ( "None" );
     for ( auto& dimension : mRawView->GetDimensions ( ) ) { mDimensionDropdownX->add ( dimension ); }
     mMainPanel.add ( mDimensionDropdownX.get ( ) );
@@ -233,7 +233,7 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utils::ExploreSetting
 
     // Y Dimension Dropdown
     mDimensionDropdownY.reset ( );
-    mDimensionDropdownY = make_unique<ofxDropdown> ( static_cast<std::string>("Y Dimension"), Utils::ofxDropdownScrollSpeed );
+    mDimensionDropdownY = make_unique<ofxDropdown> ( static_cast<std::string>("Y Dimension"), Utilities::ofxDropdownScrollSpeed );
     mDimensionDropdownY->add ( "None" );
     for ( auto& dimension : mRawView->GetDimensions ( ) ) { mDimensionDropdownY->add ( dimension ); }
     mMainPanel.add ( mDimensionDropdownY.get ( ) );
@@ -245,7 +245,7 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utils::ExploreSetting
 
     // Z Dimension Dropdown
     mDimensionDropdownZ.reset ( );
-    mDimensionDropdownZ = make_unique<ofxDropdown> ( static_cast<std::string>("Z Dimension"), Utils::ofxDropdownScrollSpeed );
+    mDimensionDropdownZ = make_unique<ofxDropdown> ( static_cast<std::string>("Z Dimension"), Utilities::ofxDropdownScrollSpeed );
     mDimensionDropdownZ->add ( "None" );
     for ( auto& dimension : mRawView->GetDimensions ( ) ) { mDimensionDropdownZ->add ( dimension ); }
     mMainPanel.add ( mDimensionDropdownZ.get ( ) );
@@ -259,7 +259,7 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utils::ExploreSetting
 
     // Colour Dimension Dropdown
     mDimensionDropdownColor.reset ( );
-    mDimensionDropdownColor = make_unique<ofxDropdown> ( static_cast<std::string>("Color Dimension"), Utils::ofxDropdownScrollSpeed );
+    mDimensionDropdownColor = make_unique<ofxDropdown> ( static_cast<std::string>("Color Dimension"), Utilities::ofxDropdownScrollSpeed );
     mDimensionDropdownColor->add ( "None" );
     for ( auto& dimension : mRawView->GetDimensions ( ) ) { mDimensionDropdownColor->add ( dimension ); }
     mMainPanel.add ( mDimensionDropdownColor.get ( ) );
@@ -311,7 +311,7 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utils::ExploreSetting
 
     // Dynamic Panning Dimension Dropdown
     mDimensionDropdownDynamicPan.reset ( );
-    mDimensionDropdownDynamicPan = make_unique<ofxDropdown> ( static_cast<std::string>("Dynamic Panning Dimension"), Utils::ofxDropdownScrollSpeed );
+    mDimensionDropdownDynamicPan = make_unique<ofxDropdown> ( static_cast<std::string>("Dynamic Panning Dimension"), Utilities::ofxDropdownScrollSpeed );
     mDimensionDropdownDynamicPan->add ( "None" );
     for ( auto& dimension : mRawView->GetDimensions ( ) ) { mDimensionDropdownDynamicPan->add ( dimension ); }
     mMainPanel.add ( mDimensionDropdownDynamicPan.get ( ) );
@@ -333,7 +333,7 @@ void ExplorerMenu::SetupPanelSectionAudioManager ( )
     int bufferSize = mAudioSettingsManager.GetCurrentBufferSize ( );
 
     mApiDropdown.reset ( );
-    mApiDropdown = make_unique<ofxDropdown> ( (string)"Audio API", Utils::ofxDropdownScrollSpeed );
+    mApiDropdown = make_unique<ofxDropdown> ( (string)"Audio API", Utilities::ofxDropdownScrollSpeed );
     for ( size_t i = 0; i < mAudioSettingsManager.GetApiCount ( ); i++ )
     {
         std::string apiName = std::string ( mAudioSettingsManager.GetApiName ( i ) );
@@ -349,7 +349,7 @@ void ExplorerMenu::SetupPanelSectionAudioManager ( )
     mMainPanel.add ( mApiDropdown.get ( ) );
 
     mOutDeviceDropdown.reset ( );
-    mOutDeviceDropdown = make_unique<ofxDropdown> ( (string)"Output Device", Utils::ofxDropdownScrollSpeed );
+    mOutDeviceDropdown = make_unique<ofxDropdown> ( (string)"Output Device", Utilities::ofxDropdownScrollSpeed );
     for ( size_t i = 0; i < mAudioSettingsManager.GetCurrentApiDevicesOut ( ).size ( ); i++ )
     {
         std::string deviceName = mAudioSettingsManager.GetCurrentApiDevicesOut ( )[i].name;
@@ -363,7 +363,7 @@ void ExplorerMenu::SetupPanelSectionAudioManager ( )
     mMainPanel.add ( mOutDeviceDropdown.get ( ) );
 
     mBufferSizeDropdown.reset ( );
-    mBufferSizeDropdown = make_unique<ofxIntDropdown> ( (string)"Buffer Size", Utils::ofxDropdownScrollSpeed );
+    mBufferSizeDropdown = make_unique<ofxIntDropdown> ( (string)"Buffer Size", Utilities::ofxDropdownScrollSpeed );
     for ( auto& each : mAudioSettingsManager.GetBufferSizes ( ) ) { mBufferSizeDropdown->add ( each ); }
     mBufferSizeDropdown->disableMultipleSelection ( );
     mBufferSizeDropdown->enableCollapseOnSelection ( );
@@ -593,7 +593,7 @@ void ExplorerMenu::OpenCorpus ( )
         return;
     }
 
-    Utils::ExploreSettings initialSettings { };
+    Utilities::ExploreSettings initialSettings { };
     {
         initialSettings.SetHopSize ( mRawView->GetHopSize ( ) );
 
@@ -638,11 +638,11 @@ void ExplorerMenu::OpenCorpus ( )
 }
 
 // TODO - change how this and FillDimension and Train (point picker) work, should have a function that triggers training and one that doesn't (for initial filling)
-void ExplorerMenu::SetDimension ( string dimension, Utils::Axis axis )
+void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis axis )
 {
     if ( bBlockDimensionFilling ) { return; }
 
-    if ( axis == Utils::Axis::DYNAMIC_PAN )
+    if ( axis == Utilities::Axis::DYNAMIC_PAN )
     {
         if ( dimension == "None" )
         {
@@ -694,15 +694,15 @@ void ExplorerMenu::CameraSwitcher ( )
     bool isZNone = mDimensionDropdownZ->getAllSelected ( )[0] == "None";
     int numDisabledAxes = isXNone + isYNone + isZNone;
 
-    Utils::Axis							  disabledAxis = Utils::Axis::NONE;
-    if		( isXNone )					{ disabledAxis = Utils::Axis::X; }
-    else if ( isYNone )					{ disabledAxis = Utils::Axis::Y; }
-    else if ( isZNone )					{ disabledAxis = Utils::Axis::Z; }
-    else if ( numDisabledAxes > 1 )		{ disabledAxis = Utils::Axis::MULTIPLE; }
+    Utilities::Axis							  disabledAxis = Utilities::Axis::NONE;
+    if		( isXNone )					{ disabledAxis = Utilities::Axis::X; }
+    else if ( isYNone )					{ disabledAxis = Utilities::Axis::Y; }
+    else if ( isZNone )					{ disabledAxis = Utilities::Axis::Z; }
+    else if ( numDisabledAxes > 1 )		{ disabledAxis = Utilities::Axis::MULTIPLE; }
 
     bool current3D = mLiveView.Is3D ( );
 
-    if ( disabledAxis == Utils::Axis::NONE || disabledAxis == Utils::Axis::MULTIPLE )
+    if ( disabledAxis == Utilities::Axis::NONE || disabledAxis == Utilities::Axis::MULTIPLE )
     {
         if ( !mLiveView.Is3D ( ) )
         {
@@ -721,7 +721,7 @@ void ExplorerMenu::CameraSwitcher ( )
     }
 }
 
-void ExplorerMenu::PropogateCorpusSettings ( const Utils::ExploreSettings& settings )
+void ExplorerMenu::PropogateCorpusSettings ( const Utilities::ExploreSettings& settings )
 {
     // TODO - change these 3 so that only the final call of the 3 triggers point picker Train ( )
     SetDimensionX ( settings.GetDimensionX ( ) );
@@ -748,22 +748,22 @@ void ExplorerMenu::PropogateCorpusSettings ( const Utils::ExploreSettings& setti
     // Corpus Controls
 void ExplorerMenu::SetDimensionX ( const string& dimension )
 {
-    SetDimension ( dimension, Utils::Axis::X );
+    SetDimension ( dimension, Utilities::Axis::X );
 }
 
 void ExplorerMenu::SetDimensionY ( const string& dimension )
 {
-    SetDimension ( dimension, Utils::Axis::Y );
+    SetDimension ( dimension, Utilities::Axis::Y );
 }
 
 void ExplorerMenu::SetDimensionZ ( const string& dimension )
 {
-    SetDimension ( dimension, Utils::Axis::Z );
+    SetDimension ( dimension, Utilities::Axis::Z );
 }
 
 void ExplorerMenu::SetDimensionColor ( const string& dimension )
 {
-    SetDimension ( dimension, Utils::Axis::COLOR );
+    SetDimension ( dimension, Utilities::Axis::COLOR );
 }
 
 void ExplorerMenu::SwitchColorSpectrum ( const bool& fullSpectrum )
@@ -771,7 +771,7 @@ void ExplorerMenu::SwitchColorSpectrum ( const bool& fullSpectrum )
     if ( fullSpectrum ) { mColorSpectrumSwitcher.setName ( "Color Spectrum: Full" ); }
     else { mColorSpectrumSwitcher.setName ( "Color Spectrum: Red<->Blue" ); }
     mLiveView.SetColorFullSpectrum ( fullSpectrum );
-    SetDimension ( mDimensionDropdownColor->getAllSelected ( )[0], Utils::Axis::COLOR );
+    SetDimension ( mDimensionDropdownColor->getAllSelected ( )[0], Utilities::Axis::COLOR );
 }
 
 void ExplorerMenu::ToggleLoopPlayheads ( const bool& loop )
@@ -816,7 +816,7 @@ void ExplorerMenu::SetVolume( const float& volume)
 
 void ExplorerMenu::SetDimensionDynamicPan ( const string& dimension )
 {
-    SetDimension ( dimension, Utils::Axis::DYNAMIC_PAN );
+    SetDimension ( dimension, Utilities::Axis::DYNAMIC_PAN );
 }
 
 void ExplorerMenu::SetPanningStrength ( const float& strength )

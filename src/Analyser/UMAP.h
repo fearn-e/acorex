@@ -16,8 +16,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "Utils/Data.h"
-#include "Utils/DatasetConversion.h"
+#include "Utilities/Data.h"
+#include "Utilities/DatasetConversion.h"
 
 #include <flucoma/algorithms/public/UMAP.hpp>
 #include <Eigen/Core>
@@ -36,14 +36,14 @@ public:
     UMAP ( ) { };
     ~UMAP ( ) { };
 
-    bool Fit ( Utils::DataSet& dataset, const Utils::ReductionSettings& settings );
+    bool Fit ( Utilities::DataSet& dataset, const Utilities::ReductionSettings& settings );
 
 private:
 
-    void ExtractTimeDimension ( Utils::DataSet& dataset, std::vector<double>& timeDimension );
-    void InsertTimeDimension ( Utils::DataSet& dataset, const std::vector<double>& timeDimension );
+    void ExtractTimeDimension ( Utilities::DataSet& dataset, std::vector<double>& timeDimension );
+    void InsertTimeDimension ( Utilities::DataSet& dataset, const std::vector<double>& timeDimension );
 
-    Utils::DatasetConversion mConversion;
+    Utilities::DatasetConversion mConversion;
 };
 
 } // namespace Analyser

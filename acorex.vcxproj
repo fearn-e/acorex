@@ -117,10 +117,10 @@
     <ClCompile Include="src\ExplorerMenu.cpp" />
     <ClCompile Include="src\Explorer\LiveView.cpp" />
     <ClCompile Include="src\Explorer\RawView.cpp" />
-    <ClCompile Include="src\Utils\AudioSettingsManager.cpp" />
-    <ClCompile Include="src\Utils\AudioFileLoader.cpp" />
-    <ClCompile Include="src\Utils\DatasetConversion.cpp" />
-    <ClCompile Include="src\Utils\JSON.cpp" />
+    <ClCompile Include="src\Utilities\AudioSettingsManager.cpp" />
+    <ClCompile Include="src\Utilities\AudioFileLoader.cpp" />
+    <ClCompile Include="src\Utilities\DatasetConversion.cpp" />
+    <ClCompile Include="src\Utilities\JSON.cpp" />
     <ClCompile Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDropdown\src\ofxDropdown.cpp" />
     <ClCompile Include="..\..\..\addons\ofxDropdown\src\ofxDropdownOption.cpp" />
@@ -147,13 +147,13 @@
     <ClInclude Include="src\ExplorerMenu.h" />
     <ClInclude Include="src\Explorer\LiveView.h" />
     <ClInclude Include="src\Explorer\RawView.h" />
-    <ClInclude Include="src\Utils\AudioFileLoader.h" />
-    <ClInclude Include="src\Utils\Data.h" />
-    <ClInclude Include="src\Utils\DatasetConversion.h" />
-    <ClInclude Include="src\Utils\DimensionBounds.h" />
-    <ClInclude Include="src\Utils\InterfaceDefs.h" />
-    <ClInclude Include="src\Utils\JSON.h" />
-    <ClInclude Include="src\Utils\AudioSettingsManager.h" />
+    <ClInclude Include="src\Utilities\AudioFileLoader.h" />
+    <ClInclude Include="src\Utilities\Data.h" />
+    <ClInclude Include="src\Utilities\DatasetConversion.h" />
+    <ClInclude Include="src\Utilities\DimensionBounds.h" />
+    <ClInclude Include="src\Utilities\InterfaceDefs.h" />
+    <ClInclude Include="src\Utilities\JSON.h" />
+    <ClInclude Include="src\Utilities\AudioSettingsManager.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\libs\dr_flac.h" />
     <ClInclude Include="..\..\..\addons\ofxAudioFile\libs\dr_mp3.h" />
@@ -173,8 +173,8 @@
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h" />
-    <ClInclude Include="src\Utils\TemporaryDefaults.h" />
-    <ClInclude Include="src\Utils\TemporaryKeybinds.h" />
+    <ClInclude Include="src\Utilities\TemporaryDefaults.h" />
+    <ClInclude Include="src\Utilities\TemporaryKeybinds.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

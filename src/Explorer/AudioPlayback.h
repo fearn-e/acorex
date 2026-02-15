@@ -18,8 +18,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Explorer/RawView.h"
 #include "Explorer/PointPicker.h"
-#include "Utils/Data.h"
-#include "Utils/DimensionBounds.h"
+#include "Utilities/Data.h"
+#include "Utilities/DimensionBounds.h"
 
 #include <ofSoundBuffer.h>
 #include <ofSoundStream.h>
@@ -45,13 +45,13 @@ public:
 
     bool CreatePlayhead ( size_t fileIndex, size_t sampleIndex );
     bool KillPlayhead ( size_t playheadID );
-    std::vector<Utils::VisualPlayhead> GetPlayheadInfo ( );
+    std::vector<Utilities::VisualPlayhead> GetPlayheadInfo ( );
     void SetFlagMissingOutput ( bool missing );
     void WaitForMissingOutputConfirm ( );
 
     void UserInvokedPause ( bool pause ) { bUserPauseFlag = pause; }
 
-    void SetDimensionBounds ( const Utils::DimensionBoundsData& dimensionBoundsData );
+    void SetDimensionBounds ( const Utilities::DimensionBoundsData& dimensionBoundsData );
     void SetCorpusMesh ( const std::vector<ofMesh>& corpusMesh );
 
     void SetPointPicker ( std::shared_ptr<PointPicker>& pointPicker ) { mPointPicker = pointPicker; }
@@ -68,10 +68,10 @@ public:
     void SetPanningStrength ( int panStrengthX1000 ) { mPanningStrengthX1000 = panStrengthX1000; }
 
 private:
-    void FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utils::AudioPlayhead* playhead, bool outBufferFull );
-    void CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, size_t startSample_A, size_t endSample_A, size_t fileIndex_A, Utils::AudioPlayhead* playhead_B, size_t lengthSetting, bool outBufferFull );
+    void FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utilities::AudioPlayhead* playhead, bool outBufferFull );
+    void CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, size_t startSample_A, size_t endSample_A, size_t fileIndex_A, Utilities::AudioPlayhead* playhead_B, size_t lengthSetting, bool outBufferFull );
 
-    void CalculateTriggerPoints ( Utils::AudioPlayhead& playhead );
+    void CalculateTriggerPoints ( Utilities::AudioPlayhead& playhead );
 
     std::shared_ptr<RawView> mRawView;
     std::shared_ptr<PointPicker> mPointPicker;
@@ -103,21 +103,21 @@ private:
 
     // playhead states ---------------------------
 
-    std::vector<Utils::AudioPlayhead> mPlayheads;
+    std::vector<Utilities::AudioPlayhead> mPlayheads;
     std::atomic<int> mActivePlayheads;
 
     std::mutex mNewPlayheadMutex;
-    std::queue<Utils::AudioPlayhead> mNewPlayheads;
+    std::queue<Utilities::AudioPlayhead> mNewPlayheads;
     std::queue<size_t> mPlayheadsToKill;
     size_t playheadCounter;
 
     std::mutex mVisualPlayheadUpdateMutex;
-    std::vector<Utils::VisualPlayhead> mVisualPlayheads;
+    std::vector<Utilities::VisualPlayhead> mVisualPlayheads;
 
     // audio thread local copies ------------------
 
     std::mutex mDimensionBoundsMutex;
-    Utils::DimensionBoundsData mDimensionBounds;
+    Utilities::DimensionBoundsData mDimensionBounds;
 
     std::mutex mCorpusMeshMutex;
     std::vector<ofMesh> mCorpusMesh;

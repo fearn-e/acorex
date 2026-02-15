@@ -82,7 +82,7 @@ void Explorer::RawView::ClearCorpus ( )
     mDataset = { };
 }
 
-bool Explorer::RawView::LoadAudioSet ( Utils::DataSet& dataset )
+bool Explorer::RawView::LoadAudioSet ( Utilities::DataSet& dataset )
 {
     dataset.audio.loaded.clear ( );
     dataset.audio.raw.clear ( );
@@ -145,17 +145,17 @@ std::string Explorer::RawView::GetCorpusName ( ) const
     return mCorpusName;
 }
 
-Utils::AudioData* Explorer::RawView::GetAudioData ( )
+Utilities::AudioData* Explorer::RawView::GetAudioData ( )
 {
     return &mDataset.audio;
 }
 
-Utils::TrailData* Explorer::RawView::GetTrailData ( )
+Utilities::TrailData* Explorer::RawView::GetTrailData ( )
 {
     return &mDataset.trails;
 }
 
-Utils::DataSet* Explorer::RawView::GetDataset ( )
+Utilities::DataSet* Explorer::RawView::GetDataset ( )
 {
     return &mDataset;
 }

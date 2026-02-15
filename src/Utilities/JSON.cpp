@@ -14,14 +14,14 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "Utils/JSON.h"
+#include "Utilities/JSON.h"
 
 #include <ofLog.h>
 #include <fstream>
 
 using namespace Acorex;
 
-bool Utils::JSON::Write ( const std::string& outputFile, const DataSet& dataset )
+bool Utilities::JSON::Write ( const std::string& outputFile, const DataSet& dataset )
 {
     try
     {
@@ -40,7 +40,7 @@ bool Utils::JSON::Write ( const std::string& outputFile, const DataSet& dataset 
     return true;
 }
 
-bool Utils::JSON::Read ( const std::string& inputFile, DataSet& dataset )
+bool Utilities::JSON::Read ( const std::string& inputFile, DataSet& dataset )
 {
     try
     {
@@ -61,7 +61,7 @@ bool Utils::JSON::Read ( const std::string& inputFile, DataSet& dataset )
     return true;
 }
 
-bool Utils::JSON::Read ( const std::string& inputFile, AnalysisSettings& settings )
+bool Utilities::JSON::Read ( const std::string& inputFile, AnalysisSettings& settings )
 {
     try
     {
@@ -87,7 +87,7 @@ bool Utils::JSON::Read ( const std::string& inputFile, AnalysisSettings& setting
 #error "data structure changed, please update json serialization"
 #endif
 
-void Utils::to_json ( nlohmann::json& j, const DataSet& a )
+void Utilities::to_json ( nlohmann::json& j, const DataSet& a )
 {
     j = nlohmann::json {	
         TO_J ( currentPointCount),
@@ -109,7 +109,7 @@ void Utils::to_json ( nlohmann::json& j, const DataSet& a )
         TO_J_SETTINGS ( maxFreq ) };
 }
 
-void Utils::from_json ( const nlohmann::json& j, DataSet& a )
+void Utilities::from_json ( const nlohmann::json& j, DataSet& a )
 {
     TO_A ( currentPointCount );
     TO_A ( dimensionNames );
@@ -130,7 +130,7 @@ void Utils::from_json ( const nlohmann::json& j, DataSet& a )
     TO_A_SETTINGS ( maxFreq );
 }
 
-void Utils::to_json ( nlohmann::json& j, const AnalysisSettings& a )
+void Utilities::to_json ( nlohmann::json& j, const AnalysisSettings& a )
 {
     j = nlohmann::json { 
         TO_J ( currentDimensionCount ),
@@ -148,7 +148,7 @@ void Utils::to_json ( nlohmann::json& j, const AnalysisSettings& a )
         TO_J ( maxFreq ) };
 }
 
-void Utils::from_json ( const nlohmann::json& j, AnalysisSettings& a )
+void Utilities::from_json ( const nlohmann::json& j, AnalysisSettings& a )
 { 
     TO_A ( currentDimensionCount );
     TO_A ( bIsReduction );

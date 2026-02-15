@@ -14,11 +14,11 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "Utils/DatasetConversion.h"
+#include "Utilities/DatasetConversion.h"
 
 using namespace Acorex;
 
-void Utils::DatasetConversion::CorpusToFluid ( fluid::FluidDataSet<std::string, double, 1>& fluidset, const Utils::DataSet& dataset, std::vector<int>& filePointLength )
+void Utilities::DatasetConversion::CorpusToFluid ( fluid::FluidDataSet<std::string, double, 1>& fluidset, const Utilities::DataSet& dataset, std::vector<int>& filePointLength )
 {
     filePointLength.resize ( dataset.trails.raw.size ( ) );
     int fileMarker = 0;
@@ -42,7 +42,7 @@ void Utils::DatasetConversion::CorpusToFluid ( fluid::FluidDataSet<std::string, 
     }
 }
 
-void Utils::DatasetConversion::FluidToCorpus ( Utils::DataSet& dataset, const fluid::FluidDataSet<std::string, double, 1>& fluidset, const std::vector<int>& filePointLength, const int reducedDimensionCount )
+void Utilities::DatasetConversion::FluidToCorpus ( Utilities::DataSet& dataset, const fluid::FluidDataSet<std::string, double, 1>& fluidset, const std::vector<int>& filePointLength, const int reducedDimensionCount )
 {
     dataset.trails.raw.clear ( );
 

@@ -16,7 +16,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "Utils/Data.h"
+#include "Utilities/Data.h"
 
 #include <vector>
 
@@ -25,7 +25,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #endif
 
 namespace Acorex {
-namespace Utils {
+namespace Utilities {
 
 class DimensionBounds {
 public:
@@ -64,11 +64,11 @@ public:
 
     double GetMinBound ( int dimension ) const { return bounds.min[dimension]; }
     double GetMaxBound ( int dimension ) const { return bounds.max[dimension]; }
-    Utils::DimensionBoundsData GetBoundsData ( ) const { return bounds; }
+    Utilities::DimensionBoundsData GetBoundsData ( ) const { return bounds; }
 
 private:
-    Utils::DimensionBoundsData bounds;
+    Utilities::DimensionBoundsData bounds;
 };
 
-} // namespace Utils
+} // namespace Utilities
 } // namespace Acorex

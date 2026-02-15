@@ -16,7 +16,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "AnalyserMenu.h"
 
-#include "Utils/TemporaryDefaults.h"
+#include "Utilities/TemporaryDefaults.h"
 
 using namespace Acorex;
 
@@ -587,7 +587,7 @@ void AnalyserMenu::Analyse ( )
     bool success = false;
     if ( !bInsertingIntoCorpus )
     {
-        Utils::AnalysisSettings settings;
+        Utilities::AnalysisSettings settings;
         PackSettingsFromUser ( settings );
         success = mController.CreateCorpus ( inputPath, outputPath, settings );
     }
@@ -631,7 +631,7 @@ void AnalyserMenu::Reduce ( )
     bProcessing = true;
 
     bool success = false;
-    Utils::ReductionSettings settings;
+    Utilities::ReductionSettings settings;
     PackSettingsFromUser ( settings );
     success = mController.ReduceCorpus ( inputPath, outputPath, settings );
 
@@ -703,7 +703,7 @@ void AnalyserMenu::SelectAnalysisOutputFile ( )
 
     if ( bInsertingIntoCorpus )
     {
-        Utils::AnalysisSettings settings;
+        Utilities::AnalysisSettings settings;
         bool success = mJSON.Read ( outputFile.getPath ( ), settings );
         if ( !success ) { return; }
 
@@ -741,7 +741,7 @@ void AnalyserMenu::SelectReductionInputFile ( )
         return;
     }
 
-    Utils::AnalysisSettings settings;
+    Utilities::AnalysisSettings settings;
     bool success = mJSON.Read ( inputFile.getPath ( ), settings );
     if ( !success ) { return; }
     if ( settings.currentDimensionCount <= 2 )
@@ -783,7 +783,7 @@ void AnalyserMenu::SelectReductionOutputFile ( )
 
 // Load and Save Settings -----------------------
 
-void AnalyserMenu::UnpackSettingsFromFile ( const Utils::AnalysisSettings& settings )
+void AnalyserMenu::UnpackSettingsFromFile ( const Utilities::AnalysisSettings& settings )
 {
     mAnalysisPitchToggle = settings.bPitch;
     mAnalysisLoudnessToggle = settings.bLoudness;
@@ -803,7 +803,7 @@ void AnalyserMenu::UnpackSettingsFromFile ( const Utils::AnalysisSettings& setti
 #endif // !DATA_CHANGE_CHECK_1
 }
 
-void AnalyserMenu::PackSettingsFromUser ( Utils::AnalysisSettings& settings )
+void AnalyserMenu::PackSettingsFromUser ( Utilities::AnalysisSettings& settings )
 {
     settings.bPitch = mAnalysisPitchToggle;
     settings.bLoudness = mAnalysisLoudnessToggle;
@@ -823,7 +823,7 @@ void AnalyserMenu::PackSettingsFromUser ( Utils::AnalysisSettings& settings )
 #endif // !DATA_CHANGE_CHECK_1
 }
 
-void AnalyserMenu::PackSettingsFromUser ( Utils::ReductionSettings& settings )
+void AnalyserMenu::PackSettingsFromUser ( Utilities::ReductionSettings& settings )
 {
     settings.dimensionReductionTarget = mReducedDimensionsField;
     settings.maxIterations = mMaxIterationsField;

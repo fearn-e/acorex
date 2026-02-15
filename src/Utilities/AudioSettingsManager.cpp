@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Utils/AudioSettingsManager.h"
+#include "Utilities/AudioSettingsManager.h"
 
 #include <ofUtils.h>
 #include <ofAppRunner.h>
@@ -8,7 +8,7 @@
 
 using namespace Acorex;
 
-Utils::AudioSettingsManager::AudioSettingsManager ( )
+Utilities::AudioSettingsManager::AudioSettingsManager ( )
     : ofApiReferenceIndices {
         ofSoundDevice::UNSPECIFIED, // 0
         ofSoundDevice::DEFAULT,     // 1
@@ -72,7 +72,7 @@ Utils::AudioSettingsManager::AudioSettingsManager ( )
     if ( !defaultDeviceFound ) { currentAudioDeviceIndex = DEFAULT_OUT_DEVICE_INDEX; }
 };
 
-bool Utils::AudioSettingsManager::RefreshDeviceListChanged ( )
+bool Utilities::AudioSettingsManager::RefreshDeviceListChanged ( )
 {
     std::vector<std::vector<ofSoundDevice>> oldAudioDevicesOut = audioDevicesOut;
 
@@ -112,7 +112,7 @@ bool Utils::AudioSettingsManager::RefreshDeviceListChanged ( )
     return true;
 }
 
-bool Utils::AudioSettingsManager::ChangeSelectedApi ( size_t newApiIndex )
+bool Utilities::AudioSettingsManager::ChangeSelectedApi ( size_t newApiIndex )
 {
     if ( newApiIndex >= availablePlatformApis.size ( ) || newApiIndex < 0 )
     {
@@ -131,7 +131,7 @@ bool Utils::AudioSettingsManager::ChangeSelectedApi ( size_t newApiIndex )
     return true;
 }
 
-bool Utils::AudioSettingsManager::ChangeSelectedDevice ( size_t newDeviceIndex )
+bool Utilities::AudioSettingsManager::ChangeSelectedDevice ( size_t newDeviceIndex )
 {
     if ( newDeviceIndex >= audioDevicesOut[currentApiIndex].size ( ) || newDeviceIndex < 0 )
     {
@@ -144,7 +144,7 @@ bool Utils::AudioSettingsManager::ChangeSelectedDevice ( size_t newDeviceIndex )
     return true;
 }
 
-void Utils::AudioSettingsManager::ScanAndPopulateAllDevicesOut ( )
+void Utilities::AudioSettingsManager::ScanAndPopulateAllDevicesOut ( )
 {
     audioDevicesOut.clear ( );
 
@@ -171,7 +171,7 @@ void Utils::AudioSettingsManager::ScanAndPopulateAllDevicesOut ( )
     }
 }
 
-bool Utils::AudioSettingsManager::FindMatchingDevice ( const ofSoundDevice& referenceDevice, size_t apiIndex, size_t& matchingDeviceIndex ) const
+bool Utilities::AudioSettingsManager::FindMatchingDevice ( const ofSoundDevice& referenceDevice, size_t apiIndex, size_t& matchingDeviceIndex ) const
 {
     for ( size_t i = 0; i < audioDevicesOut[apiIndex].size ( ); i++ )
     {
@@ -187,7 +187,7 @@ bool Utils::AudioSettingsManager::FindMatchingDevice ( const ofSoundDevice& refe
     return false;
 }
 
-bool Utils::AudioSettingsManager::FindDefaultDeviceIndex ( size_t apiIndex, size_t& defaultDeviceIndex ) const
+bool Utilities::AudioSettingsManager::FindDefaultDeviceIndex ( size_t apiIndex, size_t& defaultDeviceIndex ) const
 {
     for ( size_t i = 0; i < audioDevicesOut[apiIndex].size ( ); i++ )
     {

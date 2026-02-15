@@ -23,11 +23,11 @@ using namespace Acorex;
 
 // Public --------------------------------------------------------------------
 
-bool Analyser::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const Utils::AnalysisSettings& settings )
+bool Analyser::Controller::CreateCorpus ( const std::string& inputPath, const std::string& outputPath, const Utilities::AnalysisSettings& settings )
 {
     bool success;
 
-    Utils::DataSet dataset;
+    Utilities::DataSet dataset;
 
     dataset.analysisSettings = settings;
 
@@ -55,11 +55,11 @@ bool Analyser::Controller::CreateCorpus ( const std::string& inputPath, const st
     return true;
 }
 
-bool Analyser::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const Utils::ReductionSettings& settings )
+bool Analyser::Controller::ReduceCorpus ( const std::string& inputPath, const std::string& outputPath, const Utilities::ReductionSettings& settings )
 {
     bool success;
 
-    Utils::DataSet dataset;
+    Utilities::DataSet dataset;
 
     success = mJSON.Read ( inputPath, dataset );
     if ( !success ) { return false; }
@@ -80,7 +80,7 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
 {
     bool success;
 
-    Utils::DataSet existingDataset;
+    Utilities::DataSet existingDataset;
     success = mJSON.Read ( outputPath, existingDataset );
     if ( !success ) { return false; }
 
@@ -124,7 +124,7 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
         ofLogNotice ( "Controller" ) << newFiles.size ( ) << " new files left to process, with " << preTreated - newFiles.size ( ) << " duplicates removed.";
     }
 
-    Utils::DataSet newDataset;
+    Utilities::DataSet newDataset;
     newDataset.fileList = newFiles;
     newDataset.analysisSettings = existingDataset.analysisSettings;
 #ifndef DATA_CHANGE_CHECK_1
@@ -163,7 +163,7 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
 
 // Private -------------------------------------------------------------------
 
-std::vector<int> Analyser::Controller::MergeDatasets ( Utils::DataSet& primaryDataset, const Utils::DataSet& additionalDataset, const bool additionalReplacesPrimary )
+std::vector<int> Analyser::Controller::MergeDatasets ( Utilities::DataSet& primaryDataset, const Utilities::DataSet& additionalDataset, const bool additionalReplacesPrimary )
 {
     int filesSkipped = 0;
     int filesAdded = 0;
@@ -255,7 +255,7 @@ bool Analyser::Controller::SearchDirectory ( const std::string& directory, std::
     return true;
 }
 
-void Analyser::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::AnalysisSettings& settings )
+void Analyser::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utilities::AnalysisSettings& settings )
 {
     dimensionNames.clear ( );
 
@@ -293,7 +293,7 @@ void Analyser::Controller::GenerateDimensionNames ( std::vector<std::string>& di
     }
 }
 
-void Analyser::Controller::GenerateReducedDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::ReductionSettings& settings )
+void Analyser::Controller::GenerateReducedDimensionNames ( std::vector<std::string>& dimensionNames, const Utilities::ReductionSettings& settings )
 {
     dimensionNames.clear ( );
 

@@ -17,8 +17,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #pragma once
 
 #include "Explorer/RawView.h"
-#include "Utils/DimensionBounds.h"
-#include "Utils/DatasetConversion.h"
+#include "Utilities/DimensionBounds.h"
+#include "Utilities/DatasetConversion.h"
 
 #include <flucoma/algorithms/public/KDTree.hpp>
 #include <flucoma/data/FluidDataSet.hpp>
@@ -35,19 +35,19 @@ public:
     PointPicker ( );
     ~PointPicker ( ) { }
 
-    void Initialise ( const Utils::DataSet& dataset, const Utils::DimensionBounds& dimensionBounds );
+    void Initialise ( const Utilities::DataSet& dataset, const Utilities::DimensionBounds& dimensionBounds );
     void Clear ( );
 
-    void Train ( int dimensionIndex, Utils::Axis axis, bool none );
+    void Train ( int dimensionIndex, Utilities::Axis axis, bool none );
 
     void Exit ( );
 
     void Draw ( );
 
     void FindNearestToMouse ( );
-    bool FindNearestToPosition (	const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, 
+    bool FindNearestToPosition (	const glm::vec3& position, Utilities::PointFT& nearestPoint, Utilities::PointFT currentPoint, 
                                     int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed, 
-                                    int minTimeDiffSameFile, int remainingSamplesRequired, const Utils::AudioData& audioSet, size_t hopSize );
+                                    int minTimeDiffSameFile, int remainingSamplesRequired, const Utilities::AudioData& audioSet, size_t hopSize );
 
     // Setters & Getters ----------------------------
 
@@ -60,7 +60,7 @@ public:
     bool IsTrained ( ) const { return bTrained; }
 
 private:
-    void ScaleDataset ( Utils::DataSet& scaledDataset, const Utils::DimensionBounds& dimensionBounds );
+    void ScaleDataset ( Utilities::DataSet& scaledDataset, const Utilities::DimensionBounds& dimensionBounds );
 
     // Listeners ------------------------------------
 
@@ -108,7 +108,7 @@ private:
     std::vector<int> mCorpusFileLookUp; int mNearestPointFile;
     std::vector<int> mCorpusTimeLookUp; int mNearestPointTime;
     
-    Utils::DatasetConversion mDatasetConversion;
+    Utilities::DatasetConversion mDatasetConversion;
 
     std::vector<glm::vec3> testPoints;
     std::vector<float> testRadii;

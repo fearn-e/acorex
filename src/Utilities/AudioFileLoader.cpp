@@ -14,14 +14,14 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "Utils/AudioFileLoader.h"
+#include "Utilities/AudioFileLoader.h"
 
 #include <ofSoundBuffer.h>
 #include "ofLog.h"
 
 using namespace Acorex;
 
-bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVector& output, double targetSampleRate )
+bool Utilities::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVector& output, double targetSampleRate )
 {
     if ( !ofFile::doesFileExist ( filename ) )
     {
@@ -59,7 +59,7 @@ bool Utils::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVe
     return true;
 }
 
-void Utils::AudioFileLoader::ReadToMono ( std::vector<float>& output, ofxAudioFile& file )
+void Utilities::AudioFileLoader::ReadToMono ( std::vector<float>& output, ofxAudioFile& file )
 {
     int numChannels = file.channels ( );
     int numSamples = file.length ( );
@@ -87,7 +87,7 @@ void Utils::AudioFileLoader::ReadToMono ( std::vector<float>& output, ofxAudioFi
     }
 }
 
-void Utils::AudioFileLoader::Resample ( std::vector<float>& audio, double fileRate, double targetRate  )
+void Utilities::AudioFileLoader::Resample ( std::vector<float>& audio, double fileRate, double targetRate  )
 {
     ofSoundBuffer resampleBuffer;
 

@@ -18,7 +18,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "AnalyserMenu.h"
 #include "ExplorerMenu.h"
-#include "Utils/InterfaceDefs.h"
+#include "Utilities/InterfaceDefs.h"
 
 #include <ofMain.h>
 #include <ofxGui.h>
@@ -49,8 +49,8 @@ private:
 
     Acorex::AnalyserMenu mAnalyserMenu;
     Acorex::ExplorerMenu mExplorerMenu;
-    std::shared_ptr<Acorex::Utils::MenuLayout> mLayout;
-    Acorex::Utils::Colors mColors;
+    std::shared_ptr<Acorex::Utilities::MenuLayout> mLayout;
+    Acorex::Utilities::Colors mColors;
 
     ofxToggle mAnalyseToggle;
     ofxToggle mExploreToggle;

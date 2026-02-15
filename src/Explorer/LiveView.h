@@ -20,9 +20,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Explorer/PointPicker.h"
 #include "Explorer/RawView.h"
 #include "Explorer/AudioPlayback.h"
-#include "Utils/Data.h"
-#include "Utils/DimensionBounds.h"
-#include "Utils/InterfaceDefs.h"
+#include "Utilities/Data.h"
+#include "Utilities/DimensionBounds.h"
+#include "Utilities/InterfaceDefs.h"
 
 #include <ofMesh.h>
 #include <ofEasyCam.h>
@@ -61,14 +61,14 @@ public:
 
     void CreatePoints ( );
 
-    void FillDimension ( int dimensionIndex, Utils::Axis axis );
-    void ClearDimension ( Utils::Axis axis );
+    void FillDimension ( int dimensionIndex, Utilities::Axis axis );
+    void ClearDimension ( Utilities::Axis axis );
     void RefreshFileColors ( int fileIndex );
 
     // Camera Functions ----------------------------
 
     void Init3DCam ( );
-    void Init2DCam ( Utils::Axis disabledAxis );
+    void Init2DCam ( Utilities::Axis disabledAxis );
 
     void Zoom2DCam ( float y, bool mouse );
     void Zoom3DCam ( float y, bool mouse );
@@ -78,13 +78,13 @@ public:
     // Setters & Getters ----------------------------
 
     void SetRawView ( std::shared_ptr<RawView>& rawPointer ) { mRawView = rawPointer; mAudioPlayback.SetRawView ( rawPointer ); }
-    void SetMenuLayout ( std::shared_ptr<Utils::MenuLayout>& layout ) { mLayout = layout; }
+    void SetMenuLayout ( std::shared_ptr<Utilities::MenuLayout>& layout ) { mLayout = layout; }
     void Set3D ( bool is3D ) { b3D = is3D; }
     void SetColorFullSpectrum ( bool fullSpectrum ) { bColorFullSpectrum = fullSpectrum; }
 
     bool Is3D ( ) const { return b3D; }
 
-    std::vector<Utils::VisualPlayhead>& GetPlayheads ( ) { return mPlayheads; }
+    std::vector<Utilities::VisualPlayhead>& GetPlayheads ( ) { return mPlayheads; }
 
     AudioPlayback* GetAudioPlayback ( ) { return &mAudioPlayback; }
 
@@ -108,7 +108,7 @@ private:
     float deltaTime;
     float lastUpdateTime;
 
-    Utils::Axis mDisabledAxis;
+    Utilities::Axis mDisabledAxis;
     std::string xLabel, yLabel, zLabel;
     int colorDimension;
 
@@ -117,7 +117,7 @@ private:
 
     // Playheads -------------------------------------
 
-    std::vector<Utils::VisualPlayhead> mPlayheads;
+    std::vector<Utilities::VisualPlayhead> mPlayheads;
 
     // Camera ----------------------------------------
 
@@ -127,7 +127,7 @@ private:
 
     // Acorex Objects ------------------------------
 
-    Utils::DimensionBounds mDimensionBounds;
+    Utilities::DimensionBounds mDimensionBounds;
     std::shared_ptr<PointPicker> mPointPicker;
     AudioPlayback mAudioPlayback;
     std::shared_ptr<Utils::MenuLayout> mLayout;

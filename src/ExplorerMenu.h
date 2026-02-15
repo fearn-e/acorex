@@ -18,9 +18,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Explorer/RawView.h"
 #include "Explorer/LiveView.h"
-#include "Utils/AudioSettingsManager.h"
-#include "Utils/Data.h"
-#include "Utils/InterfaceDefs.h"
+#include "Utilities/AudioSettingsManager.h"
+#include "Utilities/Data.h"
+#include "Utilities/InterfaceDefs.h"
 
 #include <ofxGui.h>
 #include <ofxDropdown.h>
@@ -48,7 +48,7 @@ public:
     void RefreshUI ( );
     void WindowResized ( );
 
-    void SetMenuLayout ( std::shared_ptr<Utils::MenuLayout>& menuLayout ) { mLayout = menuLayout; mLiveView.SetMenuLayout ( menuLayout ); }
+    void SetMenuLayout ( std::shared_ptr<Utilities::MenuLayout>& menuLayout ) { mLayout = menuLayout; mLiveView.SetMenuLayout ( menuLayout ); }
 
 private:
     void SlowUpdate ( );
@@ -56,11 +56,11 @@ private:
     // UI Management -------------------------------
 
     void OpenStartupPanel ( );
-    void OpenFullPanel ( const Utils::ExploreSettings& settings );
+    void OpenFullPanel ( const Utilities::ExploreSettings& settings );
 
     void SetupPanelSectionHeader ( std::string corpusNameLabel );
     // TODO - pass in default values for all the controls
-    void SetupPanelSectionCorpusControls ( const Utils::ExploreSettings& settings );
+    void SetupPanelSectionCorpusControls ( const Utilities::ExploreSettings& settings );
     void SetupPanelSectionAudioManager ( );
 
     void RefreshStartupPanelUI ( );
@@ -86,12 +86,12 @@ private:
     // Main Functions ------------------------------
 
     void OpenCorpus ( );
-    void SetDimension ( string dimension, Utils::Axis axis );
+    void SetDimension ( string dimension, Utilities::Axis axis );
     int GetDimensionIndex ( std::string& dimension );
     void CameraSwitcher ( );
 
     /// Triggers all listeners that update corpus related settings.
-    void PropogateCorpusSettings ( const Utils::ExploreSettings& settings );
+    void PropogateCorpusSettings ( const Utilities::ExploreSettings& settings );
 
     // Listener Functions --------------------------
 
@@ -135,7 +135,7 @@ private:
     bool bIsCorpusOpen;
     bool bBlockDimensionFilling;
     
-    Utils::Axis mDisabledAxis;
+    Utilities::Axis mDisabledAxis;
 
     // Timing --------------------------------------
 
@@ -177,9 +177,9 @@ private:
 
     std::shared_ptr<Explorer::RawView> mRawView;
     Explorer::LiveView mLiveView;
-    Utils::AudioSettingsManager mAudioSettingsManager;
-    Utils::Colors mColors;
-    std::shared_ptr<Utils::MenuLayout> mLayout;
+    Utilities::AudioSettingsManager mAudioSettingsManager;
+    Utilities::Colors mColors;
+    std::shared_ptr<Utilities::MenuLayout> mLayout;
 };
 
 } // namespace Acorex
