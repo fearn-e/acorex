@@ -43,8 +43,7 @@ private:
     bool SearchDirectory ( const std::string& directory, std::vector<std::string>& files );
 
     void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::AnalysisSettings& settings );
-    void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::ReductionSettings& settings, bool time );
-    void Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames );
+    void GenerateReducedDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::ReductionSettings& settings );
 
     Utils::JSON mJSON;
     Analyser::GenAnalysis mGenAnalysis;

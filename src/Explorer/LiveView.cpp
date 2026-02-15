@@ -28,7 +28,7 @@ using namespace Acorex;
 
 Explorer::LiveView::LiveView ( )
     : bListenersAdded ( false ),
-    bDebug ( false ), bDraw ( false ), b3D ( true ), bColorFullSpectrum ( false ), bLoopAudio ( false ),
+    bDebug ( false ), bDraw ( false ), b3D ( true ), bColorFullSpectrum ( false ),
     mKeyboardMoveState { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // W, A, S, D, R, F, Q, E, Z, X
     mCamMoveSpeedScaleAdjusted ( SpaceDefs::mCamMoveSpeed ),
     deltaTime ( 0.1f ), lastUpdateTime ( 0 ),
@@ -54,7 +54,7 @@ void Explorer::LiveView::Initialise ( )
     mDimensionBounds.CalculateBounds ( *mRawView->GetDataset ( ) );
 
     mAudioPlayback.SetDimensionBounds ( mDimensionBounds.GetBoundsData ( ) );
-
+    
     mPointPicker->Initialise ( *mRawView->GetDataset ( ), mDimensionBounds );
 
     AddListeners ( );
@@ -70,14 +70,13 @@ void Explorer::LiveView::Clear ( )
 
     mDimensionBounds.Clear ( );
 
-    mTimeCorpus.clear ( );
+    mCorpusMesh.clear ( );
 
     mPlayheads.clear ( );
 
     bDraw = false;
     b3D = true;
     bColorFullSpectrum = false;
-    bLoopAudio = false;
 
     for ( auto& each : mKeyboardMoveState ) { each = false; }
     mCamMoveSpeedScaleAdjusted = SpaceDefs::mCamMoveSpeed;
@@ -236,79 +235,9 @@ void Explorer::LiveView::UpdatePlayheads ( )
     for ( auto& playhead : mPlayheads )
     {
         size_t timeIndex = playhead.sampleIndex / mRawView->GetHopSize ( );
-        playhead.position[0] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).x;
-        playhead.position[1] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).y;
-        playhead.position[2] = mTimeCorpus[playhead.fileIndex].getVertex ( timeIndex ).z;
-    }
-}
-
-void Explorer::LiveView::OLD_UpdateAudioPlayers ( )
-{
-    if ( mPlayingFiles.size ( ) == 0 ) { return; }
-
-    if ( mRawView->IsTimeAnalysis ( )  )
-    {
-        Utils::TimeData* time = mRawView->GetTimeData ( );
-
-        for ( int i = 0; i < mPlayingFiles.size ( ); i++ )
-        {
-            float timePlayed = mSoundPlayers[i].getPositionMS ( ) / 1000.0;
-            if ( !mSoundPlayers[i].getIsPlaying ( ) || timePlayed < mPlayingLastPositionMS[i] || ( mPlayingTimeHeads[i] + 1 ) >= time->raw[mPlayingFiles[i]].size ( ) )
-            {
-                if ( !bLoopAudio )
-                {
-                    RefreshFileColors ( mPlayingFiles[i] );
-                    mPlayingFiles.erase ( mPlayingFiles.begin ( ) + i );
-                    mPlayingTimeHeads.erase ( mPlayingTimeHeads.begin ( ) + i );
-                    mPlayingLastPositionMS.erase ( mPlayingLastPositionMS.begin ( ) + i );
-                    mPlayingLastColor.erase ( mPlayingLastColor.begin ( ) + i );
-                    mSoundPlayers[i].stop ( );
-                    mSoundPlayers.erase ( mSoundPlayers.begin ( ) + i );
-                    i--;
-                    continue;
-                }
-                else
-                {
-                    mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], mPlayingLastColor[i] );
-
-                    mPlayingTimeHeads[i] = 0;
-
-                    mPlayingLastColor[i] = mTimeCorpus[mPlayingFiles[i]].getColor ( mPlayingTimeHeads[i] );
-                    mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], ofColor { 255, 255, 255, 255 } );
-                }
-            }
-            else
-            {
-                float nextTimeStep = time->raw[mPlayingFiles[i]][mPlayingTimeHeads[i]][0];
-
-                if ( timePlayed >= nextTimeStep )
-                {
-                    mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], mPlayingLastColor[i] );
-
-                    mPlayingTimeHeads[i]++;
-
-                    mPlayingLastColor[i] = mTimeCorpus[mPlayingFiles[i]].getColor ( mPlayingTimeHeads[i] );
-                    mTimeCorpus[mPlayingFiles[i]].setColor ( mPlayingTimeHeads[i], ofColor { 255, 255, 255, 255 } );
-                }
-            }
-
-            mPlayingLastPositionMS[i] = timePlayed;
-        }
-    }
-    else // stats
-    {
-        Utils::StatsData* stats = mRawView->GetStatsData ( );
-
-        for ( int i = 0; i < mPlayingFiles.size ( ); i++ )
-        {
-            if ( mSoundPlayers[i].getIsPlaying ( ) ) { continue; }
-
-            RefreshFileColors ( mPlayingFiles[i] );
-            mPlayingFiles.erase ( mPlayingFiles.begin ( ) + i );
-            mSoundPlayers[i].stop ( );
-            mSoundPlayers.erase ( mSoundPlayers.begin ( ) + i );
-            i--;
-        }
+        playhead.position[0] = mCorpusMesh[playhead.fileIndex].getVertex ( timeIndex ).x;
+        playhead.position[1] = mCorpusMesh[playhead.fileIndex].getVertex ( timeIndex ).y;
+        playhead.position[2] = mCorpusMesh[playhead.fileIndex].getVertex ( timeIndex ).z;
     }
 }
 
@@ -326,48 +255,49 @@ void Explorer::LiveView::Draw ( )
     mCamera->begin ( );
 
     // Draw Axis ------------------------------
-    ofSetColor ( 255, 255, 255 );
+    {
+        ofSetColor ( 255, 255, 255 );
 
-    if ( mDisabledAxis != Utils::Axis::X ) { ofDrawLine ( { SpaceDefs::mSpaceMin, 0, 0 }, { SpaceDefs::mSpaceMax, 0, 0 } ); }
-    if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawLine ( { 0, SpaceDefs::mSpaceMin, 0 }, { 0, SpaceDefs::mSpaceMax, 0 } ); }
-    if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawLine ( { 0, 0, SpaceDefs::mSpaceMin }, { 0, 0, SpaceDefs::mSpaceMax } ); }
+        if ( mDisabledAxis != Utils::Axis::X ) { ofDrawLine ( { SpaceDefs::mSpaceMin, 0, 0 }, { SpaceDefs::mSpaceMax, 0, 0 } ); }
+        if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawLine ( { 0, SpaceDefs::mSpaceMin, 0 }, { 0, SpaceDefs::mSpaceMax, 0 } ); }
+        if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawLine ( { 0, 0, SpaceDefs::mSpaceMin }, { 0, 0, SpaceDefs::mSpaceMax } ); }
 
-    if ( mDisabledAxis != Utils::Axis::X ) { ofDrawBitmapString ( xLabel , { SpaceDefs::mSpaceMax, 0, 0 } ); }
-    if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawBitmapString ( yLabel , { 0, SpaceDefs::mSpaceMax, 0 } ); }
-    if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawBitmapString ( zLabel , { 0, 0, SpaceDefs::mSpaceMax } ); }
+        if ( mDisabledAxis != Utils::Axis::X ) { ofDrawBitmapString ( xLabel , { SpaceDefs::mSpaceMax, 0, 0 } ); }
+        if ( mDisabledAxis != Utils::Axis::Y ) { ofDrawBitmapString ( yLabel , { 0, SpaceDefs::mSpaceMax, 0 } ); }
+        if ( mDisabledAxis != Utils::Axis::Z ) { ofDrawBitmapString ( zLabel , { 0, 0, SpaceDefs::mSpaceMax } ); }
+    }
 
     // Draw points ------------------------------
-    if ( mRawView->IsTimeAnalysis ( ) ) // Time
     {
         if ( mPointPicker->GetNearestMousePointFile ( ) == -1 )
         {
-            for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
+            for ( int file = 0; file < mCorpusMesh.size ( ); file++ )
             {
-                mTimeCorpus[file].enableColors ( );
-                mTimeCorpus[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
-                mTimeCorpus[file].draw ( );
-                mTimeCorpus[file].setMode ( OF_PRIMITIVE_POINTS );
-                mTimeCorpus[file].draw ( );
+                mCorpusMesh[file].enableColors ( );
+                mCorpusMesh[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
+                mCorpusMesh[file].draw ( );
+                mCorpusMesh[file].setMode ( OF_PRIMITIVE_POINTS );
+                mCorpusMesh[file].draw ( );
             }
         }
         else
         {
-            for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
+            for ( int file = 0; file < mCorpusMesh.size ( ); file++ )
             {
                 if ( file == mPointPicker->GetNearestMousePointFile ( ) ) { continue; }
-                mTimeCorpus[file].disableColors ( );
+                mCorpusMesh[file].disableColors ( );
                 ofSetColor ( 255, 255, 255, 25 );
-                mTimeCorpus[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
-                mTimeCorpus[file].draw ( );
-                mTimeCorpus[file].setMode ( OF_PRIMITIVE_POINTS );
-                mTimeCorpus[file].draw ( );
+                mCorpusMesh[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
+                mCorpusMesh[file].draw ( );
+                mCorpusMesh[file].setMode ( OF_PRIMITIVE_POINTS );
+                mCorpusMesh[file].draw ( );
             }
 
-            mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].enableColors ( );
-            mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_LINE_STRIP );
-            mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].draw ( );
-            mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_POINTS );
-            mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].draw ( );
+            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].enableColors ( );
+            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_LINE_STRIP );
+            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].draw ( );
+            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_POINTS );
+            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].draw ( );
         }
 
         for ( int i = 0; i < mPlayheads.size ( ); i++ )
@@ -386,38 +316,6 @@ void Explorer::LiveView::Draw ( )
             ofEnableDepthTest ( );
         }
     }
-    else // Stats
-    {
-        if ( mPointPicker->GetNearestMousePointFile ( ) == -1 && mPlayingFiles.size ( ) == 0 )
-        {
-            mStatsCorpus.enableColors ( );
-            mStatsCorpus.setMode ( OF_PRIMITIVE_POINTS );
-            mStatsCorpus.draw ( );
-        }
-        else
-        {
-            mStatsCorpus.disableColors ( );
-            ofSetColor ( 255, 255, 255, 25 );
-            mStatsCorpus.setMode ( OF_PRIMITIVE_POINTS );
-            mStatsCorpus.draw ( );
-
-            ofDisableDepthTest ( );
-
-            for ( int i = 0; i < mPlayingFiles.size ( ); i++ )
-            {
-                ofSetColor ( 255, 255, 255, 150 );
-                ofDrawSphere ( mStatsCorpus.getVertex ( mPlayingFiles[i] ), 25 );
-            }
-
-            if ( mPointPicker->GetNearestMousePointFile ( ) >= 0 )
-            {
-                ofSetColor ( mStatsCorpus.getColor ( mPointPicker->GetNearestMousePointFile ( ) ) );
-                ofDrawSphere ( mStatsCorpus.getVertex ( mPointPicker->GetNearestMousePointFile ( ) ), 25 );
-            }
-
-            ofEnableDepthTest ( );
-        }
-    }
 
     mCamera->end ( );
     ofDisableAlphaBlending ( );
@@ -428,12 +326,9 @@ void Explorer::LiveView::Draw ( )
     if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
     {
         ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )], 20, ofGetHeight ( ) - 60 );
-        if ( mRawView->IsTimeAnalysis ( ) )
-        {
-            std::string hopInfoSamps = std::to_string ( mPointPicker->GetNearestMousePointTime ( ) * mRawView->GetHopSize ( ) );
-            std::string hopInfoSecs = std::to_string ( mRawView->GetTimeData ( )->raw[mPointPicker->GetNearestMousePointFile ( )][mPointPicker->GetNearestMousePointTime ( )][0] );
-            ofDrawBitmapStringHighlight ( "Nearest Timepoint: " + hopInfoSamps + " samples, " + hopInfoSecs + "s", 20, ofGetHeight ( ) - 40 );
-        }
+        std::string hopInfoSamps = std::to_string ( mPointPicker->GetNearestMousePointTime ( ) * mRawView->GetHopSize ( ) );
+        std::string hopInfoSecs = std::to_string ( mRawView->GetTrailData ( )->raw[mPointPicker->GetNearestMousePointFile ( )][mPointPicker->GetNearestMousePointTime ( )][0] );
+        ofDrawBitmapStringHighlight ( "Nearest Timepoint: " + hopInfoSamps + " samples, " + hopInfoSecs + "s", 20, ofGetHeight ( ) - 40 );
     }
 
     // Paused overlay ---------------------------
@@ -474,118 +369,30 @@ void Explorer::LiveView::KillPlayhead ( size_t playheadID )
     mAudioPlayback.KillPlayhead ( playheadID );
 }
 
-void Explorer::LiveView::OLD_PlaySound ( )
-{
-    if ( std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker->GetNearestMousePointFile ( ) ) != mPlayingFiles.end ( ) )
-    {
-        std::vector<int>::iterator it = std::find ( mPlayingFiles.begin ( ), mPlayingFiles.end ( ), mPointPicker->GetNearestMousePointFile ( ) );
-        int index = std::distance ( mPlayingFiles.begin ( ), it );
-        mSoundPlayers[index].setPositionMS ( 0 );
-        mSoundPlayers[index].play ( );
-
-        if ( mRawView->IsTimeAnalysis ( ) )
-        {
-            ofColor color = mTimeCorpus[mPlayingFiles[index]].getColor ( mPlayingTimeHeads[index] );
-            color.setBrightness ( 100 );  color.setSaturation ( 100 );
-            mTimeCorpus[mPlayingFiles[index]].setColor ( mPlayingTimeHeads[index], color );
-
-            mPlayingTimeHeads[index] = 0;
-
-            color = mTimeCorpus[mPlayingFiles[index]].getColor ( mPlayingTimeHeads[index] );
-            color.setBrightness ( 255 );  color.setSaturation ( 0 );
-            mTimeCorpus[mPlayingFiles[index]].setColor ( mPlayingTimeHeads[index], color );
-
-            mPlayingLastPositionMS[index] = 0.0f;
-        }
-        return;
-    }
-
-    std::string filePath = mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )];
-
-    ofSoundPlayer soundPlayer;
-    bool success = soundPlayer.load ( filePath );
-    if ( !success ) { ofLogError ( "Explorer" ) << "Failed to load sound file: " << filePath; return; }
-
-    mPlayingFiles.push_back ( mPointPicker->GetNearestMousePointFile ( ) );
-    if ( mRawView->IsTimeAnalysis ( ) )
-    {
-        mPlayingTimeHeads.push_back ( 0 );
-        mPlayingLastPositionMS.push_back ( 0.0f );
-        mPlayingLastColor.push_back ( mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].getColor ( 0 ) );
-        mTimeCorpus[mPointPicker->GetNearestMousePointFile ( )].setColor ( 0, ofColor { 255, 255, 255, 255 } );
-    }
-    else
-    { }
-
-    mSoundPlayers.push_back ( soundPlayer );
-    mSoundPlayers.back ( ).setLoop ( bLoopAudio );
-    mSoundPlayers.back ( ).setVolume ( 0.6 );
-    mSoundPlayers.back ( ).play ( );
-}
-
 // Filler Functions ----------------------------
 
 void Explorer::LiveView::CreatePoints ( )
 {
-    if ( mRawView->IsTimeAnalysis ( ) )
+    Utils::TrailData* trails = mRawView->GetTrailData ( );
+
+    for ( int file = 0; file < trails->raw.size ( ); file++ )
     {
-        Utils::TimeData* time = mRawView->GetTimeData ( );
-
-        for ( int file = 0; file < time->raw.size ( ); file++ )
+        ofMesh mesh;
+        for ( int timepoint = 0; timepoint < trails->raw[file].size ( ); timepoint++ )
         {
-            ofMesh mesh;
-            for ( int timepoint = 0; timepoint < time->raw[file].size ( ); timepoint++ )
-            {
-                mesh.addVertex ( { 0, 0, 0 } );
-                ofColor color = ofColor::fromHsb ( 35, 255, 255 );
-                mesh.addColor ( color );
-            }
-            mTimeCorpus.push_back ( mesh );
+            mesh.addVertex ( { 0, 0, 0 } );
+            ofColor color = ofColor::fromHsb ( 35, 255, 255 );
+            mesh.addColor ( color );
         }
-
-        mAudioPlayback.SetTimeCorpus ( mTimeCorpus );
-
-        bDraw = true;
-        return;
+        mCorpusMesh.push_back ( mesh );
     }
-    // ------------------------------
 
-    Utils::StatsData* stats = mRawView->GetStatsData ( );
+    mAudioPlayback.SetCorpusMesh ( mCorpusMesh );
 
-    if ( !mRawView->IsReduction ( ) )
-    {
-        for ( int file = 0; file < stats->raw.size ( ); file++ )
-        {
-            for ( int point = 0; point < stats->raw[file].size ( ); point++ )
-            {
-                mStatsCorpus.addVertex ( { 0, 0, 0 } );
-                ofColor color = ofColor::fromHsb ( 35, 255, 255 );
-                mStatsCorpus.addColor ( color );
-            }
-        }
-
-        bDraw = true;
-        return;
-    }
-    // ------------------------------
-
-    {
-        for ( int file = 0; file < stats->reduced.size ( ); file++ )
-        {
-            for ( int point = 0; point < stats->reduced[file].size ( ); point++ )
-            {
-                mStatsCorpus.addVertex ( { 0, 0, 0 } );
-                ofColor color = ofColor::fromHsb ( 35, 255, 255 );
-                mStatsCorpus.addColor ( color );
-            }
-        }
-
-        bDraw = true;
-        return;
-    }
+    bDraw = true;
 }
 
-void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axis )
+void Explorer::LiveView::FillDimension ( int dimensionIndex, Utils::Axis axis )
 {
     std::string dimensionName = mRawView->GetDimensions ( )[dimensionIndex];
     if ( axis == Utils::Axis::X ) { xLabel = dimensionName; }
@@ -593,166 +400,71 @@ void Explorer::LiveView::FillDimensionTime ( int dimensionIndex, Utils::Axis axi
     else if ( axis == Utils::Axis::Z ) { zLabel = dimensionName; }
     else if ( axis == Utils::Axis::COLOR ) { colorDimension = dimensionIndex; }
 
-    Utils::TimeData* time = mRawView->GetTimeData ( );
+    Utils::TrailData* trails = mRawView->GetTrailData ( );
 
     double min = mDimensionBounds.GetMinBound ( dimensionIndex );
     double max = mDimensionBounds.GetMaxBound ( dimensionIndex );
 
-    for ( int file = 0; file < time->raw.size ( ); file++ )
+    for ( int file = 0; file < trails->raw.size ( ); file++ )
     {
-        for ( int timepoint = 0; timepoint < time->raw[file].size ( ); timepoint++ )
+        for ( int timepoint = 0; timepoint < trails->raw[file].size ( ); timepoint++ )
         {
-            double value = time->raw[file][timepoint][dimensionIndex];
+            double value = trails->raw[file][timepoint][dimensionIndex];
 
+            //colors
             if ( axis == Utils::Axis::COLOR )
             {
                 if ( bColorFullSpectrum ) { value = ofMap ( value, min, max, SpaceDefs::mColorMin, SpaceDefs::mColorMax ); }
                 else { value = ofMap ( value, min, max, SpaceDefs::mColorBlue, SpaceDefs::mColorRed ); }
-                ofColor currentColor = mTimeCorpus[file].getColor ( timepoint );
+                ofColor currentColor = mCorpusMesh[file].getColor ( timepoint );
                 currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
                 currentColor.a = 150;
-                mTimeCorpus[file].setColor ( timepoint, currentColor );
+                mCorpusMesh[file].setColor ( timepoint, currentColor );
             }
+            //positions
             else
             {
                 value = ofMap ( value, min, max, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
-                glm::vec3 currentPoint = mTimeCorpus[file].getVertex ( timepoint );
+                glm::vec3 currentPoint = mCorpusMesh[file].getVertex ( timepoint );
                 currentPoint[(int)axis] = value;
-                mTimeCorpus[file].setVertex ( timepoint, currentPoint );
+                mCorpusMesh[file].setVertex ( timepoint, currentPoint );
             }
         }
     }
 
-    mAudioPlayback.SetTimeCorpus ( mTimeCorpus );
+    mAudioPlayback.SetCorpusMesh ( mCorpusMesh );
 
     mPointPicker->Train ( dimensionIndex, axis, false );
 }
 
-void Explorer::LiveView::FillDimensionStats ( int dimensionIndex, Utils::Axis axis )
-{
-    std::string dimensionName = mRawView->GetDimensions ( )[dimensionIndex];
-    if ( axis == Utils::Axis::X ) { xLabel = dimensionName; }
-    else if ( axis == Utils::Axis::Y ) { yLabel = dimensionName; }
-    else if ( axis == Utils::Axis::Z ) { zLabel = dimensionName; }
-    else if ( axis == Utils::Axis::COLOR ) { colorDimension = dimensionIndex; }
-
-    int statisticIndex = dimensionIndex % mRawView->GetStatistics ( ).size ( );
-    int dividedDimensionIndex = dimensionIndex / mRawView->GetStatistics ( ).size ( );
-
-    Utils::StatsData* stats = mRawView->GetStatsData ( );
-
-    double min = mDimensionBounds.GetMinBound ( dimensionIndex );
-    double max = mDimensionBounds.GetMaxBound ( dimensionIndex );
-
-    for ( int file = 0; file < stats->raw.size ( ); file++ )
-    {
-        double value = stats->raw[file][dividedDimensionIndex][statisticIndex];
-        
-        if ( axis == Utils::Axis::COLOR )
-        {
-            if ( bColorFullSpectrum ) { value = ofMap ( value, min, max, SpaceDefs::mColorMin, SpaceDefs::mColorMax ); }
-            else { value = ofMap ( value, min, max, SpaceDefs::mColorBlue, SpaceDefs::mColorRed ); }
-            ofColor currentColor = mStatsCorpus.getColor ( file );
-            currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
-            currentColor.a = 150;
-            mStatsCorpus.setColor ( file, currentColor );
-        }
-        else
-        {
-            value = ofMap (  value, min, max, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
-            glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
-            currentPoint[(int)axis] = value;
-            mStatsCorpus.setVertex ( file, currentPoint );
-        }
-    }
-
-    mPointPicker->Train ( dimensionIndex, axis, false );
-}
-
-void Explorer::LiveView::FillDimensionStatsReduced ( int dimensionIndex, Utils::Axis axis )
-{
-    std::string dimensioName = mRawView->GetDimensions ( )[dimensionIndex];
-    if ( axis == Utils::Axis::X ) { xLabel = dimensioName; }
-    else if ( axis == Utils::Axis::Y ) { yLabel = dimensioName; }
-    else if ( axis == Utils::Axis::Z ) { zLabel = dimensioName; }
-    else if ( axis == Utils::Axis::COLOR ) { colorDimension = dimensionIndex; }
-
-    Utils::StatsData* stats = mRawView->GetStatsData ( );
-
-    double min = mDimensionBounds.GetMinBound ( dimensionIndex );
-    double max = mDimensionBounds.GetMaxBound ( dimensionIndex );
-
-    for ( int file = 0; file < stats->reduced.size ( ); file++ )
-    {
-        double value = stats->reduced[file][dimensionIndex];
-
-        if ( axis == Utils::Axis::COLOR )
-        {
-            if ( bColorFullSpectrum ) { value = ofMap ( value, min, max, SpaceDefs::mColorMin, SpaceDefs::mColorMax ); }
-            else { value = ofMap ( value, min, max, SpaceDefs::mColorBlue, SpaceDefs::mColorRed ); }
-            ofColor currentColor = mStatsCorpus.getColor ( file );
-            currentColor.setHsb ( value, currentColor.getSaturation ( ), currentColor.getBrightness ( ) );
-            currentColor.a = 150;
-            mStatsCorpus.setColor ( file, currentColor );
-        }
-        else
-        {
-            value = ofMap ( value, min, max, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax );
-            glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
-            currentPoint[(int)axis] = value;
-            mStatsCorpus.setVertex ( file, currentPoint );
-        }
-    }
-
-    mPointPicker->Train ( dimensionIndex, axis, false );
-}
-
-void Explorer::LiveView::FillDimensionNone ( Utils::Axis axis )
+void Explorer::LiveView::ClearDimension ( Utils::Axis axis )
 {
     if ( axis == Utils::Axis::X ) { xLabel = ""; }
     else if ( axis == Utils::Axis::Y ) { yLabel = ""; }
     else if ( axis == Utils::Axis::Z ) { zLabel = ""; }
     else if ( axis == Utils::Axis::COLOR ) { colorDimension = -1; }
 
-    if ( mRawView->IsTimeAnalysis ( ) )
+    for ( int file = 0; file < mCorpusMesh.size ( ); file++ )
     {
-        for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
+        for ( int timepoint = 0; timepoint < mCorpusMesh[file].getNumVertices ( ); timepoint++ )
         {
-            for ( int timepoint = 0; timepoint < mTimeCorpus[file].getNumVertices ( ); timepoint++ )
-            {
-                if ( axis == Utils::Axis::COLOR )
-                {
-                    ofColor currentColor = ofColor::fromHsb ( 35, 255, 255 );
-                    mTimeCorpus[file].setColor ( timepoint, currentColor );
-                }
-                else
-                {
-                    glm::vec3 currentPoint = mTimeCorpus[file].getVertex ( timepoint );
-                    currentPoint[(int)axis] = 0;
-                    mTimeCorpus[file].setVertex ( timepoint, currentPoint );
-                }
-            }
-        }
-
-        mAudioPlayback.SetTimeCorpus ( mTimeCorpus );
-    }
-    else
-    {
-        for ( int file = 0; file < mStatsCorpus.getNumVertices ( ); file++ )
-        {
+            //colors
             if ( axis == Utils::Axis::COLOR )
             {
                 ofColor currentColor = ofColor::fromHsb ( 35, 255, 255 );
-                mStatsCorpus.setColor ( file, currentColor );
+                mCorpusMesh[file].setColor ( timepoint, currentColor );
             }
+            //positions
             else
             {
-                glm::vec3 currentPoint = mStatsCorpus.getVertex ( file );
+                glm::vec3 currentPoint = mCorpusMesh[file].getVertex ( timepoint );
                 currentPoint[(int)axis] = 0;
-                mStatsCorpus.setVertex ( file, currentPoint );
+                mCorpusMesh[file].setVertex ( timepoint, currentPoint );
             }
         }
     }
+
+    mAudioPlayback.SetCorpusMesh ( mCorpusMesh );
 
     mPointPicker->Train ( -1, axis, true );
 }
@@ -766,36 +478,13 @@ void Explorer::LiveView::RefreshFileColors ( int fileIndex )
     double outputMin = bColorFullSpectrum ? SpaceDefs::mColorMin : SpaceDefs::mColorBlue;
     double outputMax = bColorFullSpectrum ? SpaceDefs::mColorMax : SpaceDefs::mColorRed;
 
-    if ( mRawView->IsTimeAnalysis ( ) )
+    Utils::TrailData* trails = mRawView->GetTrailData ( );
+
+    for ( int timepoint = 0; timepoint < trails->raw[fileIndex].size ( ); timepoint++ )
     {
-        Utils::TimeData* time = mRawView->GetTimeData ( );
-
-        for ( int timepoint = 0; timepoint < time->raw[fileIndex].size ( ); timepoint++ )
-        {
-            ofColor color = ofColor::fromHsb ( ofMap ( time->raw[fileIndex][timepoint][colorDimension], min, max, outputMin, outputMax ), 255, 255, 255 );
-            if ( mPointPicker->GetNearestMousePointFile ( ) != fileIndex && mPointPicker->GetNearestMousePointFile ( ) != -1 ) { color.a = 125; }
-            mTimeCorpus[fileIndex].setColor ( timepoint, color );
-        }
-    }
-    else
-    {
-        Utils::StatsData* stats = mRawView->GetStatsData ( );
-
-        if ( !mRawView->IsReduction ( ) )
-        {
-            int statisticIndex = colorDimension % DATA_NUM_STATS;
-            int dimensionIndex = colorDimension / DATA_NUM_STATS;
-
-            ofColor color = ofColor::fromHsb ( ofMap ( stats->raw[fileIndex][dimensionIndex][statisticIndex], min, max, outputMin, outputMax ), 255, 255, 255 );
-            if ( mPointPicker->GetNearestMousePointFile ( ) != fileIndex && mPointPicker->GetNearestMousePointFile ( ) != -1 ) { color.a = 125; }
-            mStatsCorpus.setColor ( fileIndex, color );
-        }
-        else
-        {
-            ofColor color = ofColor::fromHsb ( ofMap ( stats->reduced[fileIndex][colorDimension], min, max, outputMin, outputMax ), 255, 255, 255 );
-            if ( mPointPicker->GetNearestMousePointFile ( ) != fileIndex && mPointPicker->GetNearestMousePointFile ( ) != -1 ) { color.a = 125; }
-            mStatsCorpus.setColor ( fileIndex, color );
-        }
+        ofColor color = ofColor::fromHsb ( ofMap ( trails->raw[fileIndex][timepoint][colorDimension], min, max, outputMin, outputMax ), 255, 255, 255 );
+        if ( mPointPicker->GetNearestMousePointFile ( ) != fileIndex && mPointPicker->GetNearestMousePointFile ( ) != -1 ) { color.a = 125; }
+        mCorpusMesh[fileIndex].setColor ( timepoint, color );
     }
 }
 
@@ -1007,11 +696,6 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
         else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD ) { CreatePlayhead ( ); }
         else if ( args.key == ACOREX_KEYBIND_AUDIO_PAUSE ) { bUserPaused = !bUserPaused; mAudioPlayback.UserInvokedPause ( bUserPaused ); }
         else if ( args.key == ACOREX_KEYBIND_TOGGLE_DEBUG_VIEW ) { bDebug = !bDebug; }
-        // else if ( args.key == 'l' ) // TODO - delete, deprecated, tied to old sound system
-        // {
-        //     bLoopAudio = !bLoopAudio;
-        //     for ( auto& each : mSoundPlayers ) { each.setLoop ( bLoopAudio ); }
-        // }
         //else if ( args.key == 'c' ) // TODO - might not need this key either just like the ENTER key below, remove also?
         //{ 
         //    if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )

@@ -29,8 +29,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #define DATA_CHANGE_CHECK_1
 
-#define DATA_NUM_STATS 7
-
 namespace Acorex {
 namespace Utils {
 
@@ -54,13 +52,8 @@ struct AudioData {
     std::vector<ofSoundBuffer> raw; // [file]
 };
 
-struct TimeData {
+struct TrailData {
     std::vector<std::vector<std::vector<double>>> raw; // [file][timepoint][dimension] (first dimension is always time)
-};
-
-struct StatsData {
-    std::vector<std::vector<std::vector<double>>> raw; // [file][dimension][statistic] (mean, stdDev, skewness, kurtosis, loPercent, midPercent, hiPercent)
-    std::vector<std::vector<double>> reduced; // [file][dimension]
 };
 
 struct ExploreSettings {
@@ -138,8 +131,7 @@ public:
 
 struct AnalysisSettings {
     int currentDimensionCount = 0;
-    bool hasBeenReduced = false;
-    bool bTime = false; // TODO - remove, old stats code
+    bool bIsReduction = false;
     bool bPitch = false;
     bool bLoudness = false;
     bool bShape = false;
@@ -162,17 +154,13 @@ struct DataSet {
     int currentPointCount = 0;
 
     std::vector<std::string> dimensionNames; // [dimension]
-    std::vector<std::string> statisticNames = { "Mean Average", "Standard Deviation", "Skewness", "Kurtosis", "Low Quartile", "Median", "High Quartile" }; // [statistic]
     std::vector<std::string> fileList; // [file]
 
     AudioData audio;
 
-    TimeData time;
-
-    StatsData stats;
+    TrailData trails;
 
     AnalysisSettings analysisSettings;
-
 };
 
 struct PointFT {

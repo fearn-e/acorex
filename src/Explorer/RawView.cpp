@@ -129,24 +129,14 @@ bool Explorer::RawView::IsLoaded ( ) const
     return !mCorpusName.empty ( ) && mDataset.fileList.size ( ) > 0;
 }
 
-bool Explorer::RawView::IsTimeAnalysis ( ) const
-{
-    return mDataset.analysisSettings.bTime;
-}
-
 bool Explorer::RawView::IsReduction ( ) const
 {
-    return mDataset.analysisSettings.hasBeenReduced;
+    return mDataset.analysisSettings.bIsReduction;
 }
 
 std::vector<std::string> Explorer::RawView::GetDimensions ( ) const
 {
     return mDataset.dimensionNames;
-}
-
-std::vector<std::string> Explorer::RawView::GetStatistics ( ) const
-{
-    return mDataset.statisticNames;
 }
 
 std::string Explorer::RawView::GetCorpusName ( ) const
@@ -159,14 +149,9 @@ Utils::AudioData* Explorer::RawView::GetAudioData ( )
     return &mDataset.audio;
 }
 
-Utils::TimeData* Explorer::RawView::GetTimeData ( )
+Utils::TrailData* Explorer::RawView::GetTrailData ( )
 {
-    return &mDataset.time;
-}
-
-Utils::StatsData* Explorer::RawView::GetStatsData ( )
-{
-    return &mDataset.stats;
+    return &mDataset.trails;
 }
 
 Utils::DataSet* Explorer::RawView::GetDataset ( )

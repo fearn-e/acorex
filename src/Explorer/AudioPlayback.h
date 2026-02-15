@@ -51,7 +51,7 @@ public:
     void UserInvokedPause ( bool pause ) { bUserPauseFlag = pause; }
 
     void SetDimensionBounds ( const Utils::DimensionBoundsData& dimensionBoundsData );
-    void SetTimeCorpus ( const std::vector<ofMesh>& timeCorpus );
+    void SetCorpusMesh ( const std::vector<ofMesh>& corpusMesh );
 
     void SetPointPicker ( std::shared_ptr<PointPicker>& pointPicker ) { mPointPicker = pointPicker; }
 
@@ -118,8 +118,8 @@ private:
     std::mutex mDimensionBoundsMutex;
     Utils::DimensionBoundsData mDimensionBounds;
 
-    std::mutex mTimeCorpusMutex;
-    std::vector<ofMesh> mTimeCorpus;
+    std::mutex mCorpusMeshMutex;
+    std::vector<ofMesh> mCorpusMesh;
 
     // settings -----------------------------------
 

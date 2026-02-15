@@ -46,10 +46,6 @@ public:
     int ProcessFiles ( Utils::DataSet& dataset );
 
 private:
-    fluid::RealVector ComputeStats ( fluid::RealMatrixView matrix, fluid::algorithm::MultiStats stats );
-
-    void Push7Stats ( fluid::RealVector& stats, std::vector<std::vector<double>>& fileData, int numDimensions );
-
     Utils::AudioFileLoader mAudioLoader;
 };
 

@@ -46,25 +46,10 @@ public:
 
             for ( int file = 0; file < dataset.fileList.size ( ); file++ )
             {
-                if ( dataset.analysisSettings.bTime )
+                for ( int timepoint = 0; timepoint < dataset.trails.raw[file].size ( ); timepoint++ )
                 {
-                    for ( int timepoint = 0; timepoint < dataset.time.raw[file].size ( ); timepoint++ )
-                    {
-                        if ( dataset.time.raw[file][timepoint][dimension] < bounds.min[dimension] ) { bounds.min[dimension] = dataset.time.raw[file][timepoint][dimension]; }
-                        if ( dataset.time.raw[file][timepoint][dimension] > bounds.max[dimension] ) { bounds.max[dimension] = dataset.time.raw[file][timepoint][dimension]; }
-                    }
-                }
-                else if ( dataset.analysisSettings.hasBeenReduced )
-                {
-                    if ( dataset.stats.reduced[file][dimension] < bounds.min[dimension] ) { bounds.min[dimension] = dataset.stats.reduced[file][dimension]; }
-                    if ( dataset.stats.reduced[file][dimension] > bounds.max[dimension] ) { bounds.max[dimension] = dataset.stats.reduced[file][dimension]; }
-                }
-                else
-                {
-                    int tempDim = dimension / DATA_NUM_STATS;
-                    int tempStat = dimension % DATA_NUM_STATS;
-                    if ( dataset.stats.raw[file][tempDim][tempStat] < bounds.min[dimension] ) { bounds.min[dimension] = dataset.stats.raw[file][tempDim][tempStat]; }
-                    if ( dataset.stats.raw[file][tempDim][tempStat] > bounds.max[dimension] ) { bounds.max[dimension] = dataset.stats.raw[file][tempDim][tempStat]; }
+                    if ( dataset.trails.raw[file][timepoint][dimension] < bounds.min[dimension] ) { bounds.min[dimension] = dataset.trails.raw[file][timepoint][dimension]; }
+                    if ( dataset.trails.raw[file][timepoint][dimension] > bounds.max[dimension] ) { bounds.max[dimension] = dataset.trails.raw[file][timepoint][dimension]; }
                 }
             }
         }

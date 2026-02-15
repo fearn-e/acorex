@@ -50,17 +50,10 @@ void Explorer::PointPicker::Initialise ( const Utils::DataSet& dataset, const Ut
 
     for ( int file = 0; file < dataset.fileList.size ( ); file++ )
     {
-        if ( dataset.analysisSettings.bTime )
-        {
-            for ( int timepoint = 0; timepoint < dataset.time.raw[file].size ( ); timepoint++ )
-            {
-                mCorpusFileLookUp.push_back ( file );
-                mCorpusTimeLookUp.push_back ( timepoint );
-            }
-        }
-        else
+        for ( int timepoint = 0; timepoint < dataset.trails.raw[file].size ( ); timepoint++ )
         {
             mCorpusFileLookUp.push_back ( file );
+            mCorpusTimeLookUp.push_back ( timepoint );
         }
     }
 
@@ -172,47 +165,14 @@ void Explorer::PointPicker::RemoveListeners ( )
 
 void Explorer::PointPicker::ScaleDataset ( Utils::DataSet& scaledDataset, const Utils::DimensionBounds& dimensionBounds )
 {
-    if ( scaledDataset.analysisSettings.bTime )
+    for ( int file = 0; file < scaledDataset.trails.raw.size ( ); file++ )
     {
-        for ( int file = 0; file < scaledDataset.time.raw.size ( ); file++ )
-        {
-            for ( int timepoint = 0; timepoint < scaledDataset.time.raw[file].size ( ); timepoint++ )
-            {
-                for ( int dimension = 0; dimension < scaledDataset.dimensionNames.size ( ); dimension++ )
-                {
-                    scaledDataset.time.raw[file][timepoint][dimension] = ofMap ( 
-                        scaledDataset.time.raw[file][timepoint][dimension],
-                        dimensionBounds.GetMinBound ( dimension ),
-                        dimensionBounds.GetMaxBound ( dimension ),
-                        0.0, 1.0, false );
-                }
-            }
-        }
-    }
-    else if ( scaledDataset.analysisSettings.hasBeenReduced )
-    {
-        for ( int file = 0; file < scaledDataset.stats.reduced.size ( ); file++ )
+        for ( int timepoint = 0; timepoint < scaledDataset.trails.raw[file].size ( ); timepoint++ )
         {
             for ( int dimension = 0; dimension < scaledDataset.dimensionNames.size ( ); dimension++ )
             {
-                scaledDataset.stats.reduced[file][dimension] = ofMap (
-                    scaledDataset.stats.reduced[file][dimension],
-                    dimensionBounds.GetMinBound ( dimension ),
-                    dimensionBounds.GetMaxBound ( dimension ),
-                    0.0, 1.0, false );
-            }
-        }
-    }
-    else
-    {
-        for ( int file = 0; file < scaledDataset.stats.raw.size ( ); file++ )
-        {
-            for ( int dimension = 0; dimension < scaledDataset.stats.raw[file].size ( ); dimension++ )
-            {
-                int statistic = dimension % DATA_NUM_STATS;
-                int dividedDimension = dimension / DATA_NUM_STATS;
-                scaledDataset.stats.raw[file][dividedDimension][statistic] = ofMap (
-                    scaledDataset.stats.raw[file][dividedDimension][statistic],
+                scaledDataset.trails.raw[file][timepoint][dimension] = ofMap (
+                    scaledDataset.trails.raw[file][timepoint][dimension],
                     dimensionBounds.GetMinBound ( dimension ),
                     dimensionBounds.GetMaxBound ( dimension ),
                     0.0, 1.0, false );
@@ -294,7 +254,7 @@ void Explorer::PointPicker::FindNearestToMouse ( )
             mNearestDistance = dist[0];
             mNearestPoint = std::stoi ( *id[0] );
             mNearestPointFile = mCorpusFileLookUp[mNearestPoint];
-            if ( mCorpusTimeLookUp.size ( ) > 0 ) { mNearestPointTime = mCorpusTimeLookUp[mNearestPoint]; }
+            mNearestPointTime = mCorpusTimeLookUp[mNearestPoint];
         }
 
         return;
@@ -363,11 +323,12 @@ void Explorer::PointPicker::FindNearestToMouse ( )
             mNearestDistance = dist[0];
             mNearestPoint = std::stoi ( *id[0] );
             mNearestPointFile = mCorpusFileLookUp[mNearestPoint];
-            if ( mCorpusTimeLookUp.size ( ) > 0 ) { mNearestPointTime = mCorpusTimeLookUp[mNearestPoint]; }
+            mNearestPointTime = mCorpusTimeLookUp[mNearestPoint];
         }
     }
 }
 
+// TODO - revisit this function for any performance improvements
 bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utils::PointFT& nearestPoint, Utils::PointFT currentPoint, 
                                                     int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed,
                                                     int minTimeDiffSameFile, int remainingSamplesRequired, const Utils::AudioData& audioSet, size_t hopSize )

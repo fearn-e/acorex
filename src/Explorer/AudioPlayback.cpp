@@ -140,8 +140,8 @@ void Explorer::AudioPlayback::ClearAndKillAudio ( )
     }
 
     {
-        std::lock_guard<std::mutex> timeCorpusLock ( mTimeCorpusMutex );
-        mTimeCorpus.clear ( );
+        std::lock_guard<std::mutex> timeCorpusLock ( mCorpusMeshMutex );
+        mCorpusMesh.clear ( );
     }
 
     mLoopPlayheads = false;
@@ -275,8 +275,8 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
                             size_t thisTimePointIndex = mPlayheads[playheadIndex].sampleIndex / mRawView->GetHopSize ( );
                             size_t jumpTimePointIndex = mPlayheads[playheadIndex].jumpSampleIndex / mRawView->GetHopSize ( );
 
-                            float panStart = mRawView->GetTimeData ( )->raw[mPlayheads[playheadIndex].fileIndex][thisTimePointIndex][mDynamicPanDimensionIndex];
-                            float panEnd = mRawView->GetTimeData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex][jumpTimePointIndex][mDynamicPanDimensionIndex];
+                            float panStart = mRawView->GetTrailData ( )->raw[mPlayheads[playheadIndex].fileIndex][thisTimePointIndex][mDynamicPanDimensionIndex];
+                            float panEnd = mRawView->GetTrailData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex][jumpTimePointIndex][mDynamicPanDimensionIndex];
 
                             {
                                 std::lock_guard <std::mutex> lock ( mDimensionBoundsMutex );
@@ -373,13 +373,13 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
                     int requiredSamples = mCrossfadeSampleLength;
                     if ( mPlayheads[playheadIndex].sampleIndex + requiredSamples >= mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getNumFrames ( ) ) { continue; }
                     if ( ((double)rand ( ) / RAND_MAX) > crossoverJumpChance ) { continue; }
-                    if ( mTimeCorpusMutex.try_lock ( ) )
+                    if ( mCorpusMeshMutex.try_lock ( ) )
                         // TODO - investigate if this lock could work differently, currently this would cause a brief moment of no possible jumps
                     {
-                        std::lock_guard<std::mutex> lock ( mTimeCorpusMutex, std::adopt_lock );
+                        std::lock_guard<std::mutex> lock ( mCorpusMeshMutex, std::adopt_lock );
 
                         size_t timePointIndex = mPlayheads[playheadIndex].sampleIndex / mRawView->GetHopSize ( );
-                        glm::vec3 playheadPosition = mTimeCorpus[mPlayheads[playheadIndex].fileIndex].getVertex ( timePointIndex );
+                        glm::vec3 playheadPosition = mCorpusMesh[mPlayheads[playheadIndex].fileIndex].getVertex ( timePointIndex );
                         Utils::PointFT nearestPoint;
                         Utils::PointFT currentPoint; currentPoint.file = mPlayheads[playheadIndex].fileIndex; currentPoint.time = timePointIndex;
 
@@ -460,7 +460,7 @@ void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_
     if ( mDynamicPanEnabled && panningStrength > 0.0 )
     {
         size_t timePointIndex = playhead->sampleIndex / mRawView->GetHopSize ( );
-        float pan = mRawView->GetTimeData ( )->raw[playhead->fileIndex][timePointIndex][mDynamicPanDimensionIndex];
+        float pan = mRawView->GetTrailData ( )->raw[playhead->fileIndex][timePointIndex][mDynamicPanDimensionIndex];
         float panNorm = 0.5f;
         {
             std::lock_guard <std::mutex> lock ( mDimensionBoundsMutex );
@@ -617,11 +617,11 @@ void Explorer::AudioPlayback::SetDimensionBounds ( const Utils::DimensionBoundsD
 }
 
 // TODO - change mTimeCorpus from an ofMesh to a more efficient data structure
-void Explorer::AudioPlayback::SetTimeCorpus ( const std::vector<ofMesh>& timeCorpus )
+void Explorer::AudioPlayback::SetCorpusMesh ( const std::vector<ofMesh>& corpusMesh )
 {
-    std::lock_guard<std::mutex> lock ( mTimeCorpusMutex );
+    std::lock_guard<std::mutex> lock ( mCorpusMeshMutex );
 
-    mTimeCorpus = timeCorpus;
+    mCorpusMesh = corpusMesh;
 }
 
 void Explorer::AudioPlayback::CalculateTriggerPoints ( Utils::AudioPlayhead& playhead )

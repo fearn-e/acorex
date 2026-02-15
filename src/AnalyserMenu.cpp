@@ -707,7 +707,7 @@ void AnalyserMenu::SelectAnalysisOutputFile ( )
         bool success = mJSON.Read ( outputFile.getPath ( ), settings );
         if ( !success ) { return; }
 
-        if ( settings.hasBeenReduced )
+        if ( settings.bIsReduction )
         {
             ofLogError ( "AnalyserMenu" ) << "Can't insert into an already reduced dataset";
             return;
@@ -805,7 +805,6 @@ void AnalyserMenu::UnpackSettingsFromFile ( const Utils::AnalysisSettings& setti
 
 void AnalyserMenu::PackSettingsFromUser ( Utils::AnalysisSettings& settings )
 {
-    settings.bTime = true;
     settings.bPitch = mAnalysisPitchToggle;
     settings.bLoudness = mAnalysisLoudnessToggle;
     settings.bShape = mAnalysisShapeToggle;

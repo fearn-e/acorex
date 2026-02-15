@@ -92,12 +92,9 @@ void Utils::to_json ( nlohmann::json& j, const DataSet& a )
         TO_J ( currentPointCount),
         TO_J ( dimensionNames ),
         TO_J ( fileList ),
-        TO_J ( time.raw ),
-        TO_J ( stats.raw ),
-        TO_J ( stats.reduced ),
+        TO_J ( trails.raw ),
         TO_J_SETTINGS ( currentDimensionCount ),
-        TO_J_SETTINGS ( hasBeenReduced ),
-        TO_J_SETTINGS ( bTime ),
+        TO_J_SETTINGS ( bIsReduction ),
         TO_J_SETTINGS ( bPitch ),
         TO_J_SETTINGS ( bLoudness ),
         TO_J_SETTINGS ( bShape ),
@@ -116,12 +113,9 @@ void Utils::from_json ( const nlohmann::json& j, DataSet& a )
     TO_A ( currentPointCount );
     TO_A ( dimensionNames );
     TO_A ( fileList );
-    TO_A ( time.raw );
-    TO_A ( stats.raw );
-    TO_A ( stats.reduced );
+    TO_A ( trails.raw );
     TO_A_SETTINGS ( currentDimensionCount );
-    TO_A_SETTINGS ( hasBeenReduced );
-    TO_A_SETTINGS ( bTime );
+    TO_A_SETTINGS ( bIsReduction );
     TO_A_SETTINGS ( bPitch );
     TO_A_SETTINGS ( bLoudness );
     TO_A_SETTINGS ( bShape );
@@ -139,8 +133,7 @@ void Utils::to_json ( nlohmann::json& j, const AnalysisSettings& a )
 {
     j = nlohmann::json { 
         TO_J ( currentDimensionCount ),
-        TO_J ( hasBeenReduced ),
-        TO_J ( bTime ),
+        TO_J ( bIsReduction ),
         TO_J ( bPitch ),
         TO_J ( bLoudness ),
         TO_J ( bShape ),
@@ -157,8 +150,7 @@ void Utils::to_json ( nlohmann::json& j, const AnalysisSettings& a )
 void Utils::from_json ( const nlohmann::json& j, AnalysisSettings& a )
 { 
     TO_A ( currentDimensionCount );
-    TO_A ( hasBeenReduced );
-    TO_A ( bTime );
+    TO_A ( bIsReduction );
     TO_A ( bPitch );
     TO_A ( bLoudness );
     TO_A ( bShape );

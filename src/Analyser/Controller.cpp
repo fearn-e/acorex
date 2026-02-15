@@ -67,7 +67,7 @@ bool Analyser::Controller::ReduceCorpus ( const std::string& inputPath, const st
     if ( !success ) { return false; }
 
     dataset.analysisSettings.currentDimensionCount = settings.dimensionReductionTarget + 1;
-    GenerateDimensionNames ( dataset.dimensionNames, settings, dataset.analysisSettings.bTime );
+    GenerateReducedDimensionNames ( dataset.dimensionNames, settings );
 
     success = mJSON.Write ( outputPath, dataset );
     if ( !success ) { return false; }
@@ -196,16 +196,8 @@ std::vector<int> Analyser::Controller::MergeDatasets ( Utils::DataSet& primaryDa
             int pointCountDiff = 0;
             primaryDataset.fileList[existingIndex] = additionalDataset.fileList[i];
 
-            if ( primaryDataset.analysisSettings.bTime )
-            { // Time
-                pointCountDiff = additionalDataset.time.raw[i].size ( ) - primaryDataset.time.raw[existingIndex].size ( ); // TODO - DOUBLE CHECK THIS
-                primaryDataset.time.raw[existingIndex] = additionalDataset.time.raw[i];
-            }
-            else
-            { // Stats
-                pointCountDiff = 0;
-                primaryDataset.stats.raw[existingIndex] = additionalDataset.stats.raw[i];
-            }
+            pointCountDiff = additionalDataset.trails.raw[i].size ( ) - primaryDataset.trails.raw[existingIndex].size ( ); // TODO - DOUBLE CHECK THIS
+            primaryDataset.trails.raw[existingIndex] = additionalDataset.trails.raw[i];
 
             primaryDataset.currentPointCount += pointCountDiff;
 
@@ -219,16 +211,8 @@ std::vector<int> Analyser::Controller::MergeDatasets ( Utils::DataSet& primaryDa
             int pointCountDiff = 0;
             primaryDataset.fileList.push_back ( additionalDataset.fileList[i] );
 
-            if ( primaryDataset.analysisSettings.bTime )
-            { // Time
-                pointCountDiff = additionalDataset.time.raw[i].size ( ); // TODO - DOUBLE CHECK THIS
-                primaryDataset.time.raw.push_back ( additionalDataset.time.raw[i] );
-            }
-            else
-            { // Stats
-                pointCountDiff = 1;
-                primaryDataset.stats.raw.push_back ( additionalDataset.stats.raw[i] );
-            }
+            pointCountDiff = additionalDataset.trails.raw[i].size ( ); // TODO - DOUBLE CHECK THIS
+            primaryDataset.trails.raw.push_back ( additionalDataset.trails.raw[i] );
 
             primaryDataset.currentPointCount += pointCountDiff;
 
@@ -274,93 +258,48 @@ void Analyser::Controller::GenerateDimensionNames ( std::vector<std::string>& di
 {
     dimensionNames.clear ( );
 
-    if ( settings.bTime )
-    { // Time
-        dimensionNames.push_back ( "Time" );
+    dimensionNames.push_back ( "Time" );
 
-        if ( settings.bPitch )
-        {
-            dimensionNames.push_back ( "Pitch" );
-            dimensionNames.push_back ( "Pitch Confidence" );
-        }
-
-        if ( settings.bLoudness )
-        {
-            dimensionNames.push_back ( "Loudness" );
-            dimensionNames.push_back ( "True Peak" );
-        }
-
-        if ( settings.bShape )
-        {
-            dimensionNames.push_back ( "Spectral Centroid" );
-            dimensionNames.push_back ( "Spectral Spread" );
-            dimensionNames.push_back ( "Spectral Skewness" );
-            dimensionNames.push_back ( "Spectral Kurtosis" );
-            dimensionNames.push_back ( "Spectral Rolloff" );
-            dimensionNames.push_back ( "Spectral Flatness" );
-            dimensionNames.push_back ( "Spectral Crest" );
-        }
-
-        if ( settings.bMFCC )
-        {
-            for ( int i = 0; i < settings.nCoefs; i++ )
-            {
-                dimensionNames.push_back ( "MFCC " + std::to_string ( i + 1 ) );
-            }
-        }
+    if ( settings.bPitch )
+    {
+        dimensionNames.push_back ( "Pitch" );
+        dimensionNames.push_back ( "Pitch Confidence" );
     }
-    else
-    { // Stats
-        if ( settings.bPitch )
-        {
-            Push7Stats ( "Pitch", dimensionNames );
-            Push7Stats ( "Pitch Confidence", dimensionNames );
-        }
 
-        if ( settings.bLoudness )
-        {
-            Push7Stats ( "Loudness", dimensionNames );
-            Push7Stats ( "True Peak", dimensionNames );
-        }
+    if ( settings.bLoudness )
+    {
+        dimensionNames.push_back ( "Loudness" );
+        dimensionNames.push_back ( "True Peak" );
+    }
 
-        if ( settings.bShape )
-        {
-            Push7Stats ( "Spectral Centroid", dimensionNames );
-            Push7Stats ( "Spectral Spread", dimensionNames );
-            Push7Stats ( "Spectral Skewness", dimensionNames );
-            Push7Stats ( "Spectral Kurtosis", dimensionNames );
-            Push7Stats ( "Spectral Rolloff", dimensionNames );
-            Push7Stats ( "Spectral Flatness", dimensionNames );
-            Push7Stats ( "Spectral Crest", dimensionNames );
-        }
+    if ( settings.bShape )
+    {
+        dimensionNames.push_back ( "Spectral Centroid" );
+        dimensionNames.push_back ( "Spectral Spread" );
+        dimensionNames.push_back ( "Spectral Skewness" );
+        dimensionNames.push_back ( "Spectral Kurtosis" );
+        dimensionNames.push_back ( "Spectral Rolloff" );
+        dimensionNames.push_back ( "Spectral Flatness" );
+        dimensionNames.push_back ( "Spectral Crest" );
+    }
 
-        if ( settings.bMFCC )
+    if ( settings.bMFCC )
+    {
+        for ( int i = 0; i < settings.nCoefs; i++ )
         {
-            for ( int i = 0; i < settings.nCoefs; i++ )
-            {
-                Push7Stats ( "MFCC " + std::to_string ( i + 1 ), dimensionNames );
-            }
+            dimensionNames.push_back ( "MFCC " + std::to_string ( i + 1 ) );
         }
     }
 }
 
-void Analyser::Controller::GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::ReductionSettings& settings, bool time )
+void Analyser::Controller::GenerateReducedDimensionNames ( std::vector<std::string>& dimensionNames, const Utils::ReductionSettings& settings )
 {
     dimensionNames.clear ( );
 
-    if ( time ) { dimensionNames.push_back ( "Time" ); }
+    dimensionNames.push_back ( "Time" );
 
     for ( int i = 0; i < settings.dimensionReductionTarget; i++ )
     {
         dimensionNames.push_back ( "Dimension " + std::to_string ( i + 1 ) );
-    }
-}
-
-void Analyser::Controller::Push7Stats ( std::string masterDimension, std::vector<std::string>& dimensionNames )
-{
-    Utils::DataSet temp;
-    for ( int i = 0; i < temp.statisticNames.size ( ); i++ )
-    {
-        dimensionNames.push_back ( masterDimension + " (" + temp.statisticNames[i] + ")" );
     }
 }

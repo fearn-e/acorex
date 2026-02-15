@@ -657,15 +657,13 @@ void ExplorerMenu::SwapDimension ( string dimension, Utils::Axis axis )
         return;
     }
 
-    if ( dimension == "None" )					{ mLiveView.FillDimensionNone ( axis ); }
+    if ( dimension == "None" )					{ mLiveView.ClearDimension ( axis ); }
     else
     {
         int dimensionIndex = GetDimensionIndex ( dimension );
         if ( dimensionIndex == -1 ) { return; }
 
-        if ( mRawView->IsTimeAnalysis ( ) )		{ mLiveView.FillDimensionTime ( dimensionIndex, axis ); }
-        else if ( !mRawView->IsReduction ( ) )	{ mLiveView.FillDimensionStats ( dimensionIndex, axis ); }
-        else									{ mLiveView.FillDimensionStatsReduced ( dimensionIndex, axis ); }
+        mLiveView.FillDimension ( dimensionIndex, axis );
     }
     
     if ( bIsCorpusOpen )

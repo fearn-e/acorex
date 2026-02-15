@@ -29,7 +29,7 @@ bool Analyser::UMAP::Fit ( Utils::DataSet& dataset, const Utils::ReductionSettin
     fluid::FluidDataSet<std::string, double, 1> fluidsetIN ( dataset.analysisSettings.currentDimensionCount );
     fluid::FluidDataSet<std::string, double, 1> fluidsetOUT ( settings.dimensionReductionTarget );
 
-    std::vector<int> filePointLength ( dataset.analysisSettings.bTime ? dataset.fileList.size ( ) : 0, 0 );
+    std::vector<int> filePointLength ( dataset.fileList.size ( ), 0 );
     mConversion.CorpusToFluid ( fluidsetIN, dataset, filePointLength );
 
     fluid::index k = 15;
@@ -49,32 +49,28 @@ bool Analyser::UMAP::Fit ( Utils::DataSet& dataset, const Utils::ReductionSettin
 
     InsertTimeDimension ( dataset, timeDimension );
 
-    dataset.analysisSettings.hasBeenReduced = true;
+    dataset.analysisSettings.bIsReduction = true;
 
     return true;
 }
 
 void Analyser::UMAP::ExtractTimeDimension ( Utils::DataSet& dataset, std::vector<double>& timeDimension )
 {
-    if ( !dataset.analysisSettings.bTime ) { return; }
-
     dataset.dimensionNames.erase ( dataset.dimensionNames.begin ( ) );
     dataset.analysisSettings.currentDimensionCount -= 1;
     
     for ( int file = 0; file < dataset.fileList.size ( ); file++ )
     {
-        for ( int timepoint = 0; timepoint < dataset.time.raw[file].size ( ); timepoint++ )
+        for ( int timepoint = 0; timepoint < dataset.trails.raw[file].size ( ); timepoint++ )
         {
-            timeDimension.push_back ( dataset.time.raw[file][timepoint][0] );
-            dataset.time.raw[file][timepoint].erase ( dataset.time.raw[file][timepoint].begin ( ) );
+            timeDimension.push_back ( dataset.trails.raw[file][timepoint][0] );
+            dataset.trails.raw[file][timepoint].erase ( dataset.trails.raw[file][timepoint].begin ( ) );
         }
     }
 }
 
 void Analyser::UMAP::InsertTimeDimension ( Utils::DataSet& dataset, const std::vector<double>& timeDimension )
 {
-    if ( !dataset.analysisSettings.bTime ) { return; }
-
     dataset.dimensionNames.insert ( dataset.dimensionNames.begin ( ), "Time" );
     dataset.analysisSettings.currentDimensionCount += 1;
     
@@ -82,9 +78,9 @@ void Analyser::UMAP::InsertTimeDimension ( Utils::DataSet& dataset, const std::v
 
     for ( int file = 0; file < dataset.fileList.size ( ); file++ )
     {
-        for ( int timepoint = 0; timepoint < dataset.time.raw[file].size ( ); timepoint++ )
+        for ( int timepoint = 0; timepoint < dataset.trails.raw[file].size ( ); timepoint++ )
         {
-            dataset.time.raw[file][timepoint].insert ( dataset.time.raw[file][timepoint].begin ( ), timeDimension[insertIndex] );
+            dataset.trails.raw[file][timepoint].insert ( dataset.trails.raw[file][timepoint].begin ( ), timeDimension[insertIndex] );
             insertIndex++;
         }
     }

@@ -25,7 +25,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Utils/Data.h"
 #include <ofMesh.h>
 #include <ofEasyCam.h>
-#include <ofSoundPlayer.h>
 
 namespace Acorex {
 namespace Explorer {
@@ -49,7 +48,6 @@ public:
 
     void Update ( );
     void UpdatePlayheads ( );
-    void OLD_UpdateAudioPlayers ( );
     void SlowUpdate ( );
     void Draw ( );
 
@@ -57,16 +55,13 @@ public:
 
     void CreatePlayhead ( );
     void KillPlayhead ( size_t playheadID );
-    void OLD_PlaySound ( );
 
     // Filler Functions ----------------------------
 
     void CreatePoints ( );
 
-    void FillDimensionTime ( int dimensionIndex, Utils::Axis axis );
-    void FillDimensionStats ( int dimensionIndex, Utils::Axis axis );
-    void FillDimensionStatsReduced ( int dimensionIndex, Utils::Axis axis );
-    void FillDimensionNone ( Utils::Axis axis );
+    void FillDimension ( int dimensionIndex, Utils::Axis axis );
+    void ClearDimension ( Utils::Axis axis );
     void RefreshFileColors ( int fileIndex );
 
     // Camera Functions ----------------------------
@@ -105,7 +100,6 @@ private:
     bool bDraw;
     bool b3D;
     bool bColorFullSpectrum;
-    bool bLoopAudio;
 
     bool mKeyboardMoveState[10];
     float mCamMoveSpeedScaleAdjusted;
@@ -118,14 +112,7 @@ private:
     int colorDimension;
 
     std::shared_ptr<RawView> mRawView; // might need to be weak_ptr?
-    std::vector<ofMesh> mTimeCorpus;
-    ofMesh mStatsCorpus;
-
-    std::vector<ofSoundPlayer> mSoundPlayers;
-    std::vector<int> mPlayingFiles;
-    std::vector<int> mPlayingTimeHeads;
-    std::vector<float> mPlayingLastPositionMS;
-    std::vector<ofColor> mPlayingLastColor;
+    std::vector<ofMesh> mCorpusMesh;
 
     // Playheads -------------------------------------
 
