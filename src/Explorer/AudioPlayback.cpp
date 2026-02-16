@@ -36,7 +36,7 @@ Explorer::AudioPlayback::AudioPlayback ( )
     mCrossoverJumpChanceX1000 ( 50 ), mCrossfadeSampleLength ( 256 ), mMaxJumpDistanceSpaceX1000 ( 50 ), mMaxJumpTargets ( 5 ),
     mVolumeX1000 ( 500 ), mDynamicPanEnabled ( false ), mDynamicPanDimensionIndex ( 0 ), mPanningStrengthX1000 ( 1000 )
 {
-    srand ( time ( NULL ) );
+    mRandomGen = std::mt19937 ( std::random_device ( ) () );
 }
 
 bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t bufferSize, ofSoundDevice outDevice )
@@ -95,8 +95,6 @@ bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t buff
         ofLogError ( "AudioPlayback::RestartAudio" ) << "Failed to start audio stream with device \"" << outDevice.name << "\". Audio playback will not function.";
         return false;
     }
-
-    srand ( time ( NULL ) ); // reset random seed just for fun
 
     return true;
 }
@@ -239,7 +237,6 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
         // audio processing
         if ( !audioProcessingBlocked )
         {
-            double crossoverJumpChance = (double)mCrossoverJumpChanceX1000 / 1000.0;
             double volume = (double)mVolumeX1000 / 1000.0;
             double panningStrength = (double)mPanningStrengthX1000 / 1000.0;
 
@@ -373,7 +370,9 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
                     int requiredSamples = mCrossfadeSampleLength;
                     if ( mPlayheads[playheadIndex].sampleIndex + requiredSamples >= mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getNumFrames ( ) ) { continue; }
-                    if ( ((double)rand ( ) / RAND_MAX) > crossoverJumpChance ) { continue; }
+                    std::uniform_int_distribution<> dis ( 0, 1000 );
+                    int randomValue = dis ( mRandomGen );
+                    if ( randomValue > mCrossoverJumpChanceX1000 ) { continue; }
                     if ( mCorpusMeshMutex.try_lock ( ) )
                         // TODO - investigate if this lock could work differently, currently this would cause a brief moment of no possible jumps
                     {

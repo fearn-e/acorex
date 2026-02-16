@@ -24,6 +24,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofSoundBuffer.h>
 #include <ofSoundStream.h>
 #include <ofMesh.h>
+#include <random>
 #include <vector>
 #include <mutex>
 #include <atomic>
@@ -83,7 +84,7 @@ private:
     // TODO //implement stereo loading of source files, not just mono
     // TODO //panning bias? to globally statically shift this acorex instance left/right
     // TODO //pan smoothing? average dynamic pan position with the previous and next X segments
-    
+
     // audio states ------------------------------
 
     ofSoundStream mSoundStream;
@@ -135,6 +136,10 @@ private:
     std::atomic<bool> mDynamicPanEnabled;
     std::atomic<int> mDynamicPanDimensionIndex;
     std::atomic<int> mPanningStrengthX1000;
+
+    // Randomness ---------------------------------
+
+    std::mt19937 mRandomGen;
 };
 
 } // namespace Explorer
