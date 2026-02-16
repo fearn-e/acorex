@@ -42,6 +42,8 @@ Explorer::LiveView::LiveView ( )
 
     mCamera = std::make_shared<ofCamera> ( );
     mPointPicker->SetCamera ( mCamera );
+
+    mRandomGen = std::mt19937 ( std::random_device ( ) () );
 }
 
 void Explorer::LiveView::Initialise ( )
@@ -359,9 +361,14 @@ void Explorer::LiveView::CreatePlayhead ( )
 {
     if ( mPointPicker->GetNearestMousePointFile ( ) == -1 ) { return; }
 
-    mAudioPlayback.CreatePlayhead ( mPointPicker->GetNearestMousePointFile ( ), mPointPicker->GetNearestMousePointTime ( ) );
+    CreatePlayhead ( mPointPicker->GetNearestMousePointFile ( ), mPointPicker->GetNearestMousePointTime ( ) );
 
     return;
+}
+
+void Explorer::LiveView::CreatePlayhead ( size_t fileIndex, size_t timePointIndex )
+{
+    mAudioPlayback.CreatePlayhead ( fileIndex, timePointIndex );
 }
 
 void Explorer::LiveView::KillPlayhead ( size_t playheadID )
@@ -693,7 +700,16 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
         else if ( args.key == ACOREX_KEYBIND_CAMERA_ROTATE_RIGHT ) { mKeyboardMoveState[7] = false; }
         else if ( args.key == ACOREX_KEYBIND_CAMERA_ZOOM_IN ) { mKeyboardMoveState[8] = false; }
         else if ( args.key == ACOREX_KEYBIND_CAMERA_ZOOM_OUT ) { mKeyboardMoveState[9] = false; }
-        else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD ) { CreatePlayhead ( ); }
+        else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_ZERO_ZERO ) { mAudioPlayback.CreatePlayhead ( 0, 0 ); }
+        else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_RANDOM_POINT )
+        {
+            std::uniform_int_distribution<> disFile ( 0, mRawView->GetDataset ( )->fileList.size ( ) - 1 );
+            size_t randomFile = disFile ( mRandomGen );
+            std::uniform_int_distribution<> disTime ( 0, mRawView->GetTrailData ( )->raw[randomFile].size ( ) - 1 );
+            size_t randomTime = disTime ( mRandomGen );
+            CreatePlayhead ( randomFile, randomTime );
+        }
+        else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_PICKER_POINT ) { CreatePlayhead ( ); }
         else if ( args.key == ACOREX_KEYBIND_AUDIO_PAUSE ) { bUserPaused = !bUserPaused; mAudioPlayback.UserInvokedPause ( bUserPaused ); }
         else if ( args.key == ACOREX_KEYBIND_TOGGLE_DEBUG_VIEW ) { bDebug = !bDebug; }
         //else if ( args.key == 'c' ) // TODO - might not need this key either just like the ENTER key below, remove also?

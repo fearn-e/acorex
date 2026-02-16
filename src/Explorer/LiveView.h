@@ -26,6 +26,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include <ofMesh.h>
 #include <ofEasyCam.h>
+#include <random>
 
 namespace Acorex {
 namespace Explorer {
@@ -55,6 +56,7 @@ public:
     // Sound Functions ------------------------------
 
     void CreatePlayhead ( );
+    void CreatePlayhead ( size_t fileIndex, size_t timePointIndex );
     void KillPlayhead ( size_t playheadID );
 
     // Filler Functions ----------------------------
@@ -130,7 +132,11 @@ private:
     Utilities::DimensionBounds mDimensionBounds;
     std::shared_ptr<PointPicker> mPointPicker;
     AudioPlayback mAudioPlayback;
-    std::shared_ptr<Utils::MenuLayout> mLayout;
+    std::shared_ptr<Utilities::MenuLayout> mLayout;
+
+    // Randomness ----------------------------------
+
+    std::mt19937 mRandomGen;
 };
 
 } // namespace Explorer
