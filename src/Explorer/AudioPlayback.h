@@ -70,7 +70,7 @@ public:
 
 private:
     void FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utilities::AudioPlayhead* playhead, bool outBufferFull );
-    void CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, size_t startSample_A, size_t endSample_A, size_t fileIndex_A, Utilities::AudioPlayhead* playhead_B, size_t lengthSetting, bool outBufferFull );
+    void CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utilities::AudioPlayhead* playhead, bool outBufferFull );
 
     void CalculateTriggerPoints ( Utilities::AudioPlayhead& playhead );
 

@@ -281,79 +281,11 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
                     }
 
                     // crossfade jump
-                    // CrossfadeAudioSegment ( &playheadBuffer, &playheadBufferPosition, jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile, &mPlayheads[playheadIndex], mCrossfadeSampleLength, true );
                     if ( mPlayheads[playheadIndex].crossfading )
                     {
-                        size_t crossfadeSamplesLeft = mPlayheads[playheadIndex].crossfadeSampleLength - mPlayheads[playheadIndex].crossfadeCurrentSample;
-                        size_t bufferSpace = playheadBuffer.getNumFrames ( ) - playheadBufferPosition;
-                        if ( crossfadeSamplesLeft > bufferSpace ) { crossfadeSamplesLeft = bufferSpace; }
-
-                        float panStartNorm = 0.5f, panEndNorm = 0.5f;
-                        if ( mDynamicPanEnabled && panningStrength > 0.0 )
-                        {
-                            size_t thisTimePointIndex = mPlayheads[playheadIndex].sampleIndex / mRawView->GetHopSize ( );
-                            size_t jumpTimePointIndex = mPlayheads[playheadIndex].jumpSampleIndex / mRawView->GetHopSize ( );
-
-                            float panStart = mRawView->GetTrailData ( )->raw[mPlayheads[playheadIndex].fileIndex][thisTimePointIndex][mDynamicPanDimensionIndex];
-                            float panEnd = mRawView->GetTrailData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex][jumpTimePointIndex][mDynamicPanDimensionIndex];
-
-                            {
-                                std::lock_guard <std::mutex> lock ( mDimensionBoundsMutex );
-
-                                panStartNorm    = (float)(                  panStart                        - mDimensionBounds.min[mDynamicPanDimensionIndex] )
-                                                / (float)( mDimensionBounds.max[mDynamicPanDimensionIndex]  - mDimensionBounds.min[mDynamicPanDimensionIndex] );
-                                panEndNorm      = (float)(                  panEnd                          - mDimensionBounds.min[mDynamicPanDimensionIndex] ) 
-                                                / (float)( mDimensionBounds.max[mDynamicPanDimensionIndex]  - mDimensionBounds.min[mDynamicPanDimensionIndex] );
-                            }
-
-                            panStartNorm =  glm::clamp ( panStartNorm,  0.0f, 1.0f );
-                            panEndNorm =    glm::clamp ( panEndNorm,    0.0f, 1.0f );
-                        }
-
-                        for ( size_t i = 0; i < crossfadeSamplesLeft; i++ )
-                        {
-                            float crossfadeProgress = (float)(mPlayheads[playheadIndex].crossfadeCurrentSample + i) / (float)mPlayheads[playheadIndex].crossfadeSampleLength;
-
-                            float gain_A = cos ( crossfadeProgress * 0.5 * M_PI );
-                            float gain_B = sin ( crossfadeProgress * 0.5 * M_PI );
-
-                            float sample_A = mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getSample ( mPlayheads[playheadIndex].sampleIndex + i, 0 );
-                            float sample_B = mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex].getSample ( mPlayheads[playheadIndex].jumpSampleIndex + i, 0 );
-                            float samplePostCrossfade = (sample_A * gain_A) + (sample_B * gain_B);
-
-                            float panGainL = 1.0f, panGainR = 1.0f;
-                            if ( mDynamicPanEnabled && panningStrength > 0.0 )
-                            {
-                                float panPostCrossfade = panStartNorm + (panEndNorm - panStartNorm) * crossfadeProgress;
-                                panGainL = cos ( panPostCrossfade * 0.5 * M_PI );
-                                panGainR = sin ( panPostCrossfade * 0.5 * M_PI );
-
-                                panGainL = 1.0f - panningStrength * (1.0f - panGainL);
-                                panGainR = 1.0f - panningStrength * (1.0f - panGainR);
-                                // TODO - could have a power curve here instead of linear - something like: float result = 1.0f - pow(Y, power) * (1.0f - X);
-                                // TODO - same thing further down in FillAudioSegment();
-                            }
-
-                            playheadBuffer.getSample ( playheadBufferPosition + i, 0 ) = samplePostCrossfade * panGainL;
-                            playheadBuffer.getSample ( playheadBufferPosition + i, 1 ) = samplePostCrossfade * panGainR;
-                        }
-
-                        mPlayheads[playheadIndex].crossfadeCurrentSample += crossfadeSamplesLeft;
-                        mPlayheads[playheadIndex].sampleIndex += crossfadeSamplesLeft;
-                        mPlayheads[playheadIndex].jumpSampleIndex += crossfadeSamplesLeft;
-                        playheadBufferPosition += crossfadeSamplesLeft;
-
-                        if ( mPlayheads[playheadIndex].crossfadeCurrentSample >= mPlayheads[playheadIndex].crossfadeSampleLength )
-                        {
-                            mPlayheads[playheadIndex].crossfading = false;
-                            mPlayheads[playheadIndex].fileIndex = mPlayheads[playheadIndex].jumpFileIndex;
-                            mPlayheads[playheadIndex].sampleIndex = mPlayheads[playheadIndex].jumpSampleIndex;
-                            CalculateTriggerPoints ( mPlayheads[playheadIndex] );
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        CrossfadeAudioSegment ( &playheadBuffer, &playheadBufferPosition, &mPlayheads[playheadIndex], false );
+                        
+                        if ( mPlayheads[playheadIndex].crossfading ) { break; }
                     }
 
                     // exit loop - no more space in outbuffer, no more triggers hit
@@ -495,31 +427,77 @@ void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_
     *outBufferPosition += segmentLength;
 }
 
-// TODO - i think this function is no longer used - remove?
-void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, size_t startSample_A, size_t endSample_A, size_t fileIndex_A, Utilities::AudioPlayhead* playhead_B, size_t lengthSetting, bool outBufferFull )
+void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utilities::AudioPlayhead* playhead, bool outBufferFull )
 {
-    size_t originLength = endSample_A - startSample_A;
-    size_t jumpLength = playhead_B->triggerSamplePoints.front ( ) - playhead_B->sampleIndex;
-    size_t crossfadeLength = (originLength < jumpLength) ? originLength : jumpLength;
-    crossfadeLength = (crossfadeLength < lengthSetting) ? crossfadeLength : lengthSetting;
+    //if ( mPlayheads[playheadIndex].crossfading )
+    //{
+    size_t crossfadeSamplesLeft = playhead->crossfadeSampleLength - playhead->crossfadeCurrentSample;
+    size_t bufferSpace = outBuffer->getNumFrames ( ) - *outBufferPosition;
+    if ( crossfadeSamplesLeft > bufferSpace ) { crossfadeSamplesLeft = bufferSpace; }
 
-    if ( outBufferFull && crossfadeLength > ( outBuffer->getNumFrames ( ) - *outBufferPosition ) ) // cut off early if outBuffer is full
+    float panStartNorm = 0.5f, panEndNorm = 0.5f;
+    double panningStrength = (double)mPanningStrengthX1000 / 1000.0;
+    if ( mDynamicPanEnabled && panningStrength > 0.0 )
     {
-        crossfadeLength = outBuffer->getNumFrames ( ) - *outBufferPosition;
+        size_t thisTimePointIndex = playhead->sampleIndex / mRawView->GetHopSize ( );
+        size_t jumpTimePointIndex = playhead->jumpSampleIndex / mRawView->GetHopSize ( );
+
+        float panStart = mRawView->GetTrailData ( )->raw[playhead->fileIndex][thisTimePointIndex][mDynamicPanDimensionIndex];
+        float panEnd = mRawView->GetTrailData ( )->raw[playhead->jumpFileIndex][jumpTimePointIndex][mDynamicPanDimensionIndex];
+
+        {
+            std::lock_guard <std::mutex> lock ( mDimensionBoundsMutex );
+
+            panStartNorm    = (float)(panStart - mDimensionBounds.min[mDynamicPanDimensionIndex])
+                            / (float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]);
+            panEndNorm      = (float)(panEnd - mDimensionBounds.min[mDynamicPanDimensionIndex])
+                            / (float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]);
+        }
+
+        panStartNorm = glm::clamp ( panStartNorm, 0.0f, 1.0f );
+        panEndNorm = glm::clamp ( panEndNorm, 0.0f, 1.0f );
     }
 
-
-    for ( size_t i = 0; i < crossfadeLength; i++ )
+    for ( size_t i = 0; i < crossfadeSamplesLeft; i++ )
     {
-        float gain_A = cos ( (float)i / (float)crossfadeLength * 0.5 * M_PI );
-        float gain_B = sin ( (float)i / (float)crossfadeLength * 0.5 * M_PI );
+        float crossfadeProgress = (float)(playhead->crossfadeCurrentSample + i) / (float)playhead->crossfadeSampleLength;
 
-        outBuffer->getSample ( *outBufferPosition + i, 0 ) =	mRawView->GetAudioData ( )->raw[fileIndex_A].getSample ( startSample_A + i, 0 ) * gain_A +
-                                                                mRawView->GetAudioData ( )->raw[playhead_B->fileIndex].getSample ( playhead_B->sampleIndex + i, 0 ) * gain_B;
+        float gain_A = cos ( crossfadeProgress * 0.5 * M_PI );
+        float gain_B = sin ( crossfadeProgress * 0.5 * M_PI );
+
+        float sample_A = mRawView->GetAudioData ( )->raw[playhead->fileIndex].getSample ( playhead->sampleIndex + i, 0 );
+        float sample_B = mRawView->GetAudioData ( )->raw[playhead->jumpFileIndex].getSample ( playhead->jumpSampleIndex + i, 0 );
+        float samplePostCrossfade = (sample_A * gain_A) + (sample_B * gain_B);
+
+        float panGainL = 1.0f, panGainR = 1.0f;
+        if ( mDynamicPanEnabled && panningStrength > 0.0 )
+        {
+            float panPostCrossfade = panStartNorm + (panEndNorm - panStartNorm) * crossfadeProgress;
+            panGainL = cos ( panPostCrossfade * 0.5 * M_PI );
+            panGainR = sin ( panPostCrossfade * 0.5 * M_PI );
+
+            panGainL = 1.0f - panningStrength * (1.0f - panGainL);
+            panGainR = 1.0f - panningStrength * (1.0f - panGainR);
+            // TODO - could have a power curve here instead of linear - something like: float result = 1.0f - pow(Y, power) * (1.0f - X);
+            // TODO - same thing further down in FillAudioSegment();
+        }
+
+        outBuffer->getSample ( *outBufferPosition + i, 0 ) = samplePostCrossfade * panGainL;
+        outBuffer->getSample ( *outBufferPosition + i, 1 ) = samplePostCrossfade * panGainR;
     }
 
-    playhead_B->sampleIndex += crossfadeLength;
-    *outBufferPosition += crossfadeLength;
+    playhead->crossfadeCurrentSample += crossfadeSamplesLeft;
+    playhead->sampleIndex += crossfadeSamplesLeft;
+    playhead->jumpSampleIndex += crossfadeSamplesLeft;
+    *outBufferPosition += crossfadeSamplesLeft;
+
+    if ( playhead->crossfadeCurrentSample >= playhead->crossfadeSampleLength )
+    {
+        playhead->crossfading = false;
+        playhead->fileIndex = playhead->jumpFileIndex;
+        playhead->sampleIndex = playhead->jumpSampleIndex;
+        CalculateTriggerPoints ( *playhead );
+    }
 }
 
 bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t timePointIndex )
