@@ -570,7 +570,7 @@ void AnalyserMenu::Analyse ( )
     {
         mInvalidPulseColour = 255;
         bInvalidPulseFileSelects = true;
-        ofLogError ( "AnalyserMenu" ) << "Analysis directory or output file not selected";
+        ofLogWarning ( "AnalyserMenu" ) << "Analysis directory or output file not selected";
         return;
     }
 
@@ -578,7 +578,7 @@ void AnalyserMenu::Analyse ( )
     {
         mInvalidPulseColour = 255;
         bInvalidPulseAnalysisToggles = true;
-        ofLogError ( "AnalyserMenu" ) << "No analysis types selected";
+        ofLogWarning ( "AnalyserMenu" ) << "No analysis types selected";
         return;
     }
 
@@ -616,7 +616,7 @@ void AnalyserMenu::Reduce ( )
     {
         mInvalidPulseColour = 255;
         bInvalidPulseFileSelects = true;
-        ofLogError ( "AnalyserMenu" ) << "Reduction input or output file not selected";
+        ofLogWarning ( "AnalyserMenu" ) << "Reduction input or output file not selected";
         return;
     }
 
@@ -624,7 +624,7 @@ void AnalyserMenu::Reduce ( )
     {
         mInvalidPulseColour = 255;
         bInvalidPulseReductionDimensions = true;
-        ofLogError ( "AnalyserMenu" ) << "Can't reduce to more dimensions than currently exist";
+        ofLogWarning ( "AnalyserMenu" ) << "Can't reduce to more dimensions than currently exist";
         return;
     }
 
@@ -656,12 +656,12 @@ void AnalyserMenu::SelectAnalysisDirectory ( )
     ofFileDialogResult audioDirectory = ofSystemLoadDialog ( "Select folder containing audio files...", true, ofFilePath::getCurrentWorkingDirectory ( ) );
     if ( !audioDirectory.bSuccess )
     {
-        ofLogError ( "AnalyserMenu" ) << "No folder selected";
+        ofLogWarning ( "AnalyserMenu" ) << "No folder selected";
         return;
     }
     if ( !ofDirectory::doesDirectoryExist ( audioDirectory.getPath ( ) ) )
     {
-        ofLogError ( "AnalyserMenu" ) << "Invalid directory";
+        ofLogWarning ( "AnalyserMenu" ) << "Invalid directory";
         return;
     }
 
@@ -685,7 +685,7 @@ void AnalyserMenu::SelectAnalysisOutputFile ( )
     }
     if ( outputFile.getName ( ).find ( ".json" ) == std::string::npos )
     {
-        ofLogNotice ( "AnalyserMenu" ) << "Added missing .json extension";
+        ofLogVerbose ( "AnalyserMenu" ) << "Added missing .json extension";
         outputFile.filePath += ".json";
         outputFile.fileName += ".json";
     }

@@ -133,7 +133,7 @@ void Explorer::PointPicker::Train ( int dimensionIndex, Utilities::Axis axis, bo
 
     ofLogNotice ( "PointPicker" ) << "Training KDTree...";
     mKDTree = fluid::algorithm::KDTree ( mLiveFluidSet );
-    ofLogNotice ( "PointPicker" ) << "KDTree Trained.";
+    ofLogVerbose ( "PointPicker" ) << "KDTree Trained.";
     bTrained = true;
 
     if ( dimsFilled == 2 ) { b3D = false; }

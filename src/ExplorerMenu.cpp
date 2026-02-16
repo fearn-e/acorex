@@ -52,6 +52,8 @@ void ExplorerMenu::Initialise ( )
 
 void ExplorerMenu::Clear ( )
 {
+    bool clearedOpenCorpus = bIsCorpusOpen;
+
     bDraw = false;
     bDrawOpenCorpusWarning = false;
 
@@ -67,6 +69,8 @@ void ExplorerMenu::Clear ( )
     RemoveListeners ( );
 
     mMainPanel.clear ( );
+
+    if ( clearedOpenCorpus ) { ofLogNotice ( "Explorer" ) << "Cleared corpus."; }
 }
 
 void ExplorerMenu::Draw ( )
@@ -595,8 +599,8 @@ void ExplorerMenu::OpenCorpus ( )
 
     if ( mRawView->GetDimensions ( ).size ( ) < 2 )
     {
-        ofLogError ( "ExplorerMenu" ) << "Corpus must have at least 2 dimensions for exploration.";
         Initialise ( );
+        ofLogError ( "Explorer" ) << "Corpus must have at least 2 dimensions for exploration.";
         return;
     }
 
@@ -638,9 +642,12 @@ void ExplorerMenu::OpenCorpus ( )
 
     bIsCorpusOpen = true;
 
-    if ( mLiveView.StartAudio ( mAudioSettingsManager.GetCurrentAudioSettings ( ) ) ) { return; }
+    bool audioStarted = mLiveView.StartAudio ( mAudioSettingsManager.GetCurrentAudioSettings ( ) );
 
-    AudioOutputFailed ( );
+    ofLogNotice ( "Explorer" ) << "Opened corpus: " << mRawView->GetCorpusName ( );
+    ofLogNotice ( "Explorer" ) << mRawView->GetLoadedFileCount ( ) << "/" << mRawView->GetFileCount ( ) << " audio files loaded successfully.";
+
+    if ( !audioStarted ) { AudioOutputFailed ( ); }
 }
 
 // TODO - change how this and FillDimension and Train (point picker) work, should have a function that triggers training and one that doesn't (for initial filling)
@@ -689,7 +696,7 @@ int ExplorerMenu::GetDimensionIndex ( std::string& dimension )
             return i;
         }
     }
-    ofLogWarning ( "ExplorerMenu" ) << "Dimension " << dimension << " name not found";
+    ofLogError ( "Explorer" ) << "Dimension " << dimension << " name not found";
     return -1;
 }
 
@@ -874,7 +881,7 @@ void Acorex::ExplorerMenu::SetApi ( string& dropdownName )
 
     if ( !success )
     {
-        ofLogError ( "ExplorerMenu" ) << "Failed to change audio API to selected API."
+        ofLogError ( "Explorer" ) << "Failed to change audio API to selected API."
             << ". Selecting API: " << mAudioSettingsManager.GetCurrentApiName ( )
             << ", Selecting Device: " << mAudioSettingsManager.GetOutDevices ( mAudioSettingsManager.GetCurrentApiIndex ( ) )[mAudioSettingsManager.GetCurrentDeviceIndex ( )].name;
         mApiDropdown->setSelectedValueByIndex ( mAudioSettingsManager.GetCurrentApiIndex ( ), false );
@@ -899,7 +906,7 @@ void ExplorerMenu::SetOutDevice ( string& dropdownName )
 
     if ( !success )
     {
-        ofLogError ( "ExplorerMenu" ) << "Failed to change output device to selected device.";
+        ofLogError ( "Explorer" ) << "Failed to change output device to selected device.";
         mOutDeviceDropdown->setSelectedValueByIndex ( mAudioSettingsManager.GetCurrentDeviceIndex ( ), false );
     }
 
@@ -927,7 +934,7 @@ void ExplorerMenu::AudioOutputFailed ( )
 {
     // TODO - more error handling here? also more user feedback? - e.g. set Device/Api/Buffer dropdowns to red bg colour?
 
-    ofLogError ( "ExplorerMenu" ) << "Audio output failed to restart with current settings. This likely means the selected output device is currently unavailable. Please check your audio output device and try again.";
+    ofLogError ( "Explorer" ) << "Audio output failed to restart with current settings. This likely means the selected output device is currently unavailable. Please check your audio output device and try again.";
 }
 
 void ExplorerMenu::ResetDeviceDropdown ( )

@@ -36,9 +36,13 @@ bool Analyser::Controller::CreateCorpus ( const std::string& inputPath, const st
     
     int filesIn = dataset.fileList.size ( );
     int numAnalysed = mGenAnalysis.ProcessFiles ( dataset );
-    if ( numAnalysed > 0 )
+    if ( numAnalysed == filesIn )
     {
-        ofLogNotice ( "Controller" ) << "Processed " << filesIn << " files into " << dataset.currentPointCount 
+        ofLogNotice ( "Controller" ) << "Processed " << filesIn << " files into " << dataset.currentPointCount << " points.";
+    }
+    else if ( numAnalysed > 0 )
+    {
+        ofLogWarning ( "Controller" ) << "Processed " << numAnalysed << "/" << filesIn << " files into " << dataset.currentPointCount
             << " points, with " << dataset.fileList.size ( ) - numAnalysed << " files failed.";
     }
     else 
@@ -114,7 +118,7 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
 
         if ( newFilesTreated.empty ( ) )
         {
-            ofLogError ( "Controller" ) << "No new files left to process.";
+            ofLogError ( "Controller" ) << "No new files left to process after removing duplicates.";
             return false;
         }
 
@@ -133,9 +137,13 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
 
     int filesIn = newDataset.fileList.size ( );
     int numAnalysed = mGenAnalysis.ProcessFiles ( newDataset );
+    if ( numAnalysed == filesIn )
+    {
+        ofLogNotice ( "Controller" ) << "Processed " << filesIn << " new files into " << newDataset.currentPointCount << " points.";
+    }
     if ( numAnalysed > 0 )
     {
-        ofLogNotice ( "Controller" ) << "Processed " << filesIn << " files into " << newDataset.currentPointCount
+        ofLogWarning ( "Controller" ) << "Processed " << numAnalysed << "/" << filesIn << " files into " << newDataset.currentPointCount
             << " points, with " << newDataset.fileList.size ( ) - numAnalysed << " files failed.";
     }
     else
@@ -248,7 +256,8 @@ bool Analyser::Controller::SearchDirectory ( const std::string& directory, std::
 
     if ( files.empty ( ) )
     {
-        ofLogError ( "Controller" ) << "No files found in " << directory;
+        ofLogWarning ( "Controller" ) << "No valid audio files found in " << directory;
+        ofLogNotice ( "Controller" ) << "Supported audio formats are .wav, .flac, .mp3 and .ogg.";
         return false;
     }
 

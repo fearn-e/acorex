@@ -31,7 +31,7 @@ using namespace Acorex;
 
 int Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
 {  
-    ofLogNotice ( "GenAnalysis" ) << "Calculating file lengths...";
+    ofLogVerbose ( "GenAnalysis" ) << "Calculating file lengths...";
     double fileLengthSumTracker = 0;
     double fileLengthSumTotal = 0;
 
@@ -47,7 +47,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
         fileLengthSumTotal = sampleTotal;
     }
 
-    ofLogNotice ( "GenAnalysis" ) << "Total sample count: " << fileLengthSumTotal;
+    ofLogVerbose ( "GenAnalysis" ) << "Total sample count: " << fileLengthSumTotal;
 
     dataset.trails.raw.clear ( );
 

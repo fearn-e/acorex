@@ -93,7 +93,7 @@ bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t buff
 
     if ( !success )
     {
-        ofLogError ( "AudioPlayback::RestartAudio" ) << "Failed to start audio stream with device \"" << outDevice.name << "\". Audio playback will not function.";
+        ofLogError ( "AudioPlayback" ) << "Failed to start audio stream with device \"" << outDevice.name << "\". Audio playback will not function.";
         return false;
     }
 
@@ -520,7 +520,7 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t timePoin
     }
     else if ( mRawView->GetDataset ( )->fileList.size ( ) == 0 )
     {
-        ofLogWarning ( "AudioPlayback" ) << "No files in dataset, failed to create new playhead";
+        ofLogError ( "AudioPlayback" ) << "No files in dataset, failed to create new playhead";
         return false;
     }
 
