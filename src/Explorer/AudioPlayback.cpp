@@ -259,6 +259,27 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
                 // processing loop
                 while ( true )
                 {
+                    // remove trigger points that have been hit
+                    while ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) > 0 && mPlayheads[playheadIndex].sampleIndex >= mPlayheads[playheadIndex].triggerSamplePoints.front ( ) )
+                    {
+                        mPlayheads[playheadIndex].triggerSamplePoints.pop ( );
+                    }
+
+                    // if EOF: loop/kill
+                    if ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) == 0 )
+                    {
+                        if ( mLoopPlayheads )
+                        {
+                            mPlayheads[playheadIndex].sampleIndex = 0;
+                            CalculateTriggerPoints ( mPlayheads[playheadIndex] );
+                        }
+                        else
+                        {
+                            playheadsToKillThisBuffer.push_back ( mPlayheads[playheadIndex].playheadID );
+                            break;
+                        }
+                    }
+
                     // crossfade jump
                     // CrossfadeAudioSegment ( &playheadBuffer, &playheadBufferPosition, jumpOriginStartSample, jumpOriginEndSample, jumpOriginFile, &mPlayheads[playheadIndex], mCrossfadeSampleLength, true );
                     if ( mPlayheads[playheadIndex].crossfading )
@@ -331,27 +352,6 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
                         }
                         else
                         {
-                            break;
-                        }
-                    }
-
-                    // remove trigger points that have been hit
-                    while ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) > 0 && mPlayheads[playheadIndex].sampleIndex >= mPlayheads[playheadIndex].triggerSamplePoints.front ( ) )
-                    {
-                        mPlayheads[playheadIndex].triggerSamplePoints.pop ( );
-                    }
-
-                    // if EOF: loop/kill
-                    if ( mPlayheads[playheadIndex].triggerSamplePoints.size ( ) == 0 )
-                    {
-                        if ( mLoopPlayheads )
-                        {
-                            mPlayheads[playheadIndex].sampleIndex = 0;
-                            CalculateTriggerPoints ( mPlayheads[playheadIndex] );
-                        }
-                        else
-                        {
-                            playheadsToKillThisBuffer.push_back ( mPlayheads[playheadIndex].playheadID );
                             break;
                         }
                     }
@@ -633,11 +633,11 @@ void Explorer::AudioPlayback::CalculateTriggerPoints ( Utilities::AudioPlayhead&
     }
 
     int triggerPointDistance = mRawView->GetHopSize ( );
-    int currentTriggerPoint = triggerPointDistance;
+    int currentTriggerPoint = 0;
 
     while ( currentTriggerPoint < mRawView->GetAudioData ( )->raw[playhead.fileIndex].size ( ) ) // might have to change if stereo input support is added
     {
-        if ( currentTriggerPoint > playhead.sampleIndex )
+        if ( currentTriggerPoint >= playhead.sampleIndex )
         {
             playhead.triggerSamplePoints.push ( currentTriggerPoint );
         }
