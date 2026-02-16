@@ -146,33 +146,30 @@ ofColor Utilities::LogDisplay::getLevelColor ( ofLogLevel level )
 
 void Utilities::LogDisplay::KeyEvent ( ofKeyEventArgs& args )
 {
-    if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_VERBOSE  )
+    if ( args.type == ofKeyEventArgs::Released )
     {
-        ofSetLogLevel ( OF_LOG_VERBOSE );
-        ofLogNotice ( "Logging" ) << "Verbose log level set";
-    }
-    if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_NOTICE  )
-    {
-        ofSetLogLevel ( OF_LOG_NOTICE );
-        ofLogNotice ( "Logging" ) << "Notice log level set";
-    }
-    if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_WARNING  )
-    {
-        ofSetLogLevel ( OF_LOG_NOTICE ); //TODO - this is a bodge
-        ofLogNotice ( "Logging" ) << "Warning log level set";
-        ofSetLogLevel ( OF_LOG_WARNING );
-    }
-    if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_ERROR  )
-    {
-        ofSetLogLevel ( OF_LOG_NOTICE );
-        ofLogNotice ( "Logging" ) << "Error log level set";
-        ofSetLogLevel ( OF_LOG_ERROR );
-    }
-    if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_SILENT  )
-    {
-        ofSetLogLevel ( OF_LOG_NOTICE );
-        ofLogNotice ( "Logging" ) << "Silent log level set";
-        ofSetLogLevel ( OF_LOG_SILENT );
+        if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_SILENT )
+        {
+            ofSetLogLevel ( OF_LOG_NOTICE );
+            ofLogNotice ( "Logging" ) << "Silent log level set";
+            ofSetLogLevel ( OF_LOG_SILENT );
+        }
+        else if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_WARNING_ERROR )
+        {
+            ofSetLogLevel ( OF_LOG_NOTICE ); //TODO - this is a bodge
+            ofLogNotice ( "Logging" ) << "Warning log level set";
+            ofSetLogLevel ( OF_LOG_WARNING );
+        }
+        else if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_NOTICE )
+        {
+            ofSetLogLevel ( OF_LOG_NOTICE );
+            ofLogNotice ( "Logging" ) << "Notice log level set";
+        }
+        else if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_VERBOSE )
+        {
+            ofSetLogLevel ( OF_LOG_VERBOSE );
+            ofLogNotice ( "Logging" ) << "Verbose log level set";
+        }
     }
 }
 
@@ -193,7 +190,7 @@ void Utilities::AcorexLoggerChannel::log ( ofLogLevel level, const std::string& 
         mLogDisplay->AddLog ( level, module, message );
     }
 
-    if ( mOriginalChannel && bSendToOriginalChannel )
+    if ( bSendToOriginalChannel && mOriginalChannel )
     {
         mOriginalChannel->log ( level, module, message );
     }
