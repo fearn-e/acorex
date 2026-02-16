@@ -150,6 +150,23 @@ Utilities::AudioData* Explorer::RawView::GetAudioData ( )
     return &mDataset.audio;
 }
 
+size_t Acorex::Explorer::RawView::GetFileCount ( ) const
+{
+    return mDataset.fileList.size ( );
+}
+
+size_t Acorex::Explorer::RawView::GetLoadedFileCount ( ) const
+{
+    size_t count = 0;
+
+    for ( const auto& loaded : mDataset.audio.loaded )
+    {
+        if ( loaded ) { count++; }
+    }
+
+    return count;
+}
+
 Utilities::TrailData* Explorer::RawView::GetTrailData ( )
 {
     return &mDataset.trails;

@@ -38,6 +38,8 @@ public:
     std::vector<std::string> GetDimensions ( ) const; // get dimensions from dataset
     std::string GetCorpusName ( ) const; // get corpus name
     Utilities::AudioData* GetAudioData ( ); // get audio data from dataset
+    size_t GetFileCount ( ) const; // get number of files in dataset
+    size_t GetLoadedFileCount ( ) const; // get number of loaded files in dataset
     Utilities::TrailData* GetTrailData ( ); // get trail data from dataset
     Utilities::DataSet* GetDataset ( ); // get dataset
     size_t GetHopSize ( ) const; // get hop size used in analysis
