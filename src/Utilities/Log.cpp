@@ -17,10 +17,17 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Utilities/Log.h"
 
 #include "Utilities/TemporaryDefaults.h"
+#include "Utilities/TemporaryKeybinds.h"
 
 using namespace Acorex;
 
-// LogDisplay --------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------- LogDisplay -----------------------------------
+// -------------------------------------------------------------------------
+
+Utilities::LogDisplay::LogDisplay ( ) : bListenersAdded ( false )
+{
+}
 
 void Utilities::LogDisplay::Initialise ( )
 {
@@ -31,6 +38,7 @@ void Utilities::LogDisplay::Initialise ( )
         while ( !newLogs.empty ( ) ) { newLogs.pop ( ); }
     }
 
+    AddListeners ( );
 }
 
 void Utilities::LogDisplay::Update ( )
@@ -95,6 +103,25 @@ void Utilities::LogDisplay::Draw ( )
 
 void Utilities::LogDisplay::Exit ( )
 {
+    RemoveListeners ( );
+}
+
+void Utilities::LogDisplay::AddListeners ( )
+{
+    if ( bListenersAdded ) { return; }
+
+    ofAddListener ( ofEvents ( ).keyReleased, this, &LogDisplay::KeyEvent );
+
+    bListenersAdded = true;
+}
+
+void Utilities::LogDisplay::RemoveListeners ( )
+{
+    if ( !bListenersAdded ) { return; }
+
+    ofRemoveListener ( ofEvents ( ).keyReleased, this, &LogDisplay::KeyEvent );
+
+    bListenersAdded = false;
 }
 
 void Utilities::LogDisplay::AddLog ( ofLogLevel level, const std::string& context, const std::string& message )
@@ -117,7 +144,41 @@ ofColor Utilities::LogDisplay::getLevelColor ( ofLogLevel level )
     }
 }
 
-// AcorexLoggerChannel ------------------------------------------------------------------
+void Utilities::LogDisplay::KeyEvent ( ofKeyEventArgs& args )
+{
+    if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_VERBOSE  )
+    {
+        ofSetLogLevel ( OF_LOG_VERBOSE );
+        ofLogNotice ( "Logging" ) << "Verbose log level set";
+    }
+    if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_NOTICE  )
+    {
+        ofSetLogLevel ( OF_LOG_NOTICE );
+        ofLogNotice ( "Logging" ) << "Notice log level set";
+    }
+    if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_WARNING  )
+    {
+        ofSetLogLevel ( OF_LOG_NOTICE ); //TODO - this is a bodge
+        ofLogNotice ( "Logging" ) << "Warning log level set";
+        ofSetLogLevel ( OF_LOG_WARNING );
+    }
+    if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_ERROR  )
+    {
+        ofSetLogLevel ( OF_LOG_NOTICE );
+        ofLogNotice ( "Logging" ) << "Error log level set";
+        ofSetLogLevel ( OF_LOG_ERROR );
+    }
+    if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_SILENT  )
+    {
+        ofSetLogLevel ( OF_LOG_NOTICE );
+        ofLogNotice ( "Logging" ) << "Silent log level set";
+        ofSetLogLevel ( OF_LOG_SILENT );
+    }
+}
+
+// -------------------------------------------------------------------------
+// -------------------------- AcorexLoggerChannel --------------------------
+// -------------------------------------------------------------------------
 
 // TODO - option to change original channel sending at runtime
 Utilities::AcorexLoggerChannel::AcorexLoggerChannel ( ) : bSendToOriginalChannel ( true )

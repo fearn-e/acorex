@@ -41,7 +41,7 @@ struct LogEntry {
 
 class LogDisplay {
 public:
-    LogDisplay ( ) { }
+    LogDisplay ( );
     ~LogDisplay ( ) { }
 
     void Initialise ( );
@@ -53,8 +53,14 @@ public:
 
     void SetMenuLayout ( std::shared_ptr<MenuLayout> newLayout ) { mLayout = newLayout; }
 
+    void KeyEvent ( ofKeyEventArgs& args );
+
     //void Clear ( );
 private:
+    bool bListenersAdded;
+    void AddListeners ( );
+    void RemoveListeners ( );
+
     ofColor getLevelColor ( ofLogLevel level );
 
     std::shared_ptr<MenuLayout> mLayout;
