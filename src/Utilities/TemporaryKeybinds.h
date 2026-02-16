@@ -38,5 +38,8 @@
 #define ACOREX_KEYBIND_LOG_LEVEL_SET_NOTICE OF_KEY_F3
 #define ACOREX_KEYBIND_LOG_LEVEL_SET_VERBOSE OF_KEY_F4
 
+//ofApp key binds
+#define ACOREX_KEYBIND_LOG_TOGGLE_TERMINAL_OUTPUT OF_KEY_F5
+
 // Mouse Bind Reference:
 // PointPicker - OF_MOUSE_BUTTON_RIGHT, MouseReleased - select point

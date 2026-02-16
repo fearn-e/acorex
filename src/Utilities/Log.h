@@ -82,7 +82,7 @@ public:
     AcorexLoggerChannel ( );
 
     void SetLogDisplay ( std::shared_ptr<LogDisplay> newLogDisplay ) { mLogDisplay = newLogDisplay; }
-    void ToggleSendToOriginalChannel ( bool send ) { bSendToOriginalChannel = send; }
+    void ToggleSendToOriginalChannel ( ) { bSendToOriginalChannel = !bSendToOriginalChannel; }
 
     void log ( ofLogLevel level, const std::string& module, const std::string& message ); //override
 };

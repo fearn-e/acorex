@@ -39,6 +39,8 @@ public:
     //void dragEvent ( ofDragInfo dragInfo );
     //void gotMessage ( ofMessage msg );
 
+    void KeyEvent ( ofKeyEventArgs& args );
+
 private:
     void AddListeners ( );
     void RemoveListeners ( );

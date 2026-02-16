@@ -17,6 +17,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "ofApp.h"
 
 #include "Utilities/TemporaryDefaults.h"
+#include "Utilities/TemporaryKeybinds.h"
 
 ofApp::ofApp ( ) :
     bListenersAdded ( false )
@@ -87,15 +88,6 @@ void ofApp::exit ( )
     mExplorerMenu.Exit ( );
 }
 
-void ofApp::windowResized ( int w, int h )
-{
-    mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout->getTopBarHeight ( ) / 4 );
-    mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout->getTopBarHeight ( ) / 4 );
-    mDPIToggle.setPosition ( ofGetWidth ( ) - mLayout->getTopBarButtonWidth ( ) - 5, mLayout->getTopBarHeight ( ) / 4 );
-
-    mExplorerMenu.WindowResized ( );
-}
-
 void ofApp::AddListeners ( )
 {
     if ( bListenersAdded ) { return; }
@@ -103,6 +95,9 @@ void ofApp::AddListeners ( )
     mAnalyseToggle.addListener ( this, &ofApp::AnalyseToggled );
     mExploreToggle.addListener ( this, &ofApp::ExploreToggled );
     mDPIToggle.addListener ( this, &ofApp::DPIToggled );
+
+    ofAddListener ( ofEvents ( ).keyReleased, this, &ofApp::KeyEvent );
+
     bListenersAdded = true;
 }
 
@@ -113,7 +108,31 @@ void ofApp::RemoveListeners ( )
     mAnalyseToggle.removeListener ( this, &ofApp::AnalyseToggled );
     mExploreToggle.removeListener ( this, &ofApp::ExploreToggled );
     mDPIToggle.removeListener ( this, &ofApp::DPIToggled );
+
+    ofRemoveListener ( ofEvents ( ).keyReleased, this, &ofApp::KeyEvent );
+
     bListenersAdded = false;
+}
+
+void ofApp::windowResized ( int w, int h )
+{
+    mAnalyseToggle.setPosition ( ofGetWidth ( ) / 2 - 5 - mAnalyseToggle.getWidth ( ), mLayout->getTopBarHeight ( ) / 4 );
+    mExploreToggle.setPosition ( ofGetWidth ( ) / 2 + 5, mLayout->getTopBarHeight ( ) / 4 );
+    mDPIToggle.setPosition ( ofGetWidth ( ) - mLayout->getTopBarButtonWidth ( ) - 5, mLayout->getTopBarHeight ( ) / 4 );
+
+    mExplorerMenu.WindowResized ( );
+}
+
+void ofApp::KeyEvent ( ofKeyEventArgs& args )
+{
+    if ( args.type == ofKeyEventArgs::Released )
+    {
+        if ( args.key == ACOREX_KEYBIND_LOG_TOGGLE_TERMINAL_OUTPUT )
+        {
+            mLoggerChannel->ToggleSendToOriginalChannel ( );
+            ofLogNotice ( "Logging" ) << "Toggled terminal output.";
+        }
+    }
 }
 
 void ofApp::InitialiseUI ( )
