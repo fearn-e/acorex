@@ -29,7 +29,7 @@ using namespace Acorex;
 
 Explorer::LiveView::LiveView ( )
     : bListenersAdded ( false ),
-    bDebug ( false ), bDraw ( false ), b3D ( true ), bColorFullSpectrum ( false ),
+    bDebug ( false ), bUserPaused ( false ), bDraw ( false ), b3D ( true ), bColorFullSpectrum ( false ),
     mKeyboardMoveState { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // W, A, S, D, R, F, Q, E, Z, X
     mCamMoveSpeedScaleAdjusted ( SpaceDefs::mCamMoveSpeed ),
     deltaTime ( 0.1f ), lastUpdateTime ( 0 ),
