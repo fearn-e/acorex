@@ -333,6 +333,8 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
                                                     int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed,
                                                     int minTimeDiffSameFile, int remainingSamplesRequired, const Utilities::AudioData& audioSet, size_t hopSize )
 {
+    if ( !bTrained ) { return false; }
+
     if ( maxAllowedDistanceSpaceX1000 == 0 ) { return false; }
 
     if ( mPointPickerMutex.try_lock ( ) )
