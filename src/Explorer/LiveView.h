@@ -96,6 +96,15 @@ public:
     void MouseEvent ( ofMouseEventArgs& args );
 
 private:
+    //temp while testing new playhead drawing - to sort properly
+
+    bool bDrawAxes = false;
+    bool bDrawPlayheadColorTrails = true;
+
+    std::vector<Utilities::VisualPlayheadTrail> mPlayheadTrails;
+
+    //end temp
+
     bool bListenersAdded;
 
     bool bDebug;

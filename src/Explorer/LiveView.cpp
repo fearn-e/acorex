@@ -25,6 +25,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofEvents.h>
 #include <random>
 
+#define TEMPORARY_ACOREX_VISUAL_TRAIL_FADE_UPDATE_INTERVAL 4
+#define TEMPORARY_ACOREX_VISUAL_TRAIL_MAX_LENGTH 20
+
 using namespace Acorex;
 
 Explorer::LiveView::LiveView ( )
@@ -198,6 +201,8 @@ void Explorer::LiveView::UpdatePlayheads ( )
                 j--;
             }
 
+            std::find_if ( mPlayheadTrails.begin ( ), mPlayheadTrails.end ( ), [ this, i ] ( Utilities::VisualPlayheadTrail& trail ) { return trail.playheadID == mPlayheads[i].playheadID; } )->Kill ( );
+
             mPlayheads.erase ( mPlayheads.begin ( ) + i );
             i--;
         }
@@ -212,7 +217,9 @@ void Explorer::LiveView::UpdatePlayheads ( )
             ofColor color = it->color;
             ofRectangle rect = it->panelRect;
             bool highlight = it->highlight;
+
             *it = playheadUpdates[i];
+
             it->color = color;
             it->panelRect = rect;
             it->highlight = highlight;
@@ -222,11 +229,16 @@ void Explorer::LiveView::UpdatePlayheads ( )
             ofLogNotice ( "LiveView" ) << "Playhead " << playheadUpdates[i].playheadID << " added";
 
             mPlayheads.push_back ( playheadUpdates[i] );
+
             int rectWidth = ofGetWidth ( ) / 10; int rectSpacing = ofGetWidth ( ) / 100; int rectHeight = ofGetHeight ( ) / 10;
             std::random_device rd;
             std::mt19937 gen ( rd ( ) );
             std::uniform_int_distribution<> dis ( 0, 255 );
-            mPlayheads.back ( ).color = ofColor::fromHsb ( dis ( gen ), 255, 255 );
+            ofColor randomPlayheadColor = ofColor::fromHsb ( dis ( gen ), 255, 255 );
+
+            mPlayheadTrails.push_back ( Utilities::VisualPlayheadTrail ( playheadUpdates[i].playheadID, randomPlayheadColor, TEMPORARY_ACOREX_VISUAL_TRAIL_MAX_LENGTH, TEMPORARY_ACOREX_VISUAL_TRAIL_FADE_UPDATE_INTERVAL ) );
+
+            mPlayheads.back ( ).color = randomPlayheadColor;
             mPlayheads.back ( ).panelRect = ofRectangle (	rectSpacing * mPlayheads.size ( ) + rectWidth * ( mPlayheads.size ( ) - 1 ),
                                                             ofGetHeight ( ) - rectHeight - 5,
                                                             rectWidth,
@@ -241,6 +253,28 @@ void Explorer::LiveView::UpdatePlayheads ( )
         playhead.position[0] = mCorpusMesh[playhead.fileIndex].getVertex ( timeIndex ).x;
         playhead.position[1] = mCorpusMesh[playhead.fileIndex].getVertex ( timeIndex ).y;
         playhead.position[2] = mCorpusMesh[playhead.fileIndex].getVertex ( timeIndex ).z;
+    }
+
+    // add new points to the playhead trails
+    for ( auto& trail : mPlayheadTrails )
+    {
+        auto it = std::find_if ( mPlayheads.begin ( ), mPlayheads.end ( ), [ &trail ] ( Utilities::VisualPlayhead& playhead ) { return playhead.playheadID == trail.playheadID; } );
+        if ( it != mPlayheads.end ( ) )
+        {
+            ofColor newColor = mCorpusMesh[it->fileIndex].getColor ( it->sampleIndex / mRawView->GetHopSize ( ) );
+            trail.AddTrailPoint ( it->fileIndex, it->sampleIndex / mRawView->GetHopSize ( ), glm::vec3 ( it->position[0], it->position[1], it->position[2] ), newColor );
+        }
+    }
+
+    // update playhead trails and remove any that have finished fading
+    int currentTime = ofGetElapsedTimeMillis ( );
+    for ( int i = 0; i < mPlayheadTrails.size ( ); i++ )
+    {
+        if ( mPlayheadTrails[i].Update ( currentTime ) )
+        {
+            mPlayheadTrails.erase ( mPlayheadTrails.begin ( ) + i );
+            i--;
+        }
     }
 }
 
@@ -258,6 +292,7 @@ void Explorer::LiveView::Draw ( )
     mCamera->begin ( );
 
     // Draw Axis ------------------------------
+    if ( bDrawAxes )
     {
         ofSetColor ( 255, 255, 255 );
         if ( mDisabledAxis != Utilities::Axis::X ) { ofDrawLine ( { SpaceDefs::mSpaceMin, 0, 0 }, { SpaceDefs::mSpaceMax, 0, 0 } ); }
@@ -269,53 +304,89 @@ void Explorer::LiveView::Draw ( )
         if ( mDisabledAxis != Utilities::Axis::Z ) { ofDrawBitmapString ( zLabel, { 0, 0, SpaceDefs::mSpaceMax } ); }
     }
 
-    // Draw points ------------------------------
+    // Draw points, tails, playheads ------------------------------
     {
-        if ( mPointPicker->GetNearestMousePointFile ( ) == -1 )
+        if ( bDrawPlayheadColorTrails )
         {
-            for ( int file = 0; file < mCorpusMesh.size ( ); file++ )
+            //for ( int file = 0; file < mTimeCorpus.size ( ); file++ )
+            //{
+            //    mTimeCorpus[file].disableColors ( );
+            //    ofSetColor ( 255, 255, 255, 5 );
+            //    mTimeCorpus[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
+            //    mTimeCorpus[file].draw ( );
+            //    mTimeCorpus[file].setMode ( OF_PRIMITIVE_POINTS );
+            //    mTimeCorpus[file].draw ( );
+            //}
+
+            //ofDisableDepthTest ( );
+            //ofDisableAlphaBlending ( );
+
+            for ( auto& trail : mPlayheadTrails )
             {
-                mCorpusMesh[file].enableColors ( );
-                mCorpusMesh[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
-                mCorpusMesh[file].draw ( );
-                mCorpusMesh[file].setMode ( OF_PRIMITIVE_POINTS );
-                mCorpusMesh[file].draw ( );
+                trail.Draw ( );
             }
+
+            for ( int i = 0; i < mPlayheads.size ( ); i++ )
+            {
+                ofColor color = mPlayheads[i].color; float size = 50;
+                if ( mPlayheads[i].highlight ) { color = { 255, 255, 255, 255 }; size = 100; }
+
+                ofSetColor ( color );
+                glm::vec3 position = { mPlayheads[i].position[0], mPlayheads[i].position[1], mPlayheads[i].position[2] };
+                ofDrawSphere ( position, size );
+            }
+
+            //ofEnableAlphaBlending ( );
+            //ofEnableDepthTest ( );
         }
         else
         {
-            for ( int file = 0; file < mCorpusMesh.size ( ); file++ )
+            if ( mPointPicker->GetNearestMousePointFile ( ) == -1 )
             {
-                if ( file == mPointPicker->GetNearestMousePointFile ( ) ) { continue; }
-                mCorpusMesh[file].disableColors ( );
-                ofSetColor ( 255, 255, 255, 25 );
-                mCorpusMesh[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
-                mCorpusMesh[file].draw ( );
-                mCorpusMesh[file].setMode ( OF_PRIMITIVE_POINTS );
-                mCorpusMesh[file].draw ( );
+                for ( int file = 0; file < mCorpusMesh.size ( ); file++ )
+                {
+                    mCorpusMesh[file].enableColors ( );
+                    mCorpusMesh[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
+                    mCorpusMesh[file].draw ( );
+                    mCorpusMesh[file].setMode ( OF_PRIMITIVE_POINTS );
+                    mCorpusMesh[file].draw ( );
+                }
+            }
+            else
+            {
+                for ( int file = 0; file < mCorpusMesh.size ( ); file++ )
+                {
+                    if ( file == mPointPicker->GetNearestMousePointFile ( ) ) { continue; }
+                    mCorpusMesh[file].disableColors ( );
+                    ofSetColor ( 255, 255, 255, 25 );
+                    mCorpusMesh[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
+                    mCorpusMesh[file].draw ( );
+                    mCorpusMesh[file].setMode ( OF_PRIMITIVE_POINTS );
+                    mCorpusMesh[file].draw ( );
+                }
+
+                mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].enableColors ( );
+                mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_LINE_STRIP );
+                mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].draw ( );
+                mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_POINTS );
+                mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].draw ( );
             }
 
-            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].enableColors ( );
-            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_LINE_STRIP );
-            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].draw ( );
-            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_POINTS );
-            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].draw ( );
-        }
+            for ( int i = 0; i < mPlayheads.size ( ); i++ )
+            {
+                ofDisableDepthTest ( );
+                ofDisableAlphaBlending ( );
 
-        for ( int i = 0; i < mPlayheads.size ( ); i++ )
-        {
-            ofDisableDepthTest ( );
-            ofDisableAlphaBlending ( );
+                ofColor color = mPlayheads[i].color; float size = 50;
+                if ( mPlayheads[i].highlight ) { color = { 255, 255, 255, 255 }; size = 100; }
 
-            ofColor color = mPlayheads[i].color; float size = 50;
-            if ( mPlayheads[i].highlight ) { color = { 255, 255, 255, 255 }; size = 100; }
+                ofSetColor ( color );
+                glm::vec3 position = { mPlayheads[i].position[0], mPlayheads[i].position[1], mPlayheads[i].position[2] };
+                ofDrawSphere ( position, size );
 
-            ofSetColor ( color );
-            glm::vec3 position = { mPlayheads[i].position[0], mPlayheads[i].position[1], mPlayheads[i].position[2] };
-            ofDrawSphere ( position, size );
-
-            ofEnableAlphaBlending ( );
-            ofEnableDepthTest ( );
+                ofEnableAlphaBlending ( );
+                ofEnableDepthTest ( );
+            }
         }
     }
 
