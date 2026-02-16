@@ -108,12 +108,11 @@ ofColor Utilities::LogDisplay::getLevelColor ( ofLogLevel level )
 {
     switch ( level ) // TODO - move into InterfaceDefs.h
     {
-    case OF_LOG_VERBOSE:        return ofColor ( 130, 130, 160 ); // Dark grey
-    case OF_LOG_NOTICE:         return ofColor ( 200, 200, 200 ); // Grey
+    case OF_LOG_VERBOSE:        return ofColor ( 130, 130, 160 ); // Blueish dark grey
+    case OF_LOG_NOTICE:         return ofColor ( 190, 190, 210 ); // Blueish grey
     case OF_LOG_WARNING:        return ofColor ( 240, 240, 10  ); // Yellow
     case OF_LOG_ERROR:          return ofColor ( 240, 10,  10  ); // Red
     case OF_LOG_FATAL_ERROR:    return ofColor ( 240, 10,  160 ); // Magenta
-    case OF_LOG_SILENT:         return ofColor ( 130, 130, 130 ); // Dark grey blue
     default:                    return ofColor ( 130, 130, 130 ); // Dark grey
     }
 }
