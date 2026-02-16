@@ -288,8 +288,8 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utilities::ExploreSet
     mJumpSameFileMinTimeDiffSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Jump Chance Slider
-    mMainPanel.add ( mCrossoverJumpChanceSlider.setup ( "Crossover Jump Chance", settings.GetCrossoverJumpChance ( ), 0.0, 1.0 ) );
-    mCrossoverJumpChanceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mMainPanel.add ( mCrossoverJumpChanceSliderX1000.setup ( "Crossover Jump Chance", settings.GetCrossoverJumpChanceX1000 ( ), 0, 1000 ) );
+    mCrossoverJumpChanceSliderX1000.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Crossfade Max Length Slider
     mMainPanel.add ( mCrossfadeSampleLengthSlider.setup ( "Crossfade Sample Length", settings.GetCrossfadeSampleLengthLimitedByHopSize ( ), 1, settings.GetHopSize ( ) ) );
@@ -306,8 +306,8 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utilities::ExploreSet
     // 
     
     // Global Volume Slider
-    mMainPanel.add ( mVolumeSlider.setup ( "Volume", settings.GetVolume ( ), 0.0, 1.0 ) );
-    mVolumeSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mMainPanel.add ( mVolumeSliderX1000.setup ( "Volume", settings.GetVolumeX1000 ( ), 0, 1000 ) );
+    mVolumeSliderX1000.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Dynamic Panning Dimension Dropdown
     mDimensionDropdownDynamicPan.reset ( );
@@ -322,8 +322,8 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utilities::ExploreSet
     mDimensionDropdownDynamicPan->setSelectedValueByName ( settings.GetDimensionDynamicPan ( ), false );
 
     // Global Panning Strength Slider
-    mMainPanel.add ( mPanningStrengthSlider.setup ( "Panning Width", settings.GetPanningStrength ( ), 0.0, 1.0 ) );
-    mPanningStrengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mMainPanel.add ( mPanningStrengthSliderX1000.setup ( "Panning Width", settings.GetPanningStrengthX1000 ( ), 0, 1000 ) );
+    mPanningStrengthSliderX1000.setBackgroundColor ( mColors.interfaceBackgroundColor );
 }
 
 void ExplorerMenu::SetupPanelSectionAudioManager ( )
@@ -433,14 +433,14 @@ void ExplorerMenu::RefreshFullPanelUI ( )
     mLoopPlayheadsToggle.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     mJumpSameFileAllowedToggle.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     mJumpSameFileMinTimeDiffSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
-    mCrossoverJumpChanceSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mCrossoverJumpChanceSliderX1000.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     mCrossfadeSampleLengthSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     mMaxJumpDistanceSpaceSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     mMaxJumpTargetsSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     
-    mVolumeSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mVolumeSliderX1000.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     mDimensionDropdownDynamicPan->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
-    mPanningStrengthSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mPanningStrengthSliderX1000.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
 
     // for split later: audio manager panel
     mApiDropdown->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
@@ -492,15 +492,15 @@ void ExplorerMenu::AddListenersCorpusControls ( )
     mLoopPlayheadsToggle.addListener ( this, &ExplorerMenu::ToggleLoopPlayheadsListener );
     mJumpSameFileAllowedToggle.addListener ( this, &ExplorerMenu::ToggleJumpSameFileAllowedListener );
     mJumpSameFileMinTimeDiffSlider.addListener ( this, &ExplorerMenu::SetJumpSameFileMinTimeDiffListener );
-    mCrossoverJumpChanceSlider.addListener ( this, &ExplorerMenu::SetCrossoverJumpChanceListener );
+    mCrossoverJumpChanceSliderX1000.addListener ( this, &ExplorerMenu::SetCrossoverJumpChanceX1000Listener );
     mCrossfadeSampleLengthSlider.addListener ( this, &ExplorerMenu::SetCrossfadeSampleLengthListener );
     mMaxJumpDistanceSpaceSlider.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpaceListener );
     mMaxJumpTargetsSlider.addListener ( this, &ExplorerMenu::SetMaxJumpTargetsListener );
 
-    mVolumeSlider.addListener ( this, &ExplorerMenu::SetVolumeListener );
+    mVolumeSliderX1000.addListener ( this, &ExplorerMenu::SetVolumeX1000Listener );
 
     mDimensionDropdownDynamicPan->addListener ( this, &ExplorerMenu::SetDimensionDynamicPanListener );
-    mPanningStrengthSlider.addListener ( this, &ExplorerMenu::SetPanningStrengthListener );
+    mPanningStrengthSliderX1000.addListener ( this, &ExplorerMenu::SetPanningStrengthX1000Listener );
 
     ofAddListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
 
@@ -521,15 +521,15 @@ void ExplorerMenu::RemoveListenersCorpusControls ( )
     mLoopPlayheadsToggle.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheadsListener );
     mJumpSameFileAllowedToggle.removeListener ( this, &ExplorerMenu::ToggleJumpSameFileAllowedListener );
     mJumpSameFileMinTimeDiffSlider.removeListener ( this, &ExplorerMenu::SetJumpSameFileMinTimeDiffListener );
-    mCrossoverJumpChanceSlider.removeListener ( this, &ExplorerMenu::SetCrossoverJumpChanceListener );
+    mCrossoverJumpChanceSliderX1000.removeListener ( this, &ExplorerMenu::SetCrossoverJumpChanceX1000Listener );
     mCrossfadeSampleLengthSlider.removeListener ( this, &ExplorerMenu::SetCrossfadeSampleLengthListener );
     mMaxJumpDistanceSpaceSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpaceListener );
     mMaxJumpTargetsSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpTargetsListener );
 
-    mVolumeSlider.removeListener ( this, &ExplorerMenu::SetVolumeListener );
+    mVolumeSliderX1000.removeListener ( this, &ExplorerMenu::SetVolumeX1000Listener );
 
     mDimensionDropdownDynamicPan->removeListener ( this, &ExplorerMenu::SetDimensionDynamicPanListener );
-    mPanningStrengthSlider.removeListener ( this, &ExplorerMenu::SetPanningStrengthListener );
+    mPanningStrengthSliderX1000.removeListener ( this, &ExplorerMenu::SetPanningStrengthX1000Listener );
 
     ofRemoveListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
 
@@ -734,14 +734,14 @@ void ExplorerMenu::PropogateCorpusSettings ( const Utilities::ExploreSettings& s
     ToggleLoopPlayheads ( settings.GetLoopPlayheads ( ) );
     ToggleJumpSameFileAllowed ( settings.GetJumpSameFileAllowed ( ) );
     SetJumpSameFileMinTimeDiff ( settings.GetJumpSameFileMinTimeDiff ( ) );
-    SetCrossoverJumpChance ( settings.GetCrossoverJumpChance ( ) );
+    SetCrossoverJumpChanceX1000 ( settings.GetCrossoverJumpChanceX1000 ( ) );
     SetCrossfadeSampleLength ( settings.GetCrossfadeSampleLengthLimitedByHopSize ( ) );
     SetMaxJumpDistanceSpace ( settings.GetMaxJumpDistanceSpace ( ) );
     SetMaxJumpTargets ( settings.GetMaxJumpTargets ( ) );
 
-    SetVolume ( settings.GetVolume ( ) );
+    SetVolumeX1000 ( settings.GetVolumeX1000 ( ) );
     SetDimensionDynamicPan ( settings.GetDimensionDynamicPan ( ) );
-    SetPanningStrength ( settings.GetPanningStrength ( ) );
+    SetPanningStrengthX1000 ( settings.GetPanningStrengthX1000 ( ) );
 }
 
 // Listener Functions --------------------------
@@ -789,9 +789,9 @@ void ExplorerMenu::SetJumpSameFileMinTimeDiff ( const int& timeDiff )
     mLiveView.GetAudioPlayback ( )->SetJumpSameFileMinTimeDiff ( timeDiff );
 }
 
-void ExplorerMenu::SetCrossoverJumpChance ( const float& jumpChance )
+void ExplorerMenu::SetCrossoverJumpChanceX1000 ( const int& jumpChanceX1000 )
 {
-    mLiveView.GetAudioPlayback ( )->SetCrossoverJumpChance ( (int)(jumpChance * 1000) );
+    mLiveView.GetAudioPlayback ( )->SetCrossoverJumpChanceX1000 ( jumpChanceX1000 );
 }
 
 void ExplorerMenu::SetCrossfadeSampleLength ( const int& length )
@@ -809,9 +809,9 @@ void ExplorerMenu::SetMaxJumpTargets ( const int& targets )
     mLiveView.GetAudioPlayback ( )->SetMaxJumpTargets ( targets );
 }
 
-void ExplorerMenu::SetVolume( const float& volume)
+void ExplorerMenu::SetVolumeX1000 ( const int& volumeX1000 )
 {
-    mLiveView.GetAudioPlayback ( )->SetVolume ( (int)(volume * 1000) );
+    mLiveView.GetAudioPlayback ( )->SetVolumeX1000 ( volumeX1000 );
 }
 
 void ExplorerMenu::SetDimensionDynamicPan ( const string& dimension )
@@ -819,9 +819,9 @@ void ExplorerMenu::SetDimensionDynamicPan ( const string& dimension )
     SetDimension ( dimension, Utilities::Axis::DYNAMIC_PAN );
 }
 
-void ExplorerMenu::SetPanningStrength ( const float& strength )
+void ExplorerMenu::SetPanningStrengthX1000 ( const int& strengthX1000 )
 {
-    mLiveView.GetAudioPlayback ( )->SetPanningStrength ( (int)(strength * 1000) );
+    mLiveView.GetAudioPlayback ( )->SetPanningStrengthX1000 ( strengthX1000 );
 }
 
 void ExplorerMenu::MouseReleased ( ofMouseEventArgs& args )

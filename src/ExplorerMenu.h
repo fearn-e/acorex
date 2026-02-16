@@ -21,6 +21,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Utilities/AudioSettingsManager.h"
 #include "Utilities/Data.h"
 #include "Utilities/InterfaceDefs.h"
+#include "Utilities/ofxPercentSlider.h"
 
 #include <ofxGui.h>
 #include <ofxDropdown.h>
@@ -105,14 +106,14 @@ private:
     void ToggleLoopPlayheads ( const bool& loop );              void ToggleLoopPlayheadsListener ( bool& loop ) { ToggleLoopPlayheads ( loop ); }
     void ToggleJumpSameFileAllowed ( const bool& allowed );     void ToggleJumpSameFileAllowedListener ( bool& allowed ) { ToggleJumpSameFileAllowed ( allowed ); }
     void SetJumpSameFileMinTimeDiff ( const int& timeDiff );    void SetJumpSameFileMinTimeDiffListener ( int& timeDiff ) { SetJumpSameFileMinTimeDiff ( timeDiff ); }
-    void SetCrossoverJumpChance ( const float& jumpChance );    void SetCrossoverJumpChanceListener ( float& jumpChance ) { SetCrossoverJumpChance ( jumpChance ); }
+    void SetCrossoverJumpChanceX1000 ( const int& jumpChance ); void SetCrossoverJumpChanceX1000Listener ( int& jumpChanceX1000 ) { SetCrossoverJumpChanceX1000 ( jumpChanceX1000 ); }
     void SetCrossfadeSampleLength ( const int& length );        void SetCrossfadeSampleLengthListener ( int& length ) { SetCrossfadeSampleLength ( length ); }
     void SetMaxJumpDistanceSpace ( const float& distance );     void SetMaxJumpDistanceSpaceListener ( float& distance ) { SetMaxJumpDistanceSpace ( distance ); }
     void SetMaxJumpTargets ( const int& targets );              void SetMaxJumpTargetsListener ( int& targets ) { SetMaxJumpTargets ( targets ); }
 
-    void SetVolume( const float& volume );                      void SetVolumeListener ( float& volume ) { SetVolume ( volume ); }
+    void SetVolumeX1000 ( const int& volumeX1000 );             void SetVolumeX1000Listener ( int& volumeX1000 ) { SetVolumeX1000 ( volumeX1000 ); }
     void SetDimensionDynamicPan ( const string& dimension );    void SetDimensionDynamicPanListener ( string& dimension ) { SetDimensionDynamicPan ( dimension ); }
-    void SetPanningStrength ( const float& strength );          void SetPanningStrengthListener ( float& strength ) { SetPanningStrength ( strength ); }
+    void SetPanningStrengthX1000 ( const int& strengthX1000 );  void SetPanningStrengthX1000Listener ( int& strengthX1000 ) { SetPanningStrengthX1000 ( strengthX1000 ); }
 
     void MouseReleased ( ofMouseEventArgs& args );
 
@@ -159,15 +160,14 @@ private:
     ofxToggle mLoopPlayheadsToggle;
     ofxToggle mJumpSameFileAllowedToggle;
     ofxIntSlider mJumpSameFileMinTimeDiffSlider;
-    ofxFloatSlider mCrossoverJumpChanceSlider;
+    ofxPercentSlider mCrossoverJumpChanceSliderX1000;
     ofxIntSlider mCrossfadeSampleLengthSlider;
     ofxFloatSlider mMaxJumpDistanceSpaceSlider;
     ofxIntSlider mMaxJumpTargetsSlider;
 
-    ofxFloatSlider mVolumeSlider;
-
+    ofxPercentSlider mVolumeSliderX1000;
     unique_ptr<ofxDropdown> mDimensionDropdownDynamicPan;
-    ofxFloatSlider mPanningStrengthSlider;
+    ofxPercentSlider mPanningStrengthSliderX1000;
 
     unique_ptr<ofxDropdown> mApiDropdown;
     unique_ptr<ofxDropdown> mOutDeviceDropdown;

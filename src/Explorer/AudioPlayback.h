@@ -59,13 +59,13 @@ public:
     void SetLoopPlayheads ( bool loop ) { mLoopPlayheads = loop; }
     void SetJumpSameFileAllowed ( bool allowed ) { mJumpSameFileAllowed = allowed; }
     void SetJumpSameFileMinTimeDiff ( int timeDiff ) { mJumpSameFileMinTimeDiff = timeDiff; }
-    void SetCrossoverJumpChance ( int jumpsInAThousand ) { mCrossoverJumpChanceX1000 = jumpsInAThousand; }
+    void SetCrossoverJumpChanceX1000 ( int jumpsInAThousand ) { mCrossoverJumpChanceX1000 = jumpsInAThousand; }
     void SetCrossfadeSampleLength ( int length ) { mCrossfadeSampleLength = length; }
     void SetMaxJumpDistanceSpace ( int distanceX1000 ) { mMaxJumpDistanceSpaceX1000 = distanceX1000; }
     void SetMaxJumpTargets ( int targets ) { mMaxJumpTargets = targets; }
-    void SetVolume(int volumeX1000) { mVolumeX1000 = volumeX1000; }
+    void SetVolumeX1000 (int volumeX1000) { mVolumeX1000 = volumeX1000; }
     void SetDynamicPan ( bool enabled, int dimensionIndex ) { mDynamicPanEnabled = false; mDynamicPanDimensionIndex = dimensionIndex; mDynamicPanEnabled = enabled; }
-    void SetPanningStrength ( int panStrengthX1000 ) { mPanningStrengthX1000 = panStrengthX1000; }
+    void SetPanningStrengthX1000 ( int panStrengthX1000 ) { mPanningStrengthX1000 = panStrengthX1000; }
 
 private:
     void FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utilities::AudioPlayhead* playhead, bool outBufferFull );

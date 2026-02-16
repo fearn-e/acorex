@@ -78,7 +78,7 @@
     </ClCompile>
     <ClCompile Include="src\Explorer\PointPicker.cpp">
       <Filter>src\Explorer</Filter>
-    </ClCompile>    
+    </ClCompile>
     <ClCompile Include="src\Utilities\DatasetConversion.cpp">
       <Filter>src\Utilities</Filter>
     </ClCompile>
@@ -89,6 +89,9 @@
       <Filter>src\Explorer</Filter>
     </ClCompile>
     <ClCompile Include="src\Utilities\AudioSettingsManager.cpp">
+      <Filter>src\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\ofxPercentSlider.cpp">
       <Filter>src\Utilities</Filter>
     </ClCompile>
   </ItemGroup>
@@ -249,6 +252,9 @@
       <Filter>src\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="src\Utilities\TemporaryKeybinds.h">
+      <Filter>src\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utilities\ofxPercentSlider.h">
       <Filter>src\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
