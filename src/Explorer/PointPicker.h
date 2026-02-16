@@ -26,6 +26,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofEvents.h>
 #include <mutex>
 #include <atomic>
+#include <random>
 
 namespace Acorex {
 namespace Explorer {
@@ -48,6 +49,7 @@ public:
     bool FindNearestToPosition (	const glm::vec3& position, Utilities::PointFT& nearestPoint, Utilities::PointFT currentPoint, 
                                     int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed, 
                                     int minTimeDiffSameFile, int remainingSamplesRequired, const Utilities::AudioData& audioSet, size_t hopSize );
+    void FindRandom ( );
 
     // Setters & Getters ----------------------------
 
@@ -118,6 +120,10 @@ private:
     // Thread safety --------------------------------
 
     std::mutex mPointPickerMutex;
+
+    // Randomness -----------------------------------
+
+    std::mt19937 mRandomGen;
 };
 
 } // namespace Explorer

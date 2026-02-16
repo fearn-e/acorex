@@ -33,7 +33,7 @@ Explorer::PointPicker::PointPicker ( )
         maxAllowedDistanceFar ( 0.05 ), maxAllowedDistanceNear ( 0.01 ),
         mNearestPointFile ( -1 ), mNearestPointTime ( -1 )
 {
-
+    mRandomGen = std::mt19937 ( std::random_device ( ) () );
 }
 
 void Explorer::PointPicker::Initialise ( const Utilities::DataSet& dataset, const Utilities::DimensionBounds& dimensionBounds )
@@ -423,12 +423,27 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
     return false;
 }
 
+void Explorer::PointPicker::FindRandom ( )
+{
+    if ( !bTrained ) { return; }
+
+    std::uniform_int_distribution<int> dist ( 0, (int)mCorpusFileLookUp.size ( ) - 1 );
+    int randomPoint = dist ( mRandomGen );
+
+    mNearestPoint = randomPoint;
+    mNearestDistance = 0.0;
+
+    mNearestPointFile = mCorpusFileLookUp[randomPoint];
+    mNearestPointTime = mCorpusTimeLookUp[randomPoint];
+}
+
 void Explorer::PointPicker::KeyEvent ( ofKeyEventArgs& args )
 {
     if ( args.type == ofKeyEventArgs::Type::Released )
     {
         if ( args.key == ACOREX_KEYBIND_TOGGLE_DEBUG_VIEW ) { bDebug = !bDebug; }
         else if ( args.key == ACOREX_KEYBIND_TOGGLE_POINT_PICKER ) { bPicker = !bPicker; }
+        else if ( args.key == ACOREX_KEYBIND_PICK_RANDOM_POINT ) { FindRandom ( ); }
     }
 }
 
