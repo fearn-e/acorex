@@ -151,19 +151,19 @@ void Utilities::LogDisplay::KeyEvent ( ofKeyEventArgs& args )
         if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_SILENT )
         {
             ofSetLogLevel ( OF_LOG_NOTICE );
-            ofLogNotice ( "Logging" ) << "Silent log level set";
+            ofLogNotice ( "Logging" ) << "All logs disabled";
             ofSetLogLevel ( OF_LOG_SILENT );
         }
         else if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_WARNING_ERROR )
         {
             ofSetLogLevel ( OF_LOG_NOTICE ); //TODO - this is a bodge
-            ofLogNotice ( "Logging" ) << "Warning log level set";
+            ofLogNotice ( "Logging" ) << "Warning and error logs only";
             ofSetLogLevel ( OF_LOG_WARNING );
         }
         else if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_NOTICE )
         {
             ofSetLogLevel ( OF_LOG_NOTICE );
-            ofLogNotice ( "Logging" ) << "Notice log level set";
+            ofLogNotice ( "Logging" ) << "Regular log level set";
         }
         else if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_VERBOSE )
         {
