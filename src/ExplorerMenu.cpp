@@ -109,8 +109,8 @@ void ExplorerMenu::Draw ( )
                 fileName += "...";
             }
             ofDrawBitmapString ( "File: " + fileName, playhead.panelRect.x + 5, playhead.panelRect.y + 30 );
-            // draw sample index in the top left
-            ofDrawBitmapString ( "Samp: " + ofToString ( playhead.sampleIndex ), playhead.panelRect.x + 5, playhead.panelRect.y + 45 );
+            ofDrawBitmapString ( "Point: " + ofToString ( playhead.sampleIndex / mRawView->GetHopSize ( ) ), playhead.panelRect.x + 5, playhead.panelRect.y + 45 );   
+            ofDrawBitmapString ( "Samp: " + ofToString ( playhead.sampleIndex ), playhead.panelRect.x + 5, playhead.panelRect.y + 60 );
 
             // draw another smaller rectangle in the top right corner of the panel
             int smallRectSize = ( playhead.panelRect.width + playhead.panelRect.height ) / 10;
