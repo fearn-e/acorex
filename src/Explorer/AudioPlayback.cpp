@@ -455,6 +455,15 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
 void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utilities::AudioPlayhead* playhead, bool outBufferFull )
 {
+    size_t segmentLength = playhead->triggerSamplePoints.front ( ) - playhead->sampleIndex;
+
+    if ( outBufferFull && segmentLength > (outBuffer->getNumFrames ( ) - *outBufferPosition) ) // cut off early if outBuffer is full
+    {
+        segmentLength = outBuffer->getNumFrames ( ) - *outBufferPosition;
+    }
+    
+    if ( segmentLength == 0 ) { return; }
+
     float panGainL = 1.0f, panGainR = 1.0f;
     double panningStrength = (double)mPanningStrengthX1000 / 1000.0;
     if ( mDynamicPanEnabled && panningStrength > 0.0 )
@@ -474,13 +483,6 @@ void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_
 
         panGainL = 1.0f - panningStrength * (1.0f - panGainL);
         panGainR = 1.0f - panningStrength * (1.0f - panGainR);
-    }
-
-    size_t segmentLength = playhead->triggerSamplePoints.front ( ) - playhead->sampleIndex;
-
-    if ( outBufferFull && segmentLength > (outBuffer->getNumFrames ( ) - *outBufferPosition) ) // cut off early if outBuffer is full
-    {
-        segmentLength = outBuffer->getNumFrames ( ) - *outBufferPosition;
     }
 
     for ( size_t i = 0; i < segmentLength; i++ )
