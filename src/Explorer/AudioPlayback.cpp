@@ -521,7 +521,7 @@ void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, 
     *outBufferPosition += crossfadeLength;
 }
 
-bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t sampleIndex )
+bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t timePointIndex )
 {
     if ( bMissingOutputFlag )
     {
@@ -555,6 +555,7 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t sampleIn
 
     if ( mRawView->GetAudioData ( )->loaded[fileIndex] )
     {
+        size_t sampleIndex = timePointIndex * mRawView->GetHopSize ( );
         Utilities::AudioPlayhead newPlayhead ( playheadCounter, fileIndex, sampleIndex );
         playheadCounter++;
 
