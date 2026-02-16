@@ -597,11 +597,11 @@ void ExplorerMenu::OpenCorpus ( )
     {
         initialSettings.SetHopSize ( mRawView->GetHopSize ( ) );
 
-        initialSettings.SetDimensionX ( mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : "None" );
-        initialSettings.SetDimensionY ( mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : "None" );
-        initialSettings.SetDimensionZ ( mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : "None" );
+        initialSettings.SetDimensionX ( mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : DEFAULT_DIMENSION_X );
+        initialSettings.SetDimensionY ( mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : DEFAULT_DIMENSION_Y );
+        initialSettings.SetDimensionZ ( mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : DEFAULT_DIMENSION_Z );
 
-        initialSettings.SetDimensionColor ( mRawView->GetDimensions ( ).size ( ) > 4 ? mRawView->GetDimensions ( )[4] : "None" );
+        initialSettings.SetDimensionColor ( DEFAULT_DIMENSION_COLOR );
         initialSettings.SetColorSpectrum ( DEFAULT_COLOR_SPECTRUM );
 
         initialSettings.SetLoopPlayheads ( DEFAULT_LOOP_PLAYHEADS );
@@ -613,8 +613,7 @@ void ExplorerMenu::OpenCorpus ( )
         initialSettings.SetMaxJumpTargets ( DEFAULT_MAX_JUMP_TARGETS );
 
         initialSettings.SetVolumeX1000 ( DEFAULT_VOLUME_X1000 );
-        int randomPanDimensionIndex = mRawView->GetDimensions ( ).size ( ) > 1 ? ofRandom ( 1, mRawView->GetDimensions ( ).size ( ) - 1 ) : -1;
-        initialSettings.SetDimensionDynamicPan ( randomPanDimensionIndex != -1 ? mRawView->GetDimensions ( )[randomPanDimensionIndex] : "None" );
+        initialSettings.SetDimensionDynamicPan ( DEFAULT_DIMENSION_DYNAMIC_PAN );
         initialSettings.SetPanningStrengthX1000 ( DEFAULT_PANNING_STRENGTH_X1000 );
     }
 

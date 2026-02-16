@@ -11,11 +11,11 @@
 #define DEFAULT_HI_DPI false
 
 //default explorer settings values (could have both default globals an per-corpus "last used")
-#define DEFAULT_DIMENSION_X 0 // these could be set by name in per-corpus settings
-#define DEFAULT_DIMENSION_Y 0
-#define DEFAULT_DIMENSION_Z 0
-#define DEFAULT_DIMENSION_COLOR 0
-#define DEFAULT_DIMENSION_DYNAMIC_PAN 0
+#define DEFAULT_DIMENSION_X "None" // these could be set by name in per-corpus settings
+#define DEFAULT_DIMENSION_Y "None"
+#define DEFAULT_DIMENSION_Z "None"
+#define DEFAULT_DIMENSION_COLOR "Time"
+#define DEFAULT_DIMENSION_DYNAMIC_PAN "Time"
 #define DEFAULT_COLOR_SPECTRUM false
 #define DEFAULT_LOOP_PLAYHEADS true
 #define DEFAULT_JUMP_SAME_FILE_ALLOWED true
