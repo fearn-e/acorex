@@ -118,7 +118,7 @@ bool Utilities::AudioSettingsManager::RefreshDeviceListChanged ( )
 
     if ( !deviceListChanged ) { return false; }
 
-    ofLogNotice ( ) << "AudioSettingsManager::RefreshDeviceListChanged - device list changed, devices found: " << audioDevicesOut[currentApiIndex].size ( ) - 1;
+    ofLogNotice ( "AudioSettingsManager" ) << "Device list changed, devices found: " << audioDevicesOut[currentApiIndex].size ( ) - 1;
 
     bool deviceSet = false;
     deviceSet = FindMatchingDevice ( oldAudioDevicesOut[currentApiIndex][currentAudioDeviceIndex], currentApiIndex, currentAudioDeviceIndex );
@@ -132,7 +132,7 @@ bool Utilities::AudioSettingsManager::ChangeSelectedApi ( size_t newApiIndex )
 {
     if ( newApiIndex >= availablePlatformApis.size ( ) || newApiIndex < 0 )
     {
-        ofLogError ( ) << "AudioSettingsManager::ChangeSelectedApi - apiIndex out of range: " << newApiIndex;
+        ofLogError ( "AudioSettingsManager" ) << "apiIndex out of range: " << newApiIndex;
         currentApiIndex = 0;
         currentAudioDeviceIndex = 0;
         return false;
@@ -151,7 +151,7 @@ bool Utilities::AudioSettingsManager::ChangeSelectedDevice ( size_t newDeviceInd
 {
     if ( newDeviceIndex >= audioDevicesOut[currentApiIndex].size ( ) || newDeviceIndex < 0 )
     {
-        ofLogError ( ) << "AudioSettingsManager::ChangeSelectedDevice - deviceIndex out of range: " << newDeviceIndex;
+        ofLogError ( "AudioSettingsManager" ) << "deviceIndex out of range: " << newDeviceIndex;
         currentAudioDeviceIndex = 0;
         return false;
     }
@@ -194,7 +194,7 @@ bool Utilities::AudioSettingsManager::FindMatchingDevice ( const ofSoundDevice& 
         // TODO - replace with ID matching instead?
         if ( audioDevicesOut[apiIndex][i].name == referenceDevice.name )
         {
-            ofLogNotice ( ) << "AudioSettingsManager::FindMatchingDevice - found matching device: " << referenceDevice.name;
+            ofLogNotice ( "AudioSettingsManager" ) << "Switched to matching device: " << referenceDevice.name;
             matchingDeviceIndex = i;
             return true;
         }
@@ -209,7 +209,7 @@ bool Utilities::AudioSettingsManager::FindDefaultDeviceIndex ( size_t apiIndex, 
     {
         if ( audioDevicesOut[apiIndex][i].isDefaultOutput )
         {
-            ofLogNotice ( ) << "AudioSettingsManager::FindDefaultDeviceIndex - found default device: " << audioDevicesOut[apiIndex][i].name;
+            ofLogNotice ( "AudioSettingsManager" ) << "Switched to default device: " << audioDevicesOut[apiIndex][i].name;
             defaultDeviceIndex = i;
             return true;
         }

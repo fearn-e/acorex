@@ -25,7 +25,7 @@ bool Utilities::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::Re
 {
     if ( !ofFile::doesFileExist ( filename ) )
     {
-        ofLogError ( "GenAnalysis" ) << "input file " << filename << " does not exist";
+        ofLogError ( "AudioFileLoader" ) << "input file " << filename << " does not exist";
         return false;
     }
 
@@ -37,7 +37,7 @@ bool Utilities::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::Re
 
         if ( !file.loaded ( ) )
         {
-            ofLogError ( "GenAnalysis" ) << "input file " << filename << " could not be opened";
+            ofLogError ( "AudioFileLoader" ) << "input file " << filename << " could not be opened";
             return false;
         }
 
@@ -52,7 +52,7 @@ bool Utilities::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::Re
     }
     else
     {
-        ofLogError ( "GenAnalysis" ) << "input file " << filename << " is not valid. Supported file types: mp3, ogg, wav, flac";
+        ofLogError ( "AudioFileLoader" ) << "input file " << filename << " is not valid. Supported file types: mp3, ogg, wav, flac";
         return false;
     }
 

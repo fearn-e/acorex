@@ -689,7 +689,7 @@ int ExplorerMenu::GetDimensionIndex ( std::string& dimension )
             return i;
         }
     }
-    ofLogWarning ( "LiveView" ) << "Dimension " << dimension << " not found";
+    ofLogWarning ( "ExplorerMenu" ) << "Dimension " << dimension << " name not found";
     return -1;
 }
 
