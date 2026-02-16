@@ -22,6 +22,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Utilities/Data.h"
 #include "Utilities/InterfaceDefs.h"
 #include "Utilities/ofxPercentSlider.h"
+#include "Utilities/MIDI.h"
 
 #include <ofxGui.h>
 #include <ofxDropdown.h>
@@ -180,6 +181,7 @@ private:
     Utilities::AudioSettingsManager mAudioSettingsManager;
     Utilities::Colors mColors;
     std::shared_ptr<Utilities::MenuLayout> mLayout;
+    Utilities::MIDI mMIDI;
 };
 
 } // namespace Acorex

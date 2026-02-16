@@ -127,6 +127,9 @@
     <ClCompile Include="..\..\..\addons\ofxMidi\libs\rtmidi\RtMidi.cpp">
       <Filter>addons\ofxMidi\libs</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utilities\MIDI.cpp">
+      <Filter>src\Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -340,6 +343,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\addons\ofxMidi\libs\rtmidi\RtMidi.h">
       <Filter>addons\ofxMidi\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utilities\MIDI.h">
+      <Filter>src\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -48,6 +48,8 @@ void ExplorerMenu::Initialise ( )
     Clear ( );
 
     OpenStartupPanel ( );
+
+    mMIDI.Initialise ( );
 }
 
 void ExplorerMenu::Clear ( )
@@ -125,6 +127,8 @@ void ExplorerMenu::Update ( )
 {
     mLiveView.Update ( );
 
+    mMIDI.Update ( );
+
     if ( ofGetElapsedTimeMillis ( ) - mLastUpdateTime > mSlowUpdateInterval )
     {
         mLastUpdateTime = ofGetElapsedTimeMillis ( );
@@ -149,6 +153,7 @@ void ExplorerMenu::Exit ( )
     RemoveListenersCorpusControls ( );
     RemoveListenersAudioManager ( );
     mLiveView.Exit ( );
+    mMIDI.Exit ( );
 }
 
 // UI Management -------------------------------
