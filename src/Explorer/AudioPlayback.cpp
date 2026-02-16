@@ -53,7 +53,8 @@ bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t buff
     // instead of waiting for the other thread to confirm, just hold until i can grab the mutex that blocks that thread
     // this lets it finish what it's doing, and then i can go ahead
     // alternatively, could combine both to do the fade out effect mentioned above
-    while ( bStreamStarted && !bRestartingAudioFlagConfirmed )
+    size_t startTime = ofGetElapsedTimeMillis ( ); // temporary timeout fix in case of deadlock
+    while ( bStreamStarted && !bRestartingAudioFlagConfirmed && ofGetElapsedTimeMillis ( ) - startTime < 2000 )
     { ofSleepMillis ( 10 ); }
 
     ofSoundStreamSettings settings;
