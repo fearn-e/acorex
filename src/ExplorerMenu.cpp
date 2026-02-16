@@ -593,6 +593,13 @@ void ExplorerMenu::OpenCorpus ( )
         return;
     }
 
+    if ( mRawView->GetDimensions ( ).size ( ) < 2 )
+    {
+        ofLogError ( "ExplorerMenu" ) << "Corpus must have at least 2 dimensions for exploration.";
+        Initialise ( );
+        return;
+    }
+
     Utilities::ExploreSettings initialSettings { };
     {
         initialSettings.SetHopSize ( mRawView->GetHopSize ( ) );
