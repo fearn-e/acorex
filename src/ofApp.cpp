@@ -21,7 +21,13 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 ofApp::ofApp ( ) :
     bListenersAdded ( false )
 {
+    mLogDisplay = std::make_shared<Acorex::Utilities::LogDisplay> ( );
+    mLoggerChannel = std::make_shared<Acorex::Utilities::AcorexLoggerChannel> ( );
+    ofSetLoggerChannel ( mLoggerChannel );
+    mLoggerChannel->SetLogDisplay ( mLogDisplay );
+
     mLayout = std::make_shared<Acorex::Utilities::MenuLayout> ( );
+    mLogDisplay->SetMenuLayout ( mLayout );
     mAnalyserMenu.SetMenuLayout ( mLayout );
     mExplorerMenu.SetMenuLayout ( mLayout );
 }
@@ -42,6 +48,8 @@ void ofApp::setup ( )
 
     InitialiseUI ( );
 
+    mLogDisplay->Initialise ( );
+
     mAnalyserMenu.Initialise ( );
 
     // opens startup panel
@@ -50,11 +58,13 @@ void ofApp::setup ( )
 
 void ofApp::update ( )
 {
+    mLogDisplay->Update ( );
     mExplorerMenu.Update ( );
 }
 
 void ofApp::draw ( )
 {
+    mLogDisplay->Draw ( );
     mAnalyserMenu.Draw ( );
     mExplorerMenu.Draw ( );
 
@@ -72,6 +82,7 @@ void ofApp::draw ( )
 
 void ofApp::exit ( )
 {
+    mLogDisplay->Exit ( );
     mAnalyserMenu.Exit ( );
     mExplorerMenu.Exit ( );
 }

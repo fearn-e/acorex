@@ -19,6 +19,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "AnalyserMenu.h"
 #include "ExplorerMenu.h"
 #include "Utilities/InterfaceDefs.h"
+#include "Utilities/Log.h"
 
 #include <ofMain.h>
 #include <ofxGui.h>
@@ -46,6 +47,9 @@ private:
     void AnalyseToggled ( bool& value );
     void ExploreToggled ( bool& value );
     void DPIToggled ( bool& value );
+
+    std::shared_ptr<Acorex::Utilities::LogDisplay> mLogDisplay;
+    std::shared_ptr<Acorex::Utilities::AcorexLoggerChannel> mLoggerChannel;
 
     Acorex::AnalyserMenu mAnalyserMenu;
     Acorex::ExplorerMenu mExplorerMenu;

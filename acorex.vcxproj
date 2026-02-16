@@ -134,6 +134,7 @@
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSlider.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp" />
+    <ClCompile Include="src\Utilities\Log.cpp" />
     <ClCompile Include="src\Utilities\ofxPercentSlider.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +175,7 @@
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h" />
+    <ClInclude Include="src\Utilities\Log.h" />
     <ClInclude Include="src\Utilities\ofxPercentSlider.h" />
     <ClInclude Include="src\Utilities\TemporaryDefaults.h" />
     <ClInclude Include="src\Utilities\TemporaryKeybinds.h" />

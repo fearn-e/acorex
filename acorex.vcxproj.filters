@@ -94,6 +94,9 @@
     <ClCompile Include="src\Utilities\ofxPercentSlider.cpp">
       <Filter>src\Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utilities\Log.cpp">
+      <Filter>src\Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -255,6 +258,9 @@
       <Filter>src\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="src\Utilities\ofxPercentSlider.h">
+      <Filter>src\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utilities\Log.h">
       <Filter>src\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
