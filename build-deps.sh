@@ -139,6 +139,10 @@ echo "OS discovered as $currentOS"
         echo ""
     fi
 
+    if [ ! -d "ofxMidi" ]; then
+        git clone --depth 1 -b master https://github.com/fearn-e/ofxMidi #master branch
+        echo ""
+    fi
     cd ../apps/myApps/acorex
 
     echo "--------------------------------------------------"
