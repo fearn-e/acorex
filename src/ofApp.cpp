@@ -87,6 +87,7 @@ void ofApp::update ( )
         return;
     }
 
+    mLogDisplay->Update ( );
     mExplorerMenu.Update ( );
 }
 
