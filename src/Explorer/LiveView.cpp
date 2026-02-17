@@ -412,13 +412,14 @@ void Explorer::LiveView::Draw ( )
 
     // Draw Nearest Point -----------------------
     mPointPicker->Draw ( );
-    //if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
-    //{
-    //    ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )], 20, ofGetHeight ( ) - 60 );
-    //    std::string hopInfoSamps = std::to_string ( mPointPicker->GetNearestMousePointTime ( ) * mRawView->GetHopSize ( ) );
-    //    std::string hopInfoSecs = std::to_string ( mRawView->GetTrailData ( )->raw[mPointPicker->GetNearestMousePointFile ( )][mPointPicker->GetNearestMousePointTime ( )][0] );
-    //    ofDrawBitmapStringHighlight ( "Nearest Timepoint: " + hopInfoSamps + " samples, " + hopInfoSecs + "s", 20, ofGetHeight ( ) - 40 );
-    //}
+    if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
+    {
+        ofDrawBitmapStringHighlight ( "Point picked: " + std::to_string ( mPointPicker->GetNearestMousePointFile ( ) ) + ", " + std::to_string ( mPointPicker->GetNearestMousePointTime ( ) ), ofGetWidth ( ) - 200, ofGetHeight ( ) - 80 );
+        //ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )], 20, ofGetHeight ( ) - 60 );
+        //std::string hopInfoSamps = std::to_string ( mPointPicker->GetNearestMousePointTime ( ) * mRawView->GetHopSize ( ) );
+        //std::string hopInfoSecs = std::to_string ( mRawView->GetTrailData ( )->raw[mPointPicker->GetNearestMousePointFile ( )][mPointPicker->GetNearestMousePointTime ( )][0] );
+        //ofDrawBitmapStringHighlight ( "Nearest Timepoint: " + hopInfoSamps + " samples, " + hopInfoSecs + "s", 20, ofGetHeight ( ) - 40 );
+    }
 
     // Paused overlay ---------------------------
     if ( bUserPaused )
