@@ -429,6 +429,8 @@ void Explorer::PointPicker::FindRandom ( )
 {
     if ( !bTrained ) { return; }
 
+    std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+
     std::uniform_int_distribution<int> dist ( 0, (int)mCorpusFileLookUp.size ( ) - 1 );
     int randomPoint = dist ( mRandomGen );
 
