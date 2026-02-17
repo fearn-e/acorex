@@ -65,7 +65,6 @@ void ofApp::update ( )
 
 void ofApp::draw ( )
 {
-    mLogDisplay->Draw ( );
     mAnalyserMenu.Draw ( );
     mExplorerMenu.Draw ( );
 
@@ -78,7 +77,10 @@ void ofApp::draw ( )
         mDPIToggle.draw ( );
     }
 
-    ofDrawBitmapStringHighlight ( "fps: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 10 );
+    ofDrawBitmapStringHighlight ( "ACorEx - Audio Corpus Explorer", 0, mLayout->getTopBarHeight ( ) - 5 );
+    ofDrawBitmapStringHighlight ( "FPS: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 15 );
+
+    mLogDisplay->Draw ( );
 }
 
 void ofApp::exit ( )

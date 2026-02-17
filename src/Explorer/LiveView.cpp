@@ -350,11 +350,6 @@ void Explorer::LiveView::Draw ( )
 
         ofDisableAlphaBlending ( );
     }
-
-    if ( bDebug )
-    {
-        ofDrawBitmapStringHighlight ( "UPS: " + std::to_string ( 1 / deltaTime ), 20, ofGetHeight ( ) - 220 );
-    }
 }
 
 // Sound Functions ------------------------------
