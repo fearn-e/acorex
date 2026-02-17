@@ -54,9 +54,10 @@ void Utilities::VisualPlayheadTrail::UpdateTrail ( )
     for ( int i = 0; i < color.size ( ); i++ )
     {
         // trail points fade out - and the colour is initally 100% playhead colour, but then slowly shifts to the actual colour of the point as it fades out
-        float fadeFactor = ofMap ( i, 1, maxTrailSize, 1.0f, 0.0f, true );
-        ofColor blendedColor = playheadColor.getLerped ( color[i], 1.0f - fadeFactor );
-        displayedColor[i] = ofColor ( blendedColor.r, blendedColor.g, blendedColor.b, 255 * fadeFactor );
+        float colourFadeFactor = ofMap ( i, 1, maxTrailSize * 2, 1.0f, 0.0f, true );
+        float alphaFadeFactor = colourFadeFactor * 2.0f;
+        ofColor blendedColor = playheadColor.getLerped ( color[i], 1.0f - colourFadeFactor );
+        displayedColor[i] = ofColor ( blendedColor.r, blendedColor.g, blendedColor.b, 255 * alphaFadeFactor );
     }
 }
 
@@ -71,9 +72,8 @@ void Utilities::VisualPlayheadTrail::Kill ( )
 
     for ( int i = 0; i < color.size ( ); i++ )
     {
-        // gray out all points slightly to signify that the trail is dying, and then they will fade out from there
-        ofColor immediateGreyEffect = color[i].getLerped ( ofColor ( 255, 255, 255, 255 ), 0.5f );
-        color[i] = ofColor ( immediateGreyEffect.r, immediateGreyEffect.g, immediateGreyEffect.b, color[i].a );
+        // flash all points slightly to signify death process
+        color[i] = color[i].getLerped ( ofColor ( 255, 255, 255, 255 ), 0.5f );
     }
 }
 
