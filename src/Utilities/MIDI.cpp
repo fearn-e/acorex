@@ -22,7 +22,10 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
-//--------------------------------------------------------------
+Utilities::MIDI::MIDI ( ) : bListenersAdded ( false )
+{
+}
+
 void Utilities::MIDI::Initialise() {
 	if ( mMidiIn == NULL )
 	{
@@ -43,20 +46,17 @@ void Utilities::MIDI::Initialise() {
 	AddListeners ( );
 }
 
-//--------------------------------------------------------------
 void Utilities::MIDI::Update() {
 	/// queued message handling
 	if ( mMidiIn->hasWaitingMessages ( ) )
 	{
 		ofxMidiMessage message;
 
-		// add the latest message to the message queue
 		while ( mMidiIn->getNextMessage ( message ) )
 		{
 			midiMessages.push_back ( message );
 		}
 
-		// remove any old messages if we have too many
 		while ( midiMessages.size ( ) > maxMessages )
 		{
 			midiMessages.erase ( midiMessages.begin ( ) );
@@ -70,7 +70,6 @@ void Utilities::MIDI::Update() {
     }
 }
 
-//--------------------------------------------------------------
 void Utilities::MIDI::Exit() {
 	RemoveListeners ( );
 
@@ -95,7 +94,6 @@ void Utilities::MIDI::RemoveListeners ( )
     bListenersAdded = false;
 }
 
-//--------------------------------------------------------------
 void Utilities::MIDI::KeyEvent ( ofKeyEventArgs& args ) {
 	if ( args.type == ofKeyEventArgs::Type::Released )
 	{

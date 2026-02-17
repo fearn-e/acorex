@@ -17,18 +17,16 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include <ofxMidi.h>
 
-/// queued
-/// Manually handle messages using hasWaitingMessages()/getNextMessage().
-/// Received messages are thread safe.
-
 namespace Acorex {
 namespace Utilities {
 
 class MIDI {
 public:
+	MIDI ( );
+	~MIDI ( ) { }
+
 	void Initialise ( );
 	void Update ( );
-	void Draw ( );
 	void Exit ( );
 
 	void KeyEvent ( ofKeyEventArgs& args );
@@ -38,12 +36,12 @@ private:
 	void AddListeners ( );
 	void RemoveListeners ( );
 
-	bool bListenersAdded = false;
+	bool bListenersAdded;
 
 	std::shared_ptr<ofxMidiIn> mMidiIn;
 
-	std::vector<ofxMidiMessage> midiMessages; ///< received messages
-	std::size_t maxMessages = 10; ///< max number of messages to keep track of
+	std::vector<ofxMidiMessage> midiMessages;
+	std::size_t maxMessages = 10;
 };
 
 } // namespace Utilities
