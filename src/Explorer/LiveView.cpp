@@ -195,6 +195,8 @@ void Explorer::LiveView::UpdatePlayheads ( )
             while ( j > end )
             {
                 mPlayheads[j].panelRect = mPlayheads[j - 1].panelRect;
+                mPlayheads[j].playheadColorRect = mPlayheads[j - 1].playheadColorRect;
+                mPlayheads[j].killButtonRect = mPlayheads[j - 1].killButtonRect;
                 j--;
             }
 
@@ -210,11 +212,15 @@ void Explorer::LiveView::UpdatePlayheads ( )
         if ( it != mPlayheads.end ( ) )
         {
             ofColor color = it->color;
-            ofRectangle rect = it->panelRect;
+            ofRectangle panelRect = it->panelRect;
+            ofRectangle playheadColorRect = it->playheadColorRect;
+            ofRectangle killButtonRect = it->killButtonRect;
             bool highlight = it->highlight;
             *it = playheadUpdates[i];
             it->color = color;
-            it->panelRect = rect;
+            it->panelRect = panelRect;
+            it->playheadColorRect = playheadColorRect;
+            it->killButtonRect = killButtonRect;
             it->highlight = highlight;
         }
         else
@@ -222,15 +228,11 @@ void Explorer::LiveView::UpdatePlayheads ( )
             ofLogVerbose ( "LiveView" ) << "Playhead " << playheadUpdates[i].playheadID << " added";
 
             mPlayheads.push_back ( playheadUpdates[i] );
-            int rectWidth = ofGetWidth ( ) / 10; int rectSpacing = ofGetWidth ( ) / 100; int rectHeight = ofGetHeight ( ) / 10;
             std::random_device rd;
             std::mt19937 gen ( rd ( ) );
             std::uniform_int_distribution<> dis ( 0, 255 );
             mPlayheads.back ( ).color = ofColor::fromHsb ( dis ( gen ), 255, 255 );
-            mPlayheads.back ( ).panelRect = ofRectangle (	rectSpacing * mPlayheads.size ( ) + rectWidth * ( mPlayheads.size ( ) - 1 ),
-                                                            ofGetHeight ( ) - rectHeight - 5,
-                                                            rectWidth,
-                                                            rectHeight );
+            mPlayheads.back ( ).ResizeBox ( mPlayheads.size ( ) - 1, mLayout->getTopBarHeight ( ), ofGetHeight ( ), ofGetWidth ( ) );
         }
     }
 

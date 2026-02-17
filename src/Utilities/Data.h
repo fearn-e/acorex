@@ -188,6 +188,22 @@ struct AudioPlayhead {
 struct VisualPlayhead {
     VisualPlayhead ( size_t ID, size_t file, size_t sample ) : playheadID ( ID ), fileIndex ( file ), sampleIndex ( sample ) { }
 
+    void ResizeBox ( size_t playheadIndexUI, size_t topBarHeight, size_t windowHeight, size_t windowWidth )
+    {
+        //TODO - put these in InterfaceDefs.h and have them affected by HiDpi
+        int rectHeight = windowHeight / 20;
+        int rectWidth = rectHeight * 4;
+
+        int rectSpacing = windowWidth / 100;
+
+        float x = 0;
+        float y = topBarHeight + rectSpacing + (playheadIndexUI * (rectHeight + rectSpacing));
+
+        panelRect = ofRectangle ( x, y, rectWidth, rectHeight );
+        playheadColorRect = ofRectangle ( x, y, rectWidth / 4, rectHeight );
+        killButtonRect = ofRectangle ( x + rectWidth - rectHeight, y, rectHeight, rectHeight );
+    }
+
     bool highlight = false;
 
     size_t playheadID = 0;
@@ -199,6 +215,8 @@ struct VisualPlayhead {
 
     ofColor color = ofColor ( 255, 255, 255, 255 );
     ofRectangle panelRect = ofRectangle ( 0, 0, 0, 0 );
+    ofRectangle playheadColorRect = ofRectangle ( 0, 0, 0, 0 );
+    ofRectangle killButtonRect = ofRectangle ( 0, 0, 0, 0 );
 };
 
 } // namespace Utilities

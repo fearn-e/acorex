@@ -84,48 +84,40 @@ void ExplorerMenu::Draw ( )
     mMainPanel.draw ( );
 
     // draw playhead panels
-
+    // TODO - this all needs to be cleaned up, made prettier, and a lot of it moved into InterfaceDefs.h
+    for ( auto& playhead : mLiveView.GetPlayheads ( ) )
     {
-        for ( auto& playhead : mLiveView.GetPlayheads ( ) )
-        {
-            // highlight the playhead position if panel is hovered
-            if ( playhead.panelRect.inside ( ofGetMouseX ( ), ofGetMouseY ( ) ) )
-                playhead.highlight = true;
-            else
-                playhead.highlight = false;
+        // highlight the playhead position if panel is hovered
+        if ( playhead.panelRect.inside ( ofGetMouseX ( ), ofGetMouseY ( ) ) )
+            playhead.highlight = true;
+        else
+            playhead.highlight = false;
 
-            // draw panel
-            ofSetColor ( playhead.color );
-            ofDrawRectangle ( playhead.panelRect );
-            ofSetColor ( 200, 200, 200, 255 );
-            ofDrawRectangle ( playhead.panelRect.x, playhead.panelRect.y, playhead.panelRect.width, playhead.panelRect.height / 2 );
-            // draw playhead id in the top left
-            ofSetColor ( 0, 0, 0, 255 );
-            ofDrawBitmapString ( "ID:" + ofToString ( playhead.playheadID ), playhead.panelRect.x + 5, playhead.panelRect.y + 15 );
-            // draw file index in the top left
-            std::string fileName = mRawView->GetDataset ( )->fileList[playhead.fileIndex];
-            fileName = fileName.substr ( fileName.find_last_of ( "/" ) + 1 );
-            fileName = fileName.substr ( fileName.find_last_of ( "\\" ) + 1 );
-            int maxLength = playhead.panelRect.width / 10 - 7;
-            if ( fileName.length ( ) > maxLength )
-            {
-                fileName = fileName.substr ( 0, maxLength );
-                fileName += "...";
-            }
-            ofDrawBitmapString ( "File: " + fileName, playhead.panelRect.x + 5, playhead.panelRect.y + 30 );
-            ofDrawBitmapString ( "Point: " + ofToString ( playhead.sampleIndex / mRawView->GetHopSize ( ) ), playhead.panelRect.x + 5, playhead.panelRect.y + 45 );   
-            ofDrawBitmapString ( "Samp: " + ofToString ( playhead.sampleIndex ), playhead.panelRect.x + 5, playhead.panelRect.y + 60 );
+        // draw panel outline
+        ofColor outlineColor = playhead.highlight ? ofColor ( 255, 255, 255, 255 ) : ofColor ( 50, 50, 50, 255 );
+        int lineWidth = playhead.highlight ? 3 : 2;
+        ofSetColor ( outlineColor );
+        ofDrawRectangle ( playhead.panelRect.x - lineWidth, playhead.panelRect.y - lineWidth, 
+                          playhead.panelRect.width + (lineWidth * 2), playhead.panelRect.height + (lineWidth * 2) );
 
-            // draw another smaller rectangle in the top right corner of the panel
-            int smallRectSize = ( playhead.panelRect.width + playhead.panelRect.height ) / 10;
-            ofSetColor ( mColors.interfaceBackgroundColor );
-            ofDrawRectangle ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, smallRectSize, smallRectSize );
-            // draw an X in the top right corner of the panel
-            ofSetColor ( 255, 0, 0, 255 );
-            ofSetLineWidth ( 2 );
-            ofDrawLine ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, playhead.panelRect.x + playhead.panelRect.width, playhead.panelRect.y + smallRectSize );
-            ofDrawLine ( playhead.panelRect.x + playhead.panelRect.width, playhead.panelRect.y, playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y + smallRectSize );
-        }
+        // draw panel
+        ofSetColor ( 90, 90, 90, 255 );
+        ofDrawRectangle ( playhead.panelRect );
+        ofColor dampenedPlayheadColor = playhead.color.getLerped ( ofColor ( 255, 255, 255, 255 ), 0.2 );
+        ofSetColor ( dampenedPlayheadColor );
+        ofDrawRectangle ( playhead.playheadColorRect );
+
+        // draw playhead id
+        ofSetColor ( 0, 0, 0, 255 );
+        ofDrawBitmapString ( ofToString ( playhead.playheadID ), playhead.panelRect.x + ( playhead.panelRect.width / 3 ), playhead.panelRect.y + ( playhead.panelRect.height / 3 ) );
+
+        // draw X "kill playhead" button
+        ofSetColor ( mColors.interfaceBackgroundColor );
+        ofDrawRectangle ( playhead.killButtonRect );
+        ofSetColor ( 255, 0, 0, 255 );
+        ofSetLineWidth ( 2 );
+        ofDrawLine ( playhead.killButtonRect.x, playhead.killButtonRect.y, playhead.killButtonRect.x + playhead.killButtonRect.width, playhead.killButtonRect.y + playhead.killButtonRect.height );
+        ofDrawLine ( playhead.killButtonRect.x + playhead.killButtonRect.width, playhead.killButtonRect.y, playhead.killButtonRect.x, playhead.killButtonRect.y + playhead.killButtonRect.height );
     }
 }
 
@@ -391,13 +383,9 @@ void ExplorerMenu::WindowResized ( )
 
     if ( !bIsCorpusOpen ) { return; }
 
-    int rectWidth = ofGetWidth ( ) / 10; int rectSpacing = ofGetWidth ( ) / 100; int rectHeight = ofGetHeight ( ) / 10;
     for ( size_t i = 0; i < mLiveView.GetPlayheads ( ).size ( ); i++ ) // TODO - fix playhead visual stacking when window resizing bug, easy fix
     {
-        mLiveView.GetPlayheads ( )[i].panelRect = ofRectangle ( rectSpacing * i + rectWidth * i,
-                                                                ofGetHeight ( ) - rectHeight - 5,
-                                                                rectWidth,
-                                                                rectHeight );
+        mLiveView.GetPlayheads ( )[i].ResizeBox ( i, mLayout->getTopBarHeight ( ), ofGetHeight ( ), ofGetWidth ( ) );
     }
 }
 
@@ -841,10 +829,7 @@ void ExplorerMenu::MouseReleased ( ofMouseEventArgs& args )
 {
     for ( auto& playhead : mLiveView.GetPlayheads ( ) )
     {
-        int smallRectSize = ( playhead.panelRect.width + playhead.panelRect.height ) / 10;
-        ofRectangle smallRect = ofRectangle ( playhead.panelRect.x + playhead.panelRect.width - smallRectSize, playhead.panelRect.y, smallRectSize, smallRectSize );
-
-        if ( smallRect.inside ( args.x, args.y ) )
+        if ( playhead.killButtonRect.inside ( args.x, args.y ) )
         {
             mLiveView.GetAudioPlayback ( )->KillPlayhead ( playhead.playheadID );
             return;
