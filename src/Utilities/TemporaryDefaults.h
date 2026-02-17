@@ -11,6 +11,8 @@
 #define DEFAULT_HI_DPI false
 
 //default explorer settings values (could have both default globals an per-corpus "last used")
+#define DEFAULT_CONTROL_RECEIVER_INDEX 0
+
 #define DEFAULT_DIMENSION_X "None" // these could be set by name in per-corpus settings
 #define DEFAULT_DIMENSION_Y "None"
 #define DEFAULT_DIMENSION_Z "None"

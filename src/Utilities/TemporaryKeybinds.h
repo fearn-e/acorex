@@ -45,5 +45,7 @@
 //ofApp key binds
 #define ACOREX_KEYBIND_LOG_TOGGLE_TERMINAL_OUTPUT OF_KEY_F5
 
+#define ACOREX_KEYBIND_SET_THIS_INSTANCE_MIDI_HUB OF_KEY_F8
+
 // Mouse Bind Reference:
 // PointPicker - OF_MOUSE_BUTTON_RIGHT, MouseReleased - select point

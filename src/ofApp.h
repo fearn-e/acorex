@@ -20,6 +20,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "ExplorerMenu.h"
 #include "Utilities/InterfaceDefs.h"
 #include "Utilities/Log.h"
+#include "Utilities/MIDI.h"
 
 #include <ofMain.h>
 #include <ofxGui.h>
@@ -31,6 +32,7 @@ public:
     ~ofApp ( ) { }
 
     void setup ( );
+    void InitialiseMidiHub ( );
     void update ( );
     void draw ( );
     void exit ( );
@@ -45,6 +47,7 @@ private:
     void AddListeners ( );
     void RemoveListeners ( );
     void InitialiseUI ( );
+    void ClearUI ( );
     void RefreshUI ( );
     void AnalyseToggled ( bool& value );
     void ExploreToggled ( bool& value );
@@ -57,6 +60,12 @@ private:
     Acorex::ExplorerMenu mExplorerMenu;
     std::shared_ptr<Acorex::Utilities::MenuLayout> mLayout;
     Acorex::Utilities::Colors mColors;
+
+    bool bMidiHubInstance;
+    bool bMidiHubConfirm;
+    float mMidiHubConfirmTime;
+    float mMidiHubConfirmDuration;
+    Acorex::Utilities::MIDIHub mMidiHub;
 
     ofxToggle mAnalyseToggle;
     ofxToggle mExploreToggle;

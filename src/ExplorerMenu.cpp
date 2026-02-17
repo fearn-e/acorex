@@ -19,14 +19,19 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Utilities/InterfaceDefs.h"
 #include "Utilities/TemporaryDefaults.h"
 
+#include "Utilities/MIDI.h" //temporary, for port define
+
 #include <ofUtils.h>
 #include <of3dGraphics.h>
+
+#include <ofEvents.h>
+#include <ofApp.h>
 
 using namespace Acorex;
 
 ExplorerMenu::ExplorerMenu ( ) :    mSlowUpdateInterval ( 100 ), mOpenCorpusButtonTimeout ( 3000 ),
                                     bListenersAddedHeader ( false ), bListenersAddedCorpusControls ( false ), 
-                                    bListenersAddedAudioManager ( false )
+                                    bListenersAddedAudioManager ( false ), mControlReceiverIndex ( 0 )
 {
     mRawView = std::make_shared<Explorer::RawView> ( );
     mLiveView.SetRawView ( mRawView );
@@ -48,8 +53,6 @@ void ExplorerMenu::Initialise ( )
     Clear ( );
 
     OpenStartupPanel ( );
-
-    mMIDI.Initialise ( );
 }
 
 void ExplorerMenu::Clear ( )
@@ -63,6 +66,11 @@ void ExplorerMenu::Clear ( )
     bBlockDimensionFilling = false;
 
     mDisabledAxis = Utilities::Axis::NONE;
+
+    mControlReceiverIndex = 0;
+    mControlReceiver.stop ( );
+    while ( mControlReceiver.hasWaitingMessages ( ) )
+    { ofxOscMessage temp; mControlReceiver.getNextMessage ( temp ); }
 
     mLiveView.Clear ( );
 
@@ -127,14 +135,69 @@ void ExplorerMenu::Draw ( )
 
 void ExplorerMenu::Update ( )
 {
-    mLiveView.Update ( );
+    UpdateOscReceiver ( );
 
-    mMIDI.Update ( );
+    mLiveView.Update ( );
 
     if ( ofGetElapsedTimeMillis ( ) - mLastUpdateTime > mSlowUpdateInterval )
     {
         mLastUpdateTime = ofGetElapsedTimeMillis ( );
         SlowUpdate ( );
+    }
+}
+
+void ExplorerMenu::UpdateOscReceiver ( )
+{
+    while ( mControlReceiver.hasWaitingMessages ( ) )
+    {
+        ofxOscMessage message;
+        mControlReceiver.getNextMessage ( message );
+        std::string messageAddress = message.getAddress ( );
+        if ( messageAddress.find ( "/acorex/control" ) != std::string::npos )
+        {
+            messageAddress.erase ( 0, std::string ( "/acorex/control" ).length ( ) );
+
+            if ( messageAddress == "/volume" && message.getNumArgs ( ) > 0 && message.getArgType ( 0 ) == OFXOSC_TYPE_INT32 )
+            {
+                ofLogVerbose ( "OSC-CONTROL-RECEIVER" ) << "Received volume control message for receiver index " << mControlReceiverIndex << ".";
+                int volume = message.getArgAsInt ( 0 );
+                mVolumeSliderX1000 = volume;
+            }
+            else if ( messageAddress == "/jump_chance" && message.getNumArgs ( ) > 0 && message.getArgType ( 0 ) == OFXOSC_TYPE_INT32 )
+            {
+                ofLogVerbose ( "OSC-CONTROL-RECEIVER" ) << "Received jump chance control message for receiver index " << mControlReceiverIndex << ".";
+                int jumpChance = message.getArgAsInt ( 0 );
+                mCrossoverJumpChanceSliderX1000 = jumpChance;
+            }
+            else if ( messageAddress == "/pan_width" && message.getNumArgs ( ) > 0 && message.getArgType ( 0 ) == OFXOSC_TYPE_INT32 )
+            {
+                ofLogVerbose ( "OSC-CONTROL-RECEIVER" ) << "Received pan width control message for receiver index " << mControlReceiverIndex << ".";
+                int panWidth = message.getArgAsInt ( 0 );
+                mPanningStrengthSliderX1000 = panWidth;
+            }
+            else if ( messageAddress == "/crossfade_sample_length" && message.getNumArgs ( ) > 0 && message.getArgType ( 0 ) == OFXOSC_TYPE_INT32 )
+            {
+                ofLogVerbose ( "OSC-CONTROL-RECEIVER" ) << "Received crossfade sample length control message for receiver index " << mControlReceiverIndex << ".";
+                int crossfadeSampleLength = message.getArgAsInt ( 0 );
+                crossfadeSampleLength = ofMap ( crossfadeSampleLength, 0, 1000, mCrossfadeSampleLengthSlider.getMin ( ), mCrossfadeSampleLengthSlider.getMax ( ), true );
+                mCrossfadeSampleLengthSlider = crossfadeSampleLength;
+            }
+            else if ( messageAddress == "/create_picker_playhead" )
+            {
+                ofLogVerbose ( "OSC-CONTROL-RECEIVER" ) << "Received create picker playhead message for receiver index " << mControlReceiverIndex << ".";
+                mLiveView.CreatePlayhead ( );
+            }
+            else if ( messageAddress == "/pick_random_point" )
+            {
+                ofLogVerbose ( "OSC-CONTROL-RECEIVER" ) << "Received pick random point message for receiver index " << mControlReceiverIndex << ".";
+                mLiveView.PickRandomPoint ( );
+            }
+            else if ( messageAddress == "/create_random_playhead" )
+            {
+                ofLogVerbose ( "OSC-CONTROL-RECEIVER" ) << "Received create random playhead message for receiver index " << mControlReceiverIndex << ".";
+                mLiveView.CreatePlayheadRandom ( );
+            }
+        }
     }
 }
 
@@ -155,7 +218,6 @@ void ExplorerMenu::Exit ( )
     RemoveListenersCorpusControls ( );
     RemoveListenersAudioManager ( );
     mLiveView.Exit ( );
-    mMIDI.Exit ( );
 }
 
 // UI Management -------------------------------
@@ -222,6 +284,10 @@ void ExplorerMenu::SetupPanelSectionHeader ( std::string corpusNameLabel )
 
 void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utilities::ExploreSettings& settings )
 {
+    // Control Receiver Index Slider
+    mMainPanel.add ( mControlReceiverIndexSlider.setup ( "MIDI/OSC Control Receiver Index", DEFAULT_CONTROL_RECEIVER_INDEX, 0, 3 ) );
+    mControlReceiverIndexSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+
     // X Dimension Dropdown
     mDimensionDropdownX.reset ( );
     mDimensionDropdownX = make_unique<ofxDropdown> ( static_cast<std::string>("X Dimension"), Utilities::ofxDropdownScrollSpeed );
@@ -422,6 +488,8 @@ void ExplorerMenu::RefreshFullPanelUI ( )
     mOpenCorpusButton.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
 
     // for split later: corpus controls panel
+    mControlReceiverIndexSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+
     mDimensionDropdownX->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
     mDimensionDropdownY->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
     mDimensionDropdownZ->setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelDropdownRowHeight ( ) );
@@ -481,6 +549,8 @@ void ExplorerMenu::AddListenersCorpusControls ( )
 {
     if ( bListenersAddedCorpusControls ) { return; }
 
+    mControlReceiverIndexSlider.addListener ( this, &ExplorerMenu::SetControlReceiverIndexListener );
+
     mDimensionDropdownX->addListener ( this, &ExplorerMenu::SetDimensionXListener );
     mDimensionDropdownY->addListener ( this, &ExplorerMenu::SetDimensionYListener );
     mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SetDimensionZListener );
@@ -509,6 +579,8 @@ void ExplorerMenu::AddListenersCorpusControls ( )
 void ExplorerMenu::RemoveListenersCorpusControls ( )
 {
     if ( !bListenersAddedCorpusControls ) { return; }
+
+    mControlReceiverIndexSlider.removeListener ( this, &ExplorerMenu::SetControlReceiverIndexListener );
 
     mDimensionDropdownX->removeListener ( this, &ExplorerMenu::SetDimensionXListener );
     mDimensionDropdownY->removeListener ( this, &ExplorerMenu::SetDimensionYListener );
@@ -635,6 +707,8 @@ void ExplorerMenu::OpenCorpus ( )
 
     CameraSwitcher ( );
 
+    mControlReceiver.setup ( "localhost", ACOREX_OSC_PORT );
+
     bIsCorpusOpen = true;
 
     ofSetWindowTitle ( "ACoreX - " + mRawView->GetCorpusName ( ) );
@@ -756,6 +830,12 @@ void ExplorerMenu::PropogateCorpusSettings ( const Utilities::ExploreSettings& s
 
 // Listener Functions --------------------------
     // Corpus Controls
+void ExplorerMenu::SetControlReceiverIndex ( const int& index )
+{
+    mControlReceiverIndex = index;
+    mControlReceiver.setup ( "localhost", ACOREX_OSC_PORT + mControlReceiverIndex );
+}
+
 void ExplorerMenu::SetDimensionX ( const string& dimension )
 {
     SetDimension ( dimension, Utilities::Axis::X );

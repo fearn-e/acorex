@@ -22,8 +22,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Utilities/Data.h"
 #include "Utilities/InterfaceDefs.h"
 #include "Utilities/ofxPercentSlider.h"
-#include "Utilities/MIDI.h"
 
+#include <ofxOsc.h>
 #include <ofxGui.h>
 #include <ofxDropdown.h>
 
@@ -53,6 +53,7 @@ public:
     void SetMenuLayout ( std::shared_ptr<Utilities::MenuLayout>& menuLayout ) { mLayout = menuLayout; mLiveView.SetMenuLayout ( menuLayout ); }
 
 private:
+    void UpdateOscReceiver ( );
     void SlowUpdate ( );
 
     // UI Management -------------------------------
@@ -95,7 +96,15 @@ private:
     /// Triggers all listeners that update corpus related settings.
     void PropogateCorpusSettings ( const Utilities::ExploreSettings& settings );
 
+    // MIDI Controls ------------------------------
+
+    int mControlReceiverIndex;
+    ofxOscReceiver mControlReceiver;
+    // ADD A NEW UI ELEMENT TO SWITCH RECEIVER INDEX
+
     // Listener Functions --------------------------
+
+    void SetControlReceiverIndex ( const int& index );          void SetControlReceiverIndexListener ( int& index ) { SetControlReceiverIndex ( index ); }
 
     void SetDimensionX ( const string& dimension );             void SetDimensionXListener ( string& dimension ) { SetDimensionX ( dimension ); }
     void SetDimensionY ( const string& dimension );             void SetDimensionYListener ( string& dimension ) { SetDimensionY ( dimension ); }
@@ -149,12 +158,18 @@ private:
 
     // Panels --------------------------------------
 
+    //Main Panel
     ofxPanel mMainPanel;
     ofxLabel mCorpusNameLabel;
     ofxButton mOpenCorpusButton;
+
+    //Corpus Controls
+    ofxIntSlider mControlReceiverIndexSlider;
+
     unique_ptr<ofxDropdown> mDimensionDropdownX;
     unique_ptr<ofxDropdown> mDimensionDropdownY;
     unique_ptr<ofxDropdown> mDimensionDropdownZ;
+
     unique_ptr<ofxDropdown> mDimensionDropdownColor;
     ofxToggle mColorSpectrumSwitcher;
 
@@ -170,6 +185,7 @@ private:
     unique_ptr<ofxDropdown> mDimensionDropdownDynamicPan;
     ofxPercentSlider mPanningStrengthSliderX1000;
 
+    //Audio Settings Manager
     unique_ptr<ofxDropdown> mApiDropdown;
     unique_ptr<ofxDropdown> mOutDeviceDropdown;
     unique_ptr<ofxIntDropdown> mBufferSizeDropdown;
@@ -181,7 +197,6 @@ private:
     Utilities::AudioSettingsManager mAudioSettingsManager;
     Utilities::Colors mColors;
     std::shared_ptr<Utilities::MenuLayout> mLayout;
-    Utilities::MIDI mMIDI;
 };
 
 } // namespace Acorex

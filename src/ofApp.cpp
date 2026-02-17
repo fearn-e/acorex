@@ -20,7 +20,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Utilities/TemporaryKeybinds.h"
 
 ofApp::ofApp ( ) :
-    bListenersAdded ( false )
+    bListenersAdded ( false ), bMidiHubInstance ( false ), bMidiHubConfirm ( false ), mMidiHubConfirmTime ( 0 ), mMidiHubConfirmDuration ( 5 )
 {
     mLogDisplay = std::make_shared<Acorex::Utilities::LogDisplay> ( );
     mLoggerChannel = std::make_shared<Acorex::Utilities::AcorexLoggerChannel> ( );
@@ -57,14 +57,54 @@ void ofApp::setup ( )
     mExplorerMenu.Initialise ( );
 }
 
+// TODO - rewrite this
+void ofApp::InitialiseMidiHub ( )
+{
+    mAnalyserMenu.Close ( );
+    mAnalyserMenu.Exit ( );
+    mExplorerMenu.Close ( );
+    mExplorerMenu.Exit ( );
+    ClearUI ( );
+
+    ofSetWindowTitle ( "ACorEx - MIDI HUB INSTANCE" );
+
+    int newWidth = ofGetWidth ( ) > ofGetScreenWidth ( ) * 0.5 ? ofGetScreenWidth ( ) * 0.5 : ofGetWidth ( );
+    int newHeight = ofGetHeight ( ) > ofGetScreenHeight ( ) * 0.25 ? ofGetScreenHeight ( ) * 0.25 : ofGetHeight ( );
+    ofSetWindowShape ( newWidth, newHeight );
+
+    mLayout->toggleHiDpi ( false );
+    ofxGuiDisableHiResDisplay ( );
+
+    mMidiHub.Initialise ( );
+}
+
 void ofApp::update ( )
 {
-    mLogDisplay->Update ( );
+    if ( bMidiHubInstance )
+    {
+        mMidiHub.Update ( );
+        mLogDisplay->Update ( );
+        return;
+    }
+
     mExplorerMenu.Update ( );
 }
 
 void ofApp::draw ( )
 {
+    if ( bMidiHubInstance )
+    {
+        //mMidiHub.Draw ( );
+
+        ofSetColor ( mColors.interfaceBackgroundColor );
+        ofDrawRectangle ( 0, 0, ofGetWidth ( ), mLayout->getTopBarHeight ( ) );
+
+        ofDrawBitmapStringHighlight ( "FPS: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 15 );
+
+        mLogDisplay->Draw ( );
+        return;
+    }
+
     mAnalyserMenu.Draw ( );
     mExplorerMenu.Draw ( );
 
@@ -87,6 +127,7 @@ void ofApp::exit ( )
     mLogDisplay->Exit ( );
     mAnalyserMenu.Exit ( );
     mExplorerMenu.Exit ( );
+    mMidiHub.Exit ( );
 }
 
 void ofApp::AddListeners ( )
@@ -133,6 +174,23 @@ void ofApp::KeyEvent ( ofKeyEventArgs& args )
             mLoggerChannel->ToggleSendToOriginalChannel ( );
             ofLogNotice ( "Logging" ) << "Toggled terminal output.";
         }
+        else if ( args.key == ACOREX_KEYBIND_SET_THIS_INSTANCE_MIDI_HUB )
+        {
+            if ( bMidiHubInstance ) { return; }
+            if ( !bMidiHubConfirm || ofGetElapsedTimef ( ) - mMidiHubConfirmTime > mMidiHubConfirmDuration )
+            {
+                bMidiHubConfirm = true;
+                mMidiHubConfirmTime = ofGetElapsedTimef ( );
+                ofLogWarning ( "MIDI-HUB" ) << "Press the keybind again within " << mMidiHubConfirmDuration << " seconds to confirm setting this instance as a MIDI hub.";
+                return;
+            }
+
+            bMidiHubConfirm = false;
+
+            bMidiHubInstance = true;
+            InitialiseMidiHub ( );
+            ofLogNotice ( "MIDI-HUB" ) << "This instance is now a MIDI hub.";
+        }
     }
 }
 
@@ -153,6 +211,15 @@ void ofApp::InitialiseUI ( )
     mDPIToggle.setBackgroundColor ( mColors.transparent );
 
     AddListeners ( );
+}
+
+void ofApp::ClearUI ( )
+{
+    RemoveListeners ( );
+    
+    mAnalyseToggle = ofxToggle ( );
+    mExploreToggle = ofxToggle ( );
+    mDPIToggle = ofxToggle ( );
 }
 
 void ofApp::RefreshUI ( )

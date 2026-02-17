@@ -16,14 +16,17 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #pragma once
 
 #include <ofxMidi.h>
+#include <ofxOsc.h>
+
+#define ACOREX_OSC_PORT 13010
 
 namespace Acorex {
 namespace Utilities {
 
-class MIDI {
+class MIDIHub {
 public:
-	MIDI ( );
-	~MIDI ( ) { }
+	MIDIHub ( );
+	~MIDIHub ( ) { }
 
 	void Initialise ( );
 	void Update ( );
@@ -32,11 +35,15 @@ public:
 	void KeyEvent ( ofKeyEventArgs& args );
 
 private:
-
 	void AddListeners ( );
 	void RemoveListeners ( );
 
 	bool bListenersAdded;
+
+	ofxOscSender mOscSender0;
+    ofxOscSender mOscSender1;
+    ofxOscSender mOscSender2;
+    ofxOscSender mOscSender3;
 
 	std::shared_ptr<ofxMidiIn> mMidiIn;
 
