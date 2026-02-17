@@ -3,6 +3,12 @@
 
 using std::string;
 
+int ofxPercentSlider::operator=( int v )
+{
+	value = v;
+	return v;
+}
+
 void ofxPercentSlider::generateText(){
     // convert value from int of 0-1000 to a string that shows the values as 00.0% to 100.0%
     string valStr = ofToString ( (float)value.get ( ) / 10.0f, 1 ) + "%";
