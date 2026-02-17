@@ -323,7 +323,6 @@ void Explorer::LiveView::Draw ( )
             }
 
             ofDisableDepthTest ( );
-            ofDisableAlphaBlending ( );
         }
         if ( bDrawCloudDark )
         {
@@ -338,7 +337,6 @@ void Explorer::LiveView::Draw ( )
             }
 
             ofDisableDepthTest ( );
-            ofDisableAlphaBlending ( );
         }
 
         for ( auto& trail : mPlayheadTrails )
