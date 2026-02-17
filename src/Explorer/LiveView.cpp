@@ -354,6 +354,13 @@ void Explorer::LiveView::Draw ( )
             ofDrawSphere ( position, size );
         }
 
+        if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
+        {
+            ofSetColor ( 255, 255, 255 );
+            glm::vec3 nearestPoint = mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].getVertex ( mPointPicker->GetNearestMousePointTime ( ) );
+            ofDrawSphere ( nearestPoint, 25 );
+        }
+
         //ofEnableAlphaBlending ( );
         //ofEnableDepthTest ( );
         //{
@@ -414,7 +421,7 @@ void Explorer::LiveView::Draw ( )
     mPointPicker->Draw ( );
     if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
     {
-        ofDrawBitmapStringHighlight ( "Point picked: " + std::to_string ( mPointPicker->GetNearestMousePointFile ( ) ) + ", " + std::to_string ( mPointPicker->GetNearestMousePointTime ( ) ), ofGetWidth ( ) - 200, ofGetHeight ( ) - 80 );
+        ofDrawBitmapStringHighlight ( "Point picked: " + std::to_string ( mPointPicker->GetNearestMousePointFile ( ) ) + ", " + std::to_string ( mPointPicker->GetNearestMousePointTime ( ) ), ofGetWidth ( ) - 200, ofGetHeight ( ) - 80 );        
         //ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )], 20, ofGetHeight ( ) - 60 );
         //std::string hopInfoSamps = std::to_string ( mPointPicker->GetNearestMousePointTime ( ) * mRawView->GetHopSize ( ) );
         //std::string hopInfoSecs = std::to_string ( mRawView->GetTrailData ( )->raw[mPointPicker->GetNearestMousePointFile ( )][mPointPicker->GetNearestMousePointTime ( )][0] );
