@@ -26,6 +26,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofColor.h>
 #include <ofRectangle.h>
 #include <algorithm>
+#include <ofMath.h>
+#include <ofGraphics.h>
+#include <of3dGraphics.h>
 
 #define DATA_CHANGE_CHECK_1
 
@@ -188,21 +191,7 @@ struct AudioPlayhead {
 struct VisualPlayhead {
     VisualPlayhead ( size_t ID, size_t file, size_t sample ) : playheadID ( ID ), fileIndex ( file ), sampleIndex ( sample ) { }
 
-    void ResizeBox ( size_t playheadIndexUI, size_t topBarHeight, size_t windowHeight, size_t windowWidth )
-    {
-        //TODO - put these in InterfaceDefs.h and have them affected by HiDpi
-        int rectHeight = windowHeight / 20;
-        int rectWidth = rectHeight * 4;
-
-        int rectSpacing = windowWidth / 100;
-
-        float x = 0;
-        float y = topBarHeight + rectSpacing + (playheadIndexUI * (rectHeight + rectSpacing));
-
-        panelRect = ofRectangle ( x, y, rectWidth, rectHeight );
-        playheadColorRect = ofRectangle ( x, y, rectWidth / 4, rectHeight );
-        killButtonRect = ofRectangle ( x + rectWidth - rectHeight, y, rectHeight, rectHeight );
-    }
+    void ResizeBox ( size_t playheadIndexUI, size_t topBarHeight, size_t windowHeight, size_t windowWidth );
 
     bool highlight = false;
 
@@ -217,6 +206,45 @@ struct VisualPlayhead {
     ofRectangle panelRect = ofRectangle ( 0, 0, 0, 0 );
     ofRectangle playheadColorRect = ofRectangle ( 0, 0, 0, 0 );
     ofRectangle killButtonRect = ofRectangle ( 0, 0, 0, 0 );
+};
+
+struct VisualPlayheadTrail {
+private:
+    size_t maxTrailSize;
+    
+    bool dying;
+    int currentFadeStep;
+    int lastFadeUpdateTime;
+    int fadeUpdateInterval; // millis
+
+    std::deque<size_t> fileIndex; // [trailPoint]
+    std::deque<size_t> timePointIndex; // [trailPoint]
+
+    std::deque<glm::vec3> position; // [trailPoint]
+    std::deque<ofColor> color; // [trailPoint]
+
+    std::deque<ofColor> displayedColor; // [trailPoint]
+
+    ofColor playheadColor;
+    
+    void UpdateTrail ( );
+
+public:
+    VisualPlayheadTrail ( size_t ID, ofColor playheadColor, size_t maxTrailLength = 10, int fadeUpdateIntervalMillis = 50 );
+
+    size_t playheadID;
+
+    void Kill ( );
+
+    void Draw ( ) const;
+
+    /// Returns true when this trail can be removed.
+    bool Update ( int currentTime );
+
+    void AddTrailPoint ( size_t file, size_t timePoint, const glm::vec3& pos, const ofColor& col );
+
+    glm::vec3 GetPosition ( size_t trailPointIndex ) const { return position[trailPointIndex]; }
+    ofColor GetColor ( size_t trailPointIndex ) const { return color[trailPointIndex]; }
 };
 
 } // namespace Utilities

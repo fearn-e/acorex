@@ -88,6 +88,9 @@
     <ClCompile Include="src\Explorer\AudioPlayback.cpp">
       <Filter>src\Explorer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utilities\Data.cpp">
+      <Filter>src\Utilities</Filter>
+    </ClCompile>
     <ClCompile Include="src\Utilities\AudioSettingsManager.cpp">
       <Filter>src\Utilities</Filter>
     </ClCompile>

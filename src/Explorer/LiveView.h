@@ -103,6 +103,9 @@ private:
     bool bDebug;
     bool bUserPaused;
     bool bDraw;
+    bool bDrawAxes;
+    bool bDrawCloud; bool bDrawCloudDark;
+
     bool b3D;
     bool bColorFullSpectrum;
 
@@ -122,6 +125,7 @@ private:
     // Playheads -------------------------------------
 
     std::vector<Utilities::VisualPlayhead> mPlayheads;
+    std::vector<Utilities::VisualPlayheadTrail> mPlayheadTrails;
 
     // Camera ----------------------------------------
 

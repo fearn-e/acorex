@@ -25,11 +25,15 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofEvents.h>
 #include <random>
 
+#define TEMPORARY_ACOREX_VISUAL_TRAIL_FADE_UPDATE_INTERVAL 4
+#define TEMPORARY_ACOREX_VISUAL_TRAIL_MAX_LENGTH 20
+
 using namespace Acorex;
 
 Explorer::LiveView::LiveView ( )
     : bListenersAdded ( false ),
-    bDebug ( false ), bUserPaused ( false ), bDraw ( false ), b3D ( true ), bColorFullSpectrum ( false ),
+    bDebug ( false ), bUserPaused ( false ), bDraw ( false ), bDrawAxes ( false ), bDrawCloud ( true ), bDrawCloudDark ( true ),
+    b3D ( true ), bColorFullSpectrum ( false ),
     mKeyboardMoveState { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // W, A, S, D, R, F, Q, E, Z, X
     mCamMoveSpeedScaleAdjusted ( SpaceDefs::mCamMoveSpeed ),
     deltaTime ( 0.1f ), lastUpdateTime ( 0 ),
@@ -200,6 +204,8 @@ void Explorer::LiveView::UpdatePlayheads ( )
                 j--;
             }
 
+            std::find_if ( mPlayheadTrails.begin ( ), mPlayheadTrails.end ( ), [ this, i ] ( Utilities::VisualPlayheadTrail& trail ) { return trail.playheadID == mPlayheads[i].playheadID; } )->Kill ( );
+
             mPlayheads.erase ( mPlayheads.begin ( ) + i );
             i--;
         }
@@ -216,7 +222,9 @@ void Explorer::LiveView::UpdatePlayheads ( )
             ofRectangle playheadColorRect = it->playheadColorRect;
             ofRectangle killButtonRect = it->killButtonRect;
             bool highlight = it->highlight;
+
             *it = playheadUpdates[i];
+
             it->color = color;
             it->panelRect = panelRect;
             it->playheadColorRect = playheadColorRect;
@@ -231,7 +239,11 @@ void Explorer::LiveView::UpdatePlayheads ( )
             std::random_device rd;
             std::mt19937 gen ( rd ( ) );
             std::uniform_int_distribution<> dis ( 0, 255 );
-            mPlayheads.back ( ).color = ofColor::fromHsb ( dis ( gen ), 255, 255 );
+            ofColor randomPlayheadColor = ofColor::fromHsb ( dis ( gen ), 255, 255 );
+
+            mPlayheadTrails.push_back ( Utilities::VisualPlayheadTrail ( playheadUpdates[i].playheadID, randomPlayheadColor, TEMPORARY_ACOREX_VISUAL_TRAIL_MAX_LENGTH, TEMPORARY_ACOREX_VISUAL_TRAIL_FADE_UPDATE_INTERVAL ) );
+
+            mPlayheads.back ( ).color = randomPlayheadColor;
             mPlayheads.back ( ).ResizeBox ( mPlayheads.size ( ) - 1, mLayout->getTopBarHeight ( ), ofGetHeight ( ), ofGetWidth ( ) );
         }
     }
@@ -243,6 +255,28 @@ void Explorer::LiveView::UpdatePlayheads ( )
         playhead.position[0] = mCorpusMesh[playhead.fileIndex].getVertex ( timeIndex ).x;
         playhead.position[1] = mCorpusMesh[playhead.fileIndex].getVertex ( timeIndex ).y;
         playhead.position[2] = mCorpusMesh[playhead.fileIndex].getVertex ( timeIndex ).z;
+    }
+
+    // add new points to the playhead trails
+    for ( auto& trail : mPlayheadTrails )
+    {
+        auto it = std::find_if ( mPlayheads.begin ( ), mPlayheads.end ( ), [ &trail ] ( Utilities::VisualPlayhead& playhead ) { return playhead.playheadID == trail.playheadID; } );
+        if ( it != mPlayheads.end ( ) )
+        {
+            ofColor newColor = mCorpusMesh[it->fileIndex].getColor ( it->sampleIndex / mRawView->GetHopSize ( ) );
+            trail.AddTrailPoint ( it->fileIndex, it->sampleIndex / mRawView->GetHopSize ( ), glm::vec3 ( it->position[0], it->position[1], it->position[2] ), newColor );
+        }
+    }
+
+    // update playhead trails and remove any that have finished fading
+    int currentTime = ofGetElapsedTimeMillis ( );
+    for ( int i = 0; i < mPlayheadTrails.size ( ); i++ )
+    {
+        if ( mPlayheadTrails[i].Update ( currentTime ) )
+        {
+            mPlayheadTrails.erase ( mPlayheadTrails.begin ( ) + i );
+            i--;
+        }
     }
 }
 
@@ -260,6 +294,7 @@ void Explorer::LiveView::Draw ( )
     mCamera->begin ( );
 
     // Draw Axis ------------------------------
+    if ( bDrawAxes )
     {
         ofSetColor ( 255, 255, 255 );
         if ( mDisabledAxis != Utilities::Axis::X ) { ofDrawLine ( { SpaceDefs::mSpaceMin, 0, 0 }, { SpaceDefs::mSpaceMax, 0, 0 } ); }
@@ -271,9 +306,12 @@ void Explorer::LiveView::Draw ( )
         if ( mDisabledAxis != Utilities::Axis::Z ) { ofDrawBitmapString ( zLabel, { 0, 0, SpaceDefs::mSpaceMax } ); }
     }
 
-    // Draw points ------------------------------
+    // Draw points, tails, playheads ------------------------------
     {
-        if ( mPointPicker->GetNearestMousePointFile ( ) == -1 )
+        ofEnableDepthTest ( );
+        ofEnableAlphaBlending ( );
+
+        if ( bDrawCloud && !bDrawCloudDark )
         {
             for ( int file = 0; file < mCorpusMesh.size ( ); file++ )
             {
@@ -283,42 +321,91 @@ void Explorer::LiveView::Draw ( )
                 mCorpusMesh[file].setMode ( OF_PRIMITIVE_POINTS );
                 mCorpusMesh[file].draw ( );
             }
+
+            ofDisableDepthTest ( );
+            ofDisableAlphaBlending ( );
         }
-        else
+        if ( bDrawCloudDark )
         {
             for ( int file = 0; file < mCorpusMesh.size ( ); file++ )
             {
-                if ( file == mPointPicker->GetNearestMousePointFile ( ) ) { continue; }
                 mCorpusMesh[file].disableColors ( );
-                ofSetColor ( 255, 255, 255, 25 );
+                ofSetColor ( 255, 255, 255, 1 );
                 mCorpusMesh[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
                 mCorpusMesh[file].draw ( );
                 mCorpusMesh[file].setMode ( OF_PRIMITIVE_POINTS );
                 mCorpusMesh[file].draw ( );
             }
 
-            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].enableColors ( );
-            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_LINE_STRIP );
-            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].draw ( );
-            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_POINTS );
-            mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].draw ( );
+            ofDisableDepthTest ( );
+            ofDisableAlphaBlending ( );
+        }
+
+        for ( auto& trail : mPlayheadTrails )
+        {
+            trail.Draw ( );
         }
 
         for ( int i = 0; i < mPlayheads.size ( ); i++ )
         {
-            ofDisableDepthTest ( );
-            ofDisableAlphaBlending ( );
-
             ofColor color = mPlayheads[i].color; float size = 50;
             if ( mPlayheads[i].highlight ) { color = { 255, 255, 255, 255 }; size = 100; }
 
             ofSetColor ( color );
             glm::vec3 position = { mPlayheads[i].position[0], mPlayheads[i].position[1], mPlayheads[i].position[2] };
             ofDrawSphere ( position, size );
-
-            ofEnableAlphaBlending ( );
-            ofEnableDepthTest ( );
         }
+
+        //ofEnableAlphaBlending ( );
+        //ofEnableDepthTest ( );
+        //{
+        //    if ( mPointPicker->GetNearestMousePointFile ( ) == -1 )
+        //    {
+        //        for ( int file = 0; file < mCorpusMesh.size ( ); file++ )
+        //        {
+        //            mCorpusMesh[file].enableColors ( );
+        //            mCorpusMesh[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
+        //            mCorpusMesh[file].draw ( );
+        //            mCorpusMesh[file].setMode ( OF_PRIMITIVE_POINTS );
+        //            mCorpusMesh[file].draw ( );
+        //        }
+        //    }
+        //    else
+        //    {
+        //        for ( int file = 0; file < mCorpusMesh.size ( ); file++ )
+        //        {
+        //            if ( file == mPointPicker->GetNearestMousePointFile ( ) ) { continue; }
+        //            mCorpusMesh[file].disableColors ( );
+        //            ofSetColor ( 255, 255, 255, 25 );
+        //            mCorpusMesh[file].setMode ( OF_PRIMITIVE_LINE_STRIP );
+        //            mCorpusMesh[file].draw ( );
+        //            mCorpusMesh[file].setMode ( OF_PRIMITIVE_POINTS );
+        //            mCorpusMesh[file].draw ( );
+        //        }
+        //
+        //        mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].enableColors ( );
+        //        mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_LINE_STRIP );
+        //        mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].draw ( );
+        //        mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].setMode ( OF_PRIMITIVE_POINTS );
+        //        mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].draw ( );
+        //    }
+        //
+        //    for ( int i = 0; i < mPlayheads.size ( ); i++ )
+        //    {
+        //        ofDisableDepthTest ( );
+        //        ofDisableAlphaBlending ( );
+        //
+        //        ofColor color = mPlayheads[i].color; float size = 50;
+        //        if ( mPlayheads[i].highlight ) { color = { 255, 255, 255, 255 }; size = 100; }
+        //
+        //        ofSetColor ( color );
+        //        glm::vec3 position = { mPlayheads[i].position[0], mPlayheads[i].position[1], mPlayheads[i].position[2] };
+        //        ofDrawSphere ( position, size );
+        //
+        //        ofEnableAlphaBlending ( );
+        //        ofEnableDepthTest ( );
+        //    }
+        //}
     }
 
     mCamera->end ( );
@@ -327,13 +414,13 @@ void Explorer::LiveView::Draw ( )
 
     // Draw Nearest Point -----------------------
     mPointPicker->Draw ( );
-    if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
-    {
-        ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )], 20, ofGetHeight ( ) - 60 );
-        std::string hopInfoSamps = std::to_string ( mPointPicker->GetNearestMousePointTime ( ) * mRawView->GetHopSize ( ) );
-        std::string hopInfoSecs = std::to_string ( mRawView->GetTrailData ( )->raw[mPointPicker->GetNearestMousePointFile ( )][mPointPicker->GetNearestMousePointTime ( )][0] );
-        ofDrawBitmapStringHighlight ( "Nearest Timepoint: " + hopInfoSamps + " samples, " + hopInfoSecs + "s", 20, ofGetHeight ( ) - 40 );
-    }
+    //if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
+    //{
+    //    ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )], 20, ofGetHeight ( ) - 60 );
+    //    std::string hopInfoSamps = std::to_string ( mPointPicker->GetNearestMousePointTime ( ) * mRawView->GetHopSize ( ) );
+    //    std::string hopInfoSecs = std::to_string ( mRawView->GetTrailData ( )->raw[mPointPicker->GetNearestMousePointFile ( )][mPointPicker->GetNearestMousePointTime ( )][0] );
+    //    ofDrawBitmapStringHighlight ( "Nearest Timepoint: " + hopInfoSamps + " samples, " + hopInfoSecs + "s", 20, ofGetHeight ( ) - 40 );
+    //}
 
     // Paused overlay ---------------------------
     if ( bUserPaused )
@@ -712,13 +799,27 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
         else if ( args.key == ACOREX_KEYBIND_CAMERA_ZOOM_IN ) { mKeyboardMoveState[8] = false; }
         else if ( args.key == ACOREX_KEYBIND_CAMERA_ZOOM_OUT ) { mKeyboardMoveState[9] = false; }
         else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_ZERO_ZERO ) { mAudioPlayback.CreatePlayhead ( 0, 0 ); }
-        else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_RANDOM_POINT )
-        {
-            CreatePlayheadRandom ( );
-        }
+        else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_RANDOM_POINT ) { CreatePlayheadRandom ( ); }
         else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_PICKER_POINT ) { CreatePlayhead ( ); }
         else if ( args.key == ACOREX_KEYBIND_AUDIO_PAUSE ) { bUserPaused = !bUserPaused; mAudioPlayback.UserInvokedPause ( bUserPaused ); }
         else if ( args.key == ACOREX_KEYBIND_TOGGLE_DEBUG_VIEW ) { bDebug = !bDebug; }
+        else if ( args.key == ACOREX_KEYBIND_TOGGLE_DRAWING_AXES ) { bDrawAxes = !bDrawAxes; }
+        else if ( args.key == ACOREX_KEYBIND_TOGGLE_DRAWING_CLOUD )
+        {
+            if ( bDrawCloud && !bDrawCloudDark )
+            {
+                bDrawCloudDark = true;
+            }
+            else if ( bDrawCloud && bDrawCloudDark )
+            {
+                bDrawCloudDark = false;
+                bDrawCloud = false;
+            }
+            else
+            {
+                bDrawCloud = true;
+            }
+        }
         //else if ( args.key == 'c' ) // TODO - might not need this key either just like the ENTER key below, remove also?
         //{ 
         //    if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )

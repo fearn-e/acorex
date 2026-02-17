@@ -141,6 +141,7 @@
     <ClCompile Include="src\Explorer\RawView.cpp" />
     <ClCompile Include="src\Utilities\AudioSettingsManager.cpp" />
     <ClCompile Include="src\Utilities\AudioFileLoader.cpp" />
+    <ClCompile Include="src\Utilities\Data.cpp" />
     <ClCompile Include="src\Utilities\DatasetConversion.cpp" />
     <ClCompile Include="src\Utilities\JSON.cpp" />
     <ClCompile Include="..\..\..\addons\ofxAudioFile\src\ofxAudioFile.cpp" />
