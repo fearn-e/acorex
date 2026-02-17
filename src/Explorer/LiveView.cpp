@@ -598,7 +598,7 @@ void Explorer::LiveView::Init3DCam ( )
 { 
     double outsidePoint = SpaceDefs::mSpaceMax * 1.5;
     double midSpacePoint = (SpaceDefs::mSpaceMax + SpaceDefs::mSpaceMin ) / 2;
-    mCamera->setPosition ( outsidePoint, outsidePoint, outsidePoint );
+    mCamera->setPosition ( outsidePoint, midSpacePoint + 200, midSpacePoint );
     mCamPivot = ofPoint ( midSpacePoint, midSpacePoint, midSpacePoint );
     mCamera->lookAt ( mCamPivot ); 
     mCamera->setNearClip ( 0.01 ); 
