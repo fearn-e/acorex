@@ -72,6 +72,8 @@ void ExplorerMenu::Clear ( )
 
     mMainPanel.clear ( );
 
+    ofSetWindowTitle ( "ACorEx" );
+
     if ( clearedOpenCorpus ) { ofLogNotice ( "Explorer" ) << "Cleared corpus."; }
 }
 
@@ -635,6 +637,8 @@ void ExplorerMenu::OpenCorpus ( )
 
     bIsCorpusOpen = true;
 
+    ofSetWindowTitle ( "ACoreX - " + mRawView->GetCorpusName ( ) );
+
     bool audioStarted = mLiveView.StartAudio ( mAudioSettingsManager.GetCurrentAudioSettings ( ) );
 
     ofLogNotice ( "Explorer" ) << "Opened corpus: " << mRawView->GetCorpusName ( );
@@ -863,7 +867,7 @@ void ExplorerMenu::RescanDevices ( )
     AudioOutputFailed ( );
 }
 
-void Acorex::ExplorerMenu::SetApi ( string& dropdownName )
+void ExplorerMenu::SetApi ( string& dropdownName )
 {
     if ( mAudioSettingsManager.GetCurrentApiIndex ( ) == mApiDropdown->getSelectedOptionIndex ( ) ) { return; }
 
