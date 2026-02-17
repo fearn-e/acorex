@@ -77,7 +77,6 @@ void ofApp::draw ( )
         mDPIToggle.draw ( );
     }
 
-    ofDrawBitmapStringHighlight ( "ACorEx - Audio Corpus Explorer", 0, mLayout->getTopBarHeight ( ) - 5 );
     ofDrawBitmapStringHighlight ( "FPS: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 15 );
 
     mLogDisplay->Draw ( );
