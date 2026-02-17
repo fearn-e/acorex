@@ -57,6 +57,8 @@ public:
 
     void CreatePlayhead ( );
     void CreatePlayhead ( size_t fileIndex, size_t timePointIndex );
+    void CreatePlayheadRandom ( );
+    void PickRandomPoint ( );
     void KillPlayhead ( size_t playheadID );
 
     // Filler Functions ----------------------------

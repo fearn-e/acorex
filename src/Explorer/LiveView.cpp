@@ -368,6 +368,20 @@ void Explorer::LiveView::CreatePlayhead ( size_t fileIndex, size_t timePointInde
     mAudioPlayback.CreatePlayhead ( fileIndex, timePointIndex );
 }
 
+void Explorer::LiveView::CreatePlayheadRandom ( )
+{
+    std::uniform_int_distribution<> disFile ( 0, mRawView->GetDataset ( )->fileList.size ( ) - 1 );
+    size_t randomFile = disFile ( mRandomGen );
+    std::uniform_int_distribution<> disTime ( 0, mRawView->GetTrailData ( )->raw[randomFile].size ( ) - 1 );
+    size_t randomTime = disTime ( mRandomGen );
+    CreatePlayhead ( randomFile, randomTime );
+}
+
+void Explorer::LiveView::PickRandomPoint ( )
+{
+    mPointPicker->FindRandom ( );
+}
+
 void Explorer::LiveView::KillPlayhead ( size_t playheadID )
 {
     mAudioPlayback.KillPlayhead ( playheadID );
@@ -700,11 +714,7 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
         else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_ZERO_ZERO ) { mAudioPlayback.CreatePlayhead ( 0, 0 ); }
         else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_RANDOM_POINT )
         {
-            std::uniform_int_distribution<> disFile ( 0, mRawView->GetDataset ( )->fileList.size ( ) - 1 );
-            size_t randomFile = disFile ( mRandomGen );
-            std::uniform_int_distribution<> disTime ( 0, mRawView->GetTrailData ( )->raw[randomFile].size ( ) - 1 );
-            size_t randomTime = disTime ( mRandomGen );
-            CreatePlayhead ( randomFile, randomTime );
+            CreatePlayheadRandom ( );
         }
         else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_PICKER_POINT ) { CreatePlayhead ( ); }
         else if ( args.key == ACOREX_KEYBIND_AUDIO_PAUSE ) { bUserPaused = !bUserPaused; mAudioPlayback.UserInvokedPause ( bUserPaused ); }
