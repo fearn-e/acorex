@@ -19,6 +19,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Utilities/TemporaryDefaults.h"
 #include "Utilities/TemporaryKeybinds.h"
 
+#define ACOREX_VERSION_STRING "v1.1.0-dev.build.2026.02.18.b"
+
 ofApp::ofApp ( ) :
     bListenersAdded ( false ), bMidiHubInstance ( false ), bMidiHubConfirm ( false ), mMidiHubConfirmTime ( 0 ), mMidiHubConfirmDuration ( 5 )
 {
@@ -100,9 +102,12 @@ void ofApp::draw ( )
         ofSetColor ( mColors.interfaceBackgroundColor );
         ofDrawRectangle ( 0, 0, ofGetWidth ( ), mLayout->getTopBarHeight ( ) );
 
-        ofDrawBitmapStringHighlight ( "FPS: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 15 );
-
         mLogDisplay->Draw ( );
+
+        ofEnableAlphaBlending ( );
+        ofSetColor ( mColors.normalTextColor.r, mColors.normalTextColor.g, mColors.normalTextColor.b, 145 );    
+        ofDrawBitmapStringHighlight ( ACOREX_VERSION_STRING, 0, 15 );
+        ofDrawBitmapStringHighlight ( "FPS: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 30 );
         return;
     }
 
@@ -118,9 +123,12 @@ void ofApp::draw ( )
         mDPIToggle.draw ( );
     }
 
-    ofDrawBitmapStringHighlight ( "FPS: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 15 );
-
     mLogDisplay->Draw ( );
+
+    ofEnableAlphaBlending ( );
+    ofSetColor ( mColors.normalTextColor.r, mColors.normalTextColor.g, mColors.normalTextColor.b, 145 );
+    ofDrawBitmapStringHighlight ( ACOREX_VERSION_STRING, 0, 15 );
+    ofDrawBitmapStringHighlight ( "FPS: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 30 );
 }
 
 void ofApp::exit ( )
