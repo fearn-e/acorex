@@ -677,6 +677,10 @@ void ExplorerMenu::OpenCorpus ( )
     }
     bDrawOpenCorpusWarning = false;
 
+    bool preserveCorpusSettings = false;
+    int preservedControlReceiverIndex;
+    if ( bIsCorpusOpen ) { preserveCorpusSettings = true; }
+
     // clear stuff
     mLiveView.Clear ( );
 
@@ -698,6 +702,8 @@ void ExplorerMenu::OpenCorpus ( )
     }
 
     Utilities::ExploreSettings initialSettings { };
+
+    if ( !preserveCorpusSettings )
     {
         initialSettings.SetHopSize ( mRawView->GetHopSize ( ) );
 
@@ -720,12 +726,38 @@ void ExplorerMenu::OpenCorpus ( )
         initialSettings.SetDimensionDynamicPan ( DEFAULT_DIMENSION_DYNAMIC_PAN );
         initialSettings.SetPanningStrengthX1000 ( DEFAULT_PANNING_STRENGTH_X1000 );
     }
+    else if ( preserveCorpusSettings )
+    {
+        preservedControlReceiverIndex = mControlReceiverIndex;
+
+        initialSettings.SetHopSize ( mRawView->GetHopSize ( ) );
+
+        initialSettings.SetDimensionX ( mRawView->GetDimensions ( ).size ( ) > mDimensionDropdownX->getSelectedOptionIndex ( ) ? mDimensionDropdownX->getAllSelected ( )[0] : DEFAULT_DIMENSION_X );
+        initialSettings.SetDimensionY ( mRawView->GetDimensions ( ).size ( ) > mDimensionDropdownY->getSelectedOptionIndex ( ) ? mDimensionDropdownY->getAllSelected ( )[0] : DEFAULT_DIMENSION_Y );
+        initialSettings.SetDimensionZ ( mRawView->GetDimensions ( ).size ( ) > mDimensionDropdownZ->getSelectedOptionIndex ( ) ? mDimensionDropdownZ->getAllSelected ( )[0] : DEFAULT_DIMENSION_Z );
+
+        initialSettings.SetDimensionColor ( mRawView->GetDimensions ( ).size ( ) > mDimensionDropdownColor->getSelectedOptionIndex ( ) ? mDimensionDropdownColor->getAllSelected ( )[0] : DEFAULT_DIMENSION_COLOR );
+        initialSettings.SetColorSpectrum ( mColorSpectrumSwitcher );
+
+        initialSettings.SetLoopPlayheads ( mLoopPlayheadsToggle );
+        initialSettings.SetJumpSameFileAllowed ( mJumpSameFileAllowedToggle );
+        initialSettings.SetJumpSameFileMinTimeDiff ( mJumpSameFileMinTimeDiffSlider );
+        initialSettings.SetCrossoverJumpChanceX1000 ( mCrossoverJumpChanceSliderX1000 );
+        initialSettings.SetCrossfadeSampleLength ( mRawView->GetHopSize ( ) > mCrossfadeSampleLengthSlider ? mCrossfadeSampleLengthSlider : DEFAULT_CROSSFADE_SAMPLE_LENGTH );
+        initialSettings.SetMaxJumpDistanceSpaceX1000 ( mMaxJumpDistanceSpaceSlider );
+        initialSettings.SetMaxJumpTargets ( mMaxJumpTargetsSlider );
+
+        initialSettings.SetVolumeX1000 ( mVolumeSliderX1000 );
+        initialSettings.SetDimensionDynamicPan ( mRawView->GetDimensions ( ).size ( ) > mDimensionDropdownDynamicPan->getSelectedOptionIndex ( ) ? mDimensionDropdownDynamicPan->getAllSelected ( )[0] : DEFAULT_DIMENSION_DYNAMIC_PAN );
+        initialSettings.SetPanningStrengthX1000 ( mPanningStrengthSliderX1000 );
+    }
 
     mLiveView.Initialise ( );
 
     mLiveView.CreatePoints ( ); // TODO - combine with mLiveView.Initialise ( );?
 
     OpenFullPanel ( initialSettings );
+    mControlReceiverIndexSlider = preserveCorpusSettings ? preservedControlReceiverIndex : DEFAULT_CONTROL_RECEIVER_INDEX;
 
     bBlockDimensionFilling = false;
 
@@ -733,7 +765,7 @@ void ExplorerMenu::OpenCorpus ( )
 
     CameraSwitcher ( );
 
-    mControlReceiver.setup ( "localhost", ACOREX_OSC_PORT );
+    mControlReceiver.setup ( "localhost", ACOREX_OSC_PORT + mControlReceiverIndex );
 
     bIsCorpusOpen = true;
 
