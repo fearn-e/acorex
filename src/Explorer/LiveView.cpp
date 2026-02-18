@@ -33,7 +33,7 @@ using namespace Acorex;
 Explorer::LiveView::LiveView ( )
     : bListenersAdded ( false ),
     bDebug ( false ), bUserPaused ( false ), bDraw ( false ), bDrawAxes ( false ), bDrawCloud ( true ), bDrawCloudDark ( true ),
-    b3D ( true ), bColorFullSpectrum ( false ),
+    b3D ( true ), bColorFullSpectrum ( false ), bMouseCameraControl ( false ),
     mKeyboardMoveState { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // W, A, S, D, R, F, Q, E, Z, X
     mCamMoveSpeedScaleAdjusted ( SpaceDefs::mCamMoveSpeed ),
     deltaTime ( 0.1f ), lastUpdateTime ( 0 ),
@@ -736,7 +736,7 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
     //position: x, y
     //scroll direction: x, y
 
-    if ( b3D )
+    if ( bMouseCameraControl && b3D )
     {
         if ( args.type == 4 ) // scroll - zoom
         {
@@ -754,7 +754,7 @@ void Explorer::LiveView::MouseEvent ( ofMouseEventArgs& args )
             mPointPicker->SetNearestCheckNeeded ( );
         }
     }
-    else // 2D
+    else if ( bMouseCameraControl && !b3D )
     {
         if ( args.type == 4 ) // scroll - zoom
         {
@@ -809,6 +809,7 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
         else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_PICKER_POINT ) { CreatePlayhead ( ); }
         else if ( args.key == ACOREX_KEYBIND_AUDIO_PAUSE ) { bUserPaused = !bUserPaused; mAudioPlayback.UserInvokedPause ( bUserPaused ); }
         else if ( args.key == ACOREX_KEYBIND_TOGGLE_DEBUG_VIEW ) { bDebug = !bDebug; }
+        else if ( args.key == ACOREX_KEYBIND_TOGGLE_MOUSE_CAMERA_CONTROL ) { bMouseCameraControl = !bMouseCameraControl; }
         else if ( args.key == ACOREX_KEYBIND_TOGGLE_DRAWING_AXES ) { bDrawAxes = !bDrawAxes; }
         else if ( args.key == ACOREX_KEYBIND_TOGGLE_DRAWING_CLOUD )
         {
