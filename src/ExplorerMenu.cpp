@@ -677,6 +677,21 @@ void ExplorerMenu::OpenCorpus ( )
     }
     bDrawOpenCorpusWarning = false;
 
+    bool preserveCorpusSettings = false;
+    int preservedControlReceiverIndex = 0;
+    if ( bIsCorpusOpen ) { preserveCorpusSettings = true; }
+
+    Utilities::ExploreSettings preservedSettings { };
+    if ( preserveCorpusSettings )
+    {
+        preservedControlReceiverIndex = mControlReceiverIndex;
+
+        preservedSettings.SetCrossoverJumpChanceX1000 ( mCrossoverJumpChanceSliderX1000 );
+        preservedSettings.SetCrossfadeSampleLength ( mCrossfadeSampleLengthSlider );
+        preservedSettings.SetVolumeX1000 ( mVolumeSliderX1000 );
+        preservedSettings.SetPanningStrengthX1000 ( mPanningStrengthSliderX1000 );
+    }
+
     // clear stuff
     mLiveView.Clear ( );
 
@@ -725,7 +740,27 @@ void ExplorerMenu::OpenCorpus ( )
 
     mLiveView.CreatePoints ( ); // TODO - combine with mLiveView.Initialise ( );?
 
+    if ( preserveCorpusSettings )
+    {
+        preservedSettings.SetHopSize ( initialSettings.GetHopSize ( ) );
+
+        initialSettings.SetCrossoverJumpChanceX1000 ( preservedSettings.GetCrossoverJumpChanceX1000 ( ) );
+        initialSettings.SetCrossfadeSampleLength ( preservedSettings.GetCrossfadeSampleLengthLimitedByHopSize ( ) );
+
+        initialSettings.SetVolumeX1000 ( preservedSettings.GetVolumeX1000 ( ) );
+        initialSettings.SetPanningStrengthX1000 ( preservedSettings.GetPanningStrengthX1000 ( ) );
+    }
+
     OpenFullPanel ( initialSettings );
+
+    if ( preserveCorpusSettings )
+    {
+        mControlReceiverIndexSlider = preservedControlReceiverIndex;
+    }
+    else
+    {
+        mControlReceiverIndexSlider = DEFAULT_CONTROL_RECEIVER_INDEX;
+    }
 
     bBlockDimensionFilling = false;
 
@@ -733,7 +768,7 @@ void ExplorerMenu::OpenCorpus ( )
 
     CameraSwitcher ( );
 
-    mControlReceiver.setup ( "localhost", ACOREX_OSC_PORT );
+    mControlReceiver.setup ( "localhost", ACOREX_OSC_PORT + mControlReceiverIndex );
 
     bIsCorpusOpen = true;
 
