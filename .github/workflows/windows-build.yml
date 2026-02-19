@@ -1,4 +1,4 @@
-name: Windows Build and Release
+name: Windows Build and Draft Release
 
 on:
   push:
@@ -42,6 +42,6 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: openframeworks/apps/myApps/acorex/bin/*
-        draft: false
+        draft: true
         prerelease: false
         generate_release_notes: true
