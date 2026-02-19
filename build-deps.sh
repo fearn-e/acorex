@@ -118,8 +118,6 @@ set -o errexit
     fi
 #
 
-exit
-
 echo "OS discovered as $currentOS"
 
 # Download repos & OF addons
