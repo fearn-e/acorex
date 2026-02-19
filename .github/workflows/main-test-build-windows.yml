@@ -1,0 +1,39 @@
+name: Main Branch Test Build - Windows
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Download openFrameworks
+      shell: bash
+      run: |
+        git -c advice.detachedHead=false clone --depth 1 -b "acorex" https://github.com/fearn-e/openframeworks 
+        ./openframeworks/scripts/vs/download_libs.sh
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        path: openframeworks/apps/myApps/acorex
+    
+    - name: Setup CMake
+      uses: lukka/get-cmake@latest
+    
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+    
+    - name: Run build-deps script
+      shell: bash
+      run: cd openframeworks/apps/myApps/acorex && ./build-deps.sh
+    
+    - name: Build solution in Release mode
+      working-directory: openframeworks/apps/myApps/acorex
+      run: msbuild acorex.sln /p:Configuration=Release /p:Platform=x64 /m
