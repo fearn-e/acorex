@@ -28,6 +28,8 @@
 
 #define ACOREX_KEYBIND_AUDIO_PAUSE          ' '
 
+#define ACOREX_KEYBIND_TOGGLE_MOUSE_CAMERA_CONTROL 'c'
+
 //PointPicker key binds
 #define ACOREX_KEYBIND_TOGGLE_DEBUG_VIEW OF_KEY_F8
 

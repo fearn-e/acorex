@@ -105,6 +105,8 @@ private:
     bool bDraw;
     bool bDrawAxes;
     bool bDrawCloud; bool bDrawCloudDark;
+    
+    bool bMouseCameraControl;
 
     bool b3D;
     bool bColorFullSpectrum;
