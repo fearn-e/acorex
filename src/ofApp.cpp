@@ -35,8 +35,10 @@ ofApp::ofApp ( ) :
 
 void ofApp::setup ( )
 {   
-    ofSetWindowTitle ( "ACorEx" );
+    mVersionString.ComputeVersionString ( );
 
+    ofSetWindowTitle ( "ACorEx" );
+    
     ofSetVerticalSync ( true );
     ofBackground ( 30 );
 
@@ -103,6 +105,12 @@ void ofApp::draw ( )
         ofDrawBitmapStringHighlight ( "FPS: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 15 );
 
         mLogDisplay->Draw ( );
+
+        ofEnableAlphaBlending ( );
+        ofSetColor ( mColors.normalTextColor.r, mColors.normalTextColor.g, mColors.normalTextColor.b, 145 );
+        ofDrawBitmapStringHighlight ( mVersionString.GetVersionString ( ), 0, 15 );
+        ofDrawBitmapStringHighlight ( "FPS: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 30 );
+
         return;
     }
 
@@ -118,9 +126,12 @@ void ofApp::draw ( )
         mDPIToggle.draw ( );
     }
 
-    ofDrawBitmapStringHighlight ( "FPS: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 15 );
-
     mLogDisplay->Draw ( );
+
+    ofEnableAlphaBlending ( );
+    ofSetColor ( mColors.normalTextColor.r, mColors.normalTextColor.g, mColors.normalTextColor.b, 145 );
+    ofDrawBitmapStringHighlight ( mVersionString.GetVersionString ( ), 0, 15 );
+    ofDrawBitmapStringHighlight ( "FPS: " + ofToString ( (int)ofGetFrameRate ( ) ), 0, 30 );
 }
 
 void ofApp::exit ( )
