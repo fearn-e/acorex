@@ -169,6 +169,9 @@
     <ClCompile Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscOutboundPacketStream.cpp">
       <Filter>addons\ofxOsc\libs\oscpack\osc</Filter>
     </ClCompile>
+    <ClCompile Include="src\Versioning.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -466,6 +469,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\addons\ofxOsc\libs\oscpack\src\osc\OscHostEndianness.h">
       <Filter>addons\ofxOsc\libs\oscpack\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Versioning.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
