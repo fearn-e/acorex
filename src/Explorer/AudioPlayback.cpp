@@ -523,6 +523,11 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t timePoin
         ofLogError ( "AudioPlayback" ) << "No files in dataset, failed to create new playhead";
         return false;
     }
+    if ( !mRawView->GetAudioData ( )->loaded[fileIndex] )
+    {
+        ofLogError ( "AudioPlayback" ) << "File not loaded in memory, failed to create playhead for " << mRawView->GetDataset ( )->fileList[fileIndex];
+        return false;
+    }
 
     {
         std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
@@ -533,8 +538,6 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t timePoin
         }
     }
 
-    if ( mRawView->GetAudioData ( )->loaded[fileIndex] )
-    {
         size_t sampleIndex = timePointIndex * mRawView->GetHopSize ( );
         Utilities::AudioPlayhead newPlayhead ( playheadCounter, fileIndex, sampleIndex );
         playheadCounter++;
@@ -547,12 +550,6 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t timePoin
         }
 
         return true;
-    }
-    else
-    {
-        ofLogError ( "AudioPlayback" ) << "File not loaded in memory, failed to create playhead for " << mRawView->GetDataset ( )->fileList[fileIndex];
-        return false;
-    }
 }
 
 bool Explorer::AudioPlayback::KillPlayhead ( size_t playheadID )
