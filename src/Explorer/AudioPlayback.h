@@ -90,7 +90,7 @@ private:
     ofSoundStream mSoundStream;
     std::atomic<bool> bStreamStarted;
 
-    std::mutex mKillAudioOnlyAudioThreadBlockingMutex;
+    std::mutex mAudioThreadMutex;
 
     std::mutex mRestartingAudioMutex;
     std::atomic<bool> bRestartingAudioFlag;
