@@ -365,8 +365,8 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utilities::ExploreSet
     mCrossfadeSampleLengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Jump Max Distance Slider
-    mMainPanel.add ( mMaxJumpDistanceSpaceSlider.setup ( "Max Jump Distance Space", settings.GetMaxJumpDistanceSpace ( ), 0.0, 1.0 ) );
-    mMaxJumpDistanceSpaceSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mMainPanel.add ( mMaxJumpDistanceSpaceSliderX1000.setup ( "Max Jump Distance Space", settings.GetMaxJumpDistanceSpaceX1000 ( ), 0, 1000 ) );
+    mMaxJumpDistanceSpaceSliderX1000.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Jump Max Targets Slider
     mMainPanel.add ( mMaxJumpTargetsSlider.setup ( "Max Jump Targets", settings.GetMaxJumpTargets ( ), 1, 10 ) );
@@ -502,7 +502,7 @@ void ExplorerMenu::RefreshFullPanelUI ( )
     mJumpSameFileMinTimeDiffSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     mCrossoverJumpChanceSliderX1000.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     mCrossfadeSampleLengthSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
-    mMaxJumpDistanceSpaceSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
+    mMaxJumpDistanceSpaceSliderX1000.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     mMaxJumpTargetsSlider.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
     
     mVolumeSliderX1000.setSize ( mLayout->getExplorePanelWidth ( ), mLayout->getPanelRowHeight ( ) );
@@ -563,7 +563,7 @@ void ExplorerMenu::AddListenersCorpusControls ( )
     mJumpSameFileMinTimeDiffSlider.addListener ( this, &ExplorerMenu::SetJumpSameFileMinTimeDiffListener );
     mCrossoverJumpChanceSliderX1000.addListener ( this, &ExplorerMenu::SetCrossoverJumpChanceX1000Listener );
     mCrossfadeSampleLengthSlider.addListener ( this, &ExplorerMenu::SetCrossfadeSampleLengthListener );
-    mMaxJumpDistanceSpaceSlider.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpaceListener );
+    mMaxJumpDistanceSpaceSliderX1000.addListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpaceX1000Listener );
     mMaxJumpTargetsSlider.addListener ( this, &ExplorerMenu::SetMaxJumpTargetsListener );
 
     mVolumeSliderX1000.addListener ( this, &ExplorerMenu::SetVolumeX1000Listener );
@@ -594,7 +594,7 @@ void ExplorerMenu::RemoveListenersCorpusControls ( )
     mJumpSameFileMinTimeDiffSlider.removeListener ( this, &ExplorerMenu::SetJumpSameFileMinTimeDiffListener );
     mCrossoverJumpChanceSliderX1000.removeListener ( this, &ExplorerMenu::SetCrossoverJumpChanceX1000Listener );
     mCrossfadeSampleLengthSlider.removeListener ( this, &ExplorerMenu::SetCrossfadeSampleLengthListener );
-    mMaxJumpDistanceSpaceSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpaceListener );
+    mMaxJumpDistanceSpaceSliderX1000.removeListener ( this, &ExplorerMenu::SetMaxJumpDistanceSpaceX1000Listener );
     mMaxJumpTargetsSlider.removeListener ( this, &ExplorerMenu::SetMaxJumpTargetsListener );
 
     mVolumeSliderX1000.removeListener ( this, &ExplorerMenu::SetVolumeX1000Listener );
@@ -677,7 +677,7 @@ void ExplorerMenu::OpenCorpus ( )
 
     Utilities::ExploreSettings initialSettings { };
 
-        initialSettings.SetHopSize ( mRawView->GetHopSize ( ) );
+    initialSettings.SetHopSize ( mRawView->GetHopSize ( ) );
 
     if ( !preserveCorpusSettings )
     {
@@ -716,7 +716,7 @@ void ExplorerMenu::OpenCorpus ( )
         initialSettings.SetJumpSameFileMinTimeDiff ( mJumpSameFileMinTimeDiffSlider );
         initialSettings.SetCrossoverJumpChanceX1000 ( mCrossoverJumpChanceSliderX1000 );
         initialSettings.SetCrossfadeSampleLength ( mRawView->GetHopSize ( ) > mCrossfadeSampleLengthSlider ? mCrossfadeSampleLengthSlider : DEFAULT_CROSSFADE_SAMPLE_LENGTH );
-        initialSettings.SetMaxJumpDistanceSpaceX1000 ( mMaxJumpDistanceSpaceSlider );
+        initialSettings.SetMaxJumpDistanceSpaceX1000 ( mMaxJumpDistanceSpaceSliderX1000 );
         initialSettings.SetMaxJumpTargets ( mMaxJumpTargetsSlider );
 
         initialSettings.SetVolumeX1000 ( mVolumeSliderX1000 );
@@ -851,7 +851,7 @@ void ExplorerMenu::PropogateCorpusSettings ( const Utilities::ExploreSettings& s
     SetJumpSameFileMinTimeDiff ( settings.GetJumpSameFileMinTimeDiff ( ) );
     SetCrossoverJumpChanceX1000 ( settings.GetCrossoverJumpChanceX1000 ( ) );
     SetCrossfadeSampleLength ( settings.GetCrossfadeSampleLengthLimitedByHopSize ( ) );
-    SetMaxJumpDistanceSpace ( settings.GetMaxJumpDistanceSpace ( ) );
+    SetMaxJumpDistanceSpaceX1000 ( settings.GetMaxJumpDistanceSpaceX1000 ( ) );
     SetMaxJumpTargets ( settings.GetMaxJumpTargets ( ) );
 
     SetVolumeX1000 ( settings.GetVolumeX1000 ( ) );
@@ -920,9 +920,9 @@ void ExplorerMenu::SetCrossfadeSampleLength ( const int& length )
     mLiveView.GetAudioPlayback ( )->SetCrossfadeSampleLength ( length );
 }
 
-void ExplorerMenu::SetMaxJumpDistanceSpace ( const float& distance )
+void ExplorerMenu::SetMaxJumpDistanceSpaceX1000 ( const int& distanceX1000 )
 {
-    mLiveView.GetAudioPlayback ( )->SetMaxJumpDistanceSpace ( (int)(distance * 1000) );
+    mLiveView.GetAudioPlayback ( )->SetMaxJumpDistanceSpaceX1000 ( distanceX1000 );
 }
 
 void ExplorerMenu::SetMaxJumpTargets ( const int& targets )
