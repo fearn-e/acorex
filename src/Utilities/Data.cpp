@@ -61,7 +61,7 @@ void Utilities::VisualPlayheadTrail::UpdateTrail ( )
     }
 }
 
-void Utilities::VisualPlayheadTrail::Kill ( )
+void Utilities::VisualPlayheadTrail::SoftKill ( )
 {
     dying = true;
     currentFadeStep = 0;
