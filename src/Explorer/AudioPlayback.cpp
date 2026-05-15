@@ -69,7 +69,7 @@ bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t buff
     }
 
     {
-        std::lock_guard<std::mutex> audioOutLock ( mKillAudioOnlyAudioThreadBlockingMutex );
+        std::lock_guard<std::mutex> audioOutLock ( mAudioThreadMutex );
         mSoundStream.close ( );
     }
     
@@ -102,7 +102,7 @@ bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t buff
 
 void Explorer::AudioPlayback::ClearAndKillAudio ( )
 {
-    std::lock_guard<std::mutex> killAudioLock ( mKillAudioOnlyAudioThreadBlockingMutex );
+    std::lock_guard<std::mutex> killAudioLock ( mAudioThreadMutex );
 
     mSoundStream.close ( );
     bStreamStarted = false;
@@ -164,9 +164,9 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
     // TODO - change this and other lock_guard/try_lock instances to unique_lock with something like:
     //              std::unique_lock<std::mutex> lock ( mNewPlayheadMutex, std::try_to_lock );
     //              if ( lock.owns_lock ( ) )
-    if ( mKillAudioOnlyAudioThreadBlockingMutex.try_lock ( ) )
+    if ( mAudioThreadMutex.try_lock ( ) )
     {
-        std::lock_guard<std::mutex> lock ( mKillAudioOnlyAudioThreadBlockingMutex, std::adopt_lock );
+        std::lock_guard<std::mutex> lock ( mAudioThreadMutex, std::adopt_lock );
 
         // zero the output buffer
         for ( size_t sampleIndex = 0; sampleIndex < outBuffer.getNumFrames ( ); sampleIndex++ )
