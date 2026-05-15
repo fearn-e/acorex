@@ -23,9 +23,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #define ACOREX_PATCH_VERSION 0
 
 #ifdef _ACOREX_DEVELOPMENT_BUILD
-    #define ACOREX_VERSION_STATUS "development_build"
+    #define ACOREX_VERSION_STATUS (std::string)"development_build"
 #elif _ACOREX_DEBUG
-    #define ACOREX_VERSION_STATUS "debug_build"
+    #define ACOREX_VERSION_STATUS (std::string)"debug_build"
 #endif
 
 namespace Acorex {
