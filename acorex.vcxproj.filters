@@ -172,6 +172,9 @@
     <ClCompile Include="src\Versioning.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utilities\XML.cpp">
+      <Filter>src\Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -472,6 +475,9 @@
     </ClInclude>
     <ClInclude Include="src\Versioning.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utilities\XML.h">
+      <Filter>src\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

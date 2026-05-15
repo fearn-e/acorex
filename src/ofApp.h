@@ -63,6 +63,8 @@ private:
     Acorex::Utilities::Colors mColors;
     Acorex::VersionString mVersionString;
 
+    Acorex::
+
     bool bMidiHubInstance;
     bool bMidiHubConfirm;
     float mMidiHubConfirmTime;
