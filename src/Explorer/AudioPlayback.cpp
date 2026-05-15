@@ -356,6 +356,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
 void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utilities::AudioPlayhead* playhead, bool outBufferFull )
 {
+    //TODO - the next 6 lines seem like they're doing the same thing twice? double check
     size_t segmentLength = playhead->triggerSamplePoints.front ( ) - playhead->sampleIndex;
 
     if ( outBufferFull && segmentLength > (outBuffer->getNumFrames ( ) - *outBufferPosition) ) // cut off early if outBuffer is full
