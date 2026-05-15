@@ -652,7 +652,7 @@ void ExplorerMenu::OpenCorpus ( )
     bDrawOpenCorpusWarning = false;
 
     bool preserveCorpusSettings = false;
-    int preservedControlReceiverIndex;
+    int preservedControlReceiverIndex = 0; // TODO - check how many other instances running, set to X + 1
     if ( bIsCorpusOpen ) { preserveCorpusSettings = true; }
 
     // clear stuff
@@ -677,10 +677,10 @@ void ExplorerMenu::OpenCorpus ( )
 
     Utilities::ExploreSettings initialSettings { };
 
-    if ( !preserveCorpusSettings )
-    {
         initialSettings.SetHopSize ( mRawView->GetHopSize ( ) );
 
+    if ( !preserveCorpusSettings )
+    {
         initialSettings.SetDimensionX ( mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : DEFAULT_DIMENSION_X );
         initialSettings.SetDimensionY ( mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : DEFAULT_DIMENSION_Y );
         initialSettings.SetDimensionZ ( mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : DEFAULT_DIMENSION_Z );
@@ -703,8 +703,6 @@ void ExplorerMenu::OpenCorpus ( )
     else if ( preserveCorpusSettings )
     {
         preservedControlReceiverIndex = mControlReceiverIndex;
-
-        initialSettings.SetHopSize ( mRawView->GetHopSize ( ) );
 
         initialSettings.SetDimensionX ( mRawView->GetDimensions ( ).size ( ) > mDimensionDropdownX->getSelectedOptionIndex ( ) ? mDimensionDropdownX->getAllSelected ( )[0] : DEFAULT_DIMENSION_X );
         initialSettings.SetDimensionY ( mRawView->GetDimensions ( ).size ( ) > mDimensionDropdownY->getSelectedOptionIndex ( ) ? mDimensionDropdownY->getAllSelected ( )[0] : DEFAULT_DIMENSION_Y );
@@ -731,6 +729,7 @@ void ExplorerMenu::OpenCorpus ( )
     mLiveView.CreatePoints ( ); // TODO - combine with mLiveView.Initialise ( );?
 
     OpenFullPanel ( initialSettings );
+
     mControlReceiverIndexSlider = preserveCorpusSettings ? preservedControlReceiverIndex : DEFAULT_CONTROL_RECEIVER_INDEX;
 
     bBlockDimensionFilling = false;
