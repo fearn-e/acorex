@@ -206,33 +206,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
         if ( mNewPlayheadMutex.try_lock ( ) )
         {
             std::lock_guard<std::mutex> lock ( mNewPlayheadMutex, std::adopt_lock );
-
-            while ( !mNewPlayheads.empty ( ) )
-            {
-                mPlayheads.push_back ( mNewPlayheads.front ( ) );
-                mNewPlayheads.pop ( );
-            }
-
-            while ( !mPlayheadsToKill.empty ( ) )
-            {
-                if ( audioProcessingBlocked )
-                {
-                    for ( size_t i = 0; i < mPlayheads.size ( ); i++ )
-                    {
-                        if ( mPlayheads[i].playheadID == mPlayheadsToKill.front ( ) )
-                        {
-                            mPlayheads.erase ( mPlayheads.begin ( ) + i );
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    playheadsToKillThisBuffer.push_back ( mPlayheadsToKill.front ( ) );
-                }
-
-                mPlayheadsToKill.pop ( );
-            }
+            ProcessPlayheadInstructions ( playheadsToKillThisBuffer, audioProcessingBlocked );
         }
 
         // audio processing
@@ -373,13 +347,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
         if ( mVisualPlayheadUpdateMutex.try_lock ( ) )
         {
             std::lock_guard<std::mutex> lock ( mVisualPlayheadUpdateMutex, std::adopt_lock );
-
-            mVisualPlayheads.clear ( );
-
-            for ( size_t i = 0; i < mPlayheads.size ( ); i++ )
-            {
-                mVisualPlayheads.push_back ( Utilities::VisualPlayhead ( mPlayheads[i].playheadID, mPlayheads[i].fileIndex, mPlayheads[i].sampleIndex ) );
-            }
+            UpdateVisualPlayheads ( );
         }
 
         mActivePlayheads = mPlayheads.size ( );
@@ -501,55 +469,103 @@ void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, 
     }
 }
 
+void Explorer::AudioPlayback::ProcessPlayheadInstructions ( std::vector<size_t>& playheadsToKillThisBuffer, bool killInstantly )
+{
+    while ( !mNewPlayheads.empty ( ) )
+    {
+        mPlayheads.push_back ( mNewPlayheads.front ( ) );
+        mNewPlayheads.pop ( );
+    }
+
+    while ( !mPlayheadsToKill.empty ( ) )
+    {
+        if ( killInstantly )
+        {
+            for ( size_t i = 0; i < mPlayheads.size ( ); i++ )
+            {
+                if ( mPlayheads[i].playheadID == mPlayheadsToKill.front ( ) )
+                {
+                    mPlayheads.erase ( mPlayheads.begin ( ) + i );
+                    break;
+                }
+            }
+        }
+        else
+        {
+            playheadsToKillThisBuffer.push_back ( mPlayheadsToKill.front ( ) );
+        }
+
+        mPlayheadsToKill.pop ( );
+    }
+}
+
+void Explorer::AudioPlayback::UpdateVisualPlayheads ( )
+{
+    mVisualPlayheads.clear ( );
+
+    for ( size_t i = 0; i < mPlayheads.size ( ); i++ )
+    {
+        mVisualPlayheads.push_back ( Utilities::VisualPlayhead ( mPlayheads[i].playheadID, mPlayheads[i].fileIndex, mPlayheads[i].sampleIndex ) );
+    }
+}
+
+void Explorer::AudioPlayback::ForcePlayheadUpdateStep ( )
+{
+    std::lock_guard<std::mutex> fullAudioThreadLock ( mAudioThreadMutex );
+    ProcessPlayheadInstructions ( std::vector<size_t> ( ), true );
+    UpdateVisualPlayheads ( );
+    mActivePlayheads = mPlayheads.size ( );
+}
+
 bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t timePointIndex )
 {
-    if ( bMissingOutputFlag )
-    {
-        ofLogWarning ( "AudioPlayback" ) << "Missing output flag is active, failed to create new playhead";
-        return false;
-    }
-    else if ( bUserPauseFlag )
-    {
-        ofLogWarning ( "AudioPlayback" ) << "User pause flag is active, failed to create new playhead";
-        return false;
-    }
-    else if ( !bStreamStarted )
-    {
-        ofLogWarning ( "AudioPlayback" ) << "Audio stream not started, failed to create new playhead";
-        return false;
-    }
-    else if ( mRawView->GetDataset ( )->fileList.size ( ) == 0 )
+    if ( mRawView->GetDataset ( )->fileList.size ( ) == 0 )
     {
         ofLogError ( "AudioPlayback" ) << "No files in dataset, failed to create new playhead";
         return false;
     }
-    if ( !mRawView->GetAudioData ( )->loaded[fileIndex] )
+    else if ( !mRawView->GetAudioData ( )->loaded[fileIndex] )
     {
         ofLogError ( "AudioPlayback" ) << "File not loaded in memory, failed to create playhead for " << mRawView->GetDataset ( )->fileList[fileIndex];
         return false;
+    }
+
+    if ( bMissingOutputFlag )
+    {
+        ofLogNotice ( "AudioPlayback" ) << "Audio output is missing, new playhead is paused.";
+    }
+    else if ( bUserPauseFlag )
+    {
+        ofLogNotice ( "AudioPlayback" ) << "User has paused this instance, new playhead is paused.";
+    }
+    else if ( !bStreamStarted )
+    {
+        ofLogNotice ( "AudioPlayback" ) << "Audio stream not started, new playhead is paused.";
     }
 
     {
         std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
         if ( mNewPlayheads.size ( ) > 3 )
         {
-            ofLogWarning ( "AudioPlayback" ) << "Too many playheads queued already, failed to create new playhead";
+            ofLogWarning ( "AudioPlayback" ) << "Too many playheads invoked too quickly, failed to create new playhead.";
             return false;
         }
     }
 
-        size_t sampleIndex = timePointIndex * mRawView->GetHopSize ( );
-        Utilities::AudioPlayhead newPlayhead ( playheadCounter, fileIndex, sampleIndex );
-        playheadCounter++;
+    size_t sampleIndex = timePointIndex * mRawView->GetHopSize ( );
+    Utilities::AudioPlayhead newPlayhead ( playheadCounter, fileIndex, sampleIndex );
+    playheadCounter++;
 
-        CalculateTriggerPoints ( newPlayhead );
+    CalculateTriggerPoints ( newPlayhead );
 
-        {
-            std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
-            mNewPlayheads.push ( newPlayhead );
-        }
+    {
+        std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
+        mNewPlayheads.push ( newPlayhead );
+    }
 
-        return true;
+    if ( !bStreamStarted ) { ForcePlayheadUpdateStep ( ); }
+
+    return true;
 }
 
 bool Explorer::AudioPlayback::KillPlayhead ( size_t playheadID )
@@ -558,6 +574,8 @@ bool Explorer::AudioPlayback::KillPlayhead ( size_t playheadID )
         std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
         mPlayheadsToKill.push ( playheadID );
     }
+
+    if ( !bStreamStarted ) { ForcePlayheadUpdateStep ( ); }
 
     return true;
 }
