@@ -72,6 +72,10 @@ private:
     void FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utilities::AudioPlayhead* playhead, bool outBufferFull );
     void CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utilities::AudioPlayhead* playhead, bool outBufferFull );
 
+    void ProcessPlayheadInstructions ( std::vector<size_t>& playheadsToKillThisBuffer, bool killInstantly );
+    void UpdateVisualPlayheads ( );
+    void ForcePlayheadUpdateStep ( );
+
     void CalculateTriggerPoints ( Utilities::AudioPlayhead& playhead );
 
     std::shared_ptr<RawView> mRawView;
