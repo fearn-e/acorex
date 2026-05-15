@@ -652,7 +652,8 @@ void ExplorerMenu::OpenCorpus ( )
     bDrawOpenCorpusWarning = false;
 
     bool preserveCorpusSettings = false;
-    int preservedControlReceiverIndex = 0; // TODO - check how many other instances running, set to X + 1
+    int preservedControlReceiverIndex = 0; // TODO - check how many other instances running, set to X + 1 (and then replace the DEFAULT macro later in this function to this)
+    size_t preservedMaxCrossfadeLength = mRawView->GetHopSize ( );
     if ( bIsCorpusOpen ) { preserveCorpusSettings = true; }
 
     // clear stuff
@@ -715,7 +716,8 @@ void ExplorerMenu::OpenCorpus ( )
         initialSettings.SetJumpSameFileAllowed ( mJumpSameFileAllowedToggle );
         initialSettings.SetJumpSameFileMinTimeDiff ( mJumpSameFileMinTimeDiffSlider );
         initialSettings.SetCrossoverJumpChanceX1000 ( mCrossoverJumpChanceSliderX1000 );
-        initialSettings.SetCrossfadeSampleLength ( mRawView->GetHopSize ( ) > mCrossfadeSampleLengthSlider ? mCrossfadeSampleLengthSlider : DEFAULT_CROSSFADE_SAMPLE_LENGTH );
+        float preservedCrossfadeLengthFraction = (float)mCrossfadeSampleLengthSlider / (float)preservedMaxCrossfadeLength;
+        initialSettings.SetCrossfadeSampleLength ( clamp ( (size_t)(preservedCrossfadeLengthFraction * (float)mRawView->GetHopSize ( )), (size_t)1, mRawView->GetHopSize ( ) ) );
         initialSettings.SetMaxJumpDistanceSpaceX1000 ( mMaxJumpDistanceSpaceSliderX1000 );
         initialSettings.SetMaxJumpTargets ( mMaxJumpTargetsSlider );
 
