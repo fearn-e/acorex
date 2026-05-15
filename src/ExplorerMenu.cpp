@@ -705,12 +705,33 @@ void ExplorerMenu::OpenCorpus ( )
     {
         preservedControlReceiverIndex = mControlReceiverIndex;
 
-        initialSettings.SetDimensionX ( mRawView->GetDimensions ( ).size ( ) > mDimensionDropdownX->getSelectedOptionIndex ( ) ? mDimensionDropdownX->getAllSelected ( )[0] : DEFAULT_DIMENSION_X );
-        initialSettings.SetDimensionY ( mRawView->GetDimensions ( ).size ( ) > mDimensionDropdownY->getSelectedOptionIndex ( ) ? mDimensionDropdownY->getAllSelected ( )[0] : DEFAULT_DIMENSION_Y );
-        initialSettings.SetDimensionZ ( mRawView->GetDimensions ( ).size ( ) > mDimensionDropdownZ->getSelectedOptionIndex ( ) ? mDimensionDropdownZ->getAllSelected ( )[0] : DEFAULT_DIMENSION_Z );
+        ofLogWarning ( "TEST" ) << "started dimension name search";
 
-        initialSettings.SetDimensionColor ( mRawView->GetDimensions ( ).size ( ) > mDimensionDropdownColor->getSelectedOptionIndex ( ) ? mDimensionDropdownColor->getAllSelected ( )[0] : DEFAULT_DIMENSION_COLOR );
+        std::vector<std::string> newDimensionNames = mRawView->GetDimensions ( );
+
+        if ( std::find_if ( newDimensionNames.begin ( ), newDimensionNames.end ( ), [ this ] ( const std::string& dimension ) { return dimension == mDimensionDropdownX->getAllSelected ( )[0]; } ) == newDimensionNames.end ( ) )
+        { initialSettings.SetDimensionX ( newDimensionNames.size ( ) > 1 ? newDimensionNames[1] : DEFAULT_DIMENSION_X ); }
+        else
+        { initialSettings.SetDimensionX ( mDimensionDropdownX->getAllSelected ( )[0] ); }
+
+        if ( std::find_if ( newDimensionNames.begin ( ), newDimensionNames.end ( ), [ this ] ( const std::string& dimension ) { return dimension == mDimensionDropdownY->getAllSelected ( )[0]; } ) == newDimensionNames.end ( ) )
+        { initialSettings.SetDimensionY ( newDimensionNames.size ( ) > 2 ? newDimensionNames[2] : DEFAULT_DIMENSION_Y ); }
+        else
+        { initialSettings.SetDimensionY ( mDimensionDropdownY->getAllSelected ( )[0] ); }
+
+        if ( std::find_if ( newDimensionNames.begin ( ), newDimensionNames.end ( ), [ this ] ( const std::string& dimension ) { return dimension == mDimensionDropdownZ->getAllSelected ( )[0]; } ) == newDimensionNames.end ( ) )
+        { initialSettings.SetDimensionZ ( newDimensionNames.size ( ) > 3 ? newDimensionNames[3] : DEFAULT_DIMENSION_Z ); }
+        else
+        { initialSettings.SetDimensionZ ( mDimensionDropdownZ->getAllSelected ( )[0] ); }
+
+        if ( std::find_if ( newDimensionNames.begin ( ), newDimensionNames.end ( ), [ this ] ( const std::string& dimension ) { return dimension == mDimensionDropdownColor->getAllSelected ( )[0]; } ) == newDimensionNames.end ( ) )
+        { initialSettings.SetDimensionColor ( DEFAULT_DIMENSION_COLOR ); }
+        else
+        { initialSettings.SetDimensionColor ( mDimensionDropdownColor->getAllSelected ( )[0] ); }
+
         initialSettings.SetColorSpectrum ( mColorSpectrumSwitcher );
+
+        ofLogWarning ( "TEST" ) << "finished dimension name search";
 
         initialSettings.SetLoopPlayheads ( mLoopPlayheadsToggle );
         initialSettings.SetJumpSameFileAllowed ( mJumpSameFileAllowedToggle );
@@ -721,8 +742,14 @@ void ExplorerMenu::OpenCorpus ( )
         initialSettings.SetMaxJumpDistanceSpaceX1000 ( mMaxJumpDistanceSpaceSliderX1000 );
         initialSettings.SetMaxJumpTargets ( mMaxJumpTargetsSlider );
 
+
         initialSettings.SetVolumeX1000 ( mVolumeSliderX1000 );
-        initialSettings.SetDimensionDynamicPan ( mRawView->GetDimensions ( ).size ( ) > mDimensionDropdownDynamicPan->getSelectedOptionIndex ( ) ? mDimensionDropdownDynamicPan->getAllSelected ( )[0] : DEFAULT_DIMENSION_DYNAMIC_PAN );
+
+        if ( std::find_if ( newDimensionNames.begin ( ), newDimensionNames.end ( ), [ this ] ( const std::string& dimension ) { return dimension == mDimensionDropdownDynamicPan->getAllSelected ( )[0]; } ) == newDimensionNames.end ( ) )
+        { initialSettings.SetDimensionDynamicPan ( DEFAULT_DIMENSION_DYNAMIC_PAN ); }
+        else
+        { initialSettings.SetDimensionDynamicPan ( mDimensionDropdownDynamicPan->getAllSelected ( )[0] ); }
+
         initialSettings.SetPanningStrengthX1000 ( mPanningStrengthSliderX1000 );
     }
 
