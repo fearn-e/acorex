@@ -62,7 +62,7 @@ public:
     void SetJumpSameFileMinTimeDiff ( int timeDiff ) { mJumpSameFileMinTimeDiff = timeDiff; }
     void SetCrossoverJumpChanceX1000 ( int jumpsInAThousand ) { mCrossoverJumpChanceX1000 = jumpsInAThousand; }
     void SetCrossfadeSampleLength ( int length ) { mCrossfadeSampleLength = length; }
-    void SetMaxJumpDistanceSpace ( int distanceX1000 ) { mMaxJumpDistanceSpaceX1000 = distanceX1000; }
+    void SetMaxJumpDistanceSpaceX1000 ( int distanceX1000 ) { mMaxJumpDistanceSpaceX1000 = distanceX1000; }
     void SetMaxJumpTargets ( int targets ) { mMaxJumpTargets = targets; }
     void SetVolumeX1000 (int volumeX1000) { mVolumeX1000 = volumeX1000; }
     void SetDynamicPan ( bool enabled, int dimensionIndex ) { mDynamicPanEnabled = false; mDynamicPanDimensionIndex = dimensionIndex; mDynamicPanEnabled = enabled; }
