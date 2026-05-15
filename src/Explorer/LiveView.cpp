@@ -204,7 +204,7 @@ void Explorer::LiveView::UpdatePlayheads ( )
                 j--;
             }
 
-            std::find_if ( mPlayheadTrails.begin ( ), mPlayheadTrails.end ( ), [ this, i ] ( Utilities::VisualPlayheadTrail& trail ) { return trail.playheadID == mPlayheads[i].playheadID; } )->Kill ( );
+            std::find_if ( mPlayheadTrails.begin ( ), mPlayheadTrails.end ( ), [ this, i ] ( Utilities::VisualPlayheadTrail& trail ) { return trail.playheadID == mPlayheads[i].playheadID; } )->SoftKill ( );
 
             mPlayheads.erase ( mPlayheads.begin ( ) + i );
             i--;
