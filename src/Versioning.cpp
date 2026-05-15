@@ -53,6 +53,6 @@ void VersionString::ComputeVersionString ( )
 
     std::string compileTimestamp = compileDay + "." + compileMonth + "." + compileYear + "_" + compileTime;
 
-    versionString += "_" + compileTimestamp + "_" + ACOREX_VERSION_STATUS;
+    versionString += "_" + ACOREX_VERSION_STATUS + "_" + compileTimestamp;
 #endif
 }
