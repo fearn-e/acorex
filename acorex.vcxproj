@@ -101,6 +101,9 @@
       <Command>
       </Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>del $(IntermediateOutputPath)Build\src\$(Configuration)\Versioning.obj</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -131,6 +134,9 @@
       <Command>
       </Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>del $(IntermediateOutputPath)Build\src\$(Configuration)\Versioning.obj</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Stable|x64'">
     <ClCompile>
@@ -161,6 +167,9 @@
       <Command>
       </Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>del $(IntermediateOutputPath)Build\src\$(Configuration)\Versioning.obj</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\addons\ofxMidi\libs\rtmidi\RtMidi.cpp" />
