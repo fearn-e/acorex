@@ -234,7 +234,7 @@ public:
 
     size_t playheadID;
 
-    void Kill ( );
+    void SoftKill ( );
 
     void Draw ( ) const;
 
