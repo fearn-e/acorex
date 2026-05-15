@@ -80,6 +80,7 @@ void Explorer::LiveView::Clear ( )
     mCorpusMesh.clear ( );
 
     mPlayheads.clear ( );
+    mPlayheadTrails.clear ( );
 
     bDraw = false;
     b3D = true;
