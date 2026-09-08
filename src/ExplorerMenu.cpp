@@ -353,7 +353,7 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utilities::ExploreSet
     mJumpSameFileAllowedToggle.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Playheads Same File Jump Minimum Distance Slider
-    mMainPanel.add ( mJumpSameFileMinTimeDiffSlider.setup ( "Same file jump min point difference", settings.GetJumpSameFileMinTimeDiff ( ), 1, 30 ) );
+    mMainPanel.add ( mJumpSameFileMinTimeDiffSlider.setup ( "Same file jump min point diff (DEBUG)", settings.GetJumpSameFileMinTimeDiff ( ), 1, 30 ) );
     mJumpSameFileMinTimeDiffSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Jump Chance Slider
@@ -365,11 +365,11 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utilities::ExploreSet
     mCrossfadeSampleLengthSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Jump Max Distance Slider
-    mMainPanel.add ( mMaxJumpDistanceSpaceSliderX1000.setup ( "Max Jump Distance Space", settings.GetMaxJumpDistanceSpaceX1000 ( ), 0, 1000 ) );
+    mMainPanel.add ( mMaxJumpDistanceSpaceSliderX1000.setup ( "Max Jump Distance Space (DEBUG)", settings.GetMaxJumpDistanceSpaceX1000 ( ), 0, 1000 ) );
     mMaxJumpDistanceSpaceSliderX1000.setBackgroundColor ( mColors.interfaceBackgroundColor );
 
     // Jump Max Targets Slider
-    mMainPanel.add ( mMaxJumpTargetsSlider.setup ( "Max Jump Targets", settings.GetMaxJumpTargets ( ), 1, 10 ) );
+    mMainPanel.add ( mMaxJumpTargetsSlider.setup ( "Max Jump Targets (DEBUG)", settings.GetMaxJumpTargets ( ), 1, 10 ) );
     mMaxJumpTargetsSlider.setBackgroundColor ( mColors.interfaceBackgroundColor );
     
     // 
