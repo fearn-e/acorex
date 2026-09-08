@@ -5,7 +5,6 @@
 //#include <ofConstants.h>
 #include <ofEvents.h>
 
-
 //LiveView key binds
 #define ACOREX_KEYBIND_CAMERA_MOVE_FORWARD  'w'
 #define ACOREX_KEYBIND_CAMERA_MOVE_LEFT     'a'
@@ -31,7 +30,7 @@
 #define ACOREX_KEYBIND_TOGGLE_MOUSE_CAMERA_CONTROL 'c'
 
 //PointPicker key binds
-#define ACOREX_KEYBIND_TOGGLE_DEBUG_VIEW OF_KEY_F8
+#define ACOREX_KEYBIND_TOGGLE_DEBUG_VIEW OF_KEY_F10
 
 #define ACOREX_KEYBIND_PICK_RANDOM_POINT '2'
 
