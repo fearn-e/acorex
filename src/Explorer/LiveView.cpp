@@ -446,7 +446,7 @@ void Explorer::LiveView::Draw ( )
     }
 }
 
-// Sound Functions ------------------------------
+// Playhead Functions ------------------------------
 
 void Explorer::LiveView::CreatePlayhead ( )
 {
