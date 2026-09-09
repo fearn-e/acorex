@@ -420,7 +420,11 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 
 void Explorer::PointPicker::FindRandom ( )
 {
-    if ( !bTrained ) { return; }
+    if ( !bTrained )
+    {
+        ofLogWarning ( "PointPicker" ) << "Can't select random point, point picker not trained.";
+        return;
+    }
 
     std::lock_guard<std::mutex> lock ( mPointPickerMutex );
 
