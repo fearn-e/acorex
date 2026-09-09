@@ -89,7 +89,7 @@ private:
     // Main Functions ------------------------------
 
     void OpenCorpus ( );
-    void SetDimension ( string dimension, Utilities::Axis axis );
+    void SetDimension ( string dimension, Utilities::Axis axis, bool trainPointPicker );
     int GetDimensionIndex ( std::string& dimension );
     void CameraSwitcher ( );
 
@@ -104,26 +104,26 @@ private:
 
     // Listener Functions --------------------------
 
-    void SetControlReceiverIndex ( const int& index );              void SetControlReceiverIndexListener ( int& index ) { SetControlReceiverIndex ( index ); }
+    void SetControlReceiverIndex ( const int& index );                      void SetControlReceiverIndexListener ( int& index ) { SetControlReceiverIndex ( index ); }
 
-    void SetDimensionX ( const string& dimension );                 void SetDimensionXListener ( string& dimension ) { SetDimensionX ( dimension ); }
-    void SetDimensionY ( const string& dimension );                 void SetDimensionYListener ( string& dimension ) { SetDimensionY ( dimension ); }
-    void SetDimensionZ ( const string& dimension );                 void SetDimensionZListener ( string& dimension ) { SetDimensionZ ( dimension ); }
+    void SetDimensionX ( const string& dimension, bool trainPointPicker );  void SetDimensionXListener ( string& dimension ) { SetDimensionX ( dimension, true ); }
+    void SetDimensionY ( const string& dimension, bool trainPointPicker );  void SetDimensionYListener ( string& dimension ) { SetDimensionY ( dimension, true ); }
+    void SetDimensionZ ( const string& dimension, bool trainPointPicker );  void SetDimensionZListener ( string& dimension ) { SetDimensionZ ( dimension, true ); }
 
-    void SetDimensionColor ( const string& dimension );             void SetDimensionColorListener ( string& dimension ) { SetDimensionColor ( dimension ); }
-    void SwitchColorSpectrum ( const bool& fullSpectrum );          void SwitchColorSpectrumListener ( bool& fullSpectrum ) { SwitchColorSpectrum ( fullSpectrum ); }
+    void SetDimensionColor ( const string& dimension );                     void SetDimensionColorListener ( string& dimension ) { SetDimensionColor ( dimension ); }
+    void SwitchColorSpectrum ( const bool& fullSpectrum );                  void SwitchColorSpectrumListener ( bool& fullSpectrum ) { SwitchColorSpectrum ( fullSpectrum ); }
 
-    void ToggleLoopPlayheads ( const bool& loop );                  void ToggleLoopPlayheadsListener ( bool& loop ) { ToggleLoopPlayheads ( loop ); }
-    void ToggleJumpSameFileAllowed ( const bool& allowed );         void ToggleJumpSameFileAllowedListener ( bool& allowed ) { ToggleJumpSameFileAllowed ( allowed ); }
-    void SetJumpSameFileMinTimeDiff ( const int& timeDiff );        void SetJumpSameFileMinTimeDiffListener ( int& timeDiff ) { SetJumpSameFileMinTimeDiff ( timeDiff ); }
-    void SetCrossoverJumpChanceX1000 ( const int& jumpChance );     void SetCrossoverJumpChanceX1000Listener ( int& jumpChanceX1000 ) { SetCrossoverJumpChanceX1000 ( jumpChanceX1000 ); }
-    void SetCrossfadeSampleLength ( const int& length );            void SetCrossfadeSampleLengthListener ( int& length ) { SetCrossfadeSampleLength ( length ); }
-    void SetMaxJumpDistanceSpaceX1000 ( const int& distanceX1000 ); void SetMaxJumpDistanceSpaceX1000Listener ( int& distanceX1000 ) { SetMaxJumpDistanceSpaceX1000 ( distanceX1000 ); }
-    void SetMaxJumpTargets ( const int& targets );                  void SetMaxJumpTargetsListener ( int& targets ) { SetMaxJumpTargets ( targets ); }
+    void ToggleLoopPlayheads ( const bool& loop );                          void ToggleLoopPlayheadsListener ( bool& loop ) { ToggleLoopPlayheads ( loop ); }
+    void ToggleJumpSameFileAllowed ( const bool& allowed );                 void ToggleJumpSameFileAllowedListener ( bool& allowed ) { ToggleJumpSameFileAllowed ( allowed ); }
+    void SetJumpSameFileMinTimeDiff ( const int& timeDiff );                void SetJumpSameFileMinTimeDiffListener ( int& timeDiff ) { SetJumpSameFileMinTimeDiff ( timeDiff ); }
+    void SetCrossoverJumpChanceX1000 ( const int& jumpChance );             void SetCrossoverJumpChanceX1000Listener ( int& jumpChanceX1000 ) { SetCrossoverJumpChanceX1000 ( jumpChanceX1000 ); }
+    void SetCrossfadeSampleLength ( const int& length );                    void SetCrossfadeSampleLengthListener ( int& length ) { SetCrossfadeSampleLength ( length ); }
+    void SetMaxJumpDistanceSpaceX1000 ( const int& distanceX1000 );         void SetMaxJumpDistanceSpaceX1000Listener ( int& distanceX1000 ) { SetMaxJumpDistanceSpaceX1000 ( distanceX1000 ); }
+    void SetMaxJumpTargets ( const int& targets );                          void SetMaxJumpTargetsListener ( int& targets ) { SetMaxJumpTargets ( targets ); }
 
-    void SetVolumeX1000 ( const int& volumeX1000 );                 void SetVolumeX1000Listener ( int& volumeX1000 ) { SetVolumeX1000 ( volumeX1000 ); }
-    void SetDimensionDynamicPan ( const string& dimension );        void SetDimensionDynamicPanListener ( string& dimension ) { SetDimensionDynamicPan ( dimension ); }
-    void SetPanningStrengthX1000 ( const int& strengthX1000 );      void SetPanningStrengthX1000Listener ( int& strengthX1000 ) { SetPanningStrengthX1000 ( strengthX1000 ); }
+    void SetVolumeX1000 ( const int& volumeX1000 );                         void SetVolumeX1000Listener ( int& volumeX1000 ) { SetVolumeX1000 ( volumeX1000 ); }
+    void SetDimensionDynamicPan ( const string& dimension );                void SetDimensionDynamicPanListener ( string& dimension ) { SetDimensionDynamicPan ( dimension ); }
+    void SetPanningStrengthX1000 ( const int& strengthX1000 );              void SetPanningStrengthX1000Listener ( int& strengthX1000 ) { SetPanningStrengthX1000 ( strengthX1000 ); }
 
     void MouseReleased ( ofMouseEventArgs& args );
 
