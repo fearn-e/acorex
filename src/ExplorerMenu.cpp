@@ -791,6 +791,13 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis axis, bool t
 {
     if ( bBlockDimensionFilling ) { return; }
 
+    // TODO - fix, probably by reworking UI away from ofxGui / ofParameters?
+    if ( dimension == "" )
+    {
+        ofLogWarning ( "ExplorerMenu" ) << "Dimension deselected, undefined behaviour. This is a known bug.";
+        return;
+    }
+
     if ( axis == Utilities::Axis::DYNAMIC_PAN )
     {
         if ( dimension == "None" )
