@@ -781,8 +781,7 @@ void ExplorerMenu::OpenCorpus ( )
     if ( !audioStarted ) { AudioOutputFailed ( ); }
 }
 
-// TODO - change how this and FillDimension and Train (point picker) work, should have a function that triggers training and one that doesn't (for initial filling)
-void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis axis )
+void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis axis, bool trainPointPicker )
 {
     if ( bBlockDimensionFilling ) { return; }
 
@@ -802,13 +801,13 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis axis )
         return;
     }
 
-    if ( dimension == "None" )					{ mLiveView.ClearDimension ( axis ); }
+    if ( dimension == "None" )					{ mLiveView.ClearDimension ( axis, trainPointPicker ); }
     else
     {
         int dimensionIndex = GetDimensionIndex ( dimension );
         if ( dimensionIndex == -1 ) { return; }
 
-        mLiveView.FillDimension ( dimensionIndex, axis );
+        mLiveView.FillDimension ( dimensionIndex, axis, trainPointPicker );
     }
     
     if ( bIsCorpusOpen )
@@ -867,10 +866,9 @@ void ExplorerMenu::CameraSwitcher ( )
 
 void ExplorerMenu::PropogateCorpusSettings ( const Utilities::ExploreSettings& settings )
 {
-    // TODO - change these 3 so that only the final call of the 3 triggers point picker Train ( )
-    SetDimensionX ( settings.GetDimensionX ( ) );
-    SetDimensionY ( settings.GetDimensionY ( ) );
-    SetDimensionZ ( settings.GetDimensionZ ( ) ); // the one that actually calls training stuff
+    SetDimensionX ( settings.GetDimensionX ( ), false );
+    SetDimensionY ( settings.GetDimensionY ( ), false );
+    SetDimensionZ ( settings.GetDimensionZ ( ), true );
 
     SetDimensionColor ( settings.GetDimensionColor ( ) );
     SwitchColorSpectrum ( settings.GetColorSpectrum ( ) );
@@ -896,24 +894,24 @@ void ExplorerMenu::SetControlReceiverIndex ( const int& index )
     mControlReceiver.setup ( "localhost", ACOREX_OSC_PORT + mControlReceiverIndex );
 }
 
-void ExplorerMenu::SetDimensionX ( const string& dimension )
+void ExplorerMenu::SetDimensionX ( const string& dimension, bool trainPointPicker )
 {
-    SetDimension ( dimension, Utilities::Axis::X );
+    SetDimension ( dimension, Utilities::Axis::X, trainPointPicker );
 }
 
-void ExplorerMenu::SetDimensionY ( const string& dimension )
+void ExplorerMenu::SetDimensionY ( const string& dimension, bool trainPointPicker )
 {
-    SetDimension ( dimension, Utilities::Axis::Y );
+    SetDimension ( dimension, Utilities::Axis::Y, trainPointPicker );
 }
 
-void ExplorerMenu::SetDimensionZ ( const string& dimension )
+void ExplorerMenu::SetDimensionZ ( const string& dimension, bool trainPointPicker )
 {
-    SetDimension ( dimension, Utilities::Axis::Z );
+    SetDimension ( dimension, Utilities::Axis::Z, trainPointPicker );
 }
 
 void ExplorerMenu::SetDimensionColor ( const string& dimension )
 {
-    SetDimension ( dimension, Utilities::Axis::COLOR );
+    SetDimension ( dimension, Utilities::Axis::COLOR, false );
 }
 
 void ExplorerMenu::SwitchColorSpectrum ( const bool& fullSpectrum )
@@ -921,7 +919,7 @@ void ExplorerMenu::SwitchColorSpectrum ( const bool& fullSpectrum )
     if ( fullSpectrum ) { mColorSpectrumSwitcher.setName ( "Color Spectrum: Full" ); }
     else { mColorSpectrumSwitcher.setName ( "Color Spectrum: Red<->Blue" ); }
     mLiveView.SetColorFullSpectrum ( fullSpectrum );
-    SetDimension ( mDimensionDropdownColor->getAllSelected ( )[0], Utilities::Axis::COLOR );
+    SetDimension ( mDimensionDropdownColor->getAllSelected ( )[0], Utilities::Axis::COLOR, false );
 }
 
 void ExplorerMenu::ToggleLoopPlayheads ( const bool& loop )
@@ -966,7 +964,7 @@ void ExplorerMenu::SetVolumeX1000 ( const int& volumeX1000 )
 
 void ExplorerMenu::SetDimensionDynamicPan ( const string& dimension )
 {
-    SetDimension ( dimension, Utilities::Axis::DYNAMIC_PAN );
+    SetDimension ( dimension, Utilities::Axis::DYNAMIC_PAN, false );
 }
 
 void ExplorerMenu::SetPanningStrengthX1000 ( const int& strengthX1000 )

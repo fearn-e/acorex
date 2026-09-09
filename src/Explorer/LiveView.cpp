@@ -504,7 +504,7 @@ void Explorer::LiveView::CreatePoints ( )
     bDraw = true;
 }
 
-void Explorer::LiveView::FillDimension ( int dimensionIndex, Utilities::Axis axis )
+void Explorer::LiveView::FillDimension ( int dimensionIndex, Utilities::Axis axis, bool trainPointPicker )
 {
     std::string dimensionName = mRawView->GetDimensions ( )[dimensionIndex];
     if ( axis == Utilities::Axis::X ) { xLabel = dimensionName; }
@@ -546,10 +546,19 @@ void Explorer::LiveView::FillDimension ( int dimensionIndex, Utilities::Axis axi
 
     mAudioPlayback.SetCorpusMesh ( mCorpusMesh );
 
+    if ( axis == Utilities::Axis::COLOR )
+        ofLogVerbose ( "LiveView" ) << "Set colours.";
+    else if ( axis != Utilities::Axis::COLOR )
+    ofLogVerbose ( "LiveView" ) << "Filled dimension axis " << (int)axis << ".";
+
+    if ( !trainPointPicker || axis == Utilities::Axis::COLOR ) { return; }
+
+    ofLogVerbose ( "LiveView" ) << "Point picker training and processing functions called.";
+
     mPointPicker->Train ( dimensionIndex, axis, false );
 }
 
-void Explorer::LiveView::ClearDimension ( Utilities::Axis axis )
+void Explorer::LiveView::ClearDimension ( Utilities::Axis axis, bool trainPointPicker )
 {
     if ( axis == Utilities::Axis::X ) { xLabel = ""; }
     else if ( axis == Utilities::Axis::Y ) { yLabel = ""; }
@@ -577,6 +586,15 @@ void Explorer::LiveView::ClearDimension ( Utilities::Axis axis )
     }
 
     mAudioPlayback.SetCorpusMesh ( mCorpusMesh );
+
+    if ( axis == Utilities::Axis::COLOR )
+        ofLogVerbose ( "LiveView" ) << "Cleared colours.";
+    else if ( axis != Utilities::Axis::COLOR )
+    ofLogVerbose ( "LiveView" ) << "Cleared dimension axis " << (int)axis << ".";
+
+    if ( !trainPointPicker || axis == Utilities::Axis::COLOR ) { return; }
+
+    ofLogVerbose ( "LiveView" ) << "Point picker training and processing functions called.";
 
     mPointPicker->Train ( -1, axis, true );
 }

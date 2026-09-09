@@ -65,8 +65,8 @@ public:
 
     void CreatePoints ( );
 
-    void FillDimension ( int dimensionIndex, Utilities::Axis axis );
-    void ClearDimension ( Utilities::Axis axis );
+    void FillDimension ( int dimensionIndex, Utilities::Axis axis, bool trainPointPicker );
+    void ClearDimension ( Utilities::Axis axis, bool trainPointPicker );
     void RefreshFileColors ( int fileIndex );
 
     // Camera Functions ----------------------------
