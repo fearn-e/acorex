@@ -275,6 +275,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
                     // after this point it is assumed that a new trigger has been reached, perform jump checks for this trigger
 
+                    //TODO.2a
                     int requiredSamples = mCrossfadeSampleLength;
                     if ( mPlayheads[playheadIndex].sampleIndex + requiredSamples >= mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getNumFrames ( ) ) { continue; }
                     std::uniform_int_distribution<> dis ( 0, 1000 );
@@ -292,7 +293,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
                         if ( !mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint,
                                                                     mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileAllowed,
-                                                                    mJumpSameFileMinTimeDiff, requiredSamples, *mRawView->GetAudioData ( ), mRawView->GetHopSize ( ) ) )
+                                                                    mJumpSameFileMinTimeDiff ) )
                         {
                             continue;
                         }
@@ -302,6 +303,11 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
                         mPlayheads[playheadIndex].crossfading = true;
                         mPlayheads[playheadIndex].jumpFileIndex = nearestPoint.file;
                         mPlayheads[playheadIndex].jumpSampleIndex = nearestPoint.time * mRawView->GetHopSize ( );
+
+                        //TODO.2b
+                        if ( mPlayheads[playheadIndex].jumpSampleIndex + requiredSamples >= mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex].getNumFrames ( ) )
+                        { requiredSamples = mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex].getNumFrames ( ) - mPlayheads[playheadIndex].jumpSampleIndex; }
+
                         mPlayheads[playheadIndex].crossfadeCurrentSample = 0;
                         mPlayheads[playheadIndex].crossfadeSampleLength = requiredSamples;
                     }
