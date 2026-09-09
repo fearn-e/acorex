@@ -605,24 +605,24 @@ void Explorer::LiveView::TrainPointPicker ( )
     mPointPicker->Train ( mDimensionsIndices );
 }
 
-void Explorer::LiveView::RefreshFileColors ( int fileIndex )
-{
-    ofLogVerbose ( "Explorer" ) << "Refreshing file colors for file: " << mRawView->GetDataset ( )->fileList[fileIndex];
-
-    double min = mDimensionBounds.GetMinBound ( colorDimension );
-    double max = mDimensionBounds.GetMaxBound ( colorDimension );
-    double outputMin = bColorFullSpectrum ? SpaceDefs::mColorMin : SpaceDefs::mColorBlue;
-    double outputMax = bColorFullSpectrum ? SpaceDefs::mColorMax : SpaceDefs::mColorRed;
-
-    Utilities::TrailData* trails = mRawView->GetTrailData ( );
-
-    for ( int timepoint = 0; timepoint < trails->raw[fileIndex].size ( ); timepoint++ )
-    {
-        ofColor color = ofColor::fromHsb ( ofMap ( trails->raw[fileIndex][timepoint][colorDimension], min, max, outputMin, outputMax ), 255, 255, 255 );
-        if ( mPointPicker->GetNearestMousePointFile ( ) != fileIndex && mPointPicker->GetNearestMousePointFile ( ) != -1 ) { color.a = 125; }
-        mCorpusMesh[fileIndex].setColor ( timepoint, color );
-    }
-}
+//void Explorer::LiveView::RefreshFileColors ( int fileIndex )
+//{
+//    ofLogVerbose ( "Explorer" ) << "Refreshing file colors for file: " << mRawView->GetDataset ( )->fileList[fileIndex];
+//
+//    double min = mDimensionBounds.GetMinBound ( colorDimension );
+//    double max = mDimensionBounds.GetMaxBound ( colorDimension );
+//    double outputMin = bColorFullSpectrum ? SpaceDefs::mColorMin : SpaceDefs::mColorBlue;
+//    double outputMax = bColorFullSpectrum ? SpaceDefs::mColorMax : SpaceDefs::mColorRed;
+//
+//    Utilities::TrailData* trails = mRawView->GetTrailData ( );
+//
+//    for ( int timepoint = 0; timepoint < trails->raw[fileIndex].size ( ); timepoint++ )
+//    {
+//        ofColor color = ofColor::fromHsb ( ofMap ( trails->raw[fileIndex][timepoint][colorDimension], min, max, outputMin, outputMax ), 255, 255, 255 );
+//        if ( mPointPicker->GetNearestMousePointFile ( ) != fileIndex && mPointPicker->GetNearestMousePointFile ( ) != -1 ) { color.a = 125; }
+//        mCorpusMesh[fileIndex].setColor ( timepoint, color );
+//    }
+//}
 
 // Camera Functions ----------------------------
 

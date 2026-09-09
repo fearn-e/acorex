@@ -68,7 +68,7 @@ public:
     void FillDimension ( int dimensionIndex, Utilities::Axis axis, bool trainPointPicker );
     void ClearDimension ( Utilities::Axis axis, bool trainPointPicker );
     void TrainPointPicker ( );
-    void RefreshFileColors ( int fileIndex );
+    //void RefreshFileColors ( int fileIndex );
 
     // Camera Functions ----------------------------
 
