@@ -370,8 +370,7 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
                     { continue; } // skip if jumping would jump to the same file and the time difference is too small
 
                     nearestDistance = dist[i];
-                    nearestPoint.file = mCorpusFileLookUp[point];
-                    nearestPoint.time = mCorpusTimeLookUp[point];
+                    nearestPoint = { mCorpusFileLookUp[point], mCorpusTimeLookUp[point] };
                     jumpFound = true;
                 }
             }
@@ -408,8 +407,7 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
                 // this check (also in 2D) doesn't seem to actually be needed? leaving the comment here just in case
                 //if ( audioSet.raw[mCorpusFileLookUp[point]].getNumFrames ( ) - ((size_t)mCorpusTimeLookUp[point] * hopSize) < remainingSamplesRequired ) { continue; } // skip if there's not enough samples left in the file
                 nearestDistance = dist[i];
-                nearestPoint.file = mCorpusFileLookUp[point];
-                nearestPoint.time = mCorpusTimeLookUp[point];
+                nearestPoint = { mCorpusFileLookUp[point], mCorpusTimeLookUp[point] };
                 jumpFound = true;
             }
 
