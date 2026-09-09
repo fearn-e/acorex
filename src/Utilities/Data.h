@@ -166,6 +166,7 @@ struct DataSet {
     AnalysisSettings analysisSettings;
 };
 
+// TODO - add constructor to this for setting initial file/time cleaner
 struct PointFT {
     size_t file = 0;
     size_t time = 0;
