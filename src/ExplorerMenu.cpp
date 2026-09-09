@@ -31,7 +31,9 @@ using namespace Acorex;
 
 ExplorerMenu::ExplorerMenu ( ) :    mSlowUpdateInterval ( 100 ), mOpenCorpusButtonTimeout ( 3000 ),
                                     bListenersAddedHeader ( false ), bListenersAddedCorpusControls ( false ), 
-                                    bListenersAddedAudioManager ( false ), mControlReceiverIndex ( 0 )
+                                    bListenersAddedAudioManager ( false ), mControlReceiverIndex ( 0 ),
+                                    mLastDimensionXSetByListener ( "" ), mLastDimensionYSetByListener ( "" ),
+                                    mLastDimensionZSetByListener ( "" )
 {
     mRawView = std::make_shared<Explorer::RawView> ( );
     mLiveView.SetRawView ( mRawView );
@@ -66,6 +68,10 @@ void ExplorerMenu::Clear ( )
     bBlockDimensionFilling = false;
 
     mDisabledAxis = Utilities::Axis::NONE;
+
+    mLastDimensionXSetByListener = "";
+    mLastDimensionYSetByListener = "";
+    mLastDimensionZSetByListener = "";
 
     mControlReceiverIndex = 0;
     mControlReceiver.stop ( );
@@ -896,16 +902,34 @@ void ExplorerMenu::SetControlReceiverIndex ( const int& index )
 
 void ExplorerMenu::SetDimensionX ( const string& dimension, bool trainPointPicker )
 {
+    if ( dimension == mLastDimensionXSetByListener )
+    {
+        return;
+    }
+    mLastDimensionXSetByListener = dimension;
+
     SetDimension ( dimension, Utilities::Axis::X, trainPointPicker );
 }
 
 void ExplorerMenu::SetDimensionY ( const string& dimension, bool trainPointPicker )
 {
+    if ( dimension == mLastDimensionYSetByListener )
+    {
+        return;
+    }
+    mLastDimensionYSetByListener = dimension;
+
     SetDimension ( dimension, Utilities::Axis::Y, trainPointPicker );
 }
 
 void ExplorerMenu::SetDimensionZ ( const string& dimension, bool trainPointPicker )
 {
+    if ( dimension == mLastDimensionZSetByListener )
+    {
+        return;
+    }
+    mLastDimensionZSetByListener = dimension;
+
     SetDimension ( dimension, Utilities::Axis::Z, trainPointPicker );
 }
 

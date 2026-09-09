@@ -107,8 +107,11 @@ private:
     void SetControlReceiverIndex ( const int& index );                      void SetControlReceiverIndexListener ( int& index ) { SetControlReceiverIndex ( index ); }
 
     void SetDimensionX ( const string& dimension, bool trainPointPicker );  void SetDimensionXListener ( string& dimension ) { SetDimensionX ( dimension, true ); }
+    string mLastDimensionXSetByListener; // TODO - bodge, fix this properly with a UI rework
     void SetDimensionY ( const string& dimension, bool trainPointPicker );  void SetDimensionYListener ( string& dimension ) { SetDimensionY ( dimension, true ); }
+    string mLastDimensionYSetByListener;
     void SetDimensionZ ( const string& dimension, bool trainPointPicker );  void SetDimensionZListener ( string& dimension ) { SetDimensionZ ( dimension, true ); }
+    string mLastDimensionZSetByListener;
 
     void SetDimensionColor ( const string& dimension );                     void SetDimensionColorListener ( string& dimension ) { SetDimensionColor ( dimension ); }
     void SwitchColorSpectrum ( const bool& fullSpectrum );                  void SwitchColorSpectrumListener ( bool& fullSpectrum ) { SwitchColorSpectrum ( fullSpectrum ); }
