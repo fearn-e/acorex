@@ -183,6 +183,7 @@ void Explorer::PointPicker::Draw ( )
         }
 
         ofEnableDepthTest ( );
+        ofEnableAlphaBlending ( );
         mCamera->begin ( );
 
         ofSetColor ( 150, 150, 255, 125 );
@@ -198,6 +199,7 @@ void Explorer::PointPicker::Draw ( )
         }
 
         mCamera->end ( );
+        ofDisableAlphaBlending ( );
         ofDisableDepthTest ( );
     }
 }
