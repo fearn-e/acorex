@@ -67,6 +67,7 @@ public:
 
     void FillDimension ( int dimensionIndex, Utilities::Axis axis, bool trainPointPicker );
     void ClearDimension ( Utilities::Axis axis, bool trainPointPicker );
+    void TrainPointPicker ( );
     void RefreshFileColors ( int fileIndex );
 
     // Camera Functions ----------------------------
@@ -120,6 +121,8 @@ private:
     Utilities::Axis mDisabledAxis;
     std::string xLabel, yLabel, zLabel;
     int colorDimension;
+
+    std::array<int, 3> mDimensionsIndices;
 
     std::shared_ptr<RawView> mRawView; // might need to be weak_ptr?
     std::vector<ofMesh> mCorpusMesh;

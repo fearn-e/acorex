@@ -39,7 +39,7 @@ public:
     void Initialise ( const Utilities::DataSet& dataset, const Utilities::DimensionBounds& dimensionBounds );
     void Clear ( );
 
-    void Train ( int dimensionIndex, Utilities::Axis axis, bool none );
+    void Train ( std::array<int, 3> dimensionIndices );
 
     void Exit ( );
 
@@ -82,20 +82,17 @@ private:
     bool bDebug;
 
     std::atomic<bool> bTrained;
-    bool bSkipTraining;
 
     bool b3D;
     bool bPicker;
     bool bClicked;
     bool bNearestMouseCheckNeeded;
 
-    bool bDimensionsFilled[3];
-
     // Variables ------------------------------------
 
     std::shared_ptr<ofCamera> mCamera;
 
-    int mDimensionsIndices[3];
+    std::array<int, 3> mDimensionsIndices;
 
     int mNearestPoint;
     double mNearestDistance;
