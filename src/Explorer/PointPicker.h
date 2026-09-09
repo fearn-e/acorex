@@ -48,7 +48,7 @@ public:
     void FindNearestToMouse ( );
     bool FindNearestToPosition (	const glm::vec3& position, Utilities::PointFT& nearestPoint, Utilities::PointFT currentPoint, 
                                     int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed, 
-                                    int minTimeDiffSameFile, int remainingSamplesRequired, const Utilities::AudioData& audioSet, size_t hopSize );
+                                    int minTimeDiffSameFile);
     void FindRandom ( );
 
     // Setters & Getters ----------------------------

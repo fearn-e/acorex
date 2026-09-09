@@ -331,7 +331,7 @@ void Explorer::PointPicker::FindNearestToMouse ( )
 // TODO - revisit this function for any performance improvements
 bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utilities::PointFT& nearestPoint, Utilities::PointFT currentPoint, 
                                                     int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed,
-                                                    int minTimeDiffSameFile, int remainingSamplesRequired, const Utilities::AudioData& audioSet, size_t hopSize )
+                                                    int minTimeDiffSameFile )
 {
     if ( !bTrained ) { return false; }
 
@@ -374,8 +374,6 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
                     size_t timeDiff = mCorpusTimeLookUp[point] > currentPoint.time ? mCorpusTimeLookUp[point] - currentPoint.time : currentPoint.time - mCorpusTimeLookUp[point];
                     if ( sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file && timeDiff < minTimeDiffSameFile ) { continue; } // skip if jumping would jump to the same file and the time difference is too small
 
-                    if ( audioSet.raw[mCorpusFileLookUp[point]].getNumFrames ( ) - ( (size_t)mCorpusTimeLookUp[point] * hopSize ) < remainingSamplesRequired ) { continue; } // skip if there's not enough samples left in the file
-
                     nearestDistance = dist[i];
                     nearestPoint.file = mCorpusFileLookUp[point];
                     nearestPoint.time = mCorpusTimeLookUp[point];
@@ -410,8 +408,8 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
                 size_t timeDiff = mCorpusTimeLookUp[point] > currentPoint.time ? mCorpusTimeLookUp[point] - currentPoint.time : currentPoint.time - mCorpusTimeLookUp[point];
                 if ( sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file && timeDiff < minTimeDiffSameFile ) { continue; } // skip if jumping would jump to the same file and the time difference is too small
 
-                if ( audioSet.raw[mCorpusFileLookUp[point]].getNumFrames ( ) - ((size_t)mCorpusTimeLookUp[point] * hopSize) < remainingSamplesRequired ) { continue; } // skip if there's not enough samples left in the file
-
+                // this check (also in 2D) doesn't seem to actually be needed? leaving the comment here just in case
+                //if ( audioSet.raw[mCorpusFileLookUp[point]].getNumFrames ( ) - ((size_t)mCorpusTimeLookUp[point] * hopSize) < remainingSamplesRequired ) { continue; } // skip if there's not enough samples left in the file
                 nearestDistance = dist[i];
                 nearestPoint.file = mCorpusFileLookUp[point];
                 nearestPoint.time = mCorpusTimeLookUp[point];
