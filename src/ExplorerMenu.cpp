@@ -806,9 +806,10 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis axis, bool t
         }
         else
         {
-            int dimensionIndex = GetDimensionIndex ( dimension );
-            if ( dimensionIndex == -1 ) { return; }
-            mLiveView.GetAudioPlayback ( )->SetDynamicPan ( true, dimensionIndex );
+            std::optional<int> dimensionIndex = GetDimensionIndex ( dimension );
+            if ( !dimensionIndex.has_value ( ) ) { return; }
+
+            mLiveView.GetAudioPlayback ( )->SetDynamicPan ( true, dimensionIndex.value ( ) );
         }
 
         return;
@@ -817,10 +818,10 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis axis, bool t
     if ( dimension == "None" )					{ mLiveView.ClearDimension ( axis, trainPointPicker ); }
     else
     {
-        int dimensionIndex = GetDimensionIndex ( dimension );
-        if ( dimensionIndex == -1 ) { return; }
+        std::optional<int> dimensionIndex = GetDimensionIndex ( dimension );
+        if ( !dimensionIndex.has_value ( ) ) { return; }
 
-        mLiveView.FillDimension ( dimensionIndex, axis, trainPointPicker );
+        mLiveView.FillDimension ( dimensionIndex.value ( ), axis, trainPointPicker );
     }
     
     if ( bIsCorpusOpen )
@@ -830,7 +831,7 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis axis, bool t
     }
 }
 
-int ExplorerMenu::GetDimensionIndex ( std::string& dimension )
+std::optional<int> ExplorerMenu::GetDimensionIndex ( std::string& dimension )
 {
     for ( int i = 0; i < mRawView->GetDimensions ( ).size ( ); i++ )
     {
@@ -840,7 +841,7 @@ int ExplorerMenu::GetDimensionIndex ( std::string& dimension )
         }
     }
     ofLogError ( "Explorer" ) << "Dimension " << dimension << " name not found";
-    return -1;
+    return std::nullopt;
 }
 
 void ExplorerMenu::CameraSwitcher ( )

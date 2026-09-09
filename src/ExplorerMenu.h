@@ -26,6 +26,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofxOsc.h>
 #include <ofxGui.h>
 #include <ofxDropdown.h>
+#include <optional>
 
 // TODO - split mMainPanel into 3 panels, Header, Corpus Controls, an Audio Manager
 // TODO(cont) - to match the implementation in AnalyserMenu
@@ -90,7 +91,7 @@ private:
 
     void OpenCorpus ( );
     void SetDimension ( string dimension, Utilities::Axis axis, bool trainPointPicker );
-    int GetDimensionIndex ( std::string& dimension );
+    std::optional<int> GetDimensionIndex ( std::string& dimension );
     void CameraSwitcher ( );
 
     /// Triggers all listeners that update corpus related settings.
