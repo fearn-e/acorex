@@ -289,7 +289,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
                         size_t timePointIndex = mPlayheads[playheadIndex].sampleIndex / mRawView->GetHopSize ( );
                         glm::vec3 playheadPosition = mCorpusMesh[mPlayheads[playheadIndex].fileIndex].getVertex ( timePointIndex );
                         Utilities::PointFT nearestPoint;
-                        Utilities::PointFT currentPoint; currentPoint.file = mPlayheads[playheadIndex].fileIndex; currentPoint.time = timePointIndex;
+                        Utilities::PointFT currentPoint = { mPlayheads[playheadIndex].fileIndex, timePointIndex };
 
                         if ( !mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint,
                                                                     mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileAllowed,
