@@ -26,9 +26,9 @@ using namespace Acorex;
 
 Explorer::PointPicker::PointPicker ( )
     :   bListenersAdded ( false ), bDebug (false ),
-        bTrained ( false ), bSkipTraining ( true ),
+        bTrained ( false ),
         b3D ( true ), bPicker ( false ), bClicked ( false ), bNearestMouseCheckNeeded ( false ),
-        bDimensionsFilled { false, false, false }, mDimensionsIndices { -1, -1, -1 },
+        mDimensionsIndices { -1, -1, -1 },
         mNearestPoint ( -1 ), mNearestDistance ( -1 ),
         maxAllowedDistanceFar ( 0.05 ), maxAllowedDistanceNear ( 0.01 ),
         mNearestPointFile ( -1 ), mNearestPointTime ( -1 )
@@ -71,11 +71,10 @@ void Explorer::PointPicker::Clear ( )
     mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 0 );
     mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 0 );
 
-    bTrained = false; bSkipTraining = true;
+    bTrained = false;
     b3D = true; bPicker = false; bClicked = false; bNearestMouseCheckNeeded = false;
 
-    bDimensionsFilled[0] = false; bDimensionsFilled[1] = false; bDimensionsFilled[2] = false;
-    mDimensionsIndices[0] = -1; mDimensionsIndices[1] = -1; mDimensionsIndices[2] = -1;
+    mDimensionsIndices = { -1, -1, -1 };
 
     mNearestPoint = -1; mNearestDistance = -1; mNearestPointFile = -1; mNearestPointTime = -1;
 
@@ -85,44 +84,36 @@ void Explorer::PointPicker::Clear ( )
     RemoveListeners ( );
 }
 
-void Explorer::PointPicker::Train ( int dimensionIndex, Utilities::Axis axis, bool none )
+void Explorer::PointPicker::Train ( std::array<int, 3> dimensionIndices )
 {
     std::lock_guard<std::mutex> lock ( mPointPickerMutex );
 
-    if ( axis == Utilities::Axis::X ) { bDimensionsFilled[0] = !none; mDimensionsIndices[0] = dimensionIndex; }
-    else if ( axis == Utilities::Axis::Y ) { bDimensionsFilled[1] = !none; mDimensionsIndices[1] = dimensionIndex; }
-    else if ( axis == Utilities::Axis::Z ) { bDimensionsFilled[2] = !none; mDimensionsIndices[2] = dimensionIndex; }
-    else { return; }
-
-    int dimsFilled = bDimensionsFilled[0] + bDimensionsFilled[1] + bDimensionsFilled[2];
+    int dimsFilled = 0;
+    dimsFilled += dimensionIndices[0] > -1;
+    dimsFilled += dimensionIndices[1] > -1;
+    dimsFilled += dimensionIndices[2] > -1;
     if ( dimsFilled < 2 ) { bTrained = false; return; }
 
-    // TODO - take a closer look at this later.
-    // it seems like this makes bSkipTraining get set to false once when a corpus is first opened, as it gets 3 Train calls, for the X, Y, and Z dimensions.
-    // but this means it wouldn't work for a corpus that had only 2 dimensions to load to begin with?
-    // and if i ever accidentally set bSkipTraining back to true anywhere other than when loading a new corpus, this could just break training
-    // split this function into Train and SetDimension? - call SetDimension when first loading, then Train only once and then at runtime when changes are applied to the corpus?
-    if ( axis == Utilities::Axis::Z ) { bSkipTraining = false; }
-    if ( bSkipTraining ) { return; }
+    mDimensionsIndices = dimensionIndices;
 
     mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dimsFilled );
 
     for ( int point = 0; point < mFullFluidSet.size ( ); point++ )
     {
         fluid::RealVector pointData ( dimsFilled );
-        if ( dimsFilled == 3 || bDimensionsFilled[2] == false )
+        if ( dimsFilled == 3 || mDimensionsIndices[2] == -1 )
         {
             for ( int dim = 0; dim < dimsFilled; dim++ )
             {
                 pointData[dim] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[dim]];
             }
         }
-        else if ( bDimensionsFilled[1] == false )
+        else if ( mDimensionsIndices[1] == -1 )
         {
             pointData[0] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[0]];
             pointData[1] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[2]];
         }
-        else if ( bDimensionsFilled[0] == false )
+        else if ( mDimensionsIndices[0] == -1 )
         {
             pointData[0] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[1]];
             pointData[1] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[2]];
@@ -234,9 +225,9 @@ void Explorer::PointPicker::FindNearestToMouse ( )
         glm::vec3 rayPosition = mCamera->screenToWorld ( glm::vec3 ( mouseX, mouseY, 0 ) );
         glm::vec2 rayPosition2D;
         
-        if ( !bDimensionsFilled[0] ) { rayPosition2D.x = rayPosition.y; rayPosition2D.y = rayPosition.z; rayPosition.x = 0; }
-        if ( !bDimensionsFilled[1] ) { rayPosition2D.x = rayPosition.x; rayPosition2D.y = rayPosition.z; rayPosition.y = 0; }
-        if ( !bDimensionsFilled[2] ) { rayPosition2D.x = rayPosition.x; rayPosition2D.y = rayPosition.y; rayPosition.z = 0; }
+        if ( mDimensionsIndices[0] == -1 ) { rayPosition2D.x = rayPosition.y; rayPosition2D.y = rayPosition.z; rayPosition.x = 0; }
+        if ( mDimensionsIndices[1] == -1 ) { rayPosition2D.x = rayPosition.x; rayPosition2D.y = rayPosition.z; rayPosition.y = 0; }
+        if ( mDimensionsIndices[2] == -1 ) { rayPosition2D.x = rayPosition.x; rayPosition2D.y = rayPosition.y; rayPosition.z = 0; }
 
         fluid::RealVector query ( 2 );
 
@@ -349,9 +340,9 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 
             glm::vec2 position2D;
 
-            if ( !bDimensionsFilled[0] ) { position2D.x = position.y; position2D.y = position.z; }
-            if ( !bDimensionsFilled[1] ) { position2D.x = position.x; position2D.y = position.z; }
-            if ( !bDimensionsFilled[2] ) { position2D.x = position.x; position2D.y = position.y; }
+            if ( mDimensionsIndices[0] == -1 ) { position2D.x = position.y; position2D.y = position.z; }
+            if ( mDimensionsIndices[1] == -1 ) { position2D.x = position.x; position2D.y = position.z; }
+            if ( mDimensionsIndices[2] == -1 ) { position2D.x = position.x; position2D.y = position.y; }
 
             fluid::RealVector query ( 2 );
 

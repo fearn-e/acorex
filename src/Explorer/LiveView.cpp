@@ -39,7 +39,8 @@ Explorer::LiveView::LiveView ( )
     deltaTime ( 0.1f ), lastUpdateTime ( 0 ),
     mDisabledAxis ( Utilities::Axis::NONE ), xLabel ( "X" ), yLabel ( "Y" ), zLabel ( "Z" ), colorDimension ( -1 ),
     mCamPivot ( ofPoint ( 0, 0, 0 ) ),
-    mLastMouseX ( 0 ), mLastMouseY ( 0 )
+    mLastMouseX ( 0 ), mLastMouseY ( 0 ),
+    mDimensionsIndices { -1, -1, -1 }
 {
     mPointPicker = std::make_shared<Explorer::PointPicker> ( );
     mAudioPlayback.SetPointPicker ( mPointPicker );
@@ -92,6 +93,8 @@ void Explorer::LiveView::Clear ( )
     mDisabledAxis = Utilities::Axis::NONE;
     xLabel = "X"; yLabel = "Y"; zLabel = "Z";
     colorDimension = -1;
+
+    mDimensionsIndices = { -1, -1, -1 };
 }
 
 bool Explorer::LiveView::StartAudio ( std::pair<ofSoundDevice, int> audioSettings )
@@ -507,9 +510,9 @@ void Explorer::LiveView::CreatePoints ( )
 void Explorer::LiveView::FillDimension ( int dimensionIndex, Utilities::Axis axis, bool trainPointPicker )
 {
     std::string dimensionName = mRawView->GetDimensions ( )[dimensionIndex];
-    if ( axis == Utilities::Axis::X ) { xLabel = dimensionName; }
-    else if ( axis == Utilities::Axis::Y ) { yLabel = dimensionName; }
-    else if ( axis == Utilities::Axis::Z ) { zLabel = dimensionName; }
+    if ( axis == Utilities::Axis::X ) { mDimensionsIndices[0] = dimensionIndex; xLabel = dimensionName; }
+    else if ( axis == Utilities::Axis::Y ) { mDimensionsIndices[1] = dimensionIndex; yLabel = dimensionName; }
+    else if ( axis == Utilities::Axis::Z ) { mDimensionsIndices[2] = dimensionIndex; zLabel = dimensionName; }
     else if ( axis == Utilities::Axis::COLOR ) { colorDimension = dimensionIndex; }
 
     Utilities::TrailData* trails = mRawView->GetTrailData ( );
@@ -553,16 +556,14 @@ void Explorer::LiveView::FillDimension ( int dimensionIndex, Utilities::Axis axi
 
     if ( !trainPointPicker || axis == Utilities::Axis::COLOR ) { return; }
 
-    ofLogVerbose ( "LiveView" ) << "Point picker training and processing functions called.";
-
-    mPointPicker->Train ( dimensionIndex, axis, false );
+    TrainPointPicker ( );
 }
 
 void Explorer::LiveView::ClearDimension ( Utilities::Axis axis, bool trainPointPicker )
 {
-    if ( axis == Utilities::Axis::X ) { xLabel = ""; }
-    else if ( axis == Utilities::Axis::Y ) { yLabel = ""; }
-    else if ( axis == Utilities::Axis::Z ) { zLabel = ""; }
+    if ( axis == Utilities::Axis::X ) { mDimensionsIndices[0] = -1; xLabel = ""; }
+    else if ( axis == Utilities::Axis::Y ) { mDimensionsIndices[1] = -1; yLabel = ""; }
+    else if ( axis == Utilities::Axis::Z ) { mDimensionsIndices[2] = -1; zLabel = ""; }
     else if ( axis == Utilities::Axis::COLOR ) { colorDimension = -1; }
 
     for ( int file = 0; file < mCorpusMesh.size ( ); file++ )
@@ -594,9 +595,14 @@ void Explorer::LiveView::ClearDimension ( Utilities::Axis axis, bool trainPointP
 
     if ( !trainPointPicker || axis == Utilities::Axis::COLOR ) { return; }
 
-    ofLogVerbose ( "LiveView" ) << "Point picker training and processing functions called.";
+    TrainPointPicker ( );
+}
 
-    mPointPicker->Train ( -1, axis, true );
+void Explorer::LiveView::TrainPointPicker ( )
+{
+    ofLogVerbose ( "LiveView" ) << "Point picker training function called.";
+
+    mPointPicker->Train ( mDimensionsIndices );
 }
 
 void Explorer::LiveView::RefreshFileColors ( int fileIndex )
