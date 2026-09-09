@@ -281,7 +281,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
                     int randomValue = dis ( mRandomGen );
                     if ( randomValue > mCrossoverJumpChanceX1000 ) { continue; }
                     if ( mCorpusMeshMutex.try_lock ( ) )
-                        // TODO - investigate if this lock could work differently, currently this would cause a brief moment of no possible jumps
+                        //TODO.1
                     {
                         std::lock_guard<std::mutex> lock ( mCorpusMeshMutex, std::adopt_lock );
 
@@ -356,7 +356,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
 void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_t* outBufferPosition, Utilities::AudioPlayhead* playhead, bool outBufferFull )
 {
-    //TODO - the next 6 lines seem like they're doing the same thing twice? double check
+    //TODO.3
     size_t segmentLength = playhead->triggerSamplePoints.front ( ) - playhead->sampleIndex;
 
     if ( outBufferFull && segmentLength > (outBuffer->getNumFrames ( ) - *outBufferPosition) ) // cut off early if outBuffer is full
@@ -614,7 +614,7 @@ void Explorer::AudioPlayback::SetDimensionBounds ( const Utilities::DimensionBou
     mDimensionBounds = dimensionBoundsData;
 }
 
-// TODO - change mTimeCorpus from an ofMesh to a more efficient data structure
+//TODO.4
 void Explorer::AudioPlayback::SetCorpusMesh ( const std::vector<ofMesh>& corpusMesh )
 {
     std::lock_guard<std::mutex> lock ( mCorpusMeshMutex );
