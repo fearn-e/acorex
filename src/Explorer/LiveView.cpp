@@ -358,10 +358,11 @@ void Explorer::LiveView::Draw ( )
             ofDrawSphere ( position, size );
         }
 
-        if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
+        if ( mPointPicker->GetNearestSelectedPoint ( ).has_value ( ))
         {
             ofSetColor ( 255, 255, 255 );
-            glm::vec3 nearestPoint = mCorpusMesh[mPointPicker->GetNearestMousePointFile ( )].getVertex ( mPointPicker->GetNearestMousePointTime ( ) );
+            Utilities::PointFT point = mPointPicker->GetNearestSelectedPoint ( ).value ( );
+            glm::vec3 nearestPoint = mCorpusMesh[point.file].getVertex ( point.time );
             ofDrawSphere ( nearestPoint, 25 );
         }
 
@@ -423,9 +424,10 @@ void Explorer::LiveView::Draw ( )
 
     // Draw Nearest Point -----------------------
     mPointPicker->Draw ( );
-    if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
+    if ( mPointPicker->GetNearestSelectedPoint ( ).has_value ( ) )
     {
-        ofDrawBitmapStringHighlight ( "Point picked: " + std::to_string ( mPointPicker->GetNearestMousePointFile ( ) ) + ", " + std::to_string ( mPointPicker->GetNearestMousePointTime ( ) ), ofGetWidth ( ) - 200, ofGetHeight ( ) - 80 );        
+        Utilities::PointFT point = mPointPicker->GetNearestSelectedPoint ( ).value ( );
+        ofDrawBitmapStringHighlight ( "Point picked: file-" + std::to_string ( point.file ) + ", segment-" + std::to_string ( point.time ), ofGetWidth ( ) - 200, ofGetHeight ( ) - 80 );
         //ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )], 20, ofGetHeight ( ) - 60 );
         //std::string hopInfoSamps = std::to_string ( mPointPicker->GetNearestMousePointTime ( ) * mRawView->GetHopSize ( ) );
         //std::string hopInfoSecs = std::to_string ( mRawView->GetTrailData ( )->raw[mPointPicker->GetNearestMousePointFile ( )][mPointPicker->GetNearestMousePointTime ( )][0] );
@@ -453,16 +455,15 @@ void Explorer::LiveView::Draw ( )
 
 void Explorer::LiveView::CreatePlayhead ( )
 {
-    if ( mPointPicker->GetNearestMousePointFile ( ) == -1 ) { return; }
-
-    CreatePlayhead ( mPointPicker->GetNearestMousePointFile ( ), mPointPicker->GetNearestMousePointTime ( ) );
-
-    return;
+    if ( mPointPicker->GetNearestSelectedPoint ( ).has_value ( ) )
+    {
+        CreatePlayhead ( mPointPicker->GetNearestSelectedPoint ( ).value ( ) );
+    }
 }
 
-void Explorer::LiveView::CreatePlayhead ( size_t fileIndex, size_t timePointIndex )
+void Explorer::LiveView::CreatePlayhead ( Utilities::PointFT startingSegment )
 {
-    mAudioPlayback.CreatePlayhead ( fileIndex, timePointIndex );
+    mAudioPlayback.CreatePlayhead ( startingSegment );
 }
 
 void Explorer::LiveView::CreatePlayheadRandom ( )
@@ -471,7 +472,8 @@ void Explorer::LiveView::CreatePlayheadRandom ( )
     size_t randomFile = disFile ( mRandomGen );
     std::uniform_int_distribution<> disTime ( 0, mRawView->GetTrailData ( )->raw[randomFile].size ( ) - 1 );
     size_t randomTime = disTime ( mRandomGen );
-    CreatePlayhead ( randomFile, randomTime );
+    Utilities::PointFT randomPoint = { randomFile, randomTime };
+    CreatePlayhead ( randomPoint );
 }
 
 void Explorer::LiveView::PickRandomPoint ( )
@@ -829,7 +831,7 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
         else if ( args.key == ACOREX_KEYBIND_CAMERA_ROTATE_RIGHT ) { mKeyboardMoveState[7] = false; }
         else if ( args.key == ACOREX_KEYBIND_CAMERA_ZOOM_IN ) { mKeyboardMoveState[8] = false; }
         else if ( args.key == ACOREX_KEYBIND_CAMERA_ZOOM_OUT ) { mKeyboardMoveState[9] = false; }
-        else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_ZERO_ZERO ) { mAudioPlayback.CreatePlayhead ( 0, 0 ); }
+        else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_ZERO_ZERO ) { mAudioPlayback.CreatePlayhead ( Utilities::PointFT { 0, 0 } ); }
         else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_RANDOM_POINT ) { CreatePlayheadRandom ( ); }
         else if ( args.key == ACOREX_KEYBIND_CREATE_PLAYHEAD_PICKER_POINT ) { CreatePlayhead ( ); }
         else if ( args.key == ACOREX_KEYBIND_AUDIO_PAUSE ) { bUserPaused = !bUserPaused; mAudioPlayback.UserInvokedPause ( bUserPaused ); }

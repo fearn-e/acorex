@@ -524,16 +524,16 @@ void Explorer::AudioPlayback::ForcePlayheadUpdateStep ( )
     mActivePlayheads = mPlayheads.size ( );
 }
 
-bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t timePointIndex )
+bool Explorer::AudioPlayback::CreatePlayhead ( Utilities::PointFT startingSegment )
 {
     if ( mRawView->GetDataset ( )->fileList.size ( ) == 0 )
     {
         ofLogError ( "AudioPlayback" ) << "No files in dataset, failed to create new playhead";
         return false;
     }
-    else if ( !mRawView->GetAudioData ( )->loaded[fileIndex] )
+    else if ( !mRawView->GetAudioData ( )->loaded[startingSegment.file] )
     {
-        ofLogError ( "AudioPlayback" ) << "File not loaded in memory, failed to create playhead for " << mRawView->GetDataset ( )->fileList[fileIndex];
+        ofLogError ( "AudioPlayback" ) << "File not loaded in memory, failed to create playhead for " << mRawView->GetDataset ( )->fileList[startingSegment.file];
         return false;
     }
 
@@ -559,8 +559,8 @@ bool Explorer::AudioPlayback::CreatePlayhead ( size_t fileIndex, size_t timePoin
         }
     }
 
-    size_t sampleIndex = timePointIndex * mRawView->GetHopSize ( );
-    Utilities::AudioPlayhead newPlayhead ( playheadCounter, fileIndex, sampleIndex );
+    size_t sampleIndex = startingSegment.time * mRawView->GetHopSize ( );
+    Utilities::AudioPlayhead newPlayhead ( playheadCounter, startingSegment.file, sampleIndex );
     playheadCounter++;
 
     CalculateTriggerPoints ( newPlayhead );

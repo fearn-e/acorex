@@ -19,6 +19,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Explorer/RawView.h"
 #include "Utilities/DimensionBounds.h"
 #include "Utilities/DatasetConversion.h"
+#include "Utilities/Data.h"
 
 #include <flucoma/algorithms/public/KDTree.hpp>
 #include <flucoma/data/FluidDataSet.hpp>
@@ -56,9 +57,9 @@ public:
     void SetCamera ( std::shared_ptr<ofCamera> camera ) { mCamera = camera; }
     void SetNearestCheckNeeded ( ) { bNearestMouseCheckNeeded = true; }
 
-    int GetNearestMousePointFile ( ) const { return mNearestPointFile; }
-    int GetNearestMousePointTime ( ) const { return mNearestPointTime; }
-    double GetNearestMouseDistance ( ) const { return mNearestDistance; }
+    
+    std::optional<Utilities::PointFT> GetNearestSelectedPoint ( ) const { return mNearestSelectedPoint; }
+    std::optional<double> GetNearestSelectedPointDistance ( ) const { return mNearestSelectedPointDistance; }
     bool IsTrained ( ) const { return bTrained; }
 
 private:
@@ -94,8 +95,8 @@ private:
 
     std::array<int, 3> mDimensionsIndices;
 
-    int mNearestPoint;
-    double mNearestDistance;
+    std::optional<Utilities::PointFT> mNearestSelectedPoint;
+    std::optional<double> mNearestSelectedPointDistance;
 
     double maxAllowedDistanceFar;
     double maxAllowedDistanceNear;
@@ -104,8 +105,8 @@ private:
 
     fluid::FluidDataSet<std::string, double, 1> mFullFluidSet;
     fluid::FluidDataSet<std::string, double, 1> mLiveFluidSet;
-    std::vector<int> mCorpusFileLookUp; int mNearestPointFile;
-    std::vector<int> mCorpusTimeLookUp; int mNearestPointTime;
+    std::vector<size_t> mCorpusFileLookUp;
+    std::vector<size_t> mCorpusTimeLookUp;
     
     Utilities::DatasetConversion mDatasetConversion;
 
