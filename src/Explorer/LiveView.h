@@ -56,7 +56,7 @@ public:
     // Sound Functions ------------------------------
 
     void CreatePlayhead ( );
-    void CreatePlayhead ( size_t fileIndex, size_t timePointIndex );
+    void CreatePlayhead ( Utilities::PointFT startingSegment );
     void CreatePlayheadRandom ( );
     void PickRandomPoint ( );
     void KillPlayhead ( size_t playheadID );

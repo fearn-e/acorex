@@ -29,9 +29,8 @@ Explorer::PointPicker::PointPicker ( )
         bTrained ( false ),
         b3D ( true ), bPicker ( false ), bClicked ( false ), bNearestMouseCheckNeeded ( false ),
         mDimensionsIndices { -1, -1, -1 },
-        mNearestPoint ( -1 ), mNearestDistance ( -1 ),
-        maxAllowedDistanceFar ( 0.05 ), maxAllowedDistanceNear ( 0.01 ),
-        mNearestPointFile ( -1 ), mNearestPointTime ( -1 )
+        mNearestSelectedPoint ( std::nullopt ), mNearestSelectedPointDistance ( std::nullopt ),
+        maxAllowedDistanceFar ( 0.05 ), maxAllowedDistanceNear ( 0.01 )
 {
     mRandomGen = std::mt19937 ( std::random_device ( ) () );
 }
@@ -48,9 +47,9 @@ void Explorer::PointPicker::Initialise ( const Utilities::DataSet& dataset, cons
     Utilities::DataSet scaledDataset = dataset;
     ScaleDataset ( scaledDataset, dimensionBounds );
 
-    for ( int file = 0; file < dataset.fileList.size ( ); file++ )
+    for ( size_t file = 0; file < dataset.fileList.size ( ); file++ )
     {
-        for ( int timepoint = 0; timepoint < dataset.trails.raw[file].size ( ); timepoint++ )
+        for ( size_t timepoint = 0; timepoint < dataset.trails.raw[file].size ( ); timepoint++ )
         {
             mCorpusFileLookUp.push_back ( file );
             mCorpusTimeLookUp.push_back ( timepoint );
@@ -76,7 +75,8 @@ void Explorer::PointPicker::Clear ( )
 
     mDimensionsIndices = { -1, -1, -1 };
 
-    mNearestPoint = -1; mNearestDistance = -1; mNearestPointFile = -1; mNearestPointTime = -1;
+    mNearestSelectedPoint = std::nullopt;
+    mNearestSelectedPointDistance = std::nullopt;
 
     mCorpusFileLookUp.clear ( );
     mCorpusTimeLookUp.clear ( );
@@ -176,10 +176,10 @@ void Explorer::PointPicker::Draw ( )
 {
     if ( bDebug )
     {
-        if ( mNearestPoint != -1 )
+        if ( mNearestSelectedPoint.has_value ( ) && mNearestSelectedPointDistance.has_value ( ) )
         {
-            ofDrawBitmapStringHighlight ( "Nearest Point: " + std::to_string ( mNearestPoint ), 20, ofGetHeight ( ) - 100 );
-            ofDrawBitmapStringHighlight ( "Nearest Distance: " + std::to_string ( mNearestDistance ), 20, ofGetHeight ( ) - 80 );
+            ofDrawBitmapStringHighlight ( "Nearest Point: file-" + std::to_string ( mNearestSelectedPoint.value ( ).file ) + ", segment-" + std::to_string ( mNearestSelectedPoint.value ( ).time ), 20, ofGetHeight ( ) - 100 );
+            ofDrawBitmapStringHighlight ( "Nearest Distance: " + std::to_string ( mNearestSelectedPointDistance.value ( ) ), 20, ofGetHeight ( ) - 80 );
         }
 
         ofEnableDepthTest ( );
@@ -214,8 +214,8 @@ void Explorer::PointPicker::FindNearestToMouse ( )
 
     std::lock_guard<std::mutex> lock ( mPointPickerMutex );
 
-    mNearestPoint = -1; mNearestPointFile = -1; mNearestPointTime = -1;
-    mNearestDistance = std::numeric_limits<double>::max ( );
+    mNearestSelectedPoint = std::nullopt;
+    mNearestSelectedPointDistance = std::numeric_limits<double>::max ( );
 
     int mouseX = ofGetMouseX ( );
     int mouseY = ofGetMouseY ( );
@@ -242,12 +242,11 @@ void Explorer::PointPicker::FindNearestToMouse ( )
 
         if ( dist.size ( ) == 0 ) { return; }
 
-        if ( dist[0] < mNearestDistance )
+        if ( dist[0] < mNearestSelectedPointDistance )
         {
-            mNearestDistance = dist[0];
-            mNearestPoint = std::stoi ( *id[0] );
-            mNearestPointFile = mCorpusFileLookUp[mNearestPoint];
-            mNearestPointTime = mCorpusTimeLookUp[mNearestPoint];
+            size_t point = std::stoull ( *id[0] );
+            mNearestSelectedPoint = { mCorpusFileLookUp[point], mCorpusTimeLookUp[point] };
+            mNearestSelectedPointDistance = dist[0];
         }
 
         return;
@@ -311,12 +310,11 @@ void Explorer::PointPicker::FindNearestToMouse ( )
 
         if ( dist.size ( ) == 0 ) { continue; }
 
-        if ( dist[0] < mNearestDistance )
+        if ( dist[0] < mNearestSelectedPointDistance )
         {
-            mNearestDistance = dist[0];
-            mNearestPoint = std::stoi ( *id[0] );
-            mNearestPointFile = mCorpusFileLookUp[mNearestPoint];
-            mNearestPointTime = mCorpusTimeLookUp[mNearestPoint];
+            size_t point = std::stoull ( *id[0] );
+            mNearestSelectedPoint = { mCorpusFileLookUp[point], mCorpusTimeLookUp[point] };
+            mNearestSelectedPointDistance = dist[0];
         }
     }
 }
@@ -362,15 +360,15 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
             {
                 if ( dist[i] < nearestDistance )
                 {
-                    int point = std::stoi ( *id[i] );
+                    size_t point = std::stoull ( *id[i] );
                     if ( !sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file )
                     { continue; } // skip if jumping would jump to the same file and the option is not allowed
                     size_t timeDiff = mCorpusTimeLookUp[point] > currentPoint.time ? mCorpusTimeLookUp[point] - currentPoint.time : currentPoint.time - mCorpusTimeLookUp[point];
                     if ( sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file && timeDiff < minTimeDiffSameFile )
                     { continue; } // skip if jumping would jump to the same file and the time difference is too small
 
-                    nearestDistance = dist[i];
                     nearestPoint = { mCorpusFileLookUp[point], mCorpusTimeLookUp[point] };
+                    nearestDistance = dist[i];
                     jumpFound = true;
                 }
             }
@@ -397,7 +395,7 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
         {
             if ( dist[i] < nearestDistance )
             {
-                int point = std::stoi ( *id[i] );
+                size_t point = std::stoi ( *id[i] );
                 if ( !sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file )
                 { continue; } // skip if jumping would jump to the same file and the option is not allowed
                 size_t timeDiff = mCorpusTimeLookUp[point] > currentPoint.time ? mCorpusTimeLookUp[point] - currentPoint.time : currentPoint.time - mCorpusTimeLookUp[point];
@@ -406,8 +404,9 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 
                 // this check (also in 2D) doesn't seem to actually be needed? leaving the comment here just in case
                 //if ( audioSet.raw[mCorpusFileLookUp[point]].getNumFrames ( ) - ((size_t)mCorpusTimeLookUp[point] * hopSize) < remainingSamplesRequired ) { continue; } // skip if there's not enough samples left in the file
-                nearestDistance = dist[i];
+                
                 nearestPoint = { mCorpusFileLookUp[point], mCorpusTimeLookUp[point] };
+                nearestDistance = dist[i];
                 jumpFound = true;
             }
 
@@ -428,14 +427,11 @@ void Explorer::PointPicker::FindRandom ( )
 
     std::lock_guard<std::mutex> lock ( mPointPickerMutex );
 
-    std::uniform_int_distribution<int> dist ( 0, (int)mCorpusFileLookUp.size ( ) - 1 );
-    int randomPoint = dist ( mRandomGen );
+    std::uniform_int_distribution<size_t> dist ( 0, mCorpusFileLookUp.size ( ) - 1 );
+    size_t randomPoint = dist ( mRandomGen );
 
-    mNearestPoint = randomPoint;
-    mNearestDistance = 0.0;
-
-    mNearestPointFile = mCorpusFileLookUp[randomPoint];
-    mNearestPointTime = mCorpusTimeLookUp[randomPoint];
+    mNearestSelectedPoint = { mCorpusFileLookUp[randomPoint], mCorpusTimeLookUp[randomPoint] };
+    mNearestSelectedPointDistance = 0.0;
 }
 
 void Explorer::PointPicker::KeyEvent ( ofKeyEventArgs& args )

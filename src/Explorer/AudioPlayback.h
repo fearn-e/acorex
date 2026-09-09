@@ -44,7 +44,7 @@ public:
 
     void SetRawView ( std::shared_ptr<RawView>& rawPointer ) { mRawView = rawPointer; }
 
-    bool CreatePlayhead ( size_t fileIndex, size_t timePointIndex );
+    bool CreatePlayhead ( Utilities::PointFT startingSegment );
     bool KillPlayhead ( size_t playheadID );
     std::vector<Utilities::VisualPlayhead> GetPlayheadInfo ( );
     void SetFlagMissingOutput ( bool missing );
