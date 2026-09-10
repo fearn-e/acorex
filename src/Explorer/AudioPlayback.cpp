@@ -18,6 +18,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "ofLog.h"
 #include <random>
+#include <optional>
 
 using namespace Acorex;
 
@@ -280,7 +281,8 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
                     if ( mPlayheads[playheadIndex].sampleIndex + requiredSamples >= mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].fileIndex].getNumFrames ( ) ) { continue; }
                     std::uniform_int_distribution<> dis ( 0, 1000 );
                     int randomValue = dis ( mRandomGen );
-                    if ( randomValue > mCrossoverJumpChanceX1000 ) { continue; }
+                    if ( randomValue > mCrossoverJumpChanceX1000 )
+                    { continue; }
                     if ( mCorpusMeshMutex.try_lock ( ) )
                         //TODO.1
                     {
@@ -288,21 +290,20 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 
                         size_t timePointIndex = mPlayheads[playheadIndex].sampleIndex / mRawView->GetHopSize ( );
                         glm::vec3 playheadPosition = mCorpusMesh[mPlayheads[playheadIndex].fileIndex].getVertex ( timePointIndex );
-                        Utilities::PointFT nearestPoint;
                         Utilities::PointFT currentPoint = { mPlayheads[playheadIndex].fileIndex, timePointIndex };
 
-                        if ( !mPointPicker->FindNearestToPosition ( playheadPosition, nearestPoint, currentPoint,
-                                                                    mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileAllowed,
-                                                                    mJumpSameFileMinTimeDiff ) )
-                        {
-                            continue;
-                        }
+                        std::optional<Utilities::PointFT> nearestPoint;
+                        nearestPoint = mPointPicker->FindNearestToPosition ( playheadPosition, currentPoint, mJumpSameFileAllowed,
+                                                                            mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileMinTimeDiff );
+                        if ( !nearestPoint.has_value ( ) )
+                        { continue; }
 
-                        if ( mRawView->GetAudioData ( )->loaded[nearestPoint.file] == false ) { continue; }
+                        if ( mRawView->GetAudioData ( )->loaded[nearestPoint->file] == false )
+                        { continue; }
 
                         mPlayheads[playheadIndex].crossfading = true;
-                        mPlayheads[playheadIndex].jumpFileIndex = nearestPoint.file;
-                        mPlayheads[playheadIndex].jumpSampleIndex = nearestPoint.time * mRawView->GetHopSize ( );
+                        mPlayheads[playheadIndex].jumpFileIndex = nearestPoint->file;
+                        mPlayheads[playheadIndex].jumpSampleIndex = nearestPoint->time * mRawView->GetHopSize ( );
 
                         //TODO.2b
                         if ( mPlayheads[playheadIndex].jumpSampleIndex + requiredSamples >= mRawView->GetAudioData ( )->raw[mPlayheads[playheadIndex].jumpFileIndex].getNumFrames ( ) )

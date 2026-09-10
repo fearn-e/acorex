@@ -28,6 +28,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <mutex>
 #include <atomic>
 #include <random>
+#include <optional>
 
 namespace Acorex {
 namespace Explorer {
@@ -47,9 +48,9 @@ public:
     void Draw ( );
 
     void FindNearestToMouse ( );
-    bool FindNearestToPosition (	const glm::vec3& position, Utilities::PointFT& nearestPoint, Utilities::PointFT currentPoint, 
-                                    int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed, 
-                                    int minTimeDiffSameFile);
+    std::optional<Utilities::PointFT> FindNearestToPosition ( const glm::vec3& position, Utilities::PointFT currentPoint, bool sameFileAllowed,
+                                                            int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, int minTimeDiffSameFile );
+                                
     void FindRandom ( );
 
     // Setters & Getters ----------------------------

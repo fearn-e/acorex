@@ -325,14 +325,12 @@ size_t SubtractFromBigger ( size_t a, size_t b )
         return b - a;
 }
 
-// TODO - revisit this function for any performance improvements
-bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utilities::PointFT& nearestPoint, Utilities::PointFT currentPoint, 
-                                                    int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, bool sameFileAllowed,
-                                                    int minTimeDiffSameFile )
+//TODO.6
+std::optional<Utilities::PointFT> Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utilities::PointFT currentPoint, bool sameFileAllowed,
+                                                                                int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, int minTimeDiffSameFile )
 {
-    if ( !bTrained ) { return false; }
-
-    if ( maxAllowedDistanceSpaceX1000 == 0 ) { return false; }
+    if ( !bTrained ) { return std::nullopt; }
+    if ( maxAllowedDistanceSpaceX1000 == 0 ) { return std::nullopt; }
 
     if ( mPointPickerMutex.try_lock ( ) )
     {
@@ -357,10 +355,10 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 
             auto [dist, id] = mKDTree.kNearest ( query, maxAllowedTargets, maxAllowedDistanceSpace );
 
-            if ( dist.size ( ) == 0 ) { return false; }
+            if ( dist.size ( ) == 0 ) { return std::nullopt; }
 
             double nearestDistance = std::numeric_limits<double>::max ( );
-            bool jumpFound = false;
+            std::optional<Utilities::PointFT> nearestPoint;
             
             for ( int i = 0; i < dist.size ( ); i++ )
             {
@@ -375,11 +373,10 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 
                     nearestPoint = mCorpusPointLookUp[point];
                     nearestDistance = dist[i];
-                    jumpFound = true;
                 }
             }
 
-            return jumpFound;
+            return nearestPoint;
         }
 
         // 3D nearest
@@ -392,10 +389,10 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
 
         auto [dist, id] = mKDTree.kNearest ( query, maxAllowedTargets, maxAllowedDistanceSpace );
 
-        if ( dist.size ( ) == 0 ) { return false; }
+        if ( dist.size ( ) == 0 ) { return std::nullopt; }
 
         double nearestDistance = std::numeric_limits<double>::max ( );
-        bool jumpFound = false;
+        std::optional<Utilities::PointFT> nearestPoint;
 
         for ( int i = 0; i < dist.size ( ); i++ )
         {
@@ -413,14 +410,13 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
                 
                 nearestPoint = mCorpusPointLookUp[point];
                 nearestDistance = dist[i];
-                jumpFound = true;
             }
         }
 
-        return jumpFound;
+        return nearestPoint;
     }
 
-    return false;
+    return std::nullopt;
 }
 
 void Explorer::PointPicker::FindRandom ( )
