@@ -51,8 +51,7 @@ void Explorer::PointPicker::Initialise ( const Utilities::DataSet& dataset, cons
     {
         for ( size_t timepoint = 0; timepoint < dataset.trails.raw[file].size ( ); timepoint++ )
         {
-            mCorpusFileLookUp.push_back ( file );
-            mCorpusTimeLookUp.push_back ( timepoint );
+            mCorpusPointLookUp.push_back ( { file, timepoint } );
         }
     }
 
@@ -78,8 +77,7 @@ void Explorer::PointPicker::Clear ( )
     mNearestSelectedPoint = std::nullopt;
     mNearestSelectedPointDistance = std::nullopt;
 
-    mCorpusFileLookUp.clear ( );
-    mCorpusTimeLookUp.clear ( );
+    mCorpusPointLookUp.clear ( );
 
     RemoveListeners ( );
 }
@@ -245,7 +243,7 @@ void Explorer::PointPicker::FindNearestToMouse ( )
         if ( dist[0] < mNearestSelectedPointDistance )
         {
             size_t point = std::stoull ( *id[0] );
-            mNearestSelectedPoint = { mCorpusFileLookUp[point], mCorpusTimeLookUp[point] };
+            mNearestSelectedPoint = mCorpusPointLookUp[point];
             mNearestSelectedPointDistance = dist[0];
         }
 
@@ -313,7 +311,7 @@ void Explorer::PointPicker::FindNearestToMouse ( )
         if ( dist[0] < mNearestSelectedPointDistance )
         {
             size_t point = std::stoull ( *id[0] );
-            mNearestSelectedPoint = { mCorpusFileLookUp[point], mCorpusTimeLookUp[point] };
+            mNearestSelectedPoint = mCorpusPointLookUp[point];
             mNearestSelectedPointDistance = dist[0];
         }
     }
@@ -361,13 +359,13 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
                 if ( dist[i] < nearestDistance )
                 {
                     size_t point = std::stoull ( *id[i] );
-                    if ( !sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file )
+                    if ( !sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file )
                     { continue; } // skip if jumping would jump to the same file and the option is not allowed
-                    size_t timeDiff = mCorpusTimeLookUp[point] > currentPoint.time ? mCorpusTimeLookUp[point] - currentPoint.time : currentPoint.time - mCorpusTimeLookUp[point];
-                    if ( sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file && timeDiff < minTimeDiffSameFile )
+                    size_t timeDiff = mCorpusPointLookUp[point].time > currentPoint.time ? mCorpusPointLookUp[point].time - currentPoint.time : currentPoint.time - mCorpusPointLookUp[point].time;
+                    if ( sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file && timeDiff < minTimeDiffSameFile )
                     { continue; } // skip if jumping would jump to the same file and the time difference is too small
 
-                    nearestPoint = { mCorpusFileLookUp[point], mCorpusTimeLookUp[point] };
+                    nearestPoint = mCorpusPointLookUp[point];
                     nearestDistance = dist[i];
                     jumpFound = true;
                 }
@@ -396,16 +394,16 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
             if ( dist[i] < nearestDistance )
             {
                 size_t point = std::stoi ( *id[i] );
-                if ( !sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file )
+                if ( !sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file )
                 { continue; } // skip if jumping would jump to the same file and the option is not allowed
-                size_t timeDiff = mCorpusTimeLookUp[point] > currentPoint.time ? mCorpusTimeLookUp[point] - currentPoint.time : currentPoint.time - mCorpusTimeLookUp[point];
-                if ( sameFileAllowed && mCorpusFileLookUp[point] == currentPoint.file && timeDiff < minTimeDiffSameFile )
+                size_t timeDiff = mCorpusPointLookUp[point].time > currentPoint.time ? mCorpusPointLookUp[point].time - currentPoint.time : currentPoint.time - mCorpusPointLookUp[point].time;
+                if ( sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file && timeDiff < minTimeDiffSameFile )
                 { continue; } // skip if jumping would jump to the same file and the time difference is too small
 
                 // this check (also in 2D) doesn't seem to actually be needed? leaving the comment here just in case
                 //if ( audioSet.raw[mCorpusFileLookUp[point]].getNumFrames ( ) - ((size_t)mCorpusTimeLookUp[point] * hopSize) < remainingSamplesRequired ) { continue; } // skip if there's not enough samples left in the file
                 
-                nearestPoint = { mCorpusFileLookUp[point], mCorpusTimeLookUp[point] };
+                nearestPoint = mCorpusPointLookUp[point];
                 nearestDistance = dist[i];
                 jumpFound = true;
             }
@@ -427,10 +425,10 @@ void Explorer::PointPicker::FindRandom ( )
 
     std::lock_guard<std::mutex> lock ( mPointPickerMutex );
 
-    std::uniform_int_distribution<size_t> dist ( 0, mCorpusFileLookUp.size ( ) - 1 );
+    std::uniform_int_distribution<size_t> dist ( 0, mCorpusPointLookUp.size ( ) - 1 );
     size_t randomPoint = dist ( mRandomGen );
 
-    mNearestSelectedPoint = { mCorpusFileLookUp[randomPoint], mCorpusTimeLookUp[randomPoint] };
+    mNearestSelectedPoint = mCorpusPointLookUp[randomPoint];
     mNearestSelectedPointDistance = 0.0;
 }
 
