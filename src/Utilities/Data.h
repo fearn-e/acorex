@@ -169,6 +169,11 @@ struct DataSet {
 struct PointFT {
     PointFT ( size_t F = 0, size_t T = 0 ) : file ( F ), time ( T ) { }
 
+    bool operator==( const PointFT& other ) const noexcept
+    {
+        return file == other.file && time == other.time;
+    }
+
     size_t file = 0;
     size_t time = 0;
 };
