@@ -359,12 +359,14 @@ std::optional<Utilities::PointFT> Explorer::PointPicker::FindNearestToPosition (
 
             double nearestDistance = std::numeric_limits<double>::max ( );
             std::optional<Utilities::PointFT> nearestPoint;
-            
+
             for ( int i = 0; i < dist.size ( ); i++ )
             {
                 if ( dist[i] < nearestDistance )
                 {
                     size_t point = std::stoull ( *id[i] );
+                    if ( mCorpusPointLookUp[point] == currentPoint )
+                    { continue; } // same exact point - skip
                     if ( !sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file )
                     { continue; } // same file jump not allowed - skip
                     size_t timeDiff = SubtractFromBigger ( mCorpusPointLookUp[point].time, currentPoint.time );
@@ -399,6 +401,8 @@ std::optional<Utilities::PointFT> Explorer::PointPicker::FindNearestToPosition (
             if ( dist[i] < nearestDistance )
             {
                 size_t point = std::stoi ( *id[i] );
+                if ( mCorpusPointLookUp[point] == currentPoint )
+                { continue; } // same exact point - skip
                 if ( !sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file )
                 { continue; } // same file jump not allowed - skip
                 size_t timeDiff = SubtractFromBigger ( mCorpusPointLookUp[point].time, currentPoint.time );
