@@ -105,8 +105,7 @@ private:
 
     fluid::FluidDataSet<std::string, double, 1> mFullFluidSet;
     fluid::FluidDataSet<std::string, double, 1> mLiveFluidSet;
-    std::vector<size_t> mCorpusFileLookUp;
-    std::vector<size_t> mCorpusTimeLookUp;
+    std::vector<Utilities::PointFT> mCorpusPointLookUp;
     
     Utilities::DatasetConversion mDatasetConversion;
 
