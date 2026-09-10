@@ -415,9 +415,9 @@ bool Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, U
                 nearestDistance = dist[i];
                 jumpFound = true;
             }
-
-            return jumpFound;
         }
+
+        return jumpFound;
     }
 
     return false;
