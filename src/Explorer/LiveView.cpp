@@ -427,7 +427,7 @@ void Explorer::LiveView::Draw ( )
     if ( mPointPicker->GetNearestSelectedPoint ( ).has_value ( ) )
     {
         Utilities::PointFT point = mPointPicker->GetNearestSelectedPoint ( ).value ( );
-        ofDrawBitmapStringHighlight ( "Point picked: file-" + std::to_string ( point.file ) + ", segment-" + std::to_string ( point.time ), ofGetWidth ( ) - 200, ofGetHeight ( ) - 80 );
+        ofDrawBitmapStringHighlight ( "Point picked: file-" + std::to_string ( point.file ) + ", segment-" + std::to_string ( point.time ), ofGetWidth ( ) - 350, ofGetHeight ( ) - 80 );
         //ofDrawBitmapStringHighlight ( "Nearest File: " + mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )], 20, ofGetHeight ( ) - 60 );
         //std::string hopInfoSamps = std::to_string ( mPointPicker->GetNearestMousePointTime ( ) * mRawView->GetHopSize ( ) );
         //std::string hopInfoSecs = std::to_string ( mRawView->GetTrailData ( )->raw[mPointPicker->GetNearestMousePointFile ( )][mPointPicker->GetNearestMousePointTime ( )][0] );
