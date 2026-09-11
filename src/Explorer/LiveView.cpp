@@ -509,7 +509,7 @@ void Explorer::LiveView::CreatePoints ( )
     bDraw = true;
 }
 
-void Explorer::LiveView::FillDimension ( int dimensionIndex, Utilities::Axis axis, bool trainPointPicker )
+void Explorer::LiveView::FillDimension ( int dimensionIndex, Utilities::Axis::Type axis, bool trainPointPicker )
 {
     std::string dimensionName = mRawView->GetDimensions ( )[dimensionIndex];
     if ( axis == Utilities::Axis::X ) { mDimensionsIndices[0] = dimensionIndex; xLabel = dimensionName; }
@@ -561,7 +561,7 @@ void Explorer::LiveView::FillDimension ( int dimensionIndex, Utilities::Axis axi
     TrainPointPicker ( );
 }
 
-void Explorer::LiveView::ClearDimension ( Utilities::Axis axis, bool trainPointPicker )
+void Explorer::LiveView::ClearDimension ( Utilities::Axis::Type axis, bool trainPointPicker )
 {
     if ( axis == Utilities::Axis::X ) { mDimensionsIndices[0] = -1; xLabel = ""; }
     else if ( axis == Utilities::Axis::Y ) { mDimensionsIndices[1] = -1; yLabel = ""; }
@@ -641,7 +641,7 @@ void Explorer::LiveView::Init3DCam ( )
     mCamera->setScale ( 1 );
 }
 
-void Explorer::LiveView::Init2DCam ( Utilities::Axis disabledAxis )
+void Explorer::LiveView::Init2DCam ( Utilities::Axis::Type disabledAxis )
 { 
     double midSpacePoint = (SpaceDefs::mSpaceMax + SpaceDefs::mSpaceMin ) / 2;
     if ( disabledAxis == Utilities::Axis::X ) { mCamera->setPosition ( -midSpacePoint, midSpacePoint, midSpacePoint ); }

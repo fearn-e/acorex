@@ -788,7 +788,7 @@ void ExplorerMenu::OpenCorpus ( )
     if ( !audioStarted ) { AudioOutputFailed ( ); }
 }
 
-void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis axis, bool trainPointPicker )
+void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis::Type axis, bool trainPointPicker )
 {
     if ( bBlockDimensionFilling )
     { return; }
@@ -880,7 +880,7 @@ void ExplorerMenu::CameraSwitcher ( )
     bool isZNone = mDimensionDropdownZ->getAllSelected ( )[0] == "None";
     int numDisabledAxes = isXNone + isYNone + isZNone;
 
-    Utilities::Axis							  disabledAxis = Utilities::Axis::NONE;
+    Utilities::Axis::Type				disabledAxis = Utilities::Axis::NONE;
     if		( isXNone )					{ disabledAxis = Utilities::Axis::X; }
     else if ( isYNone )					{ disabledAxis = Utilities::Axis::Y; }
     else if ( isZNone )					{ disabledAxis = Utilities::Axis::Z; }
