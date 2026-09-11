@@ -21,6 +21,24 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
+std::string Utilities::getTimestampString ( std::chrono::system_clock::time_point timestamp )
+{  
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp.time_since_epoch()) % std::chrono::seconds(1);
+    auto time = std::chrono::system_clock::to_time_t( timestamp );
+    
+    std::tm tm_buf;
+    #ifdef _WIN32
+        localtime_s(&tm_buf, &time);
+    #else
+        localtime_r(&time, &tm_buf);
+    #endif
+    
+    std::ostringstream oss;
+    oss << std::put_time(&tm_buf, "%Y-%m-%d %H:%M:%S")
+        << '.' << std::setfill('0') << std::setw(3) << ms.count();
+    return oss.str();
+}
+
 // -------------------------------------------------------------------------
 // -------------------------- LogDisplay -----------------------------------
 // -------------------------------------------------------------------------
@@ -92,9 +110,8 @@ void Utilities::LogDisplay::Draw ( )
             float fadeProgress = std::chrono::duration<float> ( std::chrono::system_clock::now ( ) - fadeStart ).count ( ) / std::chrono::duration<float> ( fadeEnd - fadeStart ).count ( );
             logLineColor.a = ofMap ( fadeProgress, 0.0, 1.0, logLineColor.a, 0.0 );
         }
-
         ofSetColor ( logLineColor );
-        ofDrawBitmapString ( log.context + ": " + log.message, 10, ofGetHeight ( ) - 10 - (i * mLayout->getPanelRowHeight ( )) );
+        ofDrawBitmapString ( getTimestampString(log.timestamp) + " [" + log.context + "]: " + log.message, 10, ofGetHeight ( ) - 10 - (i * mLayout->getPanelRowHeight ( )) );
         logIndex--;
     }
     
@@ -127,7 +144,7 @@ void Utilities::LogDisplay::RemoveListeners ( )
 void Utilities::LogDisplay::AddLog ( ofLogLevel level, const std::string& context, const std::string& message )
 {
     std::lock_guard<std::mutex> lock ( newLogMutex );
-    auto timestamp = std::chrono::system_clock::now ( );
+    std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now ( );
     newLogs.push ( { level, context, message, timestamp } );
 }
 
