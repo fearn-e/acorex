@@ -691,13 +691,15 @@ void ExplorerMenu::OpenCorpus ( )
 
     initialSettings.SetHopSize ( mRawView->GetHopSize ( ) );
 
+    initialSettings.SetDimensionX ( mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : DEFAULT_DIMENSION_NONE );
+    initialSettings.SetDimensionY ( mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : DEFAULT_DIMENSION_NONE );
+    initialSettings.SetDimensionZ ( mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : DEFAULT_DIMENSION_NONE );
+
+    initialSettings.SetDimensionColor ( DEFAULT_DIMENSION_COLOR );
+    initialSettings.SetDimensionDynamicPan ( DEFAULT_DIMENSION_DYNAMIC_PAN );
+
     if ( !preserveCorpusSettings )
     {
-        initialSettings.SetDimensionX ( mRawView->GetDimensions ( ).size ( ) > 1 ? mRawView->GetDimensions ( )[1] : DEFAULT_DIMENSION_X );
-        initialSettings.SetDimensionY ( mRawView->GetDimensions ( ).size ( ) > 2 ? mRawView->GetDimensions ( )[2] : DEFAULT_DIMENSION_Y );
-        initialSettings.SetDimensionZ ( mRawView->GetDimensions ( ).size ( ) > 3 ? mRawView->GetDimensions ( )[3] : DEFAULT_DIMENSION_Z );
-
-        initialSettings.SetDimensionColor ( DEFAULT_DIMENSION_COLOR );
         initialSettings.SetColorSpectrum ( DEFAULT_COLOR_SPECTRUM );
 
         initialSettings.SetLoopPlayheads ( DEFAULT_LOOP_PLAYHEADS );
@@ -709,35 +711,14 @@ void ExplorerMenu::OpenCorpus ( )
         initialSettings.SetMaxJumpTargets ( DEFAULT_MAX_JUMP_TARGETS );
 
         initialSettings.SetVolumeX1000 ( DEFAULT_VOLUME_X1000 );
-        initialSettings.SetDimensionDynamicPan ( DEFAULT_DIMENSION_DYNAMIC_PAN );
         initialSettings.SetPanningStrengthX1000 ( DEFAULT_PANNING_STRENGTH_X1000 );
     }
     else if ( preserveCorpusSettings )
     {
         preservedControlReceiverIndex = mControlReceiverIndex;
-
-        std::vector<std::string> newDimensionNames = mRawView->GetDimensions ( );
-
-        if ( std::find_if ( newDimensionNames.begin ( ), newDimensionNames.end ( ), [ this ] ( const std::string& dimension ) { return dimension == mDimensionDropdownX->getAllSelected ( )[0]; } ) == newDimensionNames.end ( ) )
-        { initialSettings.SetDimensionX ( newDimensionNames.size ( ) > 1 ? newDimensionNames[1] : DEFAULT_DIMENSION_X ); }
-        else
-        { initialSettings.SetDimensionX ( mDimensionDropdownX->getAllSelected ( )[0] ); }
-
-        if ( std::find_if ( newDimensionNames.begin ( ), newDimensionNames.end ( ), [ this ] ( const std::string& dimension ) { return dimension == mDimensionDropdownY->getAllSelected ( )[0]; } ) == newDimensionNames.end ( ) )
-        { initialSettings.SetDimensionY ( newDimensionNames.size ( ) > 2 ? newDimensionNames[2] : DEFAULT_DIMENSION_Y ); }
-        else
-        { initialSettings.SetDimensionY ( mDimensionDropdownY->getAllSelected ( )[0] ); }
-
-        if ( std::find_if ( newDimensionNames.begin ( ), newDimensionNames.end ( ), [ this ] ( const std::string& dimension ) { return dimension == mDimensionDropdownZ->getAllSelected ( )[0]; } ) == newDimensionNames.end ( ) )
-        { initialSettings.SetDimensionZ ( newDimensionNames.size ( ) > 3 ? newDimensionNames[3] : DEFAULT_DIMENSION_Z ); }
-        else
-        { initialSettings.SetDimensionZ ( mDimensionDropdownZ->getAllSelected ( )[0] ); }
-
-        if ( std::find_if ( newDimensionNames.begin ( ), newDimensionNames.end ( ), [ this ] ( const std::string& dimension ) { return dimension == mDimensionDropdownColor->getAllSelected ( )[0]; } ) == newDimensionNames.end ( ) )
-        { initialSettings.SetDimensionColor ( DEFAULT_DIMENSION_COLOR ); }
-        else
+        
+        if ( GetDimensionIndex ( mDimensionDropdownColor->getAllSelected ( )[0] ).has_value ( ) )
         { initialSettings.SetDimensionColor ( mDimensionDropdownColor->getAllSelected ( )[0] ); }
-
         initialSettings.SetColorSpectrum ( mColorSpectrumSwitcher );
 
         initialSettings.SetLoopPlayheads ( mLoopPlayheadsToggle );
@@ -749,14 +730,9 @@ void ExplorerMenu::OpenCorpus ( )
         initialSettings.SetMaxJumpDistanceSpaceX1000 ( mMaxJumpDistanceSpaceSliderX1000 );
         initialSettings.SetMaxJumpTargets ( mMaxJumpTargetsSlider );
 
-
         initialSettings.SetVolumeX1000 ( mVolumeSliderX1000 );
-
-        if ( std::find_if ( newDimensionNames.begin ( ), newDimensionNames.end ( ), [ this ] ( const std::string& dimension ) { return dimension == mDimensionDropdownDynamicPan->getAllSelected ( )[0]; } ) == newDimensionNames.end ( ) )
-        { initialSettings.SetDimensionDynamicPan ( DEFAULT_DIMENSION_DYNAMIC_PAN ); }
-        else
+        if ( GetDimensionIndex ( mDimensionDropdownDynamicPan->getAllSelected ( )[0] ).has_value ( ) )
         { initialSettings.SetDimensionDynamicPan ( mDimensionDropdownDynamicPan->getAllSelected ( )[0] ); }
-
         initialSettings.SetPanningStrengthX1000 ( mPanningStrengthSliderX1000 );
     }
 
