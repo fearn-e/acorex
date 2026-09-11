@@ -682,6 +682,10 @@ void ExplorerMenu::OpenCorpus ( )
         return;
     }
 
+    mLastDimensionXSetByListener = "";
+    mLastDimensionYSetByListener = "";
+    mLastDimensionZSetByListener = "";
+
     Utilities::ExploreSettings initialSettings { };
 
     initialSettings.SetHopSize ( mRawView->GetHopSize ( ) );
