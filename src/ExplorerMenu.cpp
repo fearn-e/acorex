@@ -429,6 +429,7 @@ void ExplorerMenu::SetupPanelSectionAudioManager ( )
     {
         std::string deviceName = mAudioSettingsManager.GetCurrentApiDevicesOut ( )[i].name;
         mOutDeviceDropdown->add ( deviceName );
+        //TODO.7
     }
     mOutDeviceDropdown->disableMultipleSelection ( );
     mOutDeviceDropdown->enableCollapseOnSelection ( );
@@ -715,8 +716,6 @@ void ExplorerMenu::OpenCorpus ( )
     {
         preservedControlReceiverIndex = mControlReceiverIndex;
 
-        ofLogWarning ( "TEST" ) << "started dimension name search";
-
         std::vector<std::string> newDimensionNames = mRawView->GetDimensions ( );
 
         if ( std::find_if ( newDimensionNames.begin ( ), newDimensionNames.end ( ), [ this ] ( const std::string& dimension ) { return dimension == mDimensionDropdownX->getAllSelected ( )[0]; } ) == newDimensionNames.end ( ) )
@@ -740,8 +739,6 @@ void ExplorerMenu::OpenCorpus ( )
         { initialSettings.SetDimensionColor ( mDimensionDropdownColor->getAllSelected ( )[0] ); }
 
         initialSettings.SetColorSpectrum ( mColorSpectrumSwitcher );
-
-        ofLogWarning ( "TEST" ) << "finished dimension name search";
 
         initialSettings.SetLoopPlayheads ( mLoopPlayheadsToggle );
         initialSettings.SetJumpSameFileAllowed ( mJumpSameFileAllowedToggle );
