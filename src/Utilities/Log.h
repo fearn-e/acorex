@@ -30,8 +30,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 namespace Acorex {
 namespace Utilities {
 
+std::string getTimestampString ( std::chrono::system_clock::time_point timestamp);
+
 struct LogEntry {
-    //add timestamp
     LogEntry ( ofLogLevel newLevel, std::string newContext, std::string newMessage, std::chrono::system_clock::time_point newTimestamp ) : level ( newLevel ), context ( newContext ), message ( newMessage ), timestamp ( newTimestamp ) { }
     ofLogLevel level = OF_LOG_NOTICE;
     std::string context = "";
