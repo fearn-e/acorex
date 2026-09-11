@@ -553,11 +553,11 @@ void Explorer::LiveView::FillDimension ( int dimensionIndex, Utilities::Axis::Ty
     if ( axis == Utilities::Axis::COLOR )
         ofLogVerbose ( "LiveView" ) << "Set colours.";
     else if ( axis != Utilities::Axis::COLOR )
-    ofLogVerbose ( "LiveView" ) << "Filled dimension axis " << (int)axis << ".";
+        ofLogVerbose ( "LiveView" ) << "Filled dimension axis " << (int)axis << ".";
 
     if ( !trainPointPicker || axis == Utilities::Axis::COLOR ) { return; }
 
-    TrainPointPicker ( );
+    RefreshPointPicker ( );
 }
 
 void Explorer::LiveView::ClearDimension ( Utilities::Axis::Type axis, bool trainPointPicker )
@@ -592,18 +592,23 @@ void Explorer::LiveView::ClearDimension ( Utilities::Axis::Type axis, bool train
     if ( axis == Utilities::Axis::COLOR )
         ofLogVerbose ( "LiveView" ) << "Cleared colours.";
     else if ( axis != Utilities::Axis::COLOR )
-    ofLogVerbose ( "LiveView" ) << "Cleared dimension axis " << (int)axis << ".";
+        ofLogVerbose ( "LiveView" ) << "Cleared dimension axis " << (int)axis << ".";
 
     if ( !trainPointPicker || axis == Utilities::Axis::COLOR ) { return; }
-
-    TrainPointPicker ( );
+    
+    RefreshPointPicker ( );
 }
 
-void Explorer::LiveView::TrainPointPicker ( )
+void Explorer::LiveView::RefreshPointPicker ( )
 {
-    ofLogVerbose ( "LiveView" ) << "Point picker training function called.";
+    ofLogVerbose ( "LiveView" ) << "Point picker training & jump predetermining requested.";
 
     mPointPicker->Train ( mDimensionsIndices );
+
+    //TODO.8
+    int TEMPmaxDistanceAllowed = 50; int TEMPmaxJumpTargets = 5; int TEMPminTimeDiffSameFile = 2;
+
+    mPointPicker->PredetermineJumps ( mCorpusMesh, TEMPmaxDistanceAllowed, TEMPmaxJumpTargets, TEMPminTimeDiffSameFile );
 }
 
 //void Explorer::LiveView::RefreshFileColors ( int fileIndex )

@@ -293,7 +293,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
                         Utilities::PointFT currentPoint = { mPlayheads[playheadIndex].fileIndex, timePointIndex };
 
                         std::optional<Utilities::PointFT> nearestPoint;
-                        nearestPoint = mPointPicker->FindNearestToPosition ( playheadPosition, currentPoint, mJumpSameFileAllowed,
+                        nearestPoint = mPointPicker->FindNearestToPosition ( true, playheadPosition, currentPoint, mJumpSameFileAllowed,
                                                                             mMaxJumpDistanceSpaceX1000, mMaxJumpTargets, mJumpSameFileMinTimeDiff );
                         if ( !nearestPoint.has_value ( ) )
                         { continue; }
