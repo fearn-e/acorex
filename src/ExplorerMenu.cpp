@@ -762,8 +762,6 @@ void ExplorerMenu::OpenCorpus ( )
 
     mLiveView.Initialise ( );
 
-    mLiveView.CreatePoints ( ); // TODO - combine with mLiveView.Initialise ( );?
-
     OpenFullPanel ( initialSettings );
 
     mControlReceiverIndexSlider = preserveCorpusSettings ? preservedControlReceiverIndex : DEFAULT_CONTROL_RECEIVER_INDEX;

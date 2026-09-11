@@ -66,6 +66,26 @@ void Explorer::LiveView::Initialise ( )
     mPointPicker->Initialise ( *mRawView->GetDataset ( ), mDimensionBounds );
 
     AddListeners ( );
+
+    // Create points
+
+    Utilities::TrailData* trails = mRawView->GetTrailData ( );
+
+    for ( int file = 0; file < trails->raw.size ( ); file++ )
+    {
+        ofMesh mesh;
+        for ( int timepoint = 0; timepoint < trails->raw[file].size ( ); timepoint++ )
+        {
+            mesh.addVertex ( { 0, 0, 0 } );
+            ofColor color = ofColor::fromHsb ( 35, 255, 255 );
+            mesh.addColor ( color );
+        }
+        mCorpusMesh.push_back ( mesh );
+    }
+
+    mAudioPlayback.SetCorpusMesh ( mCorpusMesh );
+
+    bDraw = true;
 }
 
 void Explorer::LiveView::Clear ( )
@@ -487,27 +507,6 @@ void Explorer::LiveView::KillPlayhead ( size_t playheadID )
 }
 
 // Filler Functions ----------------------------
-
-void Explorer::LiveView::CreatePoints ( )
-{
-    Utilities::TrailData* trails = mRawView->GetTrailData ( );
-
-    for ( int file = 0; file < trails->raw.size ( ); file++ )
-    {
-        ofMesh mesh;
-        for ( int timepoint = 0; timepoint < trails->raw[file].size ( ); timepoint++ )
-        {
-            mesh.addVertex ( { 0, 0, 0 } );
-            ofColor color = ofColor::fromHsb ( 35, 255, 255 );
-            mesh.addColor ( color );
-        }
-        mCorpusMesh.push_back ( mesh );
-    }
-
-    mAudioPlayback.SetCorpusMesh ( mCorpusMesh );
-
-    bDraw = true;
-}
 
 void Explorer::LiveView::FillDimension ( int dimensionIndex, Utilities::Axis::Type axis, bool trainPointPicker )
 {

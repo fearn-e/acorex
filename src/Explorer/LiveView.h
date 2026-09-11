@@ -63,8 +63,6 @@ public:
 
     // Filler Functions ----------------------------
 
-    void CreatePoints ( );
-
     void FillDimension ( int dimensionIndex, Utilities::Axis::Type axis, bool trainPointPicker );
     void ClearDimension ( Utilities::Axis::Type axis, bool trainPointPicker );
     void TrainPointPicker ( );
