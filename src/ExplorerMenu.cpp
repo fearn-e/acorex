@@ -790,7 +790,8 @@ void ExplorerMenu::OpenCorpus ( )
 
 void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis axis, bool trainPointPicker )
 {
-    if ( bBlockDimensionFilling ) { return; }
+    if ( bBlockDimensionFilling )
+    { return; }
 
     // TODO - fix, probably by reworking UI away from ofxGui / ofParameters?
     if ( dimension == "" )
@@ -799,8 +800,9 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis axis, bool t
         return;
     }
 
-    if ( axis == Utilities::Axis::DYNAMIC_PAN )
+    switch ( axis )
     {
+    case Utilities::Axis::DYNAMIC_PAN:
         if ( dimension == "None" )
         {
             mLiveView.GetAudioPlayback ( )->SetDynamicPan ( false, 0 );
@@ -808,19 +810,45 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis axis, bool t
         else
         {
             std::optional<int> dimensionIndex = GetDimensionIndex ( dimension );
-            if ( !dimensionIndex.has_value ( ) ) { return; }
+            if ( !dimensionIndex.has_value ( ) )
+            { return; }
 
             mLiveView.GetAudioPlayback ( )->SetDynamicPan ( true, dimensionIndex.value ( ) );
         }
 
         return;
+
+    case Utilities::Axis::X:
+        if ( dimension == mLastDimensionXSetByListener )
+        { return; }
+
+        mLastDimensionXSetByListener = dimension;
+        break;
+
+    case Utilities::Axis::Y:
+        if ( dimension == mLastDimensionYSetByListener )
+        { return; }
+
+        mLastDimensionYSetByListener = dimension;
+        break;
+
+    case Utilities::Axis::Z:
+        if ( dimension == mLastDimensionZSetByListener )
+        { return; }
+
+        mLastDimensionZSetByListener = dimension;
+        break;
     }
 
-    if ( dimension == "None" )					{ mLiveView.ClearDimension ( axis, trainPointPicker ); }
+    if ( dimension == "None" )
+    {
+        mLiveView.ClearDimension ( axis, trainPointPicker );
+    }
     else
     {
         std::optional<int> dimensionIndex = GetDimensionIndex ( dimension );
-        if ( !dimensionIndex.has_value ( ) ) { return; }
+        if ( !dimensionIndex.has_value ( ) )
+        { return; }
 
         mLiveView.FillDimension ( dimensionIndex.value ( ), axis, trainPointPicker );
     }
@@ -911,34 +939,16 @@ void ExplorerMenu::SetControlReceiverIndex ( const int& index )
 
 void ExplorerMenu::SetDimensionX ( const string& dimension, bool trainPointPicker )
 {
-    if ( dimension == mLastDimensionXSetByListener )
-    {
-        return;
-    }
-    mLastDimensionXSetByListener = dimension;
-
     SetDimension ( dimension, Utilities::Axis::X, trainPointPicker );
 }
 
 void ExplorerMenu::SetDimensionY ( const string& dimension, bool trainPointPicker )
 {
-    if ( dimension == mLastDimensionYSetByListener )
-    {
-        return;
-    }
-    mLastDimensionYSetByListener = dimension;
-
     SetDimension ( dimension, Utilities::Axis::Y, trainPointPicker );
 }
 
 void ExplorerMenu::SetDimensionZ ( const string& dimension, bool trainPointPicker )
 {
-    if ( dimension == mLastDimensionZSetByListener )
-    {
-        return;
-    }
-    mLastDimensionZSetByListener = dimension;
-
     SetDimension ( dimension, Utilities::Axis::Z, trainPointPicker );
 }
 
