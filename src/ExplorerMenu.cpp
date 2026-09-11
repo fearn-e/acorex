@@ -858,7 +858,7 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis::Type axis, 
     }
 }
 
-std::optional<int> ExplorerMenu::GetDimensionIndex ( std::string& dimension )
+std::optional<int> ExplorerMenu::GetDimensionIndex ( const std::string& dimension )
 {
     for ( int i = 0; i < mRawView->GetDimensions ( ).size ( ); i++ )
     {
