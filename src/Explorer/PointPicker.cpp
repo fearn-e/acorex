@@ -337,6 +337,7 @@ std::optional<Utilities::PointFT> Explorer::PointPicker::FindNearestToPosition (
         std::lock_guard<std::mutex> lock ( mPointPickerMutex, std::adopt_lock );
 
         double maxAllowedDistanceSpace = (double)maxAllowedDistanceSpaceX1000 / 1000.0;
+        std::optional<Utilities::PointFT> nearestPoint;
 
         if ( !b3D )
         {
@@ -358,7 +359,6 @@ std::optional<Utilities::PointFT> Explorer::PointPicker::FindNearestToPosition (
             if ( dist.size ( ) == 0 ) { return std::nullopt; }
 
             double nearestDistance = std::numeric_limits<double>::max ( );
-            std::optional<Utilities::PointFT> nearestPoint;
 
             for ( int i = 0; i < dist.size ( ); i++ )
             {
@@ -377,50 +377,47 @@ std::optional<Utilities::PointFT> Explorer::PointPicker::FindNearestToPosition (
                     nearestDistance = dist[i];
                 }
             }
-
-            return nearestPoint;
         }
-
-        // 3D nearest
-
-        fluid::RealVector query ( 3 );
-
-        query[0] = ofMap ( position.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
-        query[1] = ofMap ( position.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
-        query[2] = ofMap ( position.z, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
-
-        auto [dist, id] = mKDTree.kNearest ( query, maxAllowedTargets, maxAllowedDistanceSpace );
-
-        if ( dist.size ( ) == 0 ) { return std::nullopt; }
-
-        double nearestDistance = std::numeric_limits<double>::max ( );
-        std::optional<Utilities::PointFT> nearestPoint;
-
-        for ( int i = 0; i < dist.size ( ); i++ )
+        else
         {
-            if ( dist[i] < nearestDistance )
-            {
-                size_t point = std::stoi ( *id[i] );
-                if ( mCorpusPointLookUp[point] == currentPoint )
-                { continue; } // same exact point - skip
-                if ( !sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file )
-                { continue; } // same file jump not allowed - skip
-                size_t timeDiff = SubtractFromBigger ( mCorpusPointLookUp[point].time, currentPoint.time );
-                if ( sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file && timeDiff < minTimeDiffSameFile )
-                { continue; } // same file jump too close - skip
+            // 3D nearest
 
-                // this check (also in 2D) doesn't seem to actually be needed? leaving the comment here just in case
-                //if ( audioSet.raw[mCorpusFileLookUp[point]].getNumFrames ( ) - ((size_t)mCorpusTimeLookUp[point] * hopSize) < remainingSamplesRequired ) { continue; } // skip if there's not enough samples left in the file
-                
-                nearestPoint = mCorpusPointLookUp[point];
-                nearestDistance = dist[i];
+            fluid::RealVector query ( 3 );
+
+            query[0] = ofMap ( position.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+            query[1] = ofMap ( position.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+            query[2] = ofMap ( position.z, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+
+            auto [dist, id] = mKDTree.kNearest ( query, maxAllowedTargets, maxAllowedDistanceSpace );
+
+            if ( dist.size ( ) == 0 ) { return std::nullopt; }
+
+            double nearestDistance = std::numeric_limits<double>::max ( );
+
+            for ( int i = 0; i < dist.size ( ); i++ )
+            {
+                if ( dist[i] < nearestDistance )
+                {
+                    size_t point = std::stoi ( *id[i] );
+                    if ( mCorpusPointLookUp[point] == currentPoint )
+                    { continue; } // same exact point - skip
+                    if ( !sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file )
+                    { continue; } // same file jump not allowed - skip
+                    size_t timeDiff = SubtractFromBigger ( mCorpusPointLookUp[point].time, currentPoint.time );
+                    if ( sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file && timeDiff < minTimeDiffSameFile )
+                    { continue; } // same file jump too close - skip
+
+                    // this check (also in 2D) doesn't seem to actually be needed? leaving the comment here just in case
+                    //if ( audioSet.raw[mCorpusFileLookUp[point]].getNumFrames ( ) - ((size_t)mCorpusTimeLookUp[point] * hopSize) < remainingSamplesRequired ) { continue; } // skip if there's not enough samples left in the file
+
+                    nearestPoint = mCorpusPointLookUp[point];
+                    nearestDistance = dist[i];
+                }
             }
         }
 
         return nearestPoint;
     }
-
-    return std::nullopt;
 }
 
 void Explorer::PointPicker::FindRandom ( )
