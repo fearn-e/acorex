@@ -90,7 +90,7 @@ private:
     // Main Functions ------------------------------
 
     void OpenCorpus ( );
-    void SetDimension ( string dimension, Utilities::Axis axis, bool trainPointPicker );
+    void SetDimension ( string dimension, Utilities::Axis::Type axis, bool trainPointPicker );
     std::optional<int> GetDimensionIndex ( std::string& dimension );
     void CameraSwitcher ( );
 
@@ -150,7 +150,7 @@ private:
     bool bIsCorpusOpen;
     bool bBlockDimensionFilling;
     
-    Utilities::Axis mDisabledAxis;
+    Utilities::Axis::Type mDisabledAxis;
 
     // Timing --------------------------------------
 

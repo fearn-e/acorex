@@ -35,14 +35,17 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 namespace Acorex {
 namespace Utilities {
 
-enum class Axis : int {
-    X = 0,
-    Y = 1,
-    Z = 2,
-    COLOR = 3,
-    NONE = 4,
-    MULTIPLE = 5,
-    DYNAMIC_PAN = 6
+struct Axis {
+    enum Type : int {
+        X = 0,
+        Y = 1,
+        Z = 2,
+        COLOR = 3,
+        DYNAMIC_PAN = 4,
+        AXES_COUNT = 5,
+        NONE = 6,
+        MULTIPLE = 7
+    };
 };
 
 struct DimensionBoundsData {

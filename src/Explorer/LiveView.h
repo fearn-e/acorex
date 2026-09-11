@@ -65,15 +65,15 @@ public:
 
     void CreatePoints ( );
 
-    void FillDimension ( int dimensionIndex, Utilities::Axis axis, bool trainPointPicker );
-    void ClearDimension ( Utilities::Axis axis, bool trainPointPicker );
+    void FillDimension ( int dimensionIndex, Utilities::Axis::Type axis, bool trainPointPicker );
+    void ClearDimension ( Utilities::Axis::Type axis, bool trainPointPicker );
     void TrainPointPicker ( );
     //void RefreshFileColors ( int fileIndex );
 
     // Camera Functions ----------------------------
 
     void Init3DCam ( );
-    void Init2DCam ( Utilities::Axis disabledAxis );
+    void Init2DCam ( Utilities::Axis::Type disabledAxis );
 
     void Zoom2DCam ( float y, bool mouse );
     void Zoom3DCam ( float y, bool mouse );
@@ -118,7 +118,7 @@ private:
     float deltaTime;
     float lastUpdateTime;
 
-    Utilities::Axis mDisabledAxis;
+    Utilities::Axis::Type mDisabledAxis;
     std::string xLabel, yLabel, zLabel;
     int colorDimension;
 
