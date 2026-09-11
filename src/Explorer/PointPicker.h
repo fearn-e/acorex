@@ -23,6 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include <flucoma/algorithms/public/KDTree.hpp>
 #include <flucoma/data/FluidDataSet.hpp>
+#include <ofMesh.h>
 #include <ofCamera.h>
 #include <ofEvents.h>
 #include <mutex>
@@ -42,19 +43,19 @@ public:
     void Clear ( );
 
     void Train ( std::array<int, 3> dimensionIndices );
+    void PredetermineJumps ( const std::vector<ofMesh>& corpusMesh, int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, int minTimeDiffSameFile );
 
     void Exit ( );
 
     void Draw ( );
 
     void FindNearestToMouse ( );
-    std::optional<Utilities::PointFT> FindNearestToPosition ( const glm::vec3& position, Utilities::PointFT currentPoint, bool sameFileAllowed,
+    std::optional<Utilities::PointFT> FindNearestToPosition ( bool returnEarlyIfBusy, const glm::vec3& position, Utilities::PointFT currentPoint, bool sameFileAllowed,
                                                             int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, int minTimeDiffSameFile );
                                 
     void FindRandom ( );
 
     // Setters & Getters ----------------------------
-
     void SetCamera ( std::shared_ptr<ofCamera> camera ) { mCamera = camera; }
     void SetNearestCheckNeeded ( ) { bNearestMouseCheckNeeded = true; }
 
@@ -90,6 +91,8 @@ private:
     bool bClicked;
     bool bNearestMouseCheckNeeded;
 
+    bool bPredeterminedJumpsReady;
+
     // Variables ------------------------------------
 
     std::shared_ptr<ofCamera> mCamera;
@@ -103,6 +106,8 @@ private:
     double maxAllowedDistanceNear;
 
     fluid::algorithm::KDTree mKDTree;
+
+    Utilities::CorpusPredeterminedJumps mPredeterminedJumps;
 
     fluid::FluidDataSet<std::string, double, 1> mFullFluidSet;
     fluid::FluidDataSet<std::string, double, 1> mLiveFluidSet;
@@ -118,6 +123,7 @@ private:
     // Thread safety --------------------------------
 
     std::mutex mPointPickerMutex;
+    std::mutex mPredeterminedJumpsMutex;
 
     // Randomness -----------------------------------
 

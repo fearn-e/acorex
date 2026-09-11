@@ -181,6 +181,17 @@ struct PointFT {
     size_t time = 0;
 };
 
+struct CorpusPredeterminedJumps {
+    void clear ( )
+    {
+        jumps.clear ( );
+        jumpsNoSameTrail.clear ( );
+    }
+
+    std::vector<std::vector<std::optional<PointFT>>> jumps;
+    std::vector<std::vector<std::optional<PointFT>>> jumpsNoSameTrail;
+};
+
 struct AudioPlayhead {
     AudioPlayhead ( size_t ID, size_t file, size_t sample ) : playheadID ( ID ), fileIndex ( file ), sampleIndex ( sample ) { }
 

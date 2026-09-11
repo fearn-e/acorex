@@ -30,7 +30,8 @@ Explorer::PointPicker::PointPicker ( )
         b3D ( true ), bPicker ( false ), bClicked ( false ), bNearestMouseCheckNeeded ( false ),
         mDimensionsIndices { -1, -1, -1 },
         mNearestSelectedPoint ( std::nullopt ), mNearestSelectedPointDistance ( std::nullopt ),
-        maxAllowedDistanceFar ( 0.05 ), maxAllowedDistanceNear ( 0.01 )
+        maxAllowedDistanceFar ( 0.05 ), maxAllowedDistanceNear ( 0.01 ),
+        bPredeterminedJumpsReady ( false ), mPredeterminedJumps ( )
 {
     mRandomGen = std::mt19937 ( std::random_device ( ) () );
 }
@@ -76,6 +77,9 @@ void Explorer::PointPicker::Clear ( )
 
     mNearestSelectedPoint = std::nullopt;
     mNearestSelectedPointDistance = std::nullopt;
+
+    bPredeterminedJumpsReady = false;
+    mPredeterminedJumps.clear ( );
 
     mCorpusPointLookUp.clear ( );
 
@@ -127,6 +131,53 @@ void Explorer::PointPicker::Train ( std::array<int, 3> dimensionIndices )
 
     if ( dimsFilled == 2 ) { b3D = false; }
     if ( dimsFilled == 3 ) { b3D = true; }
+}
+
+void Explorer::PointPicker::PredetermineJumps ( const std::vector<ofMesh>& corpusMesh, int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, int minTimeDiffSameFile )
+{
+    ofLogNotice ( "PointPicker" ) << "Predetermining jumps...";
+
+    bPredeterminedJumpsReady = false;
+
+    std::lock_guard<std::mutex> predeterminedJumpsLock ( mPredeterminedJumpsMutex );
+
+    mPredeterminedJumps.clear ( );
+    
+    bool singleFileCorpus = corpusMesh.size ( ) == 1;
+
+    mPredeterminedJumps.jumps.resize ( corpusMesh.size ( ) );
+    mPredeterminedJumps.jumpsNoSameTrail.resize ( corpusMesh.size ( ) );
+
+    for ( size_t file = 0; file < corpusMesh.size ( ); file++ )
+    {
+        ofLogVerbose ( "PointPicker" ) << "Predetermining jumps for file " << file;
+
+        mPredeterminedJumps.jumps[file].resize ( corpusMesh[file].getNumVertices ( ) );
+        mPredeterminedJumps.jumpsNoSameTrail[file].resize ( corpusMesh[file].getNumVertices ( ) );
+
+        for ( size_t time = 0; time < corpusMesh[file].getNumVertices ( ); time++ )
+        {
+            Utilities::PointFT currentPoint = { file, time };
+            std::optional<Utilities::PointFT> nearestPoint = std::nullopt;
+            std::optional<Utilities::PointFT> nearestPointNoSameTrail = std::nullopt;
+
+            nearestPoint = FindNearestToPosition ( true, corpusMesh[file].getVertex ( time ), currentPoint, true,
+                                                    maxAllowedDistanceSpaceX1000, maxAllowedTargets, minTimeDiffSameFile );
+
+            if ( !singleFileCorpus )
+            {
+                nearestPointNoSameTrail = FindNearestToPosition ( true, corpusMesh[file].getVertex ( time ), currentPoint, false,
+                                                                maxAllowedDistanceSpaceX1000, maxAllowedTargets, minTimeDiffSameFile );
+            }
+
+            mPredeterminedJumps.jumps[file][time] = nearestPoint;
+            mPredeterminedJumps.jumpsNoSameTrail[file][time] = nearestPointNoSameTrail;
+        }
+    }
+
+    ofLogVerbose ( "PointPicker" ) << "Jumps predetermined.";
+
+    bPredeterminedJumpsReady = true;
 }
 
 void Explorer::PointPicker::Exit ( )
@@ -202,6 +253,7 @@ void Explorer::PointPicker::Draw ( )
     }
 }
 
+//TODO.5
 void Explorer::PointPicker::FindNearestToMouse ( )
 {
     if ( !bClicked ) { return; }
@@ -326,61 +378,77 @@ size_t SubtractFromBigger ( size_t a, size_t b )
 }
 
 //TODO.6
-std::optional<Utilities::PointFT> Explorer::PointPicker::FindNearestToPosition ( const glm::vec3& position, Utilities::PointFT currentPoint, bool sameFileAllowed,
+std::optional<Utilities::PointFT> Explorer::PointPicker::FindNearestToPosition ( bool returnEarlyIfBusy, const glm::vec3& position, Utilities::PointFT currentPoint, bool sameFileAllowed,
                                                                                 int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, int minTimeDiffSameFile )
 {
     if ( !bTrained ) { return std::nullopt; }
     if ( maxAllowedDistanceSpaceX1000 == 0 ) { return std::nullopt; }
 
-    if ( mPointPickerMutex.try_lock ( ) )
+    if ( bPredeterminedJumpsReady && mPredeterminedJumpsMutex.try_lock ( ) )
     {
-        std::lock_guard<std::mutex> lock ( mPointPickerMutex, std::adopt_lock );
+        std::lock_guard<std::mutex> predeterminedJumpsLock ( mPredeterminedJumpsMutex, std::adopt_lock );
 
-        double maxAllowedDistanceSpace = (double)maxAllowedDistanceSpaceX1000 / 1000.0;
-        std::optional<Utilities::PointFT> nearestPoint;
+        if ( sameFileAllowed )
+        { return mPredeterminedJumps.jumps[currentPoint.file][currentPoint.time]; }
+        else
+        { return mPredeterminedJumps.jumpsNoSameTrail[currentPoint.file][currentPoint.time]; }
+    }
 
-        if ( !b3D )
+    std::unique_lock<std::mutex> lock ( mPointPickerMutex, std::try_to_lock );
+
+    if ( !lock.owns_lock ( ) )
+    {
+        if ( returnEarlyIfBusy )
+        { return std::nullopt; }
+        else
+        { lock.lock ( ); }
+    }
+
+    double maxAllowedDistanceSpace = (double)maxAllowedDistanceSpaceX1000 / 1000.0;
+    std::optional<Utilities::PointFT> nearestPoint;
+
+    if ( !b3D )
+    {
+        // 2D nearest
+
+        glm::vec2 position2D;
+
+        if ( mDimensionsIndices[0] == -1 ) { position2D.x = position.y; position2D.y = position.z; }
+        if ( mDimensionsIndices[1] == -1 ) { position2D.x = position.x; position2D.y = position.z; }
+        if ( mDimensionsIndices[2] == -1 ) { position2D.x = position.x; position2D.y = position.y; }
+
+        fluid::RealVector query ( 2 );
+
+        query[0] = ofMap ( position2D.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+        query[1] = ofMap ( position2D.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
+
+        auto [dist, id] = mKDTree.kNearest ( query, maxAllowedTargets, maxAllowedDistanceSpace );
+
+        if ( dist.size ( ) == 0 ) { return std::nullopt; }
+
+        double nearestDistance = std::numeric_limits<double>::max ( );
+
+        for ( int i = 0; i < dist.size ( ); i++ )
         {
-            // 2D nearest
-
-            glm::vec2 position2D;
-
-            if ( mDimensionsIndices[0] == -1 ) { position2D.x = position.y; position2D.y = position.z; }
-            if ( mDimensionsIndices[1] == -1 ) { position2D.x = position.x; position2D.y = position.z; }
-            if ( mDimensionsIndices[2] == -1 ) { position2D.x = position.x; position2D.y = position.y; }
-
-            fluid::RealVector query ( 2 );
-
-            query[0] = ofMap ( position2D.x, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
-            query[1] = ofMap ( position2D.y, SpaceDefs::mSpaceMin, SpaceDefs::mSpaceMax, 0.0, 1.0, false );
-
-            auto [dist, id] = mKDTree.kNearest ( query, maxAllowedTargets, maxAllowedDistanceSpace );
-
-            if ( dist.size ( ) == 0 ) { return std::nullopt; }
-
-            double nearestDistance = std::numeric_limits<double>::max ( );
-
-            for ( int i = 0; i < dist.size ( ); i++ )
+            if ( dist[i] < nearestDistance )
             {
-                if ( dist[i] < nearestDistance )
-                {
-                    size_t point = std::stoull ( *id[i] );
-                    if ( mCorpusPointLookUp[point] == currentPoint )
-                    { continue; } // same exact point - skip
-                    if ( !sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file )
-                    { continue; } // same file jump not allowed - skip
-                    size_t timeDiff = SubtractFromBigger ( mCorpusPointLookUp[point].time, currentPoint.time );
-                    if ( sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file && timeDiff < minTimeDiffSameFile )
-                    { continue; } // same file jump too close - skip
+                size_t point = std::stoull ( *id[i] );
+                if ( mCorpusPointLookUp[point] == currentPoint )
+                { continue; } // same exact point - skip
+                if ( !sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file )
+                { continue; } // same file jump not allowed - skip
+                size_t timeDiff = SubtractFromBigger ( mCorpusPointLookUp[point].time, currentPoint.time );
+                if ( sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file && timeDiff < minTimeDiffSameFile )
+                { continue; } // same file jump too close - skip
 
-                    nearestPoint = mCorpusPointLookUp[point];
-                    nearestDistance = dist[i];
-                }
+                nearestPoint = mCorpusPointLookUp[point];
+                nearestDistance = dist[i];
             }
         }
-        else
-        {
-            // 3D nearest
+    }
+    else
+    {
+        // 3D nearest
 
             fluid::RealVector query ( 3 );
 
@@ -407,17 +475,16 @@ std::optional<Utilities::PointFT> Explorer::PointPicker::FindNearestToPosition (
                     if ( sameFileAllowed && mCorpusPointLookUp[point].file == currentPoint.file && timeDiff < minTimeDiffSameFile )
                     { continue; } // same file jump too close - skip
 
-                    // this check (also in 2D) doesn't seem to actually be needed? leaving the comment here just in case
-                    //if ( audioSet.raw[mCorpusFileLookUp[point]].getNumFrames ( ) - ((size_t)mCorpusTimeLookUp[point] * hopSize) < remainingSamplesRequired ) { continue; } // skip if there's not enough samples left in the file
+                // this check (also in 2D) doesn't seem to actually be needed? leaving the comment here just in case
+                //if ( audioSet.raw[mCorpusFileLookUp[point]].getNumFrames ( ) - ((size_t)mCorpusTimeLookUp[point] * hopSize) < remainingSamplesRequired ) { continue; } // skip if there's not enough samples left in the file
 
-                    nearestPoint = mCorpusPointLookUp[point];
-                    nearestDistance = dist[i];
-                }
+                nearestPoint = mCorpusPointLookUp[point];
+                nearestDistance = dist[i];
             }
         }
-
-        return nearestPoint;
     }
+
+    return nearestPoint;
 }
 
 void Explorer::PointPicker::FindRandom ( )
