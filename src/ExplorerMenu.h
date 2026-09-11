@@ -91,7 +91,7 @@ private:
 
     void OpenCorpus ( );
     void SetDimension ( string dimension, Utilities::Axis::Type axis, bool trainPointPicker );
-    std::optional<int> GetDimensionIndex ( std::string& dimension );
+    std::optional<int> GetDimensionIndex ( const std::string& dimension );
     void CameraSwitcher ( );
 
     /// Triggers all listeners that update corpus related settings.
