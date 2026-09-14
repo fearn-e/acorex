@@ -22,6 +22,11 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofGraphics.h>
 #include <of3DGraphics.h>
 
+//TODO.63a
+#if __has_include(<omp.h>)
+#include <omp.h>
+#endif
+
 using namespace Acorex;
 
 Explorer::PointPicker::PointPicker ( )
