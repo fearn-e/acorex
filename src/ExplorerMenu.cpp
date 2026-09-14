@@ -31,9 +31,7 @@ using namespace Acorex;
 
 ExplorerMenu::ExplorerMenu ( ) :    mSlowUpdateInterval ( 100 ), mOpenCorpusButtonTimeout ( 3000 ),
                                     bListenersAddedHeader ( false ), bListenersAddedCorpusControls ( false ), 
-                                    bListenersAddedAudioManager ( false ), mControlReceiverIndex ( 0 ),
-                                    mLastDimensionXSetByListener ( "" ), mLastDimensionYSetByListener ( "" ),
-                                    mLastDimensionZSetByListener ( "" )
+                                    bListenersAddedAudioManager ( false ), mControlReceiverIndex ( 0 )
 {
     mRawView = std::make_shared<Explorer::RawView> ( );
     mLiveView.SetRawView ( mRawView );
@@ -48,6 +46,8 @@ ExplorerMenu::ExplorerMenu ( ) :    mSlowUpdateInterval ( 100 ), mOpenCorpusButt
 
     mLastUpdateTime = 0;
     mOpenCorpusButtonClickTime = 0;
+
+    mPreviousDimensions.resize ( Utilities::Axis::AXES_COUNT, "" );
 }
 
 void ExplorerMenu::Initialise ( )
@@ -69,9 +69,8 @@ void ExplorerMenu::Clear ( )
 
     mDisabledAxis = Utilities::Axis::NONE;
 
-    mLastDimensionXSetByListener = "";
-    mLastDimensionYSetByListener = "";
-    mLastDimensionZSetByListener = "";
+    mPreviousDimensions.clear ( );
+    mPreviousDimensions.resize ( Utilities::Axis::AXES_COUNT, "" );
 
     mControlReceiverIndex = 0;
     mControlReceiver.stop ( );
@@ -558,11 +557,11 @@ void ExplorerMenu::AddListenersCorpusControls ( )
 
     mControlReceiverIndexSlider.addListener ( this, &ExplorerMenu::SetControlReceiverIndexListener );
 
-    mDimensionDropdownX->addListener ( this, &ExplorerMenu::SetDimensionXListener );
-    mDimensionDropdownY->addListener ( this, &ExplorerMenu::SetDimensionYListener );
-    mDimensionDropdownZ->addListener ( this, &ExplorerMenu::SetDimensionZListener );
+    ofAddListener ( mDimensionDropdownX->dropdownHidden_E, this, &ExplorerMenu::SetDimensionXListener );
+    ofAddListener ( mDimensionDropdownY->dropdownHidden_E, this, &ExplorerMenu::SetDimensionYListener );
+    ofAddListener ( mDimensionDropdownZ->dropdownHidden_E, this, &ExplorerMenu::SetDimensionZListener );
 
-    mDimensionDropdownColor->addListener ( this, &ExplorerMenu::SetDimensionColorListener );
+    ofAddListener ( mDimensionDropdownColor->dropdownHidden_E, this, &ExplorerMenu::SetDimensionColorListener );
     mColorSpectrumSwitcher.addListener ( this, &ExplorerMenu::SwitchColorSpectrumListener );
 
     mLoopPlayheadsToggle.addListener ( this, &ExplorerMenu::ToggleLoopPlayheadsListener );
@@ -575,7 +574,7 @@ void ExplorerMenu::AddListenersCorpusControls ( )
 
     mVolumeSliderX1000.addListener ( this, &ExplorerMenu::SetVolumeX1000Listener );
 
-    mDimensionDropdownDynamicPan->addListener ( this, &ExplorerMenu::SetDimensionDynamicPanListener );
+    ofAddListener ( mDimensionDropdownDynamicPan->dropdownHidden_E, this, &ExplorerMenu::SetDimensionDynamicPanListener );
     mPanningStrengthSliderX1000.addListener ( this, &ExplorerMenu::SetPanningStrengthX1000Listener );
 
     ofAddListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
@@ -589,11 +588,11 @@ void ExplorerMenu::RemoveListenersCorpusControls ( )
 
     mControlReceiverIndexSlider.removeListener ( this, &ExplorerMenu::SetControlReceiverIndexListener );
 
-    mDimensionDropdownX->removeListener ( this, &ExplorerMenu::SetDimensionXListener );
-    mDimensionDropdownY->removeListener ( this, &ExplorerMenu::SetDimensionYListener );
-    mDimensionDropdownZ->removeListener ( this, &ExplorerMenu::SetDimensionZListener );
+    ofRemoveListener ( mDimensionDropdownX->dropdownHidden_E, this, &ExplorerMenu::SetDimensionXListener );
+    ofRemoveListener ( mDimensionDropdownY->dropdownHidden_E, this, &ExplorerMenu::SetDimensionYListener );
+    ofRemoveListener ( mDimensionDropdownZ->dropdownHidden_E, this, &ExplorerMenu::SetDimensionZListener );
 
-    mDimensionDropdownColor->removeListener ( this, &ExplorerMenu::SetDimensionColorListener );
+    ofRemoveListener ( mDimensionDropdownColor->dropdownHidden_E, this, &ExplorerMenu::SetDimensionColorListener );
     mColorSpectrumSwitcher.removeListener ( this, &ExplorerMenu::SwitchColorSpectrumListener );
 
     mLoopPlayheadsToggle.removeListener ( this, &ExplorerMenu::ToggleLoopPlayheadsListener );
@@ -606,7 +605,7 @@ void ExplorerMenu::RemoveListenersCorpusControls ( )
 
     mVolumeSliderX1000.removeListener ( this, &ExplorerMenu::SetVolumeX1000Listener );
 
-    mDimensionDropdownDynamicPan->removeListener ( this, &ExplorerMenu::SetDimensionDynamicPanListener );
+    ofRemoveListener ( mDimensionDropdownDynamicPan->dropdownHidden_E, this, &ExplorerMenu::SetDimensionDynamicPanListener );
     mPanningStrengthSliderX1000.removeListener ( this, &ExplorerMenu::SetPanningStrengthX1000Listener );
 
     ofRemoveListener ( ofEvents ( ).mouseReleased, this, &ExplorerMenu::MouseReleased );
@@ -683,9 +682,8 @@ void ExplorerMenu::OpenCorpus ( )
         return;
     }
 
-    mLastDimensionXSetByListener = "";
-    mLastDimensionYSetByListener = "";
-    mLastDimensionZSetByListener = "";
+    mPreviousDimensions.clear ( );
+    mPreviousDimensions.resize ( Utilities::Axis::AXES_COUNT, "" );
 
     Utilities::ExploreSettings initialSettings { };
 
@@ -767,16 +765,23 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis::Type axis, 
     if ( bBlockDimensionFilling )
     { return; }
 
-    //TODO.37
     if ( dimension == "" )
     {
-        ofLogWarning ( "ExplorerMenu" ) << "Dimension deselected, undefined behaviour. This is a known bug.";
+        SetDropdownToNone ( axis );
+        SetDimension ( "None", axis, trainPointPicker );
         return;
     }
 
-    switch ( axis )
+    if ( mPreviousDimensions[axis] == dimension )
     {
-    case Utilities::Axis::DYNAMIC_PAN:
+        ofLogVerbose ( "ExplorerMenu" ) << "Tried to set dropdown to a dimension it already was.";
+        return;
+    }
+
+    mPreviousDimensions[axis] = dimension;
+
+    if ( axis == Utilities::Axis::DYNAMIC_PAN )
+    {
         if ( dimension == "None" )
         {
             mLiveView.GetAudioPlayback ( )->SetDynamicPan ( false, 0 );
@@ -791,27 +796,6 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis::Type axis, 
         }
 
         return;
-
-    case Utilities::Axis::X:
-        if ( dimension == mLastDimensionXSetByListener )
-        { return; }
-
-        mLastDimensionXSetByListener = dimension;
-        break;
-
-    case Utilities::Axis::Y:
-        if ( dimension == mLastDimensionYSetByListener )
-        { return; }
-
-        mLastDimensionYSetByListener = dimension;
-        break;
-
-    case Utilities::Axis::Z:
-        if ( dimension == mLastDimensionZSetByListener )
-        { return; }
-
-        mLastDimensionZSetByListener = dimension;
-        break;
     }
 
     if ( dimension == "None" )
@@ -831,6 +815,30 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis::Type axis, 
     {
         CameraSwitcher ( );
         //TODO.38
+    }
+}
+
+void ExplorerMenu::SetDropdownToNone ( Utilities::Axis::Type axis )
+{
+    switch ( axis )
+    {
+    case Utilities::Axis::X:
+        mDimensionDropdownX->setSelectedValueByName ( "None", false );
+        break;
+    case Utilities::Axis::Y:
+        mDimensionDropdownY->setSelectedValueByName ( "None", false );
+        break;
+    case Utilities::Axis::Z:
+        mDimensionDropdownZ->setSelectedValueByName ( "None", false );
+        break;
+    case Utilities::Axis::COLOR:
+        mDimensionDropdownColor->setSelectedValueByName ( "None", false );
+        break;
+    case Utilities::Axis::DYNAMIC_PAN:
+        mDimensionDropdownDynamicPan->setSelectedValueByName ( "None", false );
+        break;
+    default:
+        ofLogError ( "ExplorerMenu" ) << "Unknown axis value of " << axis << " when attempting to reset a dropdown to \"None\"";
     }
 }
 

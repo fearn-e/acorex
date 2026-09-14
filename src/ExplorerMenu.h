@@ -89,6 +89,7 @@ private:
 
     void OpenCorpus ( );
     void SetDimension ( string dimension, Utilities::Axis::Type axis, bool trainPointPicker );
+    void SetDropdownToNone ( Utilities::Axis::Type axis );
     std::optional<int> GetDimensionIndex ( const std::string& dimension );
     void CameraSwitcher ( );
 
@@ -105,14 +106,11 @@ private:
 
     void SetControlReceiverIndex ( const int& index );                      void SetControlReceiverIndexListener ( int& index ) { SetControlReceiverIndex ( index ); }
 
-    void SetDimensionX ( const string& dimension, bool trainPointPicker );  void SetDimensionXListener ( string& dimension ) { SetDimensionX ( dimension, true ); }
-    string mLastDimensionXSetByListener; //TODO.29
-    void SetDimensionY ( const string& dimension, bool trainPointPicker );  void SetDimensionYListener ( string& dimension ) { SetDimensionY ( dimension, true ); }
-    string mLastDimensionYSetByListener;
-    void SetDimensionZ ( const string& dimension, bool trainPointPicker );  void SetDimensionZListener ( string& dimension ) { SetDimensionZ ( dimension, true ); }
-    string mLastDimensionZSetByListener;
+    void SetDimensionX ( const string& dimension, bool trainPointPicker );  void SetDimensionXListener ( string& dropdownName ) { SetDimensionX ( mDimensionDropdownX->getAllSelected ( )[0], true ); }
+    void SetDimensionY ( const string& dimension, bool trainPointPicker );  void SetDimensionYListener ( string& dropdownName ) { SetDimensionY ( mDimensionDropdownY->getAllSelected ( )[0], true ); }
+    void SetDimensionZ ( const string& dimension, bool trainPointPicker );  void SetDimensionZListener ( string& dropdownName ) { SetDimensionZ ( mDimensionDropdownZ->getAllSelected ( )[0], true ); }
 
-    void SetDimensionColor ( const string& dimension );                     void SetDimensionColorListener ( string& dimension ) { SetDimensionColor ( dimension ); }
+    void SetDimensionColor ( const string& dimension );                     void SetDimensionColorListener ( string& dropdownName ) { SetDimensionColor ( mDimensionDropdownColor->getAllSelected ( )[0] ); }
     void SwitchColorSpectrum ( const bool& fullSpectrum );                  void SwitchColorSpectrumListener ( bool& fullSpectrum ) { SwitchColorSpectrum ( fullSpectrum ); }
 
     void ToggleLoopPlayheads ( const bool& loop );                          void ToggleLoopPlayheadsListener ( bool& loop ) { ToggleLoopPlayheads ( loop ); }
@@ -124,7 +122,7 @@ private:
     void SetMaxJumpTargets ( const int& targets );                          void SetMaxJumpTargetsListener ( int& targets ) { SetMaxJumpTargets ( targets ); }
 
     void SetVolumeX1000 ( const int& volumeX1000 );                         void SetVolumeX1000Listener ( int& volumeX1000 ) { SetVolumeX1000 ( volumeX1000 ); }
-    void SetDimensionDynamicPan ( const string& dimension );                void SetDimensionDynamicPanListener ( string& dimension ) { SetDimensionDynamicPan ( dimension ); }
+    void SetDimensionDynamicPan ( const string& dimension );                void SetDimensionDynamicPanListener ( string& dropdownName ) { SetDimensionDynamicPan ( mDimensionDropdownDynamicPan->getAllSelected ( )[0] ); }
     void SetPanningStrengthX1000 ( const int& strengthX1000 );              void SetPanningStrengthX1000Listener ( int& strengthX1000 ) { SetPanningStrengthX1000 ( strengthX1000 ); }
 
     void MouseReleased ( ofMouseEventArgs& args );
@@ -166,6 +164,8 @@ private:
     ofxButton mOpenCorpusButton;
 
     //Corpus Controls
+    std::vector<std::string> mPreviousDimensions;
+
     ofxIntSlider mControlReceiverIndexSlider;
 
     unique_ptr<ofxDropdown> mDimensionDropdownX;
