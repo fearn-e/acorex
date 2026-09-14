@@ -26,7 +26,7 @@ using namespace Acorex;
 
 void Utilities::VisualPlayhead::ResizeBox ( size_t playheadIndexUI, size_t topBarHeight, size_t windowHeight, size_t windowWidth )
 {
-    //TODO - put these in InterfaceDefs.h and have them affected by HiDpi
+    //TODO.13
     int rectHeight = windowHeight / 16;
     int rectWidth = rectHeight * 5;
 

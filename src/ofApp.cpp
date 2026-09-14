@@ -59,7 +59,7 @@ void ofApp::setup ( )
     mExplorerMenu.Initialise ( );
 }
 
-// TODO - rewrite this
+//TODO.12
 void ofApp::InitialiseMidiHub ( )
 {
     mAnalyserMenu.Close ( );

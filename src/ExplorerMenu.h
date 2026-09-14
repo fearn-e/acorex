@@ -28,9 +28,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofxDropdown.h>
 #include <optional>
 
-// TODO - split mMainPanel into 3 panels, Header, Corpus Controls, an Audio Manager
-// TODO(cont) - to match the implementation in AnalyserMenu
-
+//TODO.31
 namespace Acorex {
 
 class ExplorerMenu {
@@ -63,7 +61,7 @@ private:
     void OpenFullPanel ( const Utilities::ExploreSettings& settings );
 
     void SetupPanelSectionHeader ( std::string corpusNameLabel );
-    // TODO - pass in default values for all the controls
+    //TODO.30
     void SetupPanelSectionCorpusControls ( const Utilities::ExploreSettings& settings );
     void SetupPanelSectionAudioManager ( );
 
@@ -108,7 +106,7 @@ private:
     void SetControlReceiverIndex ( const int& index );                      void SetControlReceiverIndexListener ( int& index ) { SetControlReceiverIndex ( index ); }
 
     void SetDimensionX ( const string& dimension, bool trainPointPicker );  void SetDimensionXListener ( string& dimension ) { SetDimensionX ( dimension, true ); }
-    string mLastDimensionXSetByListener; // TODO - bodge, fix this properly with a UI rework
+    string mLastDimensionXSetByListener; //TODO.29
     void SetDimensionY ( const string& dimension, bool trainPointPicker );  void SetDimensionYListener ( string& dimension ) { SetDimensionY ( dimension, true ); }
     string mLastDimensionYSetByListener;
     void SetDimensionZ ( const string& dimension, bool trainPointPicker );  void SetDimensionZListener ( string& dimension ) { SetDimensionZ ( dimension, true ); }

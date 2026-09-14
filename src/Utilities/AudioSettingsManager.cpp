@@ -189,7 +189,7 @@ bool Utilities::AudioSettingsManager::FindMatchingDevice ( const ofSoundDevice& 
 {
     for ( size_t i = 0; i < audioDevicesOut[apiIndex].size ( ); i++ )
     {
-        // TODO - replace with ID matching instead?
+        //TODO.20
         if ( audioDevicesOut[apiIndex][i].name == referenceDevice.name )
         {
             ofLogVerbose ( "AudioSettingsManager" ) << "Switched to matching device: " << referenceDevice.name;

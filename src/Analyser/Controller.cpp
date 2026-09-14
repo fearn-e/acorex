@@ -205,7 +205,7 @@ std::vector<int> Analyser::Controller::MergeDatasets ( Utilities::DataSet& prima
             int pointCountDiff = 0;
             primaryDataset.fileList[existingIndex] = additionalDataset.fileList[i];
 
-            pointCountDiff = additionalDataset.trails.raw[i].size ( ) - primaryDataset.trails.raw[existingIndex].size ( ); // TODO - DOUBLE CHECK THIS
+            pointCountDiff = additionalDataset.trails.raw[i].size ( ) - primaryDataset.trails.raw[existingIndex].size ( ); //TODO.59a
             primaryDataset.trails.raw[existingIndex] = additionalDataset.trails.raw[i];
 
             primaryDataset.currentPointCount += pointCountDiff;
@@ -220,7 +220,7 @@ std::vector<int> Analyser::Controller::MergeDatasets ( Utilities::DataSet& prima
             int pointCountDiff = 0;
             primaryDataset.fileList.push_back ( additionalDataset.fileList[i] );
 
-            pointCountDiff = additionalDataset.trails.raw[i].size ( ); // TODO - DOUBLE CHECK THIS
+            pointCountDiff = additionalDataset.trails.raw[i].size ( ); //TODO.59b
             primaryDataset.trails.raw.push_back ( additionalDataset.trails.raw[i] );
 
             primaryDataset.currentPointCount += pointCountDiff;

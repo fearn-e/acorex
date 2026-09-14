@@ -41,5 +41,3 @@ public:
 };
 
 } // Acorex
-
-// TODO - the date/time doesn't update with each compilation, because the Versioning.cpp file doesn't count as having changed - force recompile of that file somehow

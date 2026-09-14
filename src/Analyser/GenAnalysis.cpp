@@ -84,9 +84,10 @@ int Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
     //        reserveSize += floor ( (file.frames ( ) + hopSize) / hopSize );
     //    }
     //    reserveSize *= numDimensions;
-    //    dataset.time.raw.reserve ( reserveSize ); //TODO - double check this works as expected
+    //    dataset.time.raw.reserve ( reserveSize ); //TODO.60
     //}
 
+    //TODO.11a
     double startTime = ofGetElapsedTimef ( );
     for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
     {
@@ -115,6 +116,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
         std::fill ( padded.begin ( ), padded.end ( ), 0 );
         padded ( fluid::Slice ( halfWindow, in.size ( ) ) ) <<= in;
 
+        //TODO.11b
         for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
         {
             fluid::RealVector     magnitude ( nBins );

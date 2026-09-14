@@ -1,6 +1,6 @@
 #pragma once
 
-// TODO - store properly in xml or json, add rebinding menu
+//TODO.18
 
 //#include <ofConstants.h>
 #include <ofEvents.h>
@@ -12,7 +12,7 @@
 #define ACOREX_KEYBIND_CAMERA_MOVE_RIGHT    'd'
 #define ACOREX_KEYBIND_CAMERA_MOVE_UP       'r'
 #define ACOREX_KEYBIND_CAMERA_MOVE_DOWN     'f' 
-// TODO - double check these 4 lol
+//TODO.19
 #define ACOREX_KEYBIND_CAMERA_ROTATE_LEFT   'q' //? LEFT OR RIGHT?
 #define ACOREX_KEYBIND_CAMERA_ROTATE_RIGHT  'e' //? LEFT OR RIGHT?
 #define ACOREX_KEYBIND_CAMERA_ZOOM_IN       'z' //? IN OR OUT?
