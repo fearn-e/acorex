@@ -19,6 +19,11 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofSoundBuffer.h>
 #include "ofLog.h"
 
+//TODO.63b
+#if __has_include(<omp.h>)
+#include <omp.h>
+#endif
+
 using namespace Acorex;
 
 bool Utilities::AudioFileLoader::ReadAudioFile ( std::string filename, fluid::RealVector& output, double targetSampleRate )
