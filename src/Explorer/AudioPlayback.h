@@ -81,13 +81,10 @@ private:
     std::shared_ptr<RawView> mRawView;
     std::shared_ptr<PointPicker> mPointPicker;
 
-    // TODO - apply a pause/unpause fade over the length of a single buffer
-    //bool audioPauseFadeApplied = false;
-    //bool audioUnpauseFadeApplied = false;
-
-    // TODO //implement stereo loading of source files, not just mono
-    // TODO //panning bias? to globally statically shift this acorex instance left/right
-    // TODO //pan smoothing? average dynamic pan position with the previous and next X segments
+    //TODO.48
+    //TODO.49
+    //TODO.50
+    //TODO.51
 
     // audio states ------------------------------
 

@@ -1,7 +1,5 @@
 #pragma once
-// TODO -   store global defaults in xml?
-//          and per-corpus in the corpus JSONs?
-//          then no longer need this file or these defines, as everything can be loaded in place
+//TODO.17
 
 #include <ofConstants.h>
 

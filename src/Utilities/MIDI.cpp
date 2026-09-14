@@ -26,7 +26,7 @@ Utilities::MIDIHub::MIDIHub ( ) : bListenersAdded ( false )
 {
 }
 
-// TODO - retrigger this on a hotkey / periodically retrigger to check if parent instance died?
+//TODO.27
 void Utilities::MIDIHub::Initialise ( )
 {
 	if ( mMidiIn == NULL )
@@ -74,7 +74,7 @@ void Utilities::MIDIHub::Update ( )
 	{
 		// PROCESS MIDI HERE AND SEND OSC MESSAGES
 
-		// TEMPORARY HARDCODED VALUES FOR TESTING - TODO - learn midi at runtime function?
+		//TODO.28
 		// control 0, 2, 4, 6 - volumes - (faders) (XoXoXoXo)
         // control 1, 3, 5, 7 - jump chance - (faders) (oXoXoXoX)
         // control 16, 18, 20, 22 - pan width - (knobs) (XoXoXoXo)

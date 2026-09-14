@@ -35,14 +35,14 @@ bool Analyser::UMAP::Fit ( Utilities::DataSet& dataset, const Utilities::Reducti
 
     fluid::index k = 15;
 
-    if ( dataset.currentPointCount < 15 ) // TODO - double check exactly how k in UMAP works
+    if ( dataset.currentPointCount < 15 ) //TODO.61
     {
         k = dataset.currentPointCount;
     }
 
     ofLogNotice ( "UMAP" ) << "Training UMAP with " << dataset.currentPointCount << " points and " << dataset.analysisSettings.currentDimensionCount << " dimensions";
 
-    fluidsetOUT = algorithm.train ( fluidsetIN, k, settings.dimensionReductionTarget, 0.1, settings.maxIterations, 0.1 ); // TODO - check if this can be parallelised
+    fluidsetOUT = algorithm.train ( fluidsetIN, k, settings.dimensionReductionTarget, 0.1, settings.maxIterations, 0.1 ); //TODO.62
 
     ofLogNotice ( "UMAP" ) << "UMAP training complete";
 

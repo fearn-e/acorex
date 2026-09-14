@@ -24,7 +24,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <array>
 #include <string_view>
 
-// TODO - function to find a device in the list of devices marked as "default"
+//TODO.21
 
 #define CHECK_ENUM_VALUE(ENUM, VALUE, EXPECTED ) \
     static_assert(static_cast<int>(ENUM::VALUE) == EXPECTED, #ENUM "::" #VALUE " has changed, expected " #EXPECTED);
@@ -122,7 +122,7 @@ private:
 } // namespace Utilities
 } // namespace Acorex
 
-// TODO - find default device in list
+//TODO.22
 
 /*
     bool deviceSelected = false; size_t deviceIndex = 0;
@@ -147,7 +147,7 @@ private:
 */
 
 /*
-ofSoundDevice GetDefaultDeviceForApi ( ofSoundDevice::Api api ) { return outDevices[static_cast<size_t> (api)][0]; } // TODO - later, save/load last used
+ofSoundDevice GetDefaultDeviceForApi ( ofSoundDevice::Api api ) { return outDevices[static_cast<size_t> (api)][0]; } //TODO.23
 
 bool Acorex::ExplorerMenu::FindDefaultDeviceIndexInList ( const std::vector<ofSoundDevice>& devices, size_t& outIndex )
 {
@@ -167,7 +167,7 @@ bool Acorex::ExplorerMenu::FindDefaultDeviceIndexInList ( const std::vector<ofSo
 bool Acorex::ExplorerMenu::FindDefaultDeviceIndexInList ( const std::vector<ofSoundDevice>& devices, size_t& outIndex );
 
 
-    // Find APIs and Audio Devices -------------------------- // TODO - move these into their own function calls
+    // Find APIs and Audio Devices -------------------------- //TODO.24
 if ( bFirstTimeAPIDeviceLoad )
 {
     // APIs
@@ -184,7 +184,7 @@ if ( bFirstTimeAPIDeviceLoad )
     }
 
     currentAPI = defaultApi;
-    // TODO - might be overkill, but error if defaultApi doesn't exist on apiNames (shouldn't really ever happen)
+    //TODO.25
 
     // Devices
 
@@ -195,7 +195,7 @@ if ( bFirstTimeAPIDeviceLoad )
 
     if ( outDevices.empty ( ) )
     {
-        //TODO - KILL AUDIO? audioplayback probably will need to have a bool state for this case
+        //TODO.26
     }
     else
     {

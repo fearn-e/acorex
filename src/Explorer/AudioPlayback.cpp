@@ -22,9 +22,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
-// TODO - use mSoundStream.stop ( ) for killing the stream
-// might still need flags depending on when exactly stream is killed (audioOut should be allowed to finish processing)
-// but should simplify things
+//TODO.41
 
 Explorer::AudioPlayback::AudioPlayback ( )
     : bStreamStarted ( false ),
@@ -42,7 +40,7 @@ Explorer::AudioPlayback::AudioPlayback ( )
 
 bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t bufferSize, ofSoundDevice outDevice )
 {
-    // TODO - apply fade out here if stream already started and active playheads exist ?
+    //TODO.42
     {
         std::lock_guard<std::mutex> lock ( mRestartingAudioMutex );
         bRestartingAudioFlag = true;
@@ -50,10 +48,7 @@ bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t buff
 
     ofSleepMillis ( 100 );
 
-    // TODO - could probably just replace this flag system with the same mutex that is in the kill audio / clear function
-    // instead of waiting for the other thread to confirm, just hold until i can grab the mutex that blocks that thread
-    // this lets it finish what it's doing, and then i can go ahead
-    // alternatively, could combine both to do the fade out effect mentioned above
+    //TODO.43
     size_t startTime = ofGetElapsedTimeMillis ( ); // temporary timeout fix in case of deadlock
     while ( bStreamStarted && !bRestartingAudioFlagConfirmed && ofGetElapsedTimeMillis ( ) - startTime < 2000 )
     { ofSleepMillis ( 10 ); }
@@ -76,7 +71,7 @@ bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t buff
     
     bool success = false;
 
-    if ( outDevice.deviceID != -1 ) // outDevice.name != "No output selected." - TODO - maybe use an extra bool parameter instead of piggy backing on the deviceID?
+    if ( outDevice.deviceID != -1 ) // outDevice.name != "No output selected." //TODO.44
     {
         success = mSoundStream.setup ( settings );
     }
@@ -162,9 +157,7 @@ void Explorer::AudioPlayback::ClearAndKillAudio ( )
 
 void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 {
-    // TODO - change this and other lock_guard/try_lock instances to unique_lock with something like:
-    //              std::unique_lock<std::mutex> lock ( mNewPlayheadMutex, std::try_to_lock );
-    //              if ( lock.owns_lock ( ) )
+    //TODO.45    
     if ( mAudioThreadMutex.try_lock ( ) )
     {
         std::lock_guard<std::mutex> lock ( mAudioThreadMutex, std::adopt_lock );
@@ -219,7 +212,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
             // playhead loop
             for ( size_t playheadIndex = 0; playheadIndex < mPlayheads.size ( ); playheadIndex++ )
             {
-                Utilities::AudioPlayhead* currentPlayhead = &mPlayheads[playheadIndex]; // TODO - why is this not used - replace all instances of mPlayheads[playheadIndex] with currentPlayhead?
+                Utilities::AudioPlayhead* currentPlayhead = &mPlayheads[playheadIndex]; //TODO.46
 
                 ofSoundBuffer playheadBuffer;
                 playheadBuffer.setSampleRate ( mSoundStream.getSampleRate ( ) );
@@ -392,6 +385,7 @@ void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_
 
         panGainL = 1.0f - panningStrength * (1.0f - panGainL);
         panGainR = 1.0f - panningStrength * (1.0f - panGainR);
+        //TODO.47a
     }
 
     for ( size_t i = 0; i < segmentLength; i++ )
@@ -455,8 +449,7 @@ void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, 
 
             panGainL = 1.0f - panningStrength * (1.0f - panGainL);
             panGainR = 1.0f - panningStrength * (1.0f - panGainR);
-            // TODO - could have a power curve here instead of linear - something like: float result = 1.0f - pow(Y, power) * (1.0f - X);
-            // TODO - same thing further down in FillAudioSegment();
+            //TODO.47b
         }
 
         outBuffer->getSample ( *outBufferPosition + i, 0 ) = samplePostCrossfade * panGainL;

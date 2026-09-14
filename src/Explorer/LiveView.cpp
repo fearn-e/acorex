@@ -55,7 +55,7 @@ void Explorer::LiveView::Initialise ( )
 {
     Clear ( );
 
-    glPointSize ( 3.0f ); // TODO - might be fine in the constructor instead
+    glPointSize ( 3.0f ); //TODO.52
 
     Init3DCam ( );
 
@@ -161,8 +161,9 @@ void Explorer::LiveView::Update ( )
 {
     deltaTime = ofGetElapsedTimef ( ) - lastUpdateTime;
     lastUpdateTime = ofGetElapsedTimef ( );
-    if ( !bDraw ) { return; }
+    if ( !bDraw ) { return; } //TODO.9
 
+    //TODO.10
     float keyboardMoveDelta = SpaceDefs::mKeyboardMoveSpeed * deltaTime;
     float keyboardRotateDelta = SpaceDefs::mKeyboardRotateSpeed * deltaTime;
     float keyboardZoomDelta = SpaceDefs::mKeyboardZoomSpeed * deltaTime;
@@ -853,16 +854,14 @@ void Explorer::LiveView::KeyEvent ( ofKeyEventArgs& args )
                 bDrawCloud = true;
             }
         }
-        //else if ( args.key == 'c' ) // TODO - might not need this key either just like the ENTER key below, remove also?
+        //else if ( args.key == 'c' ) //TODO.53
         //{ 
         //    if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
         //    {
         //        ofSetClipboardString ( mRawView->GetDataset ( )->fileList[mPointPicker->GetNearestMousePointFile ( )] );
         //    }
         //}
-        /*else if ( args.key == OF_KEY_RETURN ) // TODO - decide whether change key or just remove entirely? enter triggers this even when
-        *                                       // typing in file dialogs or settings boxes, so it's annoying
-        *                                       // -- but might not even need this functionality at all anymore, i don't really use it
+        /*else if ( args.key == OF_KEY_RETURN ) //TODO.54
         {
             if ( mPointPicker->GetNearestMousePointFile ( ) != -1 )
             {

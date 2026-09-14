@@ -604,7 +604,7 @@ void AnalyserMenu::Analyse ( )
         return;
     }
 
-    // TODO - ask if user wants to reduce the data or view it in the corpus viewer
+    //TODO.55
     OpenMainPanel ( );
     ofLogNotice ( "AnalyserMenu" ) << "Corpus created";
     //------------------------------------------------ TEMPORARY
@@ -643,7 +643,7 @@ void AnalyserMenu::Reduce ( )
         return;
     }
 
-    // TODO - ask if user wants to open the reduced data in the corpus viewer
+    //TODO.56
     OpenMainPanel ( );
     ofLogNotice ( "AnalyserMenu" ) << "Corpus reduced";
     //------------------------------------------------ TEMPORARY
@@ -670,11 +670,7 @@ void AnalyserMenu::SelectAnalysisDirectory ( )
     bAnalysisDirectorySelected = true;
 }
 
-//TODO - fix windows save dialog defaults
-    //#ifdef _WIN32
-    //auto resultOut = pfd::save_file::save_file("Saving reduced analysis as...", "reduced_corpus.json", { "JSON Files", "*.json" });
-    //std::string resultOutPath = resultOut.result();
-    //#endif
+//TODO.57
 void AnalyserMenu::SelectAnalysisOutputFile ( )
 {
     ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus.json", "Save analysed corpus as..." );
@@ -756,11 +752,7 @@ void AnalyserMenu::SelectReductionInputFile ( )
     bReductionInputSelected = true;
 }
 
-//TODO - fix windows save dialog defaults
-    //#ifdef _WIN32
-    //auto resultOut = pfd::save_file::save_file("Saving reduced analysis as...", "reduced_corpus.json", { "JSON Files", "*.json" });
-    //std::string resultOutPath = resultOut.result();
-    //#endif
+//TODO.58
 void AnalyserMenu::SelectReductionOutputFile ( )
 {
     ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus_reduced.json", "Save reduced corpus as..." );

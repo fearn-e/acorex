@@ -150,7 +150,7 @@ void Utilities::LogDisplay::AddLog ( ofLogLevel level, const std::string& contex
 
 ofColor Utilities::LogDisplay::getLevelColor ( ofLogLevel level )
 {
-    switch ( level ) // TODO - move into InterfaceDefs.h
+    switch ( level ) //TODO.14
     {
     case OF_LOG_VERBOSE:        return ofColor ( 130, 130, 160 ); // Blueish dark grey
     case OF_LOG_NOTICE:         return ofColor ( 190, 190, 210 ); // Blueish grey
@@ -173,7 +173,7 @@ void Utilities::LogDisplay::KeyEvent ( ofKeyEventArgs& args )
         }
         else if ( args.key == ACOREX_KEYBIND_LOG_LEVEL_SET_WARNING_ERROR )
         {
-            ofSetLogLevel ( OF_LOG_NOTICE ); //TODO - this is a bodge
+            ofSetLogLevel ( OF_LOG_NOTICE ); //TODO.15
             ofLogNotice ( "Logging" ) << "Warning and error logs only";
             ofSetLogLevel ( OF_LOG_WARNING );
         }
@@ -194,7 +194,6 @@ void Utilities::LogDisplay::KeyEvent ( ofKeyEventArgs& args )
 // -------------------------- AcorexLoggerChannel --------------------------
 // -------------------------------------------------------------------------
 
-// TODO - option to change original channel sending at runtime
 Utilities::AcorexLoggerChannel::AcorexLoggerChannel ( ) : bSendToOriginalChannel ( true )
 {
     mOriginalChannel = ofGetLoggerChannel ( );

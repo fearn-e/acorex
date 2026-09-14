@@ -102,7 +102,7 @@ void ExplorerMenu::Draw ( )
     mMainPanel.draw ( );
 
     // draw playhead panels
-    // TODO - this all needs to be cleaned up, made prettier, and a lot of it moved into InterfaceDefs.h
+    //TODO.32
     for ( auto& playhead : mLiveView.GetPlayheads ( ) )
     {
         // highlight the playhead position if panel is hovered
@@ -330,7 +330,7 @@ void ExplorerMenu::SetupPanelSectionCorpusControls ( const Utilities::ExploreSet
     mDimensionDropdownZ->setBackgroundColor ( mColors.interfaceBackgroundColor );
     mDimensionDropdownZ->setSelectedValueByName ( settings.GetDimensionZ ( ), false );
 
-    // TODO - move color settings to the top of this panel section
+    //TODO.33
 
     // Colour Dimension Dropdown
     mDimensionDropdownColor.reset ( );
@@ -463,7 +463,7 @@ void ExplorerMenu::WindowResized ( )
 
     if ( !bIsCorpusOpen ) { return; }
 
-    for ( size_t i = 0; i < mLiveView.GetPlayheads ( ).size ( ); i++ ) // TODO - fix playhead visual stacking when window resizing bug, easy fix
+    for ( size_t i = 0; i < mLiveView.GetPlayheads ( ).size ( ); i++ ) //TODO.34
     {
         mLiveView.GetPlayheads ( )[i].ResizeBox ( i, mLayout->getTopBarHeight ( ), ofGetHeight ( ), ofGetWidth ( ) );
     }
@@ -646,7 +646,7 @@ void ExplorerMenu::RemoveListenersAudioManager ( )
 
 void ExplorerMenu::OpenCorpus ( )
 {
-    // TODO - is this flag still needed now that OpenFullPanel has all value sets set to bNotify = false?
+    //TODO.35
     bBlockDimensionFilling = true;
     
     if ( bIsCorpusOpen && !bDrawOpenCorpusWarning )
@@ -659,7 +659,7 @@ void ExplorerMenu::OpenCorpus ( )
     bDrawOpenCorpusWarning = false;
 
     bool preserveCorpusSettings = false;
-    int preservedControlReceiverIndex = 0; // TODO - check how many other instances running, set to X + 1 (and then replace the DEFAULT macro later in this function to this)
+    int preservedControlReceiverIndex = 0; //TODO.36
     size_t preservedMaxCrossfadeLength = mRawView->GetHopSize ( );
     if ( bIsCorpusOpen ) { preserveCorpusSettings = true; }
 
@@ -767,7 +767,7 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis::Type axis, 
     if ( bBlockDimensionFilling )
     { return; }
 
-    // TODO - fix, probably by reworking UI away from ofxGui / ofParameters?
+    //TODO.37
     if ( dimension == "" )
     {
         ofLogWarning ( "ExplorerMenu" ) << "Dimension deselected, undefined behaviour. This is a known bug.";
@@ -830,7 +830,7 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis::Type axis, 
     if ( bIsCorpusOpen )
     {
         CameraSwitcher ( );
-        // TODO - if axis != COLOR, retrain point picker // is this still needed here? already retraining in liveview
+        //TODO.38
     }
 }
 
@@ -1003,9 +1003,7 @@ void ExplorerMenu::MouseReleased ( ofMouseEventArgs& args )
     // Audio Manager
 void ExplorerMenu::RescanDevices ( )
 {
-    // TODO TEST - could have some edge cases depending on how ofxDropdown works
-    //          - this gets called when the dropdown is about to be shown - does it actually update the dropdown correctly if there's a change?
-    //          - or does the dropdown then have to be closed and opened again to show this change
+    //TODO.39
 
     bool modified = mAudioSettingsManager.RefreshDeviceListChanged ( );
 
@@ -1081,7 +1079,7 @@ void ExplorerMenu::SetBufferSize ( string& dropdownName )
 
 void ExplorerMenu::AudioOutputFailed ( )
 {
-    // TODO - more error handling here? also more user feedback? - e.g. set Device/Api/Buffer dropdowns to red bg colour?
+    //TODO.40
 
     ofLogError ( "Explorer" ) << "Audio output failed to restart with current settings. This likely means the selected output device is currently unavailable. Please check your audio output device and try again.";
 }
