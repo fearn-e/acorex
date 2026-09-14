@@ -17,7 +17,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Utilities/AudioFileLoader.h"
 
 #include <ofSoundBuffer.h>
-#include "ofLog.h"
+#include <ofLog.h>
 
 //TODO.63b
 #if __has_include(<omp.h>)
