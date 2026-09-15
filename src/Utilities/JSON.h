@@ -25,12 +25,6 @@ namespace Utilities {
 
 class JSON {
 
-#define TO_J( x ) {#x, a.x}
-#define TO_J_SETTINGS( x ) {#x, a.analysisSettings.x}
-
-#define TO_A( x ) j.at ( #x ).get_to ( a.x )
-#define TO_A_SETTINGS( x ) j.at ( #x ).get_to ( a.analysisSettings.x )
-
 public:
     JSON ( ) { };
     ~JSON ( ) { };
