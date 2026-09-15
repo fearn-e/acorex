@@ -18,6 +18,22 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include <ofLog.h>
 #include <ofUtils.h>
+#include <Eigen/Core>
+#include <flucoma/algorithms/public/DCT.hpp>
+#include <flucoma/algorithms/public/Loudness.hpp>
+#include <flucoma/algorithms/public/MelBands.hpp>
+#include <flucoma/algorithms/public/MultiStats.hpp>
+#include <flucoma/algorithms/public/STFT.hpp>
+#include <flucoma/algorithms/public/SpectralShape.hpp>
+#include <flucoma/algorithms/public/YINFFT.hpp>
+#include <flucoma/data/FluidDataSet.hpp>
+#include <flucoma/data/FluidIndex.hpp>
+#include <flucoma/data/FluidJSON.hpp>
+#include <flucoma/data/FluidMemory.hpp>
+#include <flucoma/data/TensorTypes.hpp>
+#include <ofxAudioFile.h>
+#include <vector>
+#include <string>
 
 //TODO.63c
 #if __has_include(<omp.h>)
