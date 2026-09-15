@@ -21,43 +21,35 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 using namespace Acorex;
 
 AnalyserMenu::AnalyserMenu ( ) :    bListenersAddedMain ( false ), bListenersAddedAnalysis ( false ),
-                                    bListenersAddedInsertion ( false ), bListenersAddedReduction ( false )
-{
-    ResetVariables ( );
-}
-
-void AnalyserMenu::ResetVariables ( )
-{
-    bDraw = false;
-    bProcessing = false;
-
-    bDrawMainPanel = false;
-    bDrawAnalysisPanel = false;
-    bDrawInsertionPanel = false;
-    bDrawReductionPanel = false;
-
-    bInsertingIntoCorpus = false;
-
-    bAnalysisDirectorySelected = false;
-    bAnalysisOutputSelected = false;
-    bReductionInputSelected = false;
-    bReductionOutputSelected = false;
-
-    bInvalidPulseFileSelects = false;
-    bInvalidPulseAnalysisToggles = false;
-    bInvalidPulseReductionDimensions = false;
-    mInvalidPulseColour = 255;
-
-    mCurrentDimensionCount = 0;
-
-    inputPath = "";
-    outputPath = "";
-}
+                                    bListenersAddedInsertion ( false ), bListenersAddedReduction ( false ),
+                                    bDraw ( false ), bProcessing ( false ),
+                                    bDrawMainPanel ( false ), bDrawAnalysisPanel ( false ), bDrawInsertionPanel ( false ), bDrawReductionPanel ( false ),
+                                    bInsertingIntoCorpus ( false ),
+                                    bAnalysisDirectorySelected ( false ), bAnalysisOutputSelected ( false ),
+                                    bReductionInputSelected ( false ), bReductionOutputSelected ( false ),
+                                    bInvalidPulseFileSelects ( false ), bInvalidPulseAnalysisToggles ( false ),
+                                    bInvalidPulseReductionDimensions ( false ), mInvalidPulseColour ( 255 ),
+                                    mCurrentDimensionCount ( 0 ), inputPath ( "" ), outputPath ( "" )
+{ }
 
 // initial state is a blank slate - Open ( ) must be called to actually load anything
 void AnalyserMenu::Initialise ( )
 {
-    ResetVariables ( );
+    bDraw = false; bProcessing = false;
+
+    bDrawMainPanel = false; bDrawAnalysisPanel = false; bDrawInsertionPanel = false; bDrawReductionPanel = false;
+
+    bInsertingIntoCorpus = false;
+
+    bAnalysisDirectorySelected = false; bAnalysisOutputSelected = false;
+    bReductionInputSelected = false; bReductionOutputSelected = false;
+
+    bInvalidPulseFileSelects = false; bInvalidPulseAnalysisToggles = false; bInvalidPulseReductionDimensions = false;
+    mInvalidPulseColour = 255;
+
+    mCurrentDimensionCount = 0;
+
+    inputPath = ""; outputPath = "";
 
     RemoveListenersMain ( );
     RemoveListenersAnalysis ( );
@@ -764,7 +756,7 @@ void AnalyserMenu::SelectReductionInputFile ( )
     UnpackSettingsFromFile ( settings );
     inputPath = inputFile.getPath ( );
     mReductionInputLabel = inputFile.getName ( );
-    bReductionInputSelected = true;
+    bReductionInputSelected = true; 
 }
 
 //TODO.58

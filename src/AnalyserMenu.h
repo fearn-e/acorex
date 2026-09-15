@@ -41,8 +41,6 @@ public:
     void SetMenuLayout ( std::shared_ptr<Utilities::MenuLayout>& menuLayout ) { mLayout = menuLayout; }
 
 private:
-    void ResetVariables ( );
-
     // UI Management ------------------------------
     void OpenMainPanel ( );
     void OpenAnalysisPanel ( );
