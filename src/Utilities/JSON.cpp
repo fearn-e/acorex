@@ -87,6 +87,12 @@ bool Utilities::JSON::Read ( const std::string& inputFile, AnalysisSettings& set
 #error "data structure changed, please update json serialization"
 #endif
 
+#define TO_J( x ) {#x, a.x}
+#define TO_J_SETTINGS( x ) {#x, a.analysisSettings.x}
+
+#define TO_A( x ) j.at ( #x ).get_to ( a.x )
+#define TO_A_SETTINGS( x ) j.at ( #x ).get_to ( a.analysisSettings.x )
+
 void Utilities::to_json ( nlohmann::json& j, const DataSet& a )
 {
     j = nlohmann::json {	
@@ -164,3 +170,9 @@ void Utilities::from_json ( const nlohmann::json& j, AnalysisSettings& a )
     TO_A ( minFreq );
     TO_A ( maxFreq );
 }
+
+#undef TO_J
+#undef TO_J_SETTINGS
+
+#undef TO_A
+#undef TO_A_SETTINGS
