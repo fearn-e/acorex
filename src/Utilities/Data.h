@@ -22,7 +22,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <string>
 #include <vector>
 #include <queue>
-#include <nlohmann/json.hpp>
 #include <ofColor.h>
 #include <ofRectangle.h>
 #include <algorithm>
