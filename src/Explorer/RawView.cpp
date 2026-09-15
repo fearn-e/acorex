@@ -30,10 +30,15 @@ Explorer::RawView::RawView ( ) : mHopSize ( 512 ), mCorpusName ( "" )
 
 bool Explorer::RawView::LoadCorpus ( )
 {
-    ofFileDialogResult corpusFile = ofSystemLoadDialog ( "Select corpus file" );
+    ofFileDialogResult corpusFile = ofSystemLoadDialog ( "Select corpus file", false, "" );
+    if ( corpusFile.filePath == "" )
+    {
+        ofLogWarning ( "RawView" ) << "No corpus file selected.";
+        return false;
+    }
     if ( !corpusFile.bSuccess )
     {
-        ofLogError ( "RawView" ) << "Invalid load query";
+        ofLogError ( "RawView" ) << "Invalid corpus file selection.";
         return false;
     }
     
@@ -48,12 +53,12 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
 
     if ( name.find ( ".json" ) == std::string::npos )
     {
-        ofLogError ( "RawView" ) << "Invalid file type";
+        ofLogError ( "RawView" ) << "Invalid file type.";
         return false;
     }
     if ( !ofFile::doesFileExist ( path ) )
     {
-        ofLogError ( "RawView" ) << "File does not exist";
+        ofLogError ( "RawView" ) << "File does not exist.";
         return false;
     }
 

@@ -654,14 +654,19 @@ void AnalyserMenu::Reduce ( )
 void AnalyserMenu::SelectAnalysisDirectory ( )
 {
     ofFileDialogResult audioDirectory = ofSystemLoadDialog ( "Select folder containing audio files...", true, ofFilePath::getCurrentWorkingDirectory ( ) );
+    if ( audioDirectory.filePath == "" )
+    {
+        ofLogWarning ( "RawView" ) << "No directory selected.";
+        return;
+    }
     if ( !audioDirectory.bSuccess )
     {
-        ofLogWarning ( "AnalyserMenu" ) << "No folder selected";
+        ofLogError ( "AnalyserMenu" ) << "Invalid directory selection.";
         return;
     }
     if ( !ofDirectory::doesDirectoryExist ( audioDirectory.getPath ( ) ) )
     {
-        ofLogWarning ( "AnalyserMenu" ) << "Invalid directory";
+        ofLogError ( "AnalyserMenu" ) << "Directory does not exist.";
         return;
     }
 
@@ -674,6 +679,11 @@ void AnalyserMenu::SelectAnalysisDirectory ( )
 void AnalyserMenu::SelectAnalysisOutputFile ( )
 {
     ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus.json", "Save analysed corpus as..." );
+    if ( outputFile.filePath == "" )
+    {
+        ofLogWarning ( "RawView" ) << "No output file selected.";
+        return;
+    }
     if ( !outputFile.bSuccess )
     {
         ofLogError ( "AnalyserMenu" ) << "Invalid save query";
@@ -721,14 +731,19 @@ void AnalyserMenu::SelectAnalysisOutputFile ( )
 void AnalyserMenu::SelectReductionInputFile ( )
 {
     ofFileDialogResult inputFile = ofSystemLoadDialog ( "Select a corpus file...", false, ofFilePath::getCurrentWorkingDirectory ( ) );
+    if ( inputFile.filePath == "" )
+    {
+        ofLogWarning ( "RawView" ) << "No input file selected.";
+        return;
+    }
     if ( !inputFile.bSuccess )
     {
-        ofLogError ( "AnalyserMenu" ) << "No file selected";
+        ofLogError ( "AnalyserMenu" ) << "Invalid input file selection.";
         return;
     }
     if ( !ofFile::doesFileExist ( inputFile.getPath ( ) ) )
     {
-        ofLogError ( "AnalyserMenu" ) << "Invalid file";
+        ofLogError ( "AnalyserMenu" ) << "Selected input file does not exist.";
         return;
     }
     if ( inputFile.getName ( ).find ( ".json" ) == std::string::npos )
@@ -756,14 +771,19 @@ void AnalyserMenu::SelectReductionInputFile ( )
 void AnalyserMenu::SelectReductionOutputFile ( )
 {
     ofFileDialogResult outputFile = ofSystemSaveDialog ( "acorex_corpus_reduced.json", "Save reduced corpus as..." );
+    if ( outputFile.filePath == "" )
+    {
+        ofLogWarning ( "RawView" ) << "No output file selected.";
+        return;
+    }
     if ( !outputFile.bSuccess )
     {
-        ofLogError ( "AnalyserMenu" ) << "Invalid save query";
+        ofLogError ( "AnalyserMenu" ) << "Invalid output file selection.";
         return;
     }
     if ( outputFile.getName ( ).find ( ".json" ) == std::string::npos )
     {
-        ofLogNotice ( "AnalyserMenu" ) << "Added missing .json extension";
+        ofLogVerbose ( "AnalyserMenu" ) << "Added missing .json extension";
         outputFile.filePath += ".json";
         outputFile.fileName += ".json";
     }
