@@ -62,7 +62,7 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
         return false;
     }
 
-    bool success = mJSON.Read ( path, mDataset );
+    bool success = Utilities::JSON::Read ( path, mDataset );
 
     if ( !success ) { return success; }
 

@@ -702,7 +702,7 @@ void AnalyserMenu::SelectAnalysisOutputFile ( )
     if ( bInsertingIntoCorpus )
     {
         Utilities::AnalysisSettings settings;
-        bool success = mJSON.Read ( outputFile.getPath ( ), settings );
+        bool success = Utilities::JSON::Read ( outputFile.getPath ( ), settings );
         if ( !success ) { return; }
 
         if ( settings.bIsReduction )
@@ -745,7 +745,7 @@ void AnalyserMenu::SelectReductionInputFile ( )
     }
 
     Utilities::AnalysisSettings settings;
-    bool success = mJSON.Read ( inputFile.getPath ( ), settings );
+    bool success = Utilities::JSON::Read ( inputFile.getPath ( ), settings );
     if ( !success ) { return; }
     if ( settings.currentDimensionCount <= 2 )
     {

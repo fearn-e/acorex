@@ -52,7 +52,6 @@ private:
     std::string mCorpusName;
     Utilities::DataSet mDataset;
 
-    Utilities::JSON mJSON;
     Utilities::AudioFileLoader mAudioLoader;
 };
 

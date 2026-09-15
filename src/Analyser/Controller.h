@@ -17,7 +17,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #pragma once
 
 #include "Utilities/Data.h"
-#include "Utilities/JSON.h"
 #include "Analyser/GenAnalysis.h"
 #include "Analyser/UMAP.h"
 
@@ -46,7 +45,6 @@ private:
     void GenerateDimensionNames ( std::vector<std::string>& dimensionNames, const Utilities::AnalysisSettings& settings );
     void GenerateReducedDimensionNames ( std::vector<std::string>& dimensionNames, const Utilities::ReductionSettings& settings );
 
-    Utilities::JSON mJSON;
     Analyser::GenAnalysis mGenAnalysis;
     Analyser::UMAP mUMAP;
 };

@@ -15,6 +15,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 */
 
 #include "Analyser/Controller.h"
+#include "Utilities/JSON.h"
 
 #include <ofLog.h>
 #include <filesystem>
@@ -53,7 +54,7 @@ bool Analyser::Controller::CreateCorpus ( const std::string& inputPath, const st
 
     GenerateDimensionNames ( dataset.dimensionNames, settings );
 
-    success = mJSON.Write ( outputPath, dataset );
+    success = Utilities::JSON::Write ( outputPath, dataset );
     if ( !success ) { return false; }
     
     return true;
@@ -65,7 +66,7 @@ bool Analyser::Controller::ReduceCorpus ( const std::string& inputPath, const st
 
     Utilities::DataSet dataset;
 
-    success = mJSON.Read ( inputPath, dataset );
+    success = Utilities::JSON::Read ( inputPath, dataset );
     if ( !success ) { return false; }
 
     success = mUMAP.Fit ( dataset, settings );
@@ -74,7 +75,7 @@ bool Analyser::Controller::ReduceCorpus ( const std::string& inputPath, const st
     dataset.analysisSettings.currentDimensionCount = settings.dimensionReductionTarget + 1;
     GenerateReducedDimensionNames ( dataset.dimensionNames, settings );
 
-    success = mJSON.Write ( outputPath, dataset );
+    success = Utilities::JSON::Write ( outputPath, dataset );
     if ( !success ) { return false; }
 
     return true;
@@ -85,7 +86,7 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
     bool success;
 
     Utilities::DataSet existingDataset;
-    success = mJSON.Read ( outputPath, existingDataset );
+    success = Utilities::JSON::Read ( outputPath, existingDataset );
     if ( !success ) { return false; }
 
     std::vector<std::string> newFiles;
@@ -163,7 +164,7 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
         ofLogNotice ( "Controller" ) << "Merged new files into dataset, with " << mergeInfo[0] << " already existing skipped and " << mergeInfo[1] << " not previously existing added.";
     }
 
-    success = mJSON.Write ( outputPath, existingDataset );
+    success = Utilities::JSON::Write ( outputPath, existingDataset );
     if ( !success ) { return false; }
 
     return true;
