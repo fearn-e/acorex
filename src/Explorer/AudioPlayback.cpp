@@ -200,7 +200,7 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
         if ( mtxNewPlayheads.try_lock ( ) )
         {
             std::lock_guard<std::mutex> lock ( mtxNewPlayheads, std::adopt_lock );
-            ProcessPlayheadInstructions ( playheadsToKillThisBuffer, audioProcessingBlocked );
+            ProcessPlayheadInstructions ( &playheadsToKillThisBuffer, audioProcessingBlocked );
         }
 
         // audio processing
@@ -420,9 +420,9 @@ void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, 
             std::lock_guard <std::mutex> lock ( mtxDimensionBounds );
 
             panStartNorm    = (float)(panStart - mDimensionBounds.min[mDynamicPanDimensionIndex])
-                            / (float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]);
+                / (float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]);
             panEndNorm      = (float)(panEnd - mDimensionBounds.min[mDynamicPanDimensionIndex])
-                            / (float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]);
+                / (float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]);
         }
 
         panStartNorm = glm::clamp ( panStartNorm, 0.0f, 1.0f );
@@ -470,7 +470,7 @@ void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, 
     }
 }
 
-void Explorer::AudioPlayback::ProcessPlayheadInstructions ( std::vector<size_t>& playheadsToKillThisBuffer, bool killInstantly )
+void Explorer::AudioPlayback::ProcessPlayheadInstructions ( std::vector<size_t>* playheadsToKillThisBuffer, bool killInstantly )
 {
     while ( !mNewPlayheads.empty ( ) )
     {
@@ -493,7 +493,10 @@ void Explorer::AudioPlayback::ProcessPlayheadInstructions ( std::vector<size_t>&
         }
         else
         {
-            playheadsToKillThisBuffer.push_back ( mPlayheadsToKill.front ( ) );
+            if ( playheadsToKillThisBuffer )
+            {
+                playheadsToKillThisBuffer->push_back ( mPlayheadsToKill.front ( ) );
+            }
         }
 
         mPlayheadsToKill.pop ( );
@@ -513,7 +516,7 @@ void Explorer::AudioPlayback::UpdateVisualPlayheads ( )
 void Explorer::AudioPlayback::ForcePlayheadUpdateStep ( )
 {
     std::lock_guard<std::mutex> fullAudioThreadLock ( mtxAudioThread );
-    ProcessPlayheadInstructions ( std::vector<size_t> ( ), true );
+    ProcessPlayheadInstructions ( nullptr, true );
     UpdateVisualPlayheads ( );
     mActivePlayheads = mPlayheads.size ( );
 }
