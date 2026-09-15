@@ -46,7 +46,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
-int Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
+size_t Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
 {  
     ofLogVerbose ( "GenAnalysis" ) << "Calculating file lengths...";
     double fileLengthSumTracker = 0;
@@ -68,7 +68,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
 
     dataset.trails.raw.clear ( );
 
-    int analysedFileIndex = 0;
+    size_t analysedFileIndex = 0;
     std::vector<std::string> analysedFiles;
 
     fluid::index numTimeDimensions = 1;
@@ -106,7 +106,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
 
     //TODO.11a
     double startTime = ofGetElapsedTimef ( );
-    for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
+    for ( size_t fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
     {
         fluid::RealVector in ( 0 );
         bool success = mAudioLoader.ReadAudioFile ( dataset.fileList[fileIndex], in, dataset.analysisSettings.sampleRate );
@@ -134,7 +134,7 @@ int Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
         padded ( fluid::Slice ( halfWindow, in.size ( ) ) ) <<= in;
 
         //TODO.11b
-        for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+        for ( size_t frameIndex = 0; frameIndex < nFrames; frameIndex++ )
         {
             fluid::RealVector     magnitude ( nBins );
             fluid::RealVectorView window = padded ( fluid::Slice ( frameIndex * hopSize, dataset.analysisSettings.windowFFTSize ) );
@@ -179,16 +179,16 @@ int Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
 
         std::vector<std::vector<double>> allVectors ( nFrames );
 
-        for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+        for ( size_t frameIndex = 0; frameIndex < nFrames; frameIndex++ )
         {
             allVectors[frameIndex].push_back ( frameIndex * hopSize / (double)dataset.analysisSettings.sampleRate );
         }
 
         if ( dataset.analysisSettings.bPitch )
         {
-            for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+            for ( size_t frameIndex = 0; frameIndex < nFrames; frameIndex++ )
             {
-                for ( int dimIndex = 0; dimIndex < numPitchDimensions; dimIndex++ )
+                for ( size_t dimIndex = 0; dimIndex < numPitchDimensions; dimIndex++ )
                 {
                     allVectors[frameIndex].push_back ( pitchMat ( frameIndex, dimIndex ) );
                 }
@@ -197,9 +197,9 @@ int Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
 
         if ( dataset.analysisSettings.bLoudness )
         {
-            for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+            for ( size_t frameIndex = 0; frameIndex < nFrames; frameIndex++ )
             {
-                for ( int dimIndex = 0; dimIndex < numLoudnessDimensions; dimIndex++ )
+                for ( size_t dimIndex = 0; dimIndex < numLoudnessDimensions; dimIndex++ )
                 {
                     allVectors[frameIndex].push_back ( loudnessMat ( frameIndex, dimIndex ) );
                 }
@@ -208,9 +208,9 @@ int Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
 
         if ( dataset.analysisSettings.bShape )
         {
-            for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+            for ( size_t frameIndex = 0; frameIndex < nFrames; frameIndex++ )
             {
-                for ( int dimIndex = 0; dimIndex < numShapeDimensions; dimIndex++ )
+                for ( size_t dimIndex = 0; dimIndex < numShapeDimensions; dimIndex++ )
                 {
                     allVectors[frameIndex].push_back ( shapeMat ( frameIndex, dimIndex ) );
                 }
@@ -219,9 +219,9 @@ int Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
 
         if ( dataset.analysisSettings.bMFCC )
         {
-            for ( int frameIndex = 0; frameIndex < nFrames; frameIndex++ )
+            for ( size_t frameIndex = 0; frameIndex < nFrames; frameIndex++ )
             {
-                for ( int dimIndex = 0; dimIndex < numMFCCDimensions; dimIndex++ )
+                for ( size_t dimIndex = 0; dimIndex < numMFCCDimensions; dimIndex++ )
                 {
                     allVectors[frameIndex].push_back ( mfccMat ( frameIndex, dimIndex ) );
                 }

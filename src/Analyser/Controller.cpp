@@ -35,8 +35,8 @@ bool Analyser::Controller::CreateCorpus ( const std::string& inputPath, const st
     success = SearchDirectory ( inputPath, dataset.fileList );
     if ( !success ) { return false; }
     
-    int filesIn = dataset.fileList.size ( );
-    int numAnalysed = mGenAnalysis.ProcessFiles ( dataset );
+    size_t filesIn = dataset.fileList.size ( );
+    size_t numAnalysed = mGenAnalysis.ProcessFiles ( dataset );
     if ( numAnalysed == filesIn )
     {
         ofLogNotice ( "Controller" ) << "Processed " << filesIn << " files into " << dataset.currentPointCount << " points.";
@@ -96,7 +96,7 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
     // remove new files that already exist if duplicates are not to be analysed again
     if ( !newReplacesExisting )
     {
-        int preTreated = newFiles.size ( );
+        size_t preTreated = newFiles.size ( );
 
         std::vector<std::string> newFilesTreated;
 
@@ -136,8 +136,8 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
 #error "check if this is still valid with dataset structure"
 #endif
 
-    int filesIn = newDataset.fileList.size ( );
-    int numAnalysed = mGenAnalysis.ProcessFiles ( newDataset );
+    size_t filesIn = newDataset.fileList.size ( );
+    size_t numAnalysed = mGenAnalysis.ProcessFiles ( newDataset );
     if ( numAnalysed == filesIn )
     {
         ofLogNotice ( "Controller" ) << "Processed " << filesIn << " new files into " << newDataset.currentPointCount << " points.";
@@ -153,7 +153,7 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
         return false;
     }
 
-    std::vector<int> mergeInfo = MergeDatasets ( existingDataset, newDataset, newReplacesExisting );
+    std::vector<size_t> mergeInfo = MergeDatasets ( existingDataset, newDataset, newReplacesExisting );
 
     if ( newReplacesExisting )
     {
@@ -172,17 +172,17 @@ bool Analyser::Controller::InsertIntoCorpus ( const std::string& inputPath, cons
 
 // Private -------------------------------------------------------------------
 
-std::vector<int> Analyser::Controller::MergeDatasets ( Utilities::DataSet& primaryDataset, const Utilities::DataSet& additionalDataset, const bool additionalReplacesPrimary )
+std::vector<size_t> Analyser::Controller::MergeDatasets ( Utilities::DataSet& primaryDataset, const Utilities::DataSet& additionalDataset, const bool additionalReplacesPrimary )
 {
-    int filesSkipped = 0;
-    int filesAdded = 0;
-    int filesOverwritten = 0;
+    size_t filesSkipped = 0;
+    size_t filesAdded = 0;
+    size_t filesOverwritten = 0;
 
-    for ( int i = 0; i < additionalDataset.fileList.size ( ); i++ )
+    for ( size_t i = 0; i < additionalDataset.fileList.size ( ); i++ )
     {
         bool exists = false;
-        int existingIndex = -1;
-        for ( int j = 0; j < primaryDataset.fileList.size ( ); j++ )
+        size_t existingIndex = 0;
+        for ( size_t j = 0; j < primaryDataset.fileList.size ( ); j++ )
         {
             if ( additionalDataset.fileList[i] == primaryDataset.fileList[j] )
             {
@@ -203,10 +203,10 @@ std::vector<int> Analyser::Controller::MergeDatasets ( Utilities::DataSet& prima
         {
             // Overwrite
             filesOverwritten++;
-            int pointCountDiff = 0;
+            long long int pointCountDiff = 0; //TODO.59a
             primaryDataset.fileList[existingIndex] = additionalDataset.fileList[i];
 
-            pointCountDiff = additionalDataset.trails.raw[i].size ( ) - primaryDataset.trails.raw[existingIndex].size ( ); //TODO.59a
+            pointCountDiff = additionalDataset.trails.raw[i].size ( ) - primaryDataset.trails.raw[existingIndex].size ( ); //TODO.59b
             primaryDataset.trails.raw[existingIndex] = additionalDataset.trails.raw[i];
 
             primaryDataset.currentPointCount += pointCountDiff;
@@ -218,10 +218,10 @@ std::vector<int> Analyser::Controller::MergeDatasets ( Utilities::DataSet& prima
         {
             // Add
             filesAdded++;
-            int pointCountDiff = 0;
+            long long int pointCountDiff = 0; //TODO.59c
             primaryDataset.fileList.push_back ( additionalDataset.fileList[i] );
 
-            pointCountDiff = additionalDataset.trails.raw[i].size ( ); //TODO.59b
+            pointCountDiff = additionalDataset.trails.raw[i].size ( ); //TODO.59d
             primaryDataset.trails.raw.push_back ( additionalDataset.trails.raw[i] );
 
             primaryDataset.currentPointCount += pointCountDiff;
@@ -230,7 +230,7 @@ std::vector<int> Analyser::Controller::MergeDatasets ( Utilities::DataSet& prima
         }
     }
 
-    return std::vector<int> { filesSkipped, filesAdded, filesOverwritten };
+    return std::vector<size_t> { filesSkipped, filesAdded, filesOverwritten };
 }
 
 bool Analyser::Controller::SearchDirectory ( const std::string& directory, std::vector<std::string>& files )
