@@ -66,10 +66,10 @@ private:
 
     std::shared_ptr<MenuLayout> mLayout;
 
-    std::vector<LogEntry> logs;
+    std::vector<LogEntry> mLogs;
 
     std::mutex newLogMutex;
-    std::queue<LogEntry> newLogs;
+    std::queue<LogEntry> mNewLogs;
 };
 
 class AcorexLoggerChannel : public ofBaseLoggerChannel {

@@ -49,11 +49,11 @@ Utilities::LogDisplay::LogDisplay ( ) : bListenersAdded ( false )
 
 void Utilities::LogDisplay::Initialise ( )
 {
-    logs.clear ( );
+    mLogs.clear ( );
 
     {
         std::lock_guard<std::mutex> lock ( newLogMutex );
-        while ( !newLogs.empty ( ) ) { newLogs.pop ( ); }
+        while ( !mNewLogs.empty ( ) ) { mNewLogs.pop ( ); }
     }
 
     AddListeners ( );
@@ -63,17 +63,17 @@ void Utilities::LogDisplay::Update ( )
 {
     {
         std::lock_guard<std::mutex> lock ( newLogMutex );
-        while ( !newLogs.empty ( ) )
+        while ( !mNewLogs.empty ( ) )
         {
-            logs.push_back ( newLogs.front ( ) );
-            newLogs.pop ( );
+            mLogs.push_back ( mNewLogs.front ( ) );
+            mNewLogs.pop ( );
         }
     }
 
-    size_t logsToDelete = (logs.size ( ) > ACOREX_MAX_LOG_ENTRIES_STORED) ? logs.size ( ) - ACOREX_MAX_LOG_ENTRIES_STORED : 0;
+    size_t logsToDelete = (mLogs.size ( ) > ACOREX_MAX_LOG_ENTRIES_STORED) ? mLogs.size ( ) - ACOREX_MAX_LOG_ENTRIES_STORED : 0;
     if ( logsToDelete > 0 )
     {
-        logs.erase ( logs.begin ( ), logs.begin ( ) + logsToDelete );
+        mLogs.erase ( mLogs.begin ( ), mLogs.begin ( ) + logsToDelete );
     }
 }
 
@@ -83,8 +83,8 @@ void Utilities::LogDisplay::Draw ( )
 
     if ( !mLayout ) { return; }
     
-    size_t logsToDraw = std::min ( logs.size ( ), ACOREX_MAX_LOG_ENTRIES_DISPLAYED );
-    int logIndex = logs.size ( ) - 1; // start with newest log (size - 1), and go backwards (index--)
+    size_t logsToDraw = std::min ( mLogs.size ( ), ACOREX_MAX_LOG_ENTRIES_DISPLAYED );
+    int logIndex = mLogs.size ( ) - 1; // start with newest log (size - 1), and go backwards (index--)
 
     int secondsToFadeStart = ACOREX_LOG_DISPLAY_SECONDS_TO_FADE_START;
     int secondsWhileFading = ACOREX_LOG_DISPLAY_SECONDS_WHILE_FADING;
@@ -92,7 +92,7 @@ void Utilities::LogDisplay::Draw ( )
 
     for ( size_t i = 0; i < logsToDraw; i++ )
     {
-        const LogEntry& log = logs[logIndex];
+        const LogEntry& log = mLogs[logIndex];
 
         if ( log.timestamp + std::chrono::seconds ( secondsToDisplay ) < std::chrono::system_clock::now ( ) )
         {
@@ -145,7 +145,7 @@ void Utilities::LogDisplay::AddLog ( ofLogLevel level, const std::string& contex
 {
     std::lock_guard<std::mutex> lock ( newLogMutex );
     std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now ( );
-    newLogs.push ( { level, context, message, timestamp } );
+    mNewLogs.push ( { level, context, message, timestamp } );
 }
 
 ofColor Utilities::LogDisplay::getLevelColor ( ofLogLevel level )
