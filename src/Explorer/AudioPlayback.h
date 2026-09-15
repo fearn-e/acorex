@@ -91,13 +91,13 @@ private:
     ofSoundStream mSoundStream;
     std::atomic<bool> bStreamStarted;
 
-    std::mutex mAudioThreadMutex;
+    std::mutex mtxAudioThread;
 
-    std::mutex mRestartingAudioMutex;
+    std::mutex mtxRestartingAudio;
     std::atomic<bool> bRestartingAudioFlag;
     std::atomic<bool> bRestartingAudioFlagConfirmed;
 
-    std::mutex mMissingOutputMutex;
+    std::mutex mtxMissingOutput;
     std::atomic<bool> bMissingOutputFlag;
     std::atomic<bool> bMissingOutputFlagConfirmed;
 
@@ -108,20 +108,20 @@ private:
     std::vector<Utilities::AudioPlayhead> mPlayheads;
     std::atomic<int> mActivePlayheads;
 
-    std::mutex mNewPlayheadMutex;
+    std::mutex mtxNewPlayheads;
     std::queue<Utilities::AudioPlayhead> mNewPlayheads;
     std::queue<size_t> mPlayheadsToKill;
     size_t playheadCounter;
 
-    std::mutex mVisualPlayheadUpdateMutex;
+    std::mutex mtxVisualPlayheads;
     std::vector<Utilities::VisualPlayhead> mVisualPlayheads;
 
     // audio thread local copies ------------------
 
-    std::mutex mDimensionBoundsMutex;
+    std::mutex mtxDimensionBounds;
     Utilities::DimensionBoundsData mDimensionBounds;
 
-    std::mutex mCorpusMeshMutex;
+    std::mutex mtxCorpusMesh;
     std::vector<ofMesh> mCorpusMesh;
 
     // settings -----------------------------------

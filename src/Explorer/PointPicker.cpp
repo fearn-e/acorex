@@ -44,7 +44,7 @@ void Explorer::PointPicker::Initialise ( const Utilities::DataSet& dataset, cons
 {
     Clear ( );
 
-    std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+    std::lock_guard<std::mutex> lock ( mtxPointPicker );
 
     mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dataset.dimensionNames.size ( ) );
     mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 3 );
@@ -69,7 +69,7 @@ void Explorer::PointPicker::Initialise ( const Utilities::DataSet& dataset, cons
 
 void Explorer::PointPicker::Clear ( )
 {
-    std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+    std::lock_guard<std::mutex> lock ( mtxPointPicker );
 
     mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 0 );
     mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 0 );
@@ -89,7 +89,7 @@ void Explorer::PointPicker::Clear ( )
 
 void Explorer::PointPicker::Train ( std::array<int, 3> dimensionIndices )
 {
-    std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+    std::lock_guard<std::mutex> lock ( mtxPointPicker );
 
     int dimsFilled = 0;
     dimsFilled += dimensionIndices[0] > -1;
@@ -215,7 +215,7 @@ void Explorer::PointPicker::FindNearestToMouse ( )
     if ( !bPicker && !bTrained && !bNearestMouseCheckNeeded ) { return; }
     bNearestMouseCheckNeeded = false;
 
-    std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+    std::lock_guard<std::mutex> lock ( mtxPointPicker );
 
     mNearestSelectedPoint = std::nullopt;
     mNearestSelectedPointDistance = std::numeric_limits<double>::max ( );
@@ -337,9 +337,9 @@ std::optional<Utilities::PointFT> Explorer::PointPicker::FindNearestToPosition (
     if ( !bTrained ) { return std::nullopt; }
     if ( maxAllowedDistanceSpaceX1000 == 0 ) { return std::nullopt; }
 
-    if ( mPointPickerMutex.try_lock ( ) )
+    if ( mtxPointPicker.try_lock ( ) )
     {
-        std::lock_guard<std::mutex> lock ( mPointPickerMutex, std::adopt_lock );
+        std::lock_guard<std::mutex> lock ( mtxPointPicker, std::adopt_lock );
 
         double maxAllowedDistanceSpace = (double)maxAllowedDistanceSpaceX1000 / 1000.0;
         std::optional<Utilities::PointFT> nearestPoint;
@@ -433,7 +433,7 @@ void Explorer::PointPicker::FindRandom ( )
         return;
     }
 
-    std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+    std::lock_guard<std::mutex> lock ( mtxPointPicker );
 
     std::uniform_int_distribution<size_t> dist ( 0, mCorpusPointLookUp.size ( ) - 1 );
     size_t randomPoint = dist ( mRandomGen );
