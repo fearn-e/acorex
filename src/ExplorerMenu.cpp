@@ -821,11 +821,10 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis::Type axis, 
         mLiveView.FillDimension ( dimensionIndex.value ( ), axis, trainPointPicker );
     }
     
-    if ( bIsCorpusOpen )
-    {
-        CameraSwitcher ( );
-        //TODO.38
-    }
+    if ( !bIsCorpusOpen )
+    { return; }
+
+    CameraSwitcher ( );
 }
 
 void ExplorerMenu::SetDropdownToNone ( Utilities::Axis::Type axis )
