@@ -68,7 +68,7 @@ private:
 
     std::vector<LogEntry> mLogs;
 
-    std::mutex newLogMutex;
+    std::mutex mtxNewLogs;
     std::queue<LogEntry> mNewLogs;
 };
 

@@ -52,7 +52,7 @@ void Utilities::LogDisplay::Initialise ( )
     mLogs.clear ( );
 
     {
-        std::lock_guard<std::mutex> lock ( newLogMutex );
+        std::lock_guard<std::mutex> lock ( mtxNewLogs );
         while ( !mNewLogs.empty ( ) ) { mNewLogs.pop ( ); }
     }
 
@@ -62,7 +62,7 @@ void Utilities::LogDisplay::Initialise ( )
 void Utilities::LogDisplay::Update ( )
 {
     {
-        std::lock_guard<std::mutex> lock ( newLogMutex );
+        std::lock_guard<std::mutex> lock ( mtxNewLogs );
         while ( !mNewLogs.empty ( ) )
         {
             mLogs.push_back ( mNewLogs.front ( ) );
@@ -143,7 +143,7 @@ void Utilities::LogDisplay::RemoveListeners ( )
 
 void Utilities::LogDisplay::AddLog ( ofLogLevel level, const std::string& context, const std::string& message )
 {
-    std::lock_guard<std::mutex> lock ( newLogMutex );
+    std::lock_guard<std::mutex> lock ( mtxNewLogs );
     std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now ( );
     mNewLogs.push ( { level, context, message, timestamp } );
 }

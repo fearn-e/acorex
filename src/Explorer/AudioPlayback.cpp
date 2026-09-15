@@ -42,7 +42,7 @@ bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t buff
 {
     //TODO.42
     {
-        std::lock_guard<std::mutex> lock ( mRestartingAudioMutex );
+        std::lock_guard<std::mutex> lock ( mtxRestartingAudio );
         bRestartingAudioFlag = true;
     }
 
@@ -65,7 +65,7 @@ bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t buff
     }
 
     {
-        std::lock_guard<std::mutex> audioOutLock ( mAudioThreadMutex );
+        std::lock_guard<std::mutex> audioOutLock ( mtxAudioThread );
         mSoundStream.close ( );
     }
     
@@ -79,11 +79,11 @@ bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t buff
     bStreamStarted = success;
 
     {
-        std::lock_guard<std::mutex> lock ( mMissingOutputMutex );
+        std::lock_guard<std::mutex> lock ( mtxMissingOutput );
         bMissingOutputFlag = !success; bMissingOutputFlagConfirmed = false;
     }
     {
-        std::lock_guard<std::mutex> lock ( mRestartingAudioMutex );
+        std::lock_guard<std::mutex> lock ( mtxRestartingAudio );
         bRestartingAudioFlag = false; bRestartingAudioFlagConfirmed = false;
     }
 
@@ -98,18 +98,18 @@ bool Explorer::AudioPlayback::StartRestartAudio ( size_t sampleRate, size_t buff
 
 void Explorer::AudioPlayback::ClearAndKillAudio ( )
 {
-    std::lock_guard<std::mutex> killAudioLock ( mAudioThreadMutex );
+    std::lock_guard<std::mutex> killAudioLock ( mtxAudioThread );
 
     mSoundStream.close ( );
     bStreamStarted = false;
 
     {
-        std::lock_guard<std::mutex> restartAudioLock ( mRestartingAudioMutex );
+        std::lock_guard<std::mutex> restartAudioLock ( mtxRestartingAudio );
         bRestartingAudioFlag = false; bRestartingAudioFlagConfirmed = false;
     }
 
     {
-        std::lock_guard<std::mutex> missingOutputLock ( mMissingOutputMutex );
+        std::lock_guard<std::mutex> missingOutputLock ( mtxMissingOutput );
         bMissingOutputFlag = false; bMissingOutputFlagConfirmed = false;
     }
 
@@ -119,24 +119,24 @@ void Explorer::AudioPlayback::ClearAndKillAudio ( )
     mActivePlayheads = 0;
 
     {
-        std::lock_guard<std::mutex> newPlayheadLock ( mNewPlayheadMutex );
+        std::lock_guard<std::mutex> newPlayheadLock ( mtxNewPlayheads );
         while ( !mNewPlayheads.empty ( ) ) { mNewPlayheads.pop ( ); }
         while ( !mPlayheadsToKill.empty ( ) ) { mPlayheadsToKill.pop ( ); }
         playheadCounter = 0;
     }
 
     {
-        std::lock_guard<std::mutex> visualPlayheadUpdateLock ( mVisualPlayheadUpdateMutex );
+        std::lock_guard<std::mutex> visualPlayheadUpdateLock ( mtxVisualPlayheads );
         mVisualPlayheads.clear ( );
     }
 
     {
-        std::lock_guard<std::mutex> dimensionBoundsLock ( mDimensionBoundsMutex );
+        std::lock_guard<std::mutex> dimensionBoundsLock ( mtxDimensionBounds );
         mDimensionBounds.clear ( );
     }
 
     {
-        std::lock_guard<std::mutex> timeCorpusLock ( mCorpusMeshMutex );
+        std::lock_guard<std::mutex> timeCorpusLock ( mtxCorpusMesh );
         mCorpusMesh.clear ( );
     }
 
@@ -158,9 +158,9 @@ void Explorer::AudioPlayback::ClearAndKillAudio ( )
 void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
 {
     //TODO.45    
-    if ( mAudioThreadMutex.try_lock ( ) )
+    if ( mtxAudioThread.try_lock ( ) )
     {
-        std::lock_guard<std::mutex> lock ( mAudioThreadMutex, std::adopt_lock );
+        std::lock_guard<std::mutex> lock ( mtxAudioThread, std::adopt_lock );
 
         // zero the output buffer
         for ( size_t sampleIndex = 0; sampleIndex < outBuffer.getNumFrames ( ); sampleIndex++ )
@@ -172,17 +172,17 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
         // check flags that might block audio processing
         bool audioProcessingBlocked = false;
         {
-            if ( mRestartingAudioMutex.try_lock ( ) )
+            if ( mtxRestartingAudio.try_lock ( ) )
             {
-                std::lock_guard<std::mutex> tempLock ( mRestartingAudioMutex, std::adopt_lock );
+                std::lock_guard<std::mutex> tempLock ( mtxRestartingAudio, std::adopt_lock );
                 if ( bRestartingAudioFlag )
                 { audioProcessingBlocked = true;    bRestartingAudioFlagConfirmed = true; }
                 else { bRestartingAudioFlagConfirmed = false; }
             }
 
-            if ( mMissingOutputMutex.try_lock ( ) )
+            if ( mtxMissingOutput.try_lock ( ) )
             {
-                std::lock_guard<std::mutex> tempLock ( mMissingOutputMutex, std::adopt_lock );
+                std::lock_guard<std::mutex> tempLock ( mtxMissingOutput, std::adopt_lock );
                 if ( bMissingOutputFlag )
                 { audioProcessingBlocked = true;    bMissingOutputFlagConfirmed = true; }
                 else { bMissingOutputFlagConfirmed = false; }
@@ -197,9 +197,9 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
         std::vector<size_t> playheadsToKillThisBuffer;
 
         // get playhead user changes from main thread, kill playheads here if audio processing is blocked
-        if ( mNewPlayheadMutex.try_lock ( ) )
+        if ( mtxNewPlayheads.try_lock ( ) )
         {
-            std::lock_guard<std::mutex> lock ( mNewPlayheadMutex, std::adopt_lock );
+            std::lock_guard<std::mutex> lock ( mtxNewPlayheads, std::adopt_lock );
             ProcessPlayheadInstructions ( playheadsToKillThisBuffer, audioProcessingBlocked );
         }
 
@@ -276,10 +276,10 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
                     int randomValue = dis ( mRandomGen );
                     if ( randomValue > mCrossoverJumpChanceX1000 )
                     { continue; }
-                    if ( mCorpusMeshMutex.try_lock ( ) )
+                    if ( mtxCorpusMesh.try_lock ( ) )
                         //TODO.1
                     {
-                        std::lock_guard<std::mutex> lock ( mCorpusMeshMutex, std::adopt_lock );
+                        std::lock_guard<std::mutex> lock ( mtxCorpusMesh, std::adopt_lock );
 
                         size_t timePointIndex = mPlayheads[playheadIndex].sampleIndex / mRawView->GetHopSize ( );
                         glm::vec3 playheadPosition = mCorpusMesh[mPlayheads[playheadIndex].fileIndex].getVertex ( timePointIndex );
@@ -344,9 +344,9 @@ void Explorer::AudioPlayback::audioOut ( ofSoundBuffer& outBuffer )
         }
 
         // get playhead post-processing location info for main thread
-        if ( mVisualPlayheadUpdateMutex.try_lock ( ) )
+        if ( mtxVisualPlayheads.try_lock ( ) )
         {
-            std::lock_guard<std::mutex> lock ( mVisualPlayheadUpdateMutex, std::adopt_lock );
+            std::lock_guard<std::mutex> lock ( mtxVisualPlayheads, std::adopt_lock );
             UpdateVisualPlayheads ( );
         }
 
@@ -374,7 +374,7 @@ void Explorer::AudioPlayback::FillAudioSegment ( ofSoundBuffer* outBuffer, size_
         float pan = mRawView->GetTrailData ( )->raw[playhead->fileIndex][timePointIndex][mDynamicPanDimensionIndex];
         float panNorm = 0.5f;
         {
-            std::lock_guard <std::mutex> lock ( mDimensionBoundsMutex );
+            std::lock_guard <std::mutex> lock ( mtxDimensionBounds );
 
             panNorm = (float)(                 pan                            - mDimensionBounds.min[mDynamicPanDimensionIndex])
                     / (float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]);
@@ -417,7 +417,7 @@ void Explorer::AudioPlayback::CrossfadeAudioSegment ( ofSoundBuffer* outBuffer, 
         float panEnd = mRawView->GetTrailData ( )->raw[playhead->jumpFileIndex][jumpTimePointIndex][mDynamicPanDimensionIndex];
 
         {
-            std::lock_guard <std::mutex> lock ( mDimensionBoundsMutex );
+            std::lock_guard <std::mutex> lock ( mtxDimensionBounds );
 
             panStartNorm    = (float)(panStart - mDimensionBounds.min[mDynamicPanDimensionIndex])
                             / (float)(mDimensionBounds.max[mDynamicPanDimensionIndex] - mDimensionBounds.min[mDynamicPanDimensionIndex]);
@@ -512,7 +512,7 @@ void Explorer::AudioPlayback::UpdateVisualPlayheads ( )
 
 void Explorer::AudioPlayback::ForcePlayheadUpdateStep ( )
 {
-    std::lock_guard<std::mutex> fullAudioThreadLock ( mAudioThreadMutex );
+    std::lock_guard<std::mutex> fullAudioThreadLock ( mtxAudioThread );
     ProcessPlayheadInstructions ( std::vector<size_t> ( ), true );
     UpdateVisualPlayheads ( );
     mActivePlayheads = mPlayheads.size ( );
@@ -545,7 +545,7 @@ bool Explorer::AudioPlayback::CreatePlayhead ( Utilities::PointFT startingSegmen
     }
 
     {
-        std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
+        std::lock_guard<std::mutex> lock ( mtxNewPlayheads );
         if ( mNewPlayheads.size ( ) > 3 )
         {
             ofLogWarning ( "AudioPlayback" ) << "Too many playheads invoked too quickly, failed to create new playhead.";
@@ -560,7 +560,7 @@ bool Explorer::AudioPlayback::CreatePlayhead ( Utilities::PointFT startingSegmen
     CalculateTriggerPoints ( newPlayhead );
 
     {
-        std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
+        std::lock_guard<std::mutex> lock ( mtxNewPlayheads );
         mNewPlayheads.push ( newPlayhead );
     }
 
@@ -572,7 +572,7 @@ bool Explorer::AudioPlayback::CreatePlayhead ( Utilities::PointFT startingSegmen
 bool Explorer::AudioPlayback::KillPlayhead ( size_t playheadID )
 {
     {
-        std::lock_guard<std::mutex> lock ( mNewPlayheadMutex );
+        std::lock_guard<std::mutex> lock ( mtxNewPlayheads );
         mPlayheadsToKill.push ( playheadID );
     }
 
@@ -583,7 +583,7 @@ bool Explorer::AudioPlayback::KillPlayhead ( size_t playheadID )
 
 std::vector<Utilities::VisualPlayhead> Explorer::AudioPlayback::GetPlayheadInfo ( )
 {
-    std::lock_guard<std::mutex> lock ( mVisualPlayheadUpdateMutex );
+    std::lock_guard<std::mutex> lock ( mtxVisualPlayheads );
 
     return mVisualPlayheads;
 }
@@ -609,7 +609,7 @@ void Explorer::AudioPlayback::SetDimensionBounds ( const Utilities::DimensionBou
         ofLogError ( "AudioPlayback" ) << "Attempted to set dimension bounds while audio stream is active, this should never happen, as it could hang the audio thread.";
     }
 
-    std::lock_guard<std::mutex> lock ( mDimensionBoundsMutex );
+    std::lock_guard<std::mutex> lock ( mtxDimensionBounds );
 
     mDimensionBounds = dimensionBoundsData;
 }
@@ -617,7 +617,7 @@ void Explorer::AudioPlayback::SetDimensionBounds ( const Utilities::DimensionBou
 //TODO.4
 void Explorer::AudioPlayback::SetCorpusMesh ( const std::vector<ofMesh>& corpusMesh )
 {
-    std::lock_guard<std::mutex> lock ( mCorpusMeshMutex );
+    std::lock_guard<std::mutex> lock ( mtxCorpusMesh );
 
     mCorpusMesh = corpusMesh;
 }

@@ -117,7 +117,7 @@ private:
 
     // Thread safety --------------------------------
 
-    std::mutex mPointPickerMutex;
+    std::mutex mtxPointPicker;
 
     // Randomness -----------------------------------
 
