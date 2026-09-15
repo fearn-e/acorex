@@ -132,7 +132,7 @@ void Explorer::AudioPlayback::ClearAndKillAudio ( )
 
     {
         std::lock_guard<std::mutex> dimensionBoundsLock ( mDimensionBoundsMutex );
-        mDimensionBounds = Utilities::DimensionBoundsData ( );
+        mDimensionBounds.clear ( );
     }
 
     {

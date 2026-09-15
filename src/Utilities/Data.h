@@ -49,16 +49,39 @@ struct Axis {
 };
 
 struct DimensionBoundsData {
+    void clear ( )
+    {
+        min.clear ( );
+        max.clear ( );
+    }
+
     std::vector<double> min; // [dimension]
     std::vector<double> max; // [dimension]
 };
 
 struct AudioData {
+    void clear ( )
+    {
+        loaded.clear ( );
+        raw.clear ( );
+    }
+
+    void push_back ( bool fileLoaded, ofSoundBuffer fileRaw )
+    {
+        loaded.push_back ( fileLoaded );
+        raw.push_back ( fileRaw );
+    }
+
     std::vector<bool> loaded; // [file]
     std::vector<ofSoundBuffer> raw; // [file]
 };
 
 struct TrailData {
+    void clear ( )
+    {
+        raw.clear ( );
+    }
+
     std::vector<std::vector<std::vector<double>>> raw; // [file][timepoint][dimension] (first dimension is always time)
 };
 
@@ -157,6 +180,16 @@ struct ReductionSettings {
 };
 
 struct DataSet {
+    void clear ( )
+    {
+        currentPointCount = 0;
+        dimensionNames.clear ( );
+        fileList.clear ( );
+        audio.clear ( );
+        trails.clear ( );
+        analysisSettings = AnalysisSettings { };
+    }
+
     int currentPointCount = 0;
 
     std::vector<std::string> dimensionNames; // [dimension]
