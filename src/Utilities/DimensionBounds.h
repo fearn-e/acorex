@@ -58,8 +58,7 @@ public:
 
     void Clear ( )
     {
-        bounds.min.clear ( );
-        bounds.max.clear ( );
+        bounds.clear ( );
     }
 
     double GetMinBound ( int dimension ) const { return bounds.min[dimension]; }

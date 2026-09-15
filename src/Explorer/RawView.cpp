@@ -79,13 +79,12 @@ bool Explorer::RawView::LoadCorpus ( const std::string& path, const std::string&
 void Explorer::RawView::ClearCorpus ( )
 {
     mCorpusName = "";
-    mDataset = { };
+    mDataset.clear ( );
 }
 
 bool Explorer::RawView::LoadAudioSet ( Utilities::DataSet& dataset )
 {
-    dataset.audio.loaded.clear ( );
-    dataset.audio.raw.clear ( );
+    dataset.audio.clear ( );
 
     for ( int fileIndex = 0; fileIndex < dataset.fileList.size ( ); fileIndex++ )
     {
@@ -94,16 +93,14 @@ bool Explorer::RawView::LoadAudioSet ( Utilities::DataSet& dataset )
         if ( !mAudioLoader.ReadAudioFile ( dataset.fileList[fileIndex], fileData, dataset.analysisSettings.sampleRate ) )
         {
             ofLogError ( "RawView" ) << "Failed to load audio file: " << dataset.fileList[fileIndex];
-            dataset.audio.loaded.push_back ( false );
-            dataset.audio.raw.push_back ( ofSoundBuffer ( ) );
+            dataset.audio.push_back ( false, ofSoundBuffer { } );
             continue;
         }
 
         ofSoundBuffer audioData;
         audioData.copyFrom ( std::vector<float> ( fileData.begin ( ), fileData.end ( ) ), 1, dataset.analysisSettings.sampleRate );
 
-        dataset.audio.raw.push_back ( audioData );
-        dataset.audio.loaded.push_back ( true );
+        dataset.audio.push_back ( true, audioData );
     }
     
     bool failedToLoad = true;
