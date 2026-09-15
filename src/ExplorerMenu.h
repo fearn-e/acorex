@@ -90,6 +90,7 @@ private:
     void OpenCorpus ( );
     void SetDimension ( string dimension, Utilities::Axis::Type axis, bool trainPointPicker );
     void SetDropdownToNone ( Utilities::Axis::Type axis );
+    std::optional<Utilities::Axis::Type> FlagSameDimensionOnDifferent3DAxes ( const string& selectedDimension, Utilities::Axis::Type selectedAxis ) const;
     std::optional<int> GetDimensionIndex ( const std::string& dimension );
     void CameraSwitcher ( );
 
