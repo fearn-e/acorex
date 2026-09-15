@@ -178,7 +178,6 @@ private:
     // Acorex Objects ------------------------------
 
     Analyser::Controller mController;
-    Utilities::JSON mJSON;
     Utilities::Colors mColors;
     std::shared_ptr<Utilities::MenuLayout> mLayout;
 };

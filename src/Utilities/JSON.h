@@ -23,18 +23,14 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 namespace Acorex {
 namespace Utilities {
 
-class JSON {
-
-public:
-    JSON ( ) { };
-    ~JSON ( ) { };
-
+namespace JSON {
     bool Write ( const std::string& outputFile, const DataSet& dataset );
 
     bool Read ( const std::string& inputFile, DataSet& dataset );
     bool Read ( const std::string& inputFile, AnalysisSettings& settings );
-};
+} // namespace JSON
 
+//TODO.64
 void to_json ( nlohmann::json& j, const DataSet& a );
 void from_json ( const nlohmann::json& j, DataSet& a );
 
