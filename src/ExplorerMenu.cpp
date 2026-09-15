@@ -808,6 +808,16 @@ void ExplorerMenu::SetDimension ( string dimension, Utilities::Axis::Type axis, 
         if ( !dimensionIndex.has_value ( ) )
         { return; }
 
+        if ( axis == Utilities::Axis::X || axis == Utilities::Axis::Y || axis == Utilities::Axis::Z )
+        {
+            std::optional<Utilities::Axis::Type> duplicateAxisToClear = FlagSameDimensionOnDifferent3DAxes ( dimension, axis );
+            if ( duplicateAxisToClear.has_value ( ) )
+            {
+                SetDropdownToNone ( *duplicateAxisToClear );
+                SetDimension ( "None", *duplicateAxisToClear, false );
+            }
+        }
+
         mLiveView.FillDimension ( dimensionIndex.value ( ), axis, trainPointPicker );
     }
     
@@ -840,6 +850,37 @@ void ExplorerMenu::SetDropdownToNone ( Utilities::Axis::Type axis )
     default:
         ofLogError ( "ExplorerMenu" ) << "Unknown axis value of " << axis << " when attempting to reset a dropdown to \"None\"";
     }
+}
+
+std::optional<Utilities::Axis::Type> ExplorerMenu::FlagSameDimensionOnDifferent3DAxes ( const string& selectedDimension, Utilities::Axis::Type selectedAxis ) const
+{
+    std::vector<ofxDropdown*> otherDropdowns;
+
+    switch ( selectedAxis )
+    {
+    case Utilities::Axis::X:
+        otherDropdowns = { nullptr, mDimensionDropdownY.get ( ), mDimensionDropdownZ.get ( ) };
+        break;
+    case Utilities::Axis::Y:
+        otherDropdowns = { mDimensionDropdownX.get ( ), nullptr, mDimensionDropdownZ.get ( ) };
+        break;
+    case Utilities::Axis::Z:
+        otherDropdowns = { mDimensionDropdownX.get ( ), mDimensionDropdownY.get ( ), nullptr };
+        break;
+    default:
+        ofLogError ( "ExplorerMenu" ) << "Invalid axis checked for duplicate dimensions.";
+        return std::nullopt;
+    }
+
+    for ( int i = 0; i < otherDropdowns.size ( ); i++ )
+    {
+        if ( otherDropdowns[i] && otherDropdowns[i]->getAllSelected ( )[0] == selectedDimension )
+        {
+            return (Utilities::Axis::Type)i;
+        }
+    }
+
+    return std::nullopt;
 }
 
 std::optional<int> ExplorerMenu::GetDimensionIndex ( const std::string& dimension )
