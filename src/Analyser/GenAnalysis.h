@@ -27,7 +27,7 @@ public:
     GenAnalysis ( ) { };
     ~GenAnalysis ( ) { };
 
-    int ProcessFiles ( Utilities::DataSet& dataset );
+    size_t ProcessFiles ( Utilities::DataSet& dataset );
 
 private:
     Utilities::AudioFileLoader mAudioLoader;
