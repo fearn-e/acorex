@@ -36,9 +36,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <string>
 
 //TODO.63c
-#if __has_include(<omp.h>)
-#include <omp.h>
-#endif
+//#if __has_include(<omp.h>)
+//#include <omp.h>
+//#endif
 
 #ifndef DATA_CHANGE_CHECK_1
 #error "Check if dataset is still used correctly"
@@ -54,7 +54,7 @@ size_t Analyser::GenAnalysis::ProcessFiles ( Utilities::DataSet& dataset )
 
     {
         unsigned long long int sampleTotal = 0;
-#pragma omp parallel for reduction(+:sampleTotal)
+//#pragma omp parallel for reduction(+:sampleTotal)
         for ( int i = 0; i < dataset.fileList.size ( ); i++ )
         {
             fluid::RealVector in ( 0 );

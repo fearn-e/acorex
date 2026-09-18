@@ -20,9 +20,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include <vector>
 
-#if __has_include(<omp.h>)
-#include <omp.h>
-#endif
+//#if __has_include(<omp.h>)
+//#include <omp.h>
+//#endif
 
 namespace Acorex {
 namespace Utilities {
@@ -39,7 +39,7 @@ public:
         bounds.min.resize ( dataset.dimensionNames.size ( ) );
         bounds.max.resize ( dataset.dimensionNames.size ( ) );
 
-#pragma omp parallel for
+//#pragma omp parallel for
         for ( int dimension = 0; dimension < dataset.dimensionNames.size ( ); dimension++ )
         {
             bounds.min[dimension] = std::numeric_limits<double>::max ( );
