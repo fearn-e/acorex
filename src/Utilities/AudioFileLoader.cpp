@@ -20,9 +20,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofLog.h>
 
 //TODO.63b
-#if __has_include(<omp.h>)
-#include <omp.h>
-#endif
+//#if __has_include(<omp.h>)
+//#include <omp.h>
+//#endif
 
 using namespace Acorex;
 
@@ -81,7 +81,7 @@ void Utilities::AudioFileLoader::ReadToMono ( std::vector<float>& output, ofxAud
 
     std::fill ( output.begin ( ), output.end ( ), 0 );
 
-#pragma omp parallel for
+//#pragma omp parallel for
     for ( int sample = 0; sample < numSamples; sample++ )
     {
         for ( int channel = 0; channel < numChannels; channel++ )
