@@ -175,6 +175,9 @@
     <ClCompile Include="src\Utilities\XML.cpp">
       <Filter>src\Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utilities\UserInput.cpp">
+      <Filter>src\Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -477,6 +480,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\Utilities\XML.h">
+      <Filter>src\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utilities\UserInput.h">
       <Filter>src\Utilities</Filter>
     </ClInclude>
   </ItemGroup>

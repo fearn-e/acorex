@@ -13,32 +13,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#pragma once
 
-#include <ofxXmlSettings.h>
+#include "Utilities/UserInput.h"
 
-namespace Acorex {
-namespace Utilities {
+#include <ofLog.h>
 
-class XML {
-public:
-	XML ( );
-	~XML ( ) { }
+using namespace Acorex;
 
-	void Initialise ( );
-	void Update ( );
-	void Exit ( );
-
-	//void KeyEvent ( ofKeyEventArgs& args );
-
-private:
-	//void AddListeners ( );
-	//void RemoveListeners ( );
-
-	ofXm
-
-	bool bListenersAdded;
-};
-
-} // namespace Utilities
-} // namespace Acorex
+Utilities::UserInput::UserInput ( ) : bListenersAdded ( false )
+{
+}
