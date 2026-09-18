@@ -40,7 +40,7 @@ void Explorer::PointPicker::Initialise ( const Utilities::DataSet& dataset, cons
 {
     Clear ( );
 
-    std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+    std::scoped_lock lock ( mFullFluidSetMutex, mPointPickerMutex, mClearLock );
 
     mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dataset.dimensionNames.size ( ) );
     mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 3 );
@@ -65,10 +65,11 @@ void Explorer::PointPicker::Initialise ( const Utilities::DataSet& dataset, cons
 
 void Explorer::PointPicker::Clear ( )
 {
-    std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+    std::scoped_lock lock ( mFullFluidSetMutex, mPointPickerMutex, mClearLock );
 
     mFullFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 0 );
     mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( 0 );
+    mKDTree.clear ( );
 
     bTrained = false;
     b3D = true; bPicker = false; bClicked = false; bNearestMouseCheckNeeded = false;
@@ -88,46 +89,60 @@ void Explorer::PointPicker::Clear ( )
 
 void Explorer::PointPicker::Train ( std::array<int, 3> dimensionIndices )
 {
-    std::lock_guard<std::mutex> lock ( mPointPickerMutex );
+    std::scoped_lock clearLock ( mClearMutex );
 
     int dimsFilled = 0;
     dimsFilled += dimensionIndices[0] > -1;
     dimsFilled += dimensionIndices[1] > -1;
     dimsFilled += dimensionIndices[2] > -1;
-    if ( dimsFilled < 2 ) { bTrained = false; return; }
-
-    mDimensionsIndices = dimensionIndices;
-
-    mLiveFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dimsFilled );
-
-    for ( int point = 0; point < mFullFluidSet.size ( ); point++ )
-    {
-        fluid::RealVector pointData ( dimsFilled );
-        if ( dimsFilled == 3 || mDimensionsIndices[2] == -1 )
-        {
-            for ( int dim = 0; dim < dimsFilled; dim++ )
-            {
-                pointData[dim] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[dim]];
-            }
-        }
-        else if ( mDimensionsIndices[1] == -1 )
-        {
-            pointData[0] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[0]];
-            pointData[1] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[2]];
-        }
-        else if ( mDimensionsIndices[0] == -1 )
-        {
-            pointData[0] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[1]];
-            pointData[1] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[mDimensionsIndices[2]];
-        }
-
-        mLiveFluidSet.add ( mFullFluidSet.getIds ( )[point], pointData );
+    if ( dimsFilled < 2 ) {
+        ofLogError ( "PointPicker" ) << "Failed to train, need at least 2 of 3 XYZ dimensions selected.";
+        bTrained = false;
+        return;
     }
 
-    ofLogNotice ( "PointPicker" ) << "Training KDTree...";
-    mKDTree = fluid::algorithm::KDTree ( mLiveFluidSet );
-    ofLogVerbose ( "PointPicker" ) << "KDTree Trained.";
-    bTrained = true;
+    fluid::FluidDataSet<std::string, double, 1> mTrainingFluidSet = fluid::FluidDataSet<std::string, double, 1> ( dimsFilled );
+
+    {
+        std::scoped_lock lock ( mFullFluidSetMutex );
+
+        for ( int point = 0; point < mFullFluidSet.size ( ); point++ )
+        {
+            fluid::RealVector pointData ( dimsFilled );
+            if ( dimsFilled == 3 || dimensionIndices[2] == -1 )
+            {
+                for ( int dim = 0; dim < dimsFilled; dim++ )
+                {
+                    pointData[dim] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[dimensionIndices[dim]];
+                }
+            }
+            else if ( dimensionIndices[1] == -1 )
+            {
+                pointData[0] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[dimensionIndices[0]];
+                pointData[1] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[dimensionIndices[2]];
+            }
+            else if ( dimensionIndices[0] == -1 )
+            {
+                pointData[0] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[dimensionIndices[1]];
+                pointData[1] = mFullFluidSet.get ( mFullFluidSet.getIds ( )[point] )[dimensionIndices[2]];
+            }
+
+            mTrainingFluidSet.add ( mFullFluidSet.getIds ( )[point], pointData );
+        }
+    }
+
+    ofLogNotice ( "PointPicker" ) << "Training point picker...";
+    fluid::algorithm::KDTree mTrainingKDTree = fluid::algorithm::KDTree ( mTrainingFluidSet );
+
+    ofLogVerbose ( "PointPicker" ) << "Transfering trained point picker...";
+    {
+        std::scoped_lock lock ( mPointPickerMutex );
+        mKDTree = mTrainingKDTree;
+        mLiveFluidSet = mTrainingFluidSet;
+        mDimensionsIndices = dimensionIndices;
+        bTrained = true;
+    }
+    ofLogVerbose ( "PointPicker" ) << "Point picker trained.";
 
     if ( dimsFilled == 2 ) { b3D = false; }
     if ( dimsFilled == 3 ) { b3D = true; }
@@ -135,11 +150,11 @@ void Explorer::PointPicker::Train ( std::array<int, 3> dimensionIndices )
 
 void Explorer::PointPicker::PredetermineJumps ( const std::vector<ofMesh>& corpusMesh, int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, int minTimeDiffSameFile )
 {
+    std::scoped_lock lock ( mClearMutex, mPredeterminedJumpsMutex );
+
     ofLogNotice ( "PointPicker" ) << "Predetermining jumps...";
 
     bPredeterminedJumpsReady = false;
-
-    std::lock_guard<std::mutex> predeterminedJumpsLock ( mPredeterminedJumpsMutex );
 
     mPredeterminedJumps.clear ( );
     
@@ -377,9 +392,15 @@ size_t SubtractFromBigger ( size_t a, size_t b )
         return b - a;
 }
 
-//TODO.6
 std::optional<Utilities::PointFT> Explorer::PointPicker::FindNearestToPosition ( bool returnEarlyIfBusy, const glm::vec3& position, Utilities::PointFT currentPoint, bool sameFileAllowed,
                                                                                 int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, int minTimeDiffSameFile )
+{
+    FindNearestToPosition ( returnEarlyIfBusy, position, currentPoint, sameFileAllowed, maxAllowedDistanceSpaceX1000, maxAllowedTargets, minTimeDiffSameFile, mKDTree );
+}
+
+//TODO.6
+std::optional<Utilities::PointFT> Explorer::PointPicker::FindNearestToPosition ( bool returnEarlyIfBusy, const glm::vec3& position, Utilities::PointFT currentPoint, bool sameFileAllowed,
+                                                                                int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, int minTimeDiffSameFile, fluid::algorithm::KDTree KDTree )
 {
     if ( !bTrained ) { return std::nullopt; }
     if ( maxAllowedDistanceSpaceX1000 == 0 ) { return std::nullopt; }

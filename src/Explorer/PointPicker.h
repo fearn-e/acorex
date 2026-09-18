@@ -52,7 +52,9 @@ public:
     void FindNearestToMouse ( );
     std::optional<Utilities::PointFT> FindNearestToPosition ( bool returnEarlyIfBusy, const glm::vec3& position, Utilities::PointFT currentPoint, bool sameFileAllowed,
                                                             int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, int minTimeDiffSameFile );
-                                
+    std::optional<Utilities::PointFT> FindNearestToPosition ( bool returnEarlyIfBusy, const glm::vec3& position, Utilities::PointFT currentPoint, bool sameFileAllowed,
+                                                            int maxAllowedDistanceSpaceX1000, int maxAllowedTargets, int minTimeDiffSameFile, fluid::algorithm::KDTree KDTree );
+
     void FindRandom ( );
 
     // Setters & Getters ----------------------------
@@ -124,6 +126,8 @@ private:
 
     std::mutex mPointPickerMutex;
     std::mutex mPredeterminedJumpsMutex;
+    std::mutex mFullFluidSetMutex;
+    std::mutex mClearMutex;
 
     // Randomness -----------------------------------
 
