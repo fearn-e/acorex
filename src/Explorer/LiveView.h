@@ -20,13 +20,14 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Explorer/PointPicker.h"
 #include "Explorer/RawView.h"
 #include "Explorer/AudioPlayback.h"
-#include "Utilities/Data.h"
 #include "Utilities/DimensionBounds.h"
 #include "Utilities/InterfaceDefs.h"
 
 #include <ofMesh.h>
 #include <ofEasyCam.h>
 #include <random>
+
+import "Utilities/Data.h";
 
 namespace Acorex {
 namespace Explorer {
