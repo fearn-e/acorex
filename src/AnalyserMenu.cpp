@@ -18,24 +18,31 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Utilities/TemporaryDefaults.h"
 
+#include <thread>
+
 using namespace Acorex;
 
 AnalyserMenu::AnalyserMenu ( ) :    bListenersAddedMain ( false ), bListenersAddedAnalysis ( false ),
                                     bListenersAddedInsertion ( false ), bListenersAddedReduction ( false ),
-                                    bDraw ( false ), bProcessing ( false ),
+                                    bDraw ( false ),
                                     bDrawMainPanel ( false ), bDrawAnalysisPanel ( false ), bDrawInsertionPanel ( false ), bDrawReductionPanel ( false ),
                                     bInsertingIntoCorpus ( false ),
                                     bAnalysisDirectorySelected ( false ), bAnalysisOutputSelected ( false ),
                                     bReductionInputSelected ( false ), bReductionOutputSelected ( false ),
                                     bInvalidPulseFileSelects ( false ), bInvalidPulseAnalysisToggles ( false ),
                                     bInvalidPulseReductionDimensions ( false ), mInvalidPulseColour ( 255 ),
-                                    mCurrentDimensionCount ( 0 ), inputPath ( "" ), outputPath ( "" )
+                                    mCurrentDimensionCount ( 0 ), mInputPath ( "" ), mOutputPath ( "" )
 { }
+
+AnalyserMenu::~AnalyserMenu ( )
+{
+
+}
 
 // initial state is a blank slate - Open ( ) must be called to actually load anything
 void AnalyserMenu::Initialise ( )
 {
-    bDraw = false; bProcessing = false;
+    bDraw = false;
 
     bDrawMainPanel = false; bDrawAnalysisPanel = false; bDrawInsertionPanel = false; bDrawReductionPanel = false;
 
@@ -49,7 +56,7 @@ void AnalyserMenu::Initialise ( )
 
     mCurrentDimensionCount = 0;
 
-    inputPath = ""; outputPath = "";
+    mInputPath = ""; mOutputPath = "";
 
     RemoveListenersMain ( );
     RemoveListenersAnalysis ( );
@@ -503,7 +510,7 @@ void AnalyserMenu::AddListenersAnalysis ( )
     mAnalysisPickOutputFileButton.addListener ( this, &AnalyserMenu::SelectAnalysisOutputFile );
     mWindowFFTField.addListener ( this, &AnalyserMenu::QuantiseWindowSize );
     mHopFractionField.addListener ( this, &AnalyserMenu::QuantiseHopFraction );
-    mConfirmAnalysisButton.addListener ( this, &AnalyserMenu::Analyse );
+    mConfirmAnalysisButton.addListener ( this, &AnalyserMenu::StartAnalysisThread );
     mCancelAnalysisButton.addListener ( this, &AnalyserMenu::OpenMainPanel );
     bListenersAddedAnalysis = true;
 }
@@ -515,7 +522,7 @@ void AnalyserMenu::RemoveListenersAnalysis ( )
     mAnalysisPickOutputFileButton.removeListener ( this, &AnalyserMenu::SelectAnalysisOutputFile );
     mWindowFFTField.removeListener ( this, &AnalyserMenu::QuantiseWindowSize );
     mHopFractionField.removeListener ( this, &AnalyserMenu::QuantiseHopFraction );
-    mConfirmAnalysisButton.removeListener ( this, &AnalyserMenu::Analyse );
+    mConfirmAnalysisButton.removeListener ( this, &AnalyserMenu::StartAnalysisThread );
     mCancelAnalysisButton.removeListener ( this, &AnalyserMenu::OpenMainPanel );
     bListenersAddedAnalysis = false;
 }
@@ -556,7 +563,7 @@ void AnalyserMenu::RemoveListenersReduction ( )
 
 // Analyse and Reduce ---------------------------
 
-void AnalyserMenu::Analyse ( )
+void AnalyserMenu::StartAnalysisThread ( )
 {
     if ( !bAnalysisDirectorySelected || !bAnalysisOutputSelected )
     {
@@ -574,21 +581,36 @@ void AnalyserMenu::Analyse ( )
         return;
     }
 
-    bProcessing = true;
+    ofLogFatalError ( "DEBUG_TEST_THREADING" ) << "before thread spun off, joinable: " << mProcessingThread.joinable ( );
 
     bool success = false;
     if ( !bInsertingIntoCorpus )
     {
         Utilities::AnalysisSettings settings;
         PackSettingsFromUser ( settings );
-        success = mController.CreateCorpus ( inputPath, outputPath, settings );
+        mProcessingThread = std::thread ( 
+            [ this, in = mInputPath, out = mOutputPath, settings ] ( )
+        {
+            mController.CreateCorpus ( in, out, settings );
+        }   
+        );
+        ofLogFatalError ( "DEBUG_TEST_THREADING" ) << "just after thread spun off, joinable: " << mProcessingThread.joinable ( );
     }
     else
     {
-        success = mController.InsertIntoCorpus ( inputPath, outputPath, mAnalysisInsertionReplaceWithNewToggle );
+        ofLogFatalError ( "DEBUG_UNFINISHED" ) << "analysis corpus insertion";
+        //mProcessingThread = std::thread ( mController.InsertIntoCorpus ( mInputPath, mOutputPath, mAnalysisInsertionReplaceWithNewToggle ) );
     }
 
-    bProcessing = false;
+    ofLogFatalError ( "DEBUG_UNFINISHED" ) << "post analysis main thread should return here";
+    //TODO CURRENT
+    //OpenMainPanel ( );
+    // - THIS NEEDS TO NO LONGER CALL INITIALISE FOR THIS TO WORK
+    // - initialise will clear everything, but things are still processing
+    //return; here
+
+    mProcessingThread.join ( );
+    ofLogFatalError ( "DEBUG_TEST_THREADING" ) << "just after thread joined, joinable: " << mProcessingThread.joinable ( );
 
     if ( !success )
     {
@@ -600,6 +622,21 @@ void AnalyserMenu::Analyse ( )
     OpenMainPanel ( );
     ofLogNotice ( "AnalyserMenu" ) << "Corpus created";
     //------------------------------------------------ TEMPORARY
+}
+
+void AnalyserMenu::CheckAnalysisThread ( )
+{
+
+}
+
+bool AnalyserMenu::ExistingProcessingThreads ( )
+{
+
+}
+
+void AnalyserMenu::KillProcessingThreads ( )
+{
+
 }
 
 void AnalyserMenu::Reduce ( )
@@ -620,14 +657,14 @@ void AnalyserMenu::Reduce ( )
         return;
     }
 
-    bProcessing = true;
+    //bProcessing = true;
 
     bool success = false;
     Utilities::ReductionSettings settings;
     PackSettingsFromUser ( settings );
-    success = mController.ReduceCorpus ( inputPath, outputPath, settings );
+    success = mController.ReduceCorpus ( mInputPath, mOutputPath, settings );
 
-    bProcessing = false;
+    //bProcessing = false;
 
     if ( !success )
     {
@@ -662,7 +699,7 @@ void AnalyserMenu::SelectAnalysisDirectory ( )
         return;
     }
 
-    inputPath = audioDirectory.getPath ( );
+    mInputPath = audioDirectory.getPath ( );
     mAnalysisDirectoryLabel = audioDirectory.getName ( );
     bAnalysisDirectorySelected = true;
 }
@@ -715,7 +752,7 @@ void AnalyserMenu::SelectAnalysisOutputFile ( )
     }
 
     ToggleAnalysisUILockout ( bInsertingIntoCorpus );
-    outputPath = outputFile.getPath ( );
+    mOutputPath = outputFile.getPath ( );
     mAnalysisOutputLabel = outputFile.getName ( );
     bAnalysisOutputSelected = true;
 }
@@ -754,7 +791,7 @@ void AnalyserMenu::SelectReductionInputFile ( )
     }
 
     UnpackSettingsFromFile ( settings );
-    inputPath = inputFile.getPath ( );
+    mInputPath = inputFile.getPath ( );
     mReductionInputLabel = inputFile.getName ( );
     bReductionInputSelected = true; 
 }
@@ -780,7 +817,7 @@ void AnalyserMenu::SelectReductionOutputFile ( )
         outputFile.fileName += ".json";
     }
 
-    outputPath = outputFile.getPath ( );
+    mOutputPath = outputFile.getPath ( );
     mReductionOutputLabel = outputFile.getName ( );
     bReductionOutputSelected = true;
 }
