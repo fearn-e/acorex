@@ -18,7 +18,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Explorer/RawView.h"
 #include "Explorer/PointPicker.h"
-#include "Utilities/Data.h"
 #include "Utilities/DimensionBounds.h"
 
 #include <ofSoundBuffer.h>
@@ -28,6 +27,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <vector>
 #include <mutex>
 #include <atomic>
+
+import "Utilities/Data.h";
 
 namespace Acorex {
 namespace Explorer {

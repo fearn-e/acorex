@@ -16,12 +16,13 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
-#include "Utilities/Data.h"
 #include "Analyser/GenAnalysis.h"
 #include "Analyser/UMAP.h"
 
 #include <vector>
 #include <string>
+
+import "Utilities/Data.h";
 
 namespace Acorex {
 namespace Analyser {

@@ -282,7 +282,7 @@
     <ClInclude Include="src\Explorer\LiveView.h" />
     <ClInclude Include="src\Explorer\RawView.h" />
     <ClInclude Include="src\Utilities\AudioFileLoader.h" />
-    <ClInclude Include="src\Utilities\Data.h" />
+    <ClCompile Include="src\Utilities\Data.h" />
     <ClInclude Include="src\Utilities\DatasetConversion.h" />
     <ClInclude Include="src\Utilities\DimensionBounds.h" />
     <ClInclude Include="src\Utilities\InterfaceDefs.h" />

@@ -172,6 +172,9 @@
     <ClCompile Include="src\Versioning.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utilities\Data.h">
+      <Filter>src\Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -273,9 +276,6 @@
       <Filter>src\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="src\Utilities\JSON.h">
-      <Filter>src\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Utilities\Data.h">
       <Filter>src\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="src\ofApp.h">

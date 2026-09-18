@@ -19,7 +19,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include "Explorer/RawView.h"
 #include "Utilities/DimensionBounds.h"
 #include "Utilities/DatasetConversion.h"
-#include "Utilities/Data.h"
 
 #include <flucoma/algorithms/public/KDTree.hpp>
 #include <flucoma/data/FluidDataSet.hpp>
@@ -29,6 +28,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <atomic>
 #include <random>
 #include <optional>
+
+import "Utilities/Data.h";
 
 namespace Acorex {
 namespace Explorer {
