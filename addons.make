@@ -3,3 +3,4 @@ ofxDropdown
 ofxGui
 ofxMidi
 ofxOsc
+ofxXmlSettings

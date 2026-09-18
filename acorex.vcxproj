@@ -226,6 +226,7 @@
     <ClCompile Include="src\Utilities\Log.cpp" />
     <ClCompile Include="src\Utilities\MIDI.cpp" />
     <ClCompile Include="src\Utilities\ofxPercentSlider.cpp" />
+    <ClCompile Include="src\Utilities\UserInput.cpp" />
     <ClCompile Include="src\Utilities\XML.cpp" />
     <ClCompile Include="src\Versioning.cpp" />
   </ItemGroup>
@@ -302,6 +303,7 @@
     <ClInclude Include="src\Utilities\Log.h" />
     <ClInclude Include="src\Utilities\MIDI.h" />
     <ClInclude Include="src\Utilities\ofxPercentSlider.h" />
+    <ClInclude Include="src\Utilities\UserInput.h" />
     <ClInclude Include="src\Utilities\XML.h" />
     <ClInclude Include="src\Utilities\TemporaryDefaults.h" />
     <ClInclude Include="src\Utilities\TemporaryKeybinds.h" />
