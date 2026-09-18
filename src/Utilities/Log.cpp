@@ -21,6 +21,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
+//TODO - timestamp string method 1 - pick one or other
 std::string Utilities::getTimestampString ( std::chrono::system_clock::time_point timestamp )
 {  
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp.time_since_epoch()) % std::chrono::seconds(1);
@@ -38,6 +39,32 @@ std::string Utilities::getTimestampString ( std::chrono::system_clock::time_poin
         << '.' << std::setfill('0') << std::setw(3) << ms.count();
     return oss.str();
 }
+
+//TODO - timestamp string method 2 - pick one or other
+//std::string Utilities::getTimestampString ( std::chrono::system_clock::time_point timestamp )
+//{
+//    std::stringstream str;
+//    auto t = std::chrono::system_clock::to_time_t ( timestamp );
+//    std::chrono::duration<double> s = timestamp - std::chrono::system_clock::from_time_t ( t );
+//    int ms = s.count ( ) * 1000;
+//    auto tm = *std::localtime ( &t );
+//    constexpr int bufsize = 256;
+//    char buf[bufsize];
+//
+//    // Beware! an invalid timestamp string crashes windows apps.
+//    // so we have to filter out %i (which is not supported by vs)
+//    // earlier.
+//    std::string timeFormat = "%Y-%m-%d %H:%M:%S.%i";
+//    ofStringReplace ( timeFormat, "%i", ofToString ( ms, 3, '0' ) );
+//
+//    if ( strftime ( buf, bufsize, timeFormat.c_str ( ), &tm ) != 0 )
+//    {
+//        str << buf;
+//    }
+//    auto ret = str.str ( );
+//
+//    return ret;
+//}
 
 // -------------------------------------------------------------------------
 // -------------------------- LogDisplay -----------------------------------
