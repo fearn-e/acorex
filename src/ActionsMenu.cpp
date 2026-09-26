@@ -130,17 +130,79 @@ void ActionsMenu::AnalyserAction ( string& dropdownName )
 {
     int selectedAction = mAnalyserActionsDropdown->getSelectedOptionIndex ( );
     mAnalyserActionsDropdown->deselect ( );
+    switch ( selectedAction )
+    {
+    case AnalyserAction::NONE:
+        //nothing selected, skip
+        break;
+    case AnalyserAction::ANALYSE:
 
+        ofLogWarning ( "ActionsMenu" ) << "This action is as of yet not implemented.";
+        break;
+    case AnalyserAction::REDUCE:
+
+        ofLogWarning ( "ActionsMenu" ) << "This action is as of yet not implemented.";
+        break;
+    case AnalyserAction::CANCEL:
+        //TODO.67
+        ofLogWarning ( "ActionsMenu" ) << "This action is as of yet not implemented.";
+        break;
+    default:
+        ofLogError ( "ActionsMenu" ) << "Undefined analyser action: " << selectedAction << ", \"" << mAnalyserActionsDropdown->getAllSelected ( )[0] << "\"";
+        break;
+    }
+
+    return;
 }
 void ActionsMenu::ExplorerAction ( string& dropdownName )
 {
     int selectedAction = mExplorerActionsDropdown->getSelectedOptionIndex ( );
     mExplorerActionsDropdown->deselect ( );
+    switch ( selectedAction )
+    {
+    case ExplorerAction::NONE:
+        //nothing selected, skip
+        break;
+    case ExplorerAction::OPEN_CORPUS:
 
+        ofLogWarning ( "ActionsMenu" ) << "This action is as of yet not implemented.";
+        break;
+    case ExplorerAction::CLOSE_CORPUS:
+        //TODO.TEMP - close corpus without having to open a new one
+        ofLogWarning ( "ActionsMenu" ) << "This action is as of yet not implemented.";
+        break;
+    case ExplorerAction::MIDI_TODO:
+        //TODO.66
+        ofLogWarning ( "ActionsMenu" ) << "This action is as of yet not implemented.";
+        break;
+    default:
+        ofLogError ( "ActionsMenu" ) << "Undefined explorer action: " << selectedAction << ", \"" << mExplorerActionsDropdown->getAllSelected ( )[0] << "\"";
+        break;
+    }
+
+    return;
 }
 void ActionsMenu::SettingsAction ( string& dropdownName )
 {
     int selectedAction = mSettingsActionsDropdown->getSelectedOptionIndex ( );
     mSettingsActionsDropdown->deselect ( );
+    switch ( selectedAction )
+    {
+    case SettingsAction::NONE:
+        //nothing selected, skip
+        break;
+    case SettingsAction::AUDIO_SETTINGS:
+        //TODO.TEMP - open audio settings menu? popout a second window? draw a window within the acorex window?
+        ofLogWarning ( "ActionsMenu" ) << "This action is as of yet not implemented.";
+        break;
+    case SettingsAction::DPI_TOGGLE:
+        //TODO.TEMP - toggle DPI here instead of ofApp
+        ofLogWarning ( "ActionsMenu" ) << "This action is as of yet not implemented.";
+        break;
+    default:
+        ofLogError ( "ActionsMenu" ) << "Undefined settings action: " << selectedAction << ", \"" << mSettingsActionsDropdown->getAllSelected ( )[0] << "\"";
+        break;
+    }
 
+    return;
 }
