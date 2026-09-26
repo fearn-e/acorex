@@ -57,9 +57,39 @@ void ActionsMenu::WindowResized ( )
 
 void ActionsMenu::AddListeners ( )
 {
-
+    if ( bListenersAdded )
+    { return; }
+    bListenersAdded = true;
+    ofAddListener ( mAnalyserActionsDropdown->dropdownHidden_E, this, &ActionsMenu::AnalyserAction );
+    ofAddListener ( mExplorerActionsDropdown->dropdownHidden_E, this, &ActionsMenu::ExplorerAction );
+    ofAddListener ( mSettingsActionsDropdown->dropdownHidden_E, this, &ActionsMenu::SettingsAction );
 }
 void ActionsMenu::RemoveListeners ( )
 {
+    if ( !bListenersAdded )
+    { return; }
+    bListenersAdded = false;
+    ofRemoveListener ( mAnalyserActionsDropdown->dropdownHidden_E, this, &ActionsMenu::AnalyserAction );
+    ofRemoveListener ( mExplorerActionsDropdown->dropdownHidden_E, this, &ActionsMenu::ExplorerAction );
+    ofRemoveListener ( mSettingsActionsDropdown->dropdownHidden_E, this, &ActionsMenu::SettingsAction );
+}
+
+
+void ActionsMenu::AnalyserAction ( string& dropdownName )
+{
+    int selectedAction = mAnalyserActionsDropdown->getSelectedOptionIndex ( );
+    mAnalyserActionsDropdown->deselect ( );
+
+}
+void ActionsMenu::ExplorerAction ( string& dropdownName )
+{
+    int selectedAction = mExplorerActionsDropdown->getSelectedOptionIndex ( );
+    mExplorerActionsDropdown->deselect ( );
+
+}
+void ActionsMenu::SettingsAction ( string& dropdownName )
+{
+    int selectedAction = mSettingsActionsDropdown->getSelectedOptionIndex ( );
+    mSettingsActionsDropdown->deselect ( );
 
 }

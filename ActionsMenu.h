@@ -18,6 +18,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Utilities/InterfaceDefs.h"
 
+#include <ofxGui.h>
+#include <ofxDropdown.h>
+
 namespace Acorex {
 
 class ActionsMenu {
@@ -41,6 +44,16 @@ private:
     bool bListenersAdded;
     void AddListeners ( );
     void RemoveListeners ( );
+
+    void AnalyserAction ( string& dropdownName );
+    void ExplorerAction ( string& dropdownName );
+    void SettingsAction ( string& dropdownName );
+
+    // Menu Controls / Dropdowns ---------------------
+
+    unique_ptr<ofxDropdown> mAnalyserActionsDropdown;
+    unique_ptr<ofxDropdown> mExplorerActionsDropdown;
+    unique_ptr<ofxDropdown> mSettingsActionsDropdown;
 
     // Acorex Objects --------------------------------
 
