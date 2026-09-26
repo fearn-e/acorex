@@ -143,8 +143,8 @@ private:
 
     // File Paths ---------------------------------
 
-    std::string inputPath;
-    std::string outputPath;
+    std::string mInputPath;
+    std::string mOutputPath;
 
     // Panels -------------------------------------
 

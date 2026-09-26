@@ -30,7 +30,7 @@ AnalyserMenu::AnalyserMenu ( ) :    bListenersAddedMain ( false ), bListenersAdd
                                     bReductionInputSelected ( false ), bReductionOutputSelected ( false ),
                                     bInvalidPulseFileSelects ( false ), bInvalidPulseAnalysisToggles ( false ),
                                     bInvalidPulseReductionDimensions ( false ), mInvalidPulseColour ( 255 ),
-                                    mCurrentDimensionCount ( 0 ), inputPath ( "" ), outputPath ( "" )
+                                    mCurrentDimensionCount ( 0 ), mInputPath ( "" ), mOutputPath ( "" )
 { }
 
 // initial state is a blank slate - Open ( ) must be called to actually load anything
@@ -50,7 +50,7 @@ void AnalyserMenu::Initialise ( )
 
     mCurrentDimensionCount = 0;
 
-    inputPath = ""; outputPath = "";
+    mInputPath = ""; mOutputPath = "";
 
     RemoveListenersMain ( );
     RemoveListenersAnalysis ( );
@@ -582,11 +582,11 @@ void AnalyserMenu::Analyse ( )
     {
         Utilities::AnalysisSettings settings;
         PackSettingsFromUser ( settings );
-        success = mController.CreateCorpus ( inputPath, outputPath, settings );
+        success = mController.CreateCorpus ( mInputPath, mOutputPath, settings );
     }
     else
     {
-        success = mController.InsertIntoCorpus ( inputPath, outputPath, mAnalysisInsertionReplaceWithNewToggle );
+        success = mController.InsertIntoCorpus ( mInputPath, mOutputPath, mAnalysisInsertionReplaceWithNewToggle );
     }
 
     bProcessing = false;
@@ -626,7 +626,7 @@ void AnalyserMenu::Reduce ( )
     bool success = false;
     Utilities::ReductionSettings settings;
     PackSettingsFromUser ( settings );
-    success = mController.ReduceCorpus ( inputPath, outputPath, settings );
+    success = mController.ReduceCorpus ( mInputPath, mOutputPath, settings );
 
     bProcessing = false;
 
@@ -663,7 +663,7 @@ void AnalyserMenu::SelectAnalysisDirectory ( )
         return;
     }
 
-    inputPath = audioDirectory.getPath ( );
+    mInputPath = audioDirectory.getPath ( );
     mAnalysisDirectoryLabel = audioDirectory.getName ( );
     bAnalysisDirectorySelected = true;
 }
@@ -716,7 +716,7 @@ void AnalyserMenu::SelectAnalysisOutputFile ( )
     }
 
     ToggleAnalysisUILockout ( bInsertingIntoCorpus );
-    outputPath = outputFile.getPath ( );
+    mOutputPath = outputFile.getPath ( );
     mAnalysisOutputLabel = outputFile.getName ( );
     bAnalysisOutputSelected = true;
 }
@@ -755,7 +755,7 @@ void AnalyserMenu::SelectReductionInputFile ( )
     }
 
     UnpackSettingsFromFile ( settings );
-    inputPath = inputFile.getPath ( );
+    mInputPath = inputFile.getPath ( );
     mReductionInputLabel = inputFile.getName ( );
     bReductionInputSelected = true; 
 }
@@ -781,7 +781,7 @@ void AnalyserMenu::SelectReductionOutputFile ( )
         outputFile.fileName += ".json";
     }
 
-    outputPath = outputFile.getPath ( );
+    mOutputPath = outputFile.getPath ( );
     mReductionOutputLabel = outputFile.getName ( );
     bReductionOutputSelected = true;
 }
