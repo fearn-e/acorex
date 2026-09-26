@@ -53,8 +53,8 @@ ExplorerMenu::ExplorerMenu ( ) :    mSlowUpdateInterval ( 100 ), mOpenCorpusButt
 void ExplorerMenu::Initialise ( )
 {
     Clear ( );
-
-    OpenStartupPanel ( );
+    
+    //OpenStartupPanel ( );
 }
 
 void ExplorerMenu::Clear ( )

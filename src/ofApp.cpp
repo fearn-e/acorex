@@ -54,10 +54,14 @@ void ofApp::setup ( )
 
     mLogDisplay->Initialise ( );
 
+    //TODO.TEMP - reorganise these - how much of this actually needs to happen here
     mAnalyserMenu.Initialise ( );
-
-    // opens startup panel
     mExplorerMenu.Initialise ( );
+    //analyser does a lot of stuff that should happen in the contructor/clear functions
+    //explorer only calls Clear and then opens the Startup panel
+    //Startup panel only has Open Corpus button and audio settings - both of these are moving to ActionsMenu
+    //therefore startup panel does not need to exist now
+    //redo ExplorerMenu "state machine"
 
     mActionsMenu.Initialise ( );
 }
