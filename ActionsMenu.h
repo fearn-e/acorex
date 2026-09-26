@@ -16,6 +16,36 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
+#include "Utilities/InterfaceDefs.h"
+
 namespace Acorex {
+
+class ActionsMenu {
+public:
+    ActionsMenu ( );
+    ~ActionsMenu ( ) { }
+
+    void Initialise ( );
+
+    void Draw ( );
+    void Update ( );
+
+    void Exit ( );
+
+    void RefreshUI ( );
+    void WindowResized ( );
+
+    void SetMenuLayout ( std::shared_ptr<Utilities::MenuLayout>& menuLayout ) { mLayout = menuLayout; }
+
+private:
+    bool bListenersAdded;
+    void AddListeners ( );
+    void RemoveListeners ( );
+
+    // Acorex Objects --------------------------------
+
+    Utilities::Colors mColors;
+    std::shared_ptr<Utilities::MenuLayout> mLayout;
+};
 
 } // namespace Acorex
