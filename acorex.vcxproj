@@ -200,6 +200,7 @@
     <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscParameterSync.cpp" />
     <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscReceiver.cpp" />
     <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscSender.cpp" />
+    <ClCompile Include="ActionsMenu.cpp" />
     <ClCompile Include="src\Explorer\AudioPlayback.cpp" />
     <ClCompile Include="src\Explorer\PointPicker.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -267,6 +268,7 @@
     <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOscParameterSync.h" />
     <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOscReceiver.h" />
     <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOscSender.h" />
+    <ClInclude Include="ActionsMenu.h" />
     <ClInclude Include="src\Explorer\AudioPlayback.h" />
     <ClInclude Include="src\Explorer\PointPicker.h" />
     <ClInclude Include="src\Explorer\SpaceDefs.h" />

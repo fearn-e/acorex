@@ -172,6 +172,9 @@
     <ClCompile Include="src\Versioning.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="ActionsMenu.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -471,6 +474,9 @@
       <Filter>addons\ofxOsc\libs\oscpack\osc</Filter>
     </ClInclude>
     <ClInclude Include="src\Versioning.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionsMenu.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
