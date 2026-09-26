@@ -16,6 +16,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Explorer/RawView.h"
 
+#include "Utilities/JSON.h"
+
 #include <flucoma/data/TensorTypes.hpp>
 #include <ofSoundBuffer.h>
 #include <ofSystemUtils.h>

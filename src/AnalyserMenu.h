@@ -18,7 +18,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include "Analyser/Controller.h"
 #include "Utilities/Data.h"
-#include "Utilities/JSON.h"
 #include "Utilities/InterfaceDefs.h"
 
 #include <ofxGui.h>
