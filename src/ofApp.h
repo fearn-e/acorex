@@ -16,6 +16,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #pragma once
 
+#include "ActionsMenu.h"
 #include "AnalyserMenu.h"
 #include "ExplorerMenu.h"
 #include "Utilities/InterfaceDefs.h"

@@ -28,7 +28,47 @@ void ActionsMenu::Initialise ( )
     bDraw = false;
     RemoveListeners ( );
 
+    ActionStrings actionStrings;
 
+    int actionWidths = 180, actionHeights = mLayout->getTopBarHeight ( );
+    int actionsY = 0;
+    int analyserX = 0, explorerX = 200, settingsX = 400;
+
+    // Analyser Actions Dropdown
+    mAnalyserActionsDropdown.reset ( );
+    mAnalyserActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>("Analyser"), Utilities::ofxDropdownScrollSpeed );
+    for ( auto& action : actionStrings.analyser ) { mAnalyserActionsDropdown->add ( action ); }
+    mAnalyserActionsDropdown->setPosition ( analyserX, actionsY );
+    mAnalyserActionsDropdown->setSize ( actionWidths, actionHeights );
+    mAnalyserActionsDropdown->disableMultipleSelection ( );
+    mAnalyserActionsDropdown->enableCollapseOnSelection ( );
+    mAnalyserActionsDropdown->setDropDownPosition ( ofxDropdown::DD_BELOW );
+    mAnalyserActionsDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mAnalyserActionsDropdown->deselect ( );
+
+    // Explorer Actions Dropdown
+    mExplorerActionsDropdown.reset ( );
+    mExplorerActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>("Explorer"), Utilities::ofxDropdownScrollSpeed );
+    for ( auto& action : actionStrings.explorer ) { mExplorerActionsDropdown->add ( action ); }
+    mExplorerActionsDropdown->setPosition ( explorerX, actionsY );
+    mExplorerActionsDropdown->setSize ( actionWidths, actionHeights );
+    mExplorerActionsDropdown->disableMultipleSelection ( );
+    mExplorerActionsDropdown->enableCollapseOnSelection ( );
+    mExplorerActionsDropdown->setDropDownPosition ( ofxDropdown::DD_BELOW );
+    mExplorerActionsDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mExplorerActionsDropdown->deselect ( );
+
+    // Settings Actions Dropdown
+    mSettingsActionsDropdown.reset ( );
+    mSettingsActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>("Settings"), Utilities::ofxDropdownScrollSpeed );
+    for ( auto& action : actionStrings.settings ) { mSettingsActionsDropdown->add ( action ); }
+    mSettingsActionsDropdown->setPosition ( settingsX, actionsY );
+    mSettingsActionsDropdown->setSize ( actionWidths, actionHeights );
+    mSettingsActionsDropdown->disableMultipleSelection ( );
+    mSettingsActionsDropdown->enableCollapseOnSelection ( );
+    mSettingsActionsDropdown->setDropDownPosition ( ofxDropdown::DD_BELOW );
+    mSettingsActionsDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
+    mSettingsActionsDropdown->deselect ( );
 
     AddListeners ( );
     bDraw = true;
@@ -40,6 +80,9 @@ void ActionsMenu::Draw ( )
     if ( !bDraw )
     { return; }
 
+    mAnalyserActionsDropdown->draw ( );
+    mExplorerActionsDropdown->draw ( );
+    mSettingsActionsDropdown->draw ( );
 }
 void ActionsMenu::Update ( )
 {

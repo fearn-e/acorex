@@ -21,7 +21,61 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 #include <ofxGui.h>
 #include <ofxDropdown.h>
 
+#include <string>
+
 namespace Acorex {
+
+struct AnalyserAction {
+    enum Type : int {
+        NONE = -1,
+        ANALYSE = 0,
+        REDUCE = 1,
+        CANCEL = 2,
+        ACTION_COUNT = 3
+    };
+};
+
+struct ExplorerAction {
+    enum Type : int {
+        NONE = -1,
+        OPEN_CORPUS = 0,
+        CLOSE_CORPUS = 1,
+        ACTION_COUNT = 2
+    };
+};
+
+struct SettingsAction {
+    enum Type : int {
+        NONE = -1,
+        AUDIO_SETTINGS = 0,
+        DPI_TOGGLE = 1,
+        ACTION_COUNT = 2
+    };
+};
+
+struct ActionStrings {
+    ActionStrings ( )
+    {
+        analyser.resize ( AnalyserAction::ACTION_COUNT );
+        explorer.resize ( ExplorerAction::ACTION_COUNT );
+        settings.resize ( SettingsAction::ACTION_COUNT );
+
+        analyser[AnalyserAction::ANALYSE] = "Analyse";
+        analyser[AnalyserAction::REDUCE] = "Reduce";
+        analyser[AnalyserAction::CANCEL] = "Cancel";
+
+        explorer[ExplorerAction::OPEN_CORPUS] = "Open Corpus";
+        explorer[ExplorerAction::CLOSE_CORPUS] = "Close Corpus";
+
+        settings[SettingsAction::AUDIO_SETTINGS] = "Audio Settings";
+        settings[SettingsAction::DPI_TOGGLE] = "DPI Toggle";
+
+    }
+
+    std::vector<std::string> analyser;
+    std::vector<std::string> explorer;
+    std::vector<std::string> settings;
+};
 
 class ActionsMenu {
 public:
