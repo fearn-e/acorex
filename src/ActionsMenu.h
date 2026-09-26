@@ -40,7 +40,8 @@ struct ExplorerAction {
         NONE = -1,
         OPEN_CORPUS = 0,
         CLOSE_CORPUS = 1,
-        ACTION_COUNT = 2
+        MIDI_TODO = 2,
+        ACTION_COUNT = 3
     };
 };
 
@@ -66,6 +67,7 @@ struct ActionStrings {
 
         explorer[ExplorerAction::OPEN_CORPUS] = "Open Corpus";
         explorer[ExplorerAction::CLOSE_CORPUS] = "Close Corpus";
+        explorer[ExplorerAction::MIDI_TODO] = "MIDI_HUB_ACTION_UNFINISHED";
 
         settings[SettingsAction::AUDIO_SETTINGS] = "Audio Settings";
         settings[SettingsAction::DPI_TOGGLE] = "DPI Toggle";
