@@ -114,6 +114,13 @@ set -o errexit
             rm .clang-format
             echo "removed .clang-format from openframeworks"
         fi
+
+        # cd scripts
+
+        #TODO.65
+
+        # cd ..
+
         cd apps/myApps/acorex
     fi
 #
