@@ -29,6 +29,10 @@ ActionsMenu::ActionsMenu ( ) : bListenersAdded ( false ), bDraw ( false ), bNeed
 #define TEMP_EXPLORER_X 200
 #define TEMP_SETTINGS_X 400
 
+#define TEMP_ANALYSER_DROPDOWN "Analyser"
+#define TEMP_EXPLORER_DROPDOWN "Explorer"
+#define TEMP_SETTINGS_DROPDOWN "Settings"
+
 void ActionsMenu::Initialise ( )
 {
     bDraw = false;
@@ -50,7 +54,7 @@ void ActionsMenu::Initialise ( )
 
     // Analyser Actions Dropdown
     mAnalyserActionsDropdown.reset ( );
-    mAnalyserActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>("Analyser"), 0 );
+    mAnalyserActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>(TEMP_ANALYSER_DROPDOWN), 0 );
     for ( auto& action : actionStrings.analyser ) { mAnalyserActionsDropdown->add ( action ); }
     mAnalyserDropdownPanel.add ( mAnalyserActionsDropdown.get ( ) );
     //TODO.TEMP - try changing these
@@ -63,7 +67,7 @@ void ActionsMenu::Initialise ( )
 
     // Explorer Actions Dropdown
     mExplorerActionsDropdown.reset ( );
-    mExplorerActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>("Explorer"), 0 );
+    mExplorerActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>(TEMP_EXPLORER_DROPDOWN), 0 );
     for ( auto& action : actionStrings.explorer ) { mExplorerActionsDropdown->add ( action ); }
     mExplorerDropdownPanel.add ( mExplorerActionsDropdown.get ( ) );
     //TODO.TEMP - try changing these
@@ -76,7 +80,7 @@ void ActionsMenu::Initialise ( )
 
     // Settings Actions Dropdown
     mSettingsActionsDropdown.reset ( );
-    mSettingsActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>("Settings"), 0 );
+    mSettingsActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>(TEMP_SETTINGS_DROPDOWN), 0 );
     for ( auto& action : actionStrings.settings ) { mSettingsActionsDropdown->add ( action ); }
     mSettingsDropdownPanel.add ( mSettingsActionsDropdown.get ( ) );
     //TODO.TEMP - try changing these
@@ -167,6 +171,10 @@ void ActionsMenu::AddListeners ( )
     ofAddListener ( mAnalyserActionsDropdown->dropdownHidden_E, this, &ActionsMenu::AnalyserAction );
     ofAddListener ( mExplorerActionsDropdown->dropdownHidden_E, this, &ActionsMenu::ExplorerAction );
     ofAddListener ( mSettingsActionsDropdown->dropdownHidden_E, this, &ActionsMenu::SettingsAction );
+
+    ofAddListener ( mAnalyserActionsDropdown->dropdownWillShow_E, this, &ActionsMenu::HideDropdowns );
+    ofAddListener ( mExplorerActionsDropdown->dropdownWillShow_E, this, &ActionsMenu::HideDropdowns );
+    ofAddListener ( mSettingsActionsDropdown->dropdownWillShow_E, this, &ActionsMenu::HideDropdowns );
 }
 void ActionsMenu::RemoveListeners ( )
 {
@@ -176,6 +184,10 @@ void ActionsMenu::RemoveListeners ( )
     ofRemoveListener ( mAnalyserActionsDropdown->dropdownHidden_E, this, &ActionsMenu::AnalyserAction );
     ofRemoveListener ( mExplorerActionsDropdown->dropdownHidden_E, this, &ActionsMenu::ExplorerAction );
     ofRemoveListener ( mSettingsActionsDropdown->dropdownHidden_E, this, &ActionsMenu::SettingsAction );
+
+    ofRemoveListener ( mAnalyserActionsDropdown->dropdownWillShow_E, this, &ActionsMenu::HideDropdowns );
+    ofRemoveListener ( mExplorerActionsDropdown->dropdownWillShow_E, this, &ActionsMenu::HideDropdowns );
+    ofRemoveListener ( mSettingsActionsDropdown->dropdownWillShow_E, this, &ActionsMenu::HideDropdowns );
 }
 
 
@@ -258,4 +270,13 @@ void ActionsMenu::SettingsAction ( string& dropdownName )
     }
 
     return;
+}
+
+void ActionsMenu::HideDropdowns ( )
+{
+    //TODO.TEMP - THIS STILL DOESN'T WORK QUITE THAT WELL - clicking dropdown 1, then 2, works fine, but then clicking 1 again
+    // in the same sequence doesn't open 1, needs one more click. figure out another way.
+    mAnalyserActionsDropdown->hideDropdown ( false );
+    mExplorerActionsDropdown->hideDropdown ( false );
+    mSettingsActionsDropdown->hideDropdown ( false );
 }

@@ -105,6 +105,8 @@ private:
     void ExplorerAction ( string& dropdownName );
     void SettingsAction ( string& dropdownName );
 
+    void HideDropdowns ( );
+
     // States ----------------------------------------
 
     bool bDraw;
