@@ -49,6 +49,10 @@ private:
     void ExplorerAction ( string& dropdownName );
     void SettingsAction ( string& dropdownName );
 
+    // States ----------------------------------------
+
+    bool bDraw;
+
     // Menu Controls / Dropdowns ---------------------
 
     unique_ptr<ofxDropdown> mAnalyserActionsDropdown;

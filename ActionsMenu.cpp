@@ -18,19 +18,27 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
-ActionsMenu::ActionsMenu ( ) : bListenersAdded ( false )
+ActionsMenu::ActionsMenu ( ) : bListenersAdded ( false ), bDraw ( false )
 {
 
 }
 
 void ActionsMenu::Initialise ( )
 {
+    bDraw = false;
+    RemoveListeners ( );
 
+
+
+    AddListeners ( );
+    bDraw = true;
 }
 
 
 void ActionsMenu::Draw ( )
 {
+    if ( !bDraw )
+    { return; }
 
 }
 void ActionsMenu::Update ( )
@@ -41,7 +49,7 @@ void ActionsMenu::Update ( )
 
 void ActionsMenu::Exit ( )
 {
-
+    RemoveListeners ( );
 }
 
 
