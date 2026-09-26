@@ -90,6 +90,7 @@ void ofApp::update ( )
     }
 
     mLogDisplay->Update ( );
+    mAnalyserMenu.Update ( );
     mExplorerMenu.Update ( );
 }
 

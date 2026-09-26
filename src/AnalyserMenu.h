@@ -22,13 +22,14 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 #include <ofxGui.h>
 #include <ofSystemUtils.h>
+#include <mutex>
 
 namespace Acorex {
 
 class AnalyserMenu {
 public:
     AnalyserMenu ( );
-    ~AnalyserMenu ( ) { };
+    ~AnalyserMenu ( );
 
     void Initialise ( );
     void Open ( );
@@ -75,8 +76,14 @@ private:
 
     // Analyse and Reduce --------------------------
 
-    void Analyse ( );
+    void StartAnalysisThread ( );
+    void CheckAnalysisThread ( );
     void Reduce ( );
+    //void StartReductionThread ( );
+    //void CheckReductionThread ( );
+
+    bool ExistingProcessingThreads ( );
+    void KillProcessingThreads ( );
 
     // File Dialog Button Callbacks ----------------
 
@@ -97,10 +104,13 @@ private:
     void QuantiseHopFraction ( int& value );
     void AnalysisInsertionToggleChanged ( bool& value );
 
+    // Threading ----------------------------------
+
+    std::thread mProcessingThread;
+
     // State --------------------------------------
 
     bool bDraw;
-    bool bProcessing;
 
     bool bDrawMainPanel;
     bool bDrawAnalysisPanel;

@@ -28,6 +28,8 @@ bool Analyser::Controller::CreateCorpus ( const std::string& inputPath, const st
 {
     bool success;
 
+    ofLogFatalError ( "DEBUG_TEST_THREADING" ) << "LOG FROM INSIDE THREAD CreateCorpus ( )";
+
     Utilities::DataSet dataset;
 
     dataset.analysisSettings = settings;
