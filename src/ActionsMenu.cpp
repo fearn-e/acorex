@@ -30,6 +30,7 @@ void ActionsMenu::Initialise ( )
 
     ActionStrings actionStrings;
 
+    //TODO.TEMP - add these values to interfacedefs
     int actionWidths = 180, actionHeights = mLayout->getTopBarHeight ( );
     int actionsY = 0;
     int analyserX = 0, explorerX = 200, settingsX = 400;
@@ -98,8 +99,24 @@ void ActionsMenu::Exit ( )
 
 void ActionsMenu::RefreshUI ( )
 {
+    //TODO.TEMP - add these values to interfacedefs
+    int actionWidths = 180, actionHeights = mLayout->getTopBarHeight ( );
+    int actionsY = 0;
+    int analyserX = 0, explorerX = 200, settingsX = 400;
 
+    mAnalyserActionsDropdown->setPosition ( analyserX, actionsY );
+    mAnalyserActionsDropdown->setSize ( actionWidths, actionHeights );
+    mAnalyserActionsDropdown->sizeChangedCB ( );
+
+    mExplorerActionsDropdown->setPosition ( explorerX, actionsY );
+    mExplorerActionsDropdown->setSize ( actionWidths, actionHeights );
+    mExplorerActionsDropdown->sizeChangedCB ( );
+
+    mSettingsActionsDropdown->setPosition ( settingsX, actionsY );
+    mSettingsActionsDropdown->setSize ( actionWidths, actionHeights );
+    mSettingsActionsDropdown->sizeChangedCB ( );
 }
+
 void ActionsMenu::WindowResized ( )
 {
 
