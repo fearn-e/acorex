@@ -58,6 +58,7 @@ private:
     std::shared_ptr<Acorex::Utilities::LogDisplay> mLogDisplay;
     std::shared_ptr<Acorex::Utilities::AcorexLoggerChannel> mLoggerChannel;
 
+    Acorex::ActionsMenu mActionsMenu;
     Acorex::AnalyserMenu mAnalyserMenu;
     Acorex::ExplorerMenu mExplorerMenu;
     std::shared_ptr<Acorex::Utilities::MenuLayout> mLayout;

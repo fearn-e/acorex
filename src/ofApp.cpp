@@ -29,6 +29,7 @@ ofApp::ofApp ( ) :
 
     mLayout = std::make_shared<Acorex::Utilities::MenuLayout> ( );
     mLogDisplay->SetMenuLayout ( mLayout );
+    mActionsMenu.SetMenuLayout ( mLayout );
     mAnalyserMenu.SetMenuLayout ( mLayout );
     mExplorerMenu.SetMenuLayout ( mLayout );
 }
@@ -57,11 +58,14 @@ void ofApp::setup ( )
 
     // opens startup panel
     mExplorerMenu.Initialise ( );
+
+    mActionsMenu.Initialise ( );
 }
 
 //TODO.12
 void ofApp::InitialiseMidiHub ( )
 {
+    mActionsMenu.Exit ( );
     mAnalyserMenu.Close ( );
     mAnalyserMenu.Exit ( );
     mExplorerMenu.Close ( );
@@ -114,6 +118,7 @@ void ofApp::draw ( )
         return;
     }
 
+    mActionsMenu.Draw ( );
     mAnalyserMenu.Draw ( );
     mExplorerMenu.Draw ( );
 
@@ -137,6 +142,7 @@ void ofApp::draw ( )
 void ofApp::exit ( )
 {
     mLogDisplay->Exit ( );
+    mActionsMenu.Exit ( );
     mAnalyserMenu.Exit ( );
     mExplorerMenu.Exit ( );
     mMidiHub.Exit ( );
@@ -282,6 +288,7 @@ void ofApp::DPIToggled ( bool& value )
     else { ofxGuiDisableHiResDisplay ( ); }
 
     RefreshUI ( );
+    mActionsMenu.RefreshUI ( );
     mExplorerMenu.RefreshUI ( );
     mAnalyserMenu.RefreshUI ( );
 }
