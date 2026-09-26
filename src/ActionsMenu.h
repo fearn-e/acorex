@@ -108,8 +108,13 @@ private:
     // States ----------------------------------------
 
     bool bDraw;
+    bool bNeedDeselectActionDropdowns;
 
     // Menu Controls / Dropdowns ---------------------
+
+    ofxPanel mAnalyserDropdownPanel;
+    ofxPanel mExplorerDropdownPanel;
+    ofxPanel mSettingsDropdownPanel;
 
     unique_ptr<ofxDropdown> mAnalyserActionsDropdown;
     unique_ptr<ofxDropdown> mExplorerActionsDropdown;

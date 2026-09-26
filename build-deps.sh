@@ -135,7 +135,7 @@ echo "OS discovered as $currentOS"
     cd ../../../addons
 
     if [ ! -d "ofxDropdown" ]; then
-        git clone --depth 1 -b master https://github.com/fearn-e/ofxDropdown #master branch
+        git clone --depth 1 -b acorex-experimental https://github.com/fearn-e/ofxDropdown #master branch
         echo ""
     fi
 

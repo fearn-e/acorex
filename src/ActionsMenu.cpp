@@ -18,29 +18,43 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 using namespace Acorex;
 
-ActionsMenu::ActionsMenu ( ) : bListenersAdded ( false ), bDraw ( false )
+ActionsMenu::ActionsMenu ( ) : bListenersAdded ( false ), bDraw ( false ), bNeedDeselectActionDropdowns ( false )
 {
 
 }
+
+#define TEMP_ACTION_WIDTHS 180
+#define TEMP_ACTIONS_Y 50
+#define TEMP_ANALYSER_X 0
+#define TEMP_EXPLORER_X 200
+#define TEMP_SETTINGS_X 400
 
 void ActionsMenu::Initialise ( )
 {
     bDraw = false;
     RemoveListeners ( );
 
+    mAnalyserDropdownPanel.clear ( );
+    mAnalyserDropdownPanel.setup ( );
+
+    mExplorerDropdownPanel.clear ( );
+    mExplorerDropdownPanel.setup ( );
+    
+    mSettingsDropdownPanel.clear ( );
+    mSettingsDropdownPanel.setup ( );
+
     ActionStrings actionStrings;
 
     //TODO.TEMP - add these values to interfacedefs
-    int actionWidths = 180, actionHeights = mLayout->getTopBarHeight ( );
-    int actionsY = 0;
-    int analyserX = 0, explorerX = 200, settingsX = 400;
+    int actionHeights = mLayout->getTopBarHeight ( );
 
     // Analyser Actions Dropdown
     mAnalyserActionsDropdown.reset ( );
-    mAnalyserActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>("Analyser"), Utilities::ofxDropdownScrollSpeed );
+    mAnalyserActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>("Analyser"), 0 );
     for ( auto& action : actionStrings.analyser ) { mAnalyserActionsDropdown->add ( action ); }
-    mAnalyserActionsDropdown->setPosition ( analyserX, actionsY );
-    mAnalyserActionsDropdown->setSize ( actionWidths, actionHeights );
+    mAnalyserDropdownPanel.add ( mAnalyserActionsDropdown.get ( ) );
+    //TODO.TEMP - try changing these
+    //mAnalyserActionsDropdown->setSize ( actionWidths, actionHeights );
     mAnalyserActionsDropdown->disableMultipleSelection ( );
     mAnalyserActionsDropdown->enableCollapseOnSelection ( );
     mAnalyserActionsDropdown->setDropDownPosition ( ofxDropdown::DD_BELOW );
@@ -49,10 +63,11 @@ void ActionsMenu::Initialise ( )
 
     // Explorer Actions Dropdown
     mExplorerActionsDropdown.reset ( );
-    mExplorerActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>("Explorer"), Utilities::ofxDropdownScrollSpeed );
+    mExplorerActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>("Explorer"), 0 );
     for ( auto& action : actionStrings.explorer ) { mExplorerActionsDropdown->add ( action ); }
-    mExplorerActionsDropdown->setPosition ( explorerX, actionsY );
-    mExplorerActionsDropdown->setSize ( actionWidths, actionHeights );
+    mExplorerDropdownPanel.add ( mExplorerActionsDropdown.get ( ) );
+    //TODO.TEMP - try changing these
+    //mExplorerActionsDropdown->setSize ( actionWidths, actionHeights );
     mExplorerActionsDropdown->disableMultipleSelection ( );
     mExplorerActionsDropdown->enableCollapseOnSelection ( );
     mExplorerActionsDropdown->setDropDownPosition ( ofxDropdown::DD_BELOW );
@@ -61,15 +76,28 @@ void ActionsMenu::Initialise ( )
 
     // Settings Actions Dropdown
     mSettingsActionsDropdown.reset ( );
-    mSettingsActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>("Settings"), Utilities::ofxDropdownScrollSpeed );
+    mSettingsActionsDropdown = make_unique<ofxDropdown> ( static_cast<std::string>("Settings"), 0 );
     for ( auto& action : actionStrings.settings ) { mSettingsActionsDropdown->add ( action ); }
-    mSettingsActionsDropdown->setPosition ( settingsX, actionsY );
-    mSettingsActionsDropdown->setSize ( actionWidths, actionHeights );
+    mSettingsDropdownPanel.add ( mSettingsActionsDropdown.get ( ) );
+    //TODO.TEMP - try changing these
+    //mSettingsActionsDropdown->setSize ( actionWidths, actionHeights );
     mSettingsActionsDropdown->disableMultipleSelection ( );
     mSettingsActionsDropdown->enableCollapseOnSelection ( );
     mSettingsActionsDropdown->setDropDownPosition ( ofxDropdown::DD_BELOW );
     mSettingsActionsDropdown->setBackgroundColor ( mColors.interfaceBackgroundColor );
     mSettingsActionsDropdown->deselect ( );
+
+    mAnalyserDropdownPanel.setPosition ( TEMP_ANALYSER_X, TEMP_ACTIONS_Y );
+    mAnalyserDropdownPanel.setWidthElements ( TEMP_ACTION_WIDTHS );
+    mAnalyserDropdownPanel.disableHeader ( );
+
+    mExplorerDropdownPanel.setPosition ( TEMP_EXPLORER_X, TEMP_ACTIONS_Y );
+    mExplorerDropdownPanel.setWidthElements ( TEMP_ACTION_WIDTHS );
+    mExplorerDropdownPanel.disableHeader ( );
+
+    mSettingsDropdownPanel.setPosition ( TEMP_SETTINGS_X, TEMP_ACTIONS_Y );
+    mSettingsDropdownPanel.setWidthElements ( TEMP_ACTION_WIDTHS );
+    mSettingsDropdownPanel.disableHeader ( );
 
     AddListeners ( );
     bDraw = true;
@@ -81,13 +109,20 @@ void ActionsMenu::Draw ( )
     if ( !bDraw )
     { return; }
 
-    mAnalyserActionsDropdown->draw ( );
-    mExplorerActionsDropdown->draw ( );
-    mSettingsActionsDropdown->draw ( );
+    mAnalyserDropdownPanel.draw ( );
+    mExplorerDropdownPanel.draw ( );
+    mSettingsDropdownPanel.draw ( );
 }
 void ActionsMenu::Update ( )
 {
-
+    if ( bNeedDeselectActionDropdowns )
+    {
+        ofLogFatalError ( "ActionsMenu" ) << "Deselecting dropdowns.";
+        bNeedDeselectActionDropdowns = false;
+        mAnalyserActionsDropdown->deselect ( );
+        mExplorerActionsDropdown->deselect ( );
+        mSettingsActionsDropdown->deselect ( );
+    }
 }
 
 
@@ -100,21 +135,22 @@ void ActionsMenu::Exit ( )
 void ActionsMenu::RefreshUI ( )
 {
     //TODO.TEMP - add these values to interfacedefs
-    int actionWidths = 180, actionHeights = mLayout->getTopBarHeight ( );
-    int actionsY = 0;
-    int analyserX = 0, explorerX = 200, settingsX = 400;
+    int actionHeights = mLayout->getTopBarHeight ( );
 
-    mAnalyserActionsDropdown->setPosition ( analyserX, actionsY );
-    mAnalyserActionsDropdown->setSize ( actionWidths, actionHeights );
-    mAnalyserActionsDropdown->sizeChangedCB ( );
+    mAnalyserDropdownPanel.setPosition ( TEMP_ANALYSER_X, TEMP_ACTIONS_Y );
+    mAnalyserActionsDropdown->setSize ( TEMP_ACTION_WIDTHS, actionHeights );
+    mAnalyserDropdownPanel.setWidthElements ( TEMP_ACTION_WIDTHS );
+    mAnalyserDropdownPanel.sizeChangedCB ( );
 
-    mExplorerActionsDropdown->setPosition ( explorerX, actionsY );
-    mExplorerActionsDropdown->setSize ( actionWidths, actionHeights );
-    mExplorerActionsDropdown->sizeChangedCB ( );
+    mExplorerDropdownPanel.setPosition ( TEMP_EXPLORER_X, TEMP_ACTIONS_Y );
+    mExplorerActionsDropdown->setSize ( TEMP_ACTION_WIDTHS, actionHeights );
+    mExplorerDropdownPanel.setWidthElements ( TEMP_ACTION_WIDTHS );
+    mExplorerDropdownPanel.sizeChangedCB ( );
 
-    mSettingsActionsDropdown->setPosition ( settingsX, actionsY );
-    mSettingsActionsDropdown->setSize ( actionWidths, actionHeights );
-    mSettingsActionsDropdown->sizeChangedCB ( );
+    mSettingsDropdownPanel.setPosition ( TEMP_SETTINGS_X, TEMP_ACTIONS_Y );
+    mSettingsActionsDropdown->setSize ( TEMP_ACTION_WIDTHS, actionHeights );
+    mSettingsDropdownPanel.setWidthElements ( TEMP_ACTION_WIDTHS );
+    mSettingsDropdownPanel.sizeChangedCB ( );
 }
 
 void ActionsMenu::WindowResized ( )
@@ -146,7 +182,7 @@ void ActionsMenu::RemoveListeners ( )
 void ActionsMenu::AnalyserAction ( string& dropdownName )
 {
     int selectedAction = mAnalyserActionsDropdown->getSelectedOptionIndex ( );
-    mAnalyserActionsDropdown->deselect ( );
+    bNeedDeselectActionDropdowns = true;
     switch ( selectedAction )
     {
     case AnalyserAction::NONE:
@@ -174,7 +210,7 @@ void ActionsMenu::AnalyserAction ( string& dropdownName )
 void ActionsMenu::ExplorerAction ( string& dropdownName )
 {
     int selectedAction = mExplorerActionsDropdown->getSelectedOptionIndex ( );
-    mExplorerActionsDropdown->deselect ( );
+    bNeedDeselectActionDropdowns = true;
     switch ( selectedAction )
     {
     case ExplorerAction::NONE:
@@ -202,7 +238,7 @@ void ActionsMenu::ExplorerAction ( string& dropdownName )
 void ActionsMenu::SettingsAction ( string& dropdownName )
 {
     int selectedAction = mSettingsActionsDropdown->getSelectedOptionIndex ( );
-    mSettingsActionsDropdown->deselect ( );
+    bNeedDeselectActionDropdowns = true;
     switch ( selectedAction )
     {
     case SettingsAction::NONE:
